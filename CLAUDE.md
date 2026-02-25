@@ -81,31 +81,22 @@ O script tenta consultar tanto por coluna `symbol` quanto `ticker`, e testa vari
 
 ## Metodologias de Valuation
 
-O modulo `scripts/valuation.ts` calcula o preco justo por 5 metodos e faz uma media ponderada:
+As paginas exibem 3 metodologias classicas de valuation com premissas ajustaveis:
 
-### 1. Fluxo de Caixa Descontado (DCF) — Peso padrao: 40%
-- Projeta FCF por 5 anos com crescimento de receita
-- Calcula valor terminal com crescimento perpetuo (Gordon)
-- Desconta a valor presente pelo WACC
-- Fair Value = (PV dos fluxos + PV do terminal + caixa - divida) / acoes
-
-### 2. Graham — Peso padrao: 20%
-- Formula: `sqrt(22.5 * LPA * VPA)`
+### 1. Graham (Value Investing)
+- Formula: `sqrt(maxPL * maxPVP * LPA * VPA) * (1 - margemSeguranca)`
+- Premissas ajustaveis: P/L maximo, P/VP maximo, margem de seguranca
 - Valor intrinseco baseado em lucro por acao e valor patrimonial
 
-### 3. EVA/MVA (Economic Value Added) — Peso padrao: 15%
-- NOPAT = EBIT projetado * (1 - IR)
-- EVA = NOPAT - (Capital Investido * WACC)
-- MVA = EVA / WACC
-- Fair Value = (Capital Investido + MVA - divida + caixa) / acoes
+### 2. Bazin (Dividendos)
+- Formula: `mediaDiv5anos / dividendYieldMinimo`
+- Premissas ajustaveis: DY minimo
+- Usa media de dividendos dos ultimos 5 anos
 
-### 4. Multiplos (P/L e EV/EBITDA setoriais) — Peso padrao: 15%
-- Calcula preco justo por P/L setorial e EV/EBITDA setorial
-- Media dos dois
-
-### 5. Gordon (DDM - Dividend Discount Model) — Peso padrao: 10%
-- D1 = EPS * (1 + g)
-- Fair Value = D1 / (Ke - g)
+### 3. Gordon (DDM - Dividend Discount Model)
+- Formula: `D1 / (taxaDesconto - crescimento)` onde D1 = DPA * (1 + g)
+- Premissas ajustaveis: taxa de desconto, taxa de crescimento
+- Avaliacao por desconto de dividendos futuros
 
 ### WACC
 - Ke (custo do equity) = Risk-Free Rate + Beta * Equity Risk Premium
@@ -121,27 +112,26 @@ O modulo `scripts/valuation.ts` calcula o preco justo por 5 metodos e faz uma me
 - Custo da divida: 16%
 - IR: 34%
 
-### Perfis de peso
-- **GROWTH:** DCF 50%, EVA 20%, Multiplos 20%, Graham 10%, Gordon 0%
-- **MATURE (padrao):** DCF 40%, Graham 20%, EVA 15%, Multiplos 15%, Gordon 10%
-- **DISTRESS:** DCF 40%, Multiplos 25%, Graham 20%, EVA 15%, Gordon 0%
+Cada metodo possui sliders/inputs interativos no HTML para que o usuario ajuste as premissas e veja o preco justo recalculado em tempo real (via JavaScript inline).
 
 ## Paginas de Ticker (/{TICKER}/index.html)
 
 Cada pagina gerada contem:
 
-1. **Header da empresa** — Ticker, nome, setor, preco atual, variacao dia/12m
-2. **Metricas de Mercado** — Market Cap, EV, acoes, volume, min/max 52 semanas
-3. **Metricas de Valuation** — P/L, P/VP, P/EBIT, PSR, EV/EBITDA, Div Yield, LPA, VPA
-4. **Rentabilidade & Margens** — ROE, ROIC, margem bruta/EBIT/EBITDA/liquida
-5. **Endividamento & Liquidez** — Div.Liq/EBITDA, Div.Bruta/PL, Liquidez Corrente
-6. **Card de Consenso** — Preco justo ponderado, upside, range min/max, WACC
-7. **Cards de Metodo** — Um card por metodologia com preco justo e upside
-8. **Resumo de Negocio** — Descricao longa da empresa (longBusinessSummary)
-9. **Demonstracoes Financeiras** — DRE, Balanco, Fluxo de Caixa, Dividendos (tabelas com 10 anos)
-10. **Matriz de Sensibilidade** — WACC vs crescimento perpetuo (5x5)
-11. **CTA** — Link para a plataforma paga
-12. **Disclaimer** — Aviso legal sobre IA e riscos
+1. **Nav** — Logo Brasil Horizonte (imagem) + divisor + iAcoes estilizado
+2. **Breadcrumb** — Navegacao hierarquica (Home > Acoes > TICKER)
+3. **Header da empresa** — Ticker, nome, setor, preco atual, variacao dia/12m
+4. **Metricas de Mercado** — Market Cap, EV, acoes, volume, min/max 52 semanas
+5. **Metricas de Valuation** — P/L, P/VP, P/EBIT, PSR, EV/EBITDA, Div Yield, LPA, VPA
+6. **Rentabilidade & Margens** — ROE, ROIC, margem bruta/EBIT/EBITDA/liquida
+7. **Endividamento & Liquidez** — Div.Liq/EBITDA, Div.Bruta/PL, Liquidez Corrente
+8. **Cards de Metodo** — Graham, Bazin, Gordon com premissas ajustaveis e preco justo
+9. **Resumo de Negocio** — Descricao longa da empresa (longBusinessSummary)
+10. **Nota Qualitativa** — Secao com paywall (conteudo blur + radar chart + CTA)
+11. **Demonstracoes Financeiras** — DRE, Balanco, Fluxo de Caixa, Dividendos (tabelas com 10 anos)
+12. **FAQ** — 4 perguntas frequentes dinamicas por ticker (Schema.org FAQPage)
+13. **CTA** — Link para a plataforma paga
+14. **Footer** — Logos BH + iAcoes, disclaimer legal
 
 ### SEO
 - `<title>`, `<meta description>`, `<meta keywords>`, OpenGraph tags
