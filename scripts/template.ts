@@ -74,32 +74,7 @@ const getYear = (d: string): string => {
 export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuation): string => {
   const f = data.fundamentals;
   const today = new Date().toLocaleDateString('pt-BR');
-  const descRaw = data.businessSummary
-    ? data.businessSummary.substring(0, 120).replace(/"/g, '&quot;')
-    : `${f.name} atua no setor de ${f.sector}`;
-  const desc = `${f.symbol} vale a pena? Preco justo de R$ ${fmt(grahamFV)} (Graham), R$ ${fmt(bazinFV)} (Bazin) e R$ ${fmt(gordonFV)} (Gordon). P/L ${fmtNum(f.pl)}, DY ${fmtPctShort(f.divYield)}, ROE ${fmtPctShort(f.roe)}. Analise fundamentalista completa.`;
-  const titleTag = `${f.symbol} Preco Justo e Valuation ${new Date().getFullYear()} | Analise Fundamentalista | iAcoes`;
-  const ogTitle = `${f.symbol} vale a pena? Preco Justo R$ ${fmt(grahamFV)} (Graham) | iAcoes`;
-
-  // FAQ data for SEO
-  const faqItems = [
-    {
-      q: `Qual o preco justo de ${f.symbol}?`,
-      a: `Segundo o metodo de Graham, o preco justo de ${f.symbol} e R$ ${fmt(grahamFV)}. Pelo metodo de Bazin (dividendos), o preco justo e R$ ${fmt(bazinFV)}. Pelo modelo de Gordon (DDM), o preco justo e R$ ${fmt(gordonFV)}. A cotacao atual e R$ ${fmt(f.price)}.`
-    },
-    {
-      q: `${f.symbol} esta cara ou barata?`,
-      a: `Com P/L de ${fmtNum(f.pl)} e P/VP de ${fmtNum(f.pvp)}, ${f.symbol} ${grahamFV > f.price ? 'esta sendo negociada abaixo do preco justo de Graham (R$ ' + fmt(grahamFV) + '), sugerindo que pode estar barata' : 'esta sendo negociada acima do preco justo de Graham (R$ ' + fmt(grahamFV) + '), sugerindo cautela'}. E importante considerar multiplas metodologias e o contexto do setor de ${f.sector}.`
-    },
-    {
-      q: `${f.symbol} paga bons dividendos?`,
-      a: `${f.symbol} possui Dividend Yield de ${fmtPctShort(f.divYield)}${divTTM > 0 ? ' e pagou R$ ' + fmt(divTTM) + ' por acao nos ultimos 12 meses' : ''}. ${bazinFV > 0 && bazinFV > f.price ? 'Pelo metodo de Bazin, a acao esta atrativa para dividendos, com preco justo de R$ ' + fmt(bazinFV) + '.' : 'Avalie o historico de pagamentos antes de investir focando em dividendos.'}`
-    },
-    {
-      q: `Quais os indicadores fundamentalistas de ${f.symbol}?`,
-      a: `Os principais indicadores de ${f.symbol} sao: P/L ${fmtNum(f.pl)}, P/VP ${fmtNum(f.pvp)}, ROE ${fmtPctShort(f.roe)}, ROIC ${fmtPctShort(f.roic)}, Margem Liquida ${fmtPctShort(f.netMargin)}, Div. Yield ${fmtPctShort(f.divYield)}, EV/EBITDA ${fmtNum(f.evEbitda)} e Div. Liq./EBITDA ${fmtNum(f.debtEbitda)}.`
-    }
-  ];
+  // desc, titleTag, ogTitle and faqItems are defined after graham/bazin/gordon calculations below
 
   // Prepare financial statements
   const incomeYearly = getYearlyData(data._rawIncome);
@@ -197,6 +172,29 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     }
   }
 
+  // SEO: meta description, title, FAQ
+  const desc = `${f.symbol} vale a pena? Preco justo de R$ ${fmt(grahamFV)} (Graham), R$ ${fmt(bazinFV)} (Bazin) e R$ ${fmt(gordonFV)} (Gordon). P/L ${fmtNum(f.pl)}, DY ${fmtPctShort(f.divYield)}, ROE ${fmtPctShort(f.roe)}. Analise fundamentalista completa.`;
+  const titleTag = `${f.symbol} Preco Justo e Valuation ${new Date().getFullYear()} | Analise Fundamentalista | iAcoes`;
+  const ogTitle = `${f.symbol} vale a pena? Preco Justo R$ ${fmt(grahamFV)} (Graham) | iAcoes`;
+  const faqItems = [
+    {
+      q: `Qual o preco justo de ${f.symbol}?`,
+      a: `Segundo o metodo de Graham, o preco justo de ${f.symbol} e R$ ${fmt(grahamFV)}. Pelo metodo de Bazin (dividendos), o preco justo e R$ ${fmt(bazinFV)}. Pelo modelo de Gordon (DDM), o preco justo e R$ ${fmt(gordonFV)}. A cotacao atual e R$ ${fmt(f.price)}.`
+    },
+    {
+      q: `${f.symbol} esta cara ou barata?`,
+      a: `Com P/L de ${fmtNum(f.pl)} e P/VP de ${fmtNum(f.pvp)}, ${f.symbol} ${grahamFV > f.price ? 'esta sendo negociada abaixo do preco justo de Graham (R$ ' + fmt(grahamFV) + '), sugerindo que pode estar barata' : 'esta sendo negociada acima do preco justo de Graham (R$ ' + fmt(grahamFV) + '), sugerindo cautela'}. E importante considerar multiplas metodologias e o contexto do setor de ${f.sector}.`
+    },
+    {
+      q: `${f.symbol} paga bons dividendos?`,
+      a: `${f.symbol} possui Dividend Yield de ${fmtPctShort(f.divYield)}${divTTM > 0 ? ' e pagou R$ ' + fmt(divTTM) + ' por acao nos ultimos 12 meses' : ''}. ${bazinFV > 0 && bazinFV > f.price ? 'Pelo metodo de Bazin, a acao esta atrativa para dividendos, com preco justo de R$ ' + fmt(bazinFV) + '.' : 'Avalie o historico de pagamentos antes de investir focando em dividendos.'}`
+    },
+    {
+      q: `Quais os indicadores fundamentalistas de ${f.symbol}?`,
+      a: `Os principais indicadores de ${f.symbol} sao: P/L ${fmtNum(f.pl)}, P/VP ${fmtNum(f.pvp)}, ROE ${fmtPctShort(f.roe)}, ROIC ${fmtPctShort(f.roic)}, Margem Liquida ${fmtPctShort(f.netMargin)}, Div. Yield ${fmtPctShort(f.divYield)}, EV/EBITDA ${fmtNum(f.evEbitda)} e Div. Liq./EBITDA ${fmtNum(f.debtEbitda)}.`
+    }
+  ];
+
   // Sensitivity matrix
   const matrix = val.sensitivityMatrix;
   let matrixHTML = '';
@@ -250,27 +248,85 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${f.symbol} — Analise Fundamentalista e Valuation | iAcoes by Brasil Horizonte</title>
+  <title>${titleTag}</title>
   <meta name="description" content="${desc}">
-  <meta name="keywords" content="${f.symbol},${f.name},valuation,analise fundamentalista,B3,acoes,preco justo,DCF,Graham,Gordon,EVA">
-  <meta property="og:title" content="${f.symbol} — Preco Justo ${fmtBRL(wfv)} | iAcoes">
+  <meta name="keywords" content="${f.symbol}, ${f.symbol} preco justo, ${f.symbol} vale a pena, ${f.symbol} dividendos, ${f.symbol} valuation, ${f.name}, analise fundamentalista ${f.symbol}, acoes ${f.sector}, B3, Graham, Bazin, Gordon">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <meta name="author" content="Brasil Horizonte">
+  <link rel="canonical" href="https://iacoes.com.br/${f.symbol}">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="${ogTitle}">
   <meta property="og:description" content="${desc}">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://iacoes.com.br/${f.symbol}">
-  <meta property="og:site_name" content="iAcoes — Brasil Horizonte">
-  <link rel="canonical" href="https://iacoes.com.br/${f.symbol}">
+  <meta property="og:site_name" content="iAcoes — Analise de Acoes | Brasil Horizonte">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="article:published_time" content="${new Date().toISOString()}">
+  <meta property="article:modified_time" content="${new Date().toISOString()}">
+  <meta property="article:section" content="Analise Fundamentalista">
+  <meta property="article:tag" content="${f.symbol}">
+  <meta property="article:tag" content="Valuation">
+  <meta property="article:tag" content="${f.sector}">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${ogTitle}">
+  <meta name="twitter:description" content="${desc}">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Schema.org: Article -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Article",
-    "headline": "${f.symbol} — Analise de Valuation",
+    "headline": "${f.symbol} — Preco Justo e Analise Fundamentalista ${new Date().getFullYear()}",
     "description": "${desc}",
     "datePublished": "${new Date().toISOString()}",
     "dateModified": "${new Date().toISOString()}",
-    "author": { "@type": "Organization", "name": "Brasil Horizonte" },
-    "publisher": { "@type": "Organization", "name": "iAcoes by Brasil Horizonte" }
+    "author": { "@type": "Organization", "name": "Brasil Horizonte", "url": "https://brasilhorizonte.com.br" },
+    "publisher": {
+      "@type": "Organization",
+      "name": "iAcoes by Brasil Horizonte",
+      "url": "https://iacoes.com.br"
+    },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://iacoes.com.br/${f.symbol}" },
+    "about": {
+      "@type": "FinancialProduct",
+      "name": "${f.symbol} - ${f.name}",
+      "category": "${f.sector}"
+    }
+  }
+  </script>
+
+  <!-- Schema.org: BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "iAcoes", "item": "https://iacoes.com.br/" },
+      { "@type": "ListItem", "position": 2, "name": "Acoes", "item": "https://iacoes.com.br/" },
+      { "@type": "ListItem", "position": 3, "name": "${f.symbol}", "item": "https://iacoes.com.br/${f.symbol}" }
+    ]
+  }
+  </script>
+
+  <!-- Schema.org: FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      ${faqItems.map(faq => `{
+        "@type": "Question",
+        "name": "${faq.q}",
+        "acceptedAnswer": { "@type": "Answer", "text": "${faq.a}" }
+      }`).join(',\n      ')}
+    ]
   }
   </script>
   <style>
@@ -737,6 +793,40 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     }
     .nota-card-sub { font-size: 0.7rem; color: #94a3b8; margin-top: 0.15rem; }
 
+    /* ============ BREADCRUMB ============ */
+    .breadcrumb {
+      max-width: 1100px; margin: 0 auto;
+      padding: 0.6rem 1.5rem;
+    }
+    .breadcrumb ol {
+      list-style: none; display: flex; gap: 0.3rem;
+      font-size: 0.7rem; color: #94a3b8;
+    }
+    .breadcrumb li::after { content: '/'; margin-left: 0.3rem; }
+    .breadcrumb li:last-child::after { content: ''; }
+    .breadcrumb a {
+      color: #64748b; text-decoration: none;
+    }
+    .breadcrumb a:hover { color: #B68F40; text-decoration: underline; }
+    .breadcrumb [aria-current="page"] { color: #0f172a; font-weight: 600; }
+
+    /* ============ FAQ ============ */
+    .faq-section { }
+    .faq-list { margin-top: 1rem; }
+    .faq-item {
+      border-bottom: 1px solid #e2e8f0;
+      padding: 1rem 0;
+    }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-question {
+      font-size: 0.95rem; font-weight: 700;
+      color: #0f172a; margin-bottom: 0.4rem;
+    }
+    .faq-answer {
+      font-size: 0.85rem; color: #475569;
+      line-height: 1.7;
+    }
+
     /* ============ RESPONSIVE ============ */
     @media (max-width: 1024px) {
       .metrics-grid { grid-template-columns: repeat(4, 1fr); }
@@ -774,9 +864,9 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
 <body>
 
 <!-- NAV -->
-<nav class="nav">
-  <a href="/" class="nav-brand">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#B68F40"/><text x="4" y="17" font-size="12" font-weight="800" fill="#041C24" font-family="sans-serif">BH</text></svg>
+<nav class="nav" aria-label="Navegacao principal">
+  <a href="/" class="nav-brand" aria-label="iAcoes - Pagina inicial">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" role="img" aria-label="Brasil Horizonte logo"><rect width="24" height="24" rx="6" fill="#B68F40"/><text x="4" y="17" font-size="12" font-weight="800" fill="#041C24" font-family="sans-serif">BH</text></svg>
     Brasil Horizonte
   </a>
   <div class="nav-links">
@@ -785,16 +875,26 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   </div>
 </nav>
 
-<div class="page">
+<!-- Breadcrumb -->
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <ol>
+    <li><a href="/">iAcoes</a></li>
+    <li><a href="/">Acoes</a></li>
+    <li aria-current="page">${f.symbol}</li>
+  </ol>
+</nav>
+
+<main class="page" role="main">
 
   <!-- COMPANY HEADER -->
-  <div class="company-header animate-in">
+  <article itemscope itemtype="https://schema.org/Article">
+  <header class="company-header animate-in">
     <div class="company-left">
-      <div class="company-symbol">
+      <h1 class="company-symbol">
         ${f.symbol} <span class="badge-type">${f.type}</span>
-      </div>
-      <div class="company-name">${f.name}</div>
-      <div class="company-sector">${f.sector} / ${f.subSector}</div>
+      </h1>
+      <p class="company-name">${f.name}</p>
+      <p class="company-sector">${f.sector} / ${f.subSector}</p>
     </div>
     <div class="company-right">
       <div class="price-label">Cotacao Atual</div>
@@ -805,11 +905,11 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       </div>
       <div class="price-date">Dados de ${today}</div>
     </div>
-  </div>
+  </header>
 
   <!-- MERCADO & ESTRUTURA -->
-  <div class="metrics-section animate-in">
-    <div class="section-legend">Mercado & Estrutura</div>
+  <section class="metrics-section animate-in" aria-label="Mercado e Estrutura">
+    <h2 class="section-legend">Mercado & Estrutura</h2>
     <div class="metrics-grid">
       ${metricBox('Valor de Mercado', fmtBig(f.marketCap))}
       ${metricBox('Valor da Firma (EV)', fmtBig(f.firmValue))}
@@ -818,11 +918,11 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       ${metricBox('Min. 52 Semanas', fmtBRL(f.min52Week))}
       ${metricBox('Max. 52 Semanas', fmtBRL(f.max52Week))}
     </div>
-  </div>
+  </section>
 
   <!-- VALUATION -->
-  <div class="metrics-section animate-in">
-    <div class="section-legend">Valuation</div>
+  <section class="metrics-section animate-in" aria-label="Indicadores de Valuation">
+    <h2 class="section-legend">Valuation</h2>
     <div class="metrics-grid">
       ${metricBox('P/L', fmtNum(f.pl, 2))}
       ${metricBox('P/VP', fmtNum(f.pvp, 2))}
@@ -834,11 +934,11 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       ${metricBox('LPA', fmtBRL(f.lpa))}
       ${metricBox('VPA', fmtBRL(f.vpa))}
     </div>
-  </div>
+  </section>
 
   <!-- RENTABILIDADE & MARGENS -->
-  <div class="metrics-section animate-in">
-    <div class="section-legend">Rentabilidade & Margens</div>
+  <section class="metrics-section animate-in" aria-label="Rentabilidade e Margens">
+    <h2 class="section-legend">Rentabilidade & Margens</h2>
     <div class="metrics-grid">
       ${metricBox('ROE', fmtPctShort(f.roe), colorClass(f.roe))}
       ${metricBox('ROIC', fmtPctShort(f.roic), colorClass(f.roic))}
@@ -847,20 +947,20 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       ${metricBox('Margem EBITDA', fmtPctShort(f.ebitdaMargin))}
       ${metricBox('Margem Liquida', fmtPctShort(f.netMargin), colorClass(f.netMargin))}
     </div>
-  </div>
+  </section>
 
   <!-- ENDIVIDAMENTO & LIQUIDEZ -->
-  <div class="metrics-section animate-in">
-    <div class="section-legend">Endividamento & Liquidez</div>
+  <section class="metrics-section animate-in" aria-label="Endividamento e Liquidez">
+    <h2 class="section-legend">Endividamento & Liquidez</h2>
     <div class="metrics-grid" style="grid-template-columns: repeat(3, 1fr);">
       ${metricBox('Div. Liq./EBITDA', fmtNum(f.debtEbitda, 2), colorClass(f.debtEbitda))}
       ${metricBox('Div. Bruta/Patrim.', fmtNum(f.debtEquity, 2))}
       ${metricBox('Liquidez Corrente', fmtNum(f.currentLiquidity, 2), colorClass(f.currentLiquidity))}
     </div>
-  </div>
+  </section>
 
   <!-- PRECO JUSTO (METODOS CLASSICOS) -->
-  <div class="methods-section animate-in">
+  <section class="methods-section animate-in" aria-label="Preco Justo - Metodos Classicos">
     <div class="section-header-row">
       <div>
         <h3 class="section-title font-playfair">Preco Justo (Metodos Classicos)</h3>
@@ -1024,14 +1124,14 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     <div class="methods-note">
       <strong>Nota:</strong> Graham foca em empresas com lucro e patrimonio solidos. Bazin e para empresas com dividendos estaveis. Gordon (DDM) assume crescimento perpetuo dos dividendos. Todos tem limitacoes e devem ser combinados com outras analises.
     </div>
-  </div>
+  </section>
 
   ${data.businessSummary ? `
   <!-- RESUMO DE NEGOCIO -->
-  <div class="section-card animate-in">
+  <section class="section-card animate-in" aria-label="Resumo de Negocio de ${f.symbol}">
     <div class="resumo-header">
       <div>
-        <div class="resumo-title">${f.symbol} — Visao de Negocio</div>
+        <h2 class="resumo-title">${f.symbol} — Visao de Negocio</h2>
         <div class="resumo-date">Atualizacao: ${today}</div>
       </div>
       <div class="resumo-badges">
@@ -1041,12 +1141,12 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       </div>
     </div>
     <p class="resumo-text">${data.businessSummary}</p>
-  </div>` : ''}
+  </section>` : ''}
 
   <!-- DEMONSTRACOES FINANCEIRAS -->
-  <div class="section-card animate-in">
+  <section class="section-card animate-in" aria-label="Demonstracoes Financeiras">
     <div class="section-header-row">
-      <h3 class="section-title font-playfair">Demonstracoes Financeiras</h3>
+      <h2 class="section-title font-playfair">Demonstracoes Financeiras</h2>
       <span class="section-sub">Dados historicos</span>
     </div>
 
@@ -1113,27 +1213,41 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
         <tbody>${divRows}</tbody>
       </table>
     </div>` : ''}
-  </div>
+  </section>
+
+  <!-- FAQ SEO -->
+  <section class="section-card animate-in faq-section" aria-label="Perguntas Frequentes sobre ${f.symbol}">
+    <h2 class="section-title font-playfair">Perguntas Frequentes sobre ${f.symbol}</h2>
+    <dl class="faq-list">
+      ${faqItems.map(faq => `
+      <div class="faq-item">
+        <dt class="faq-question">${faq.q}</dt>
+        <dd class="faq-answer">${faq.a}</dd>
+      </div>`).join('')}
+    </dl>
+  </section>
 
   <!-- CTA -->
-  <div class="cta-card animate-in">
+  <section class="cta-card animate-in" aria-label="Acesse a plataforma">
     <h2>Analise completa na plataforma</h2>
     <p>Acesse premissas editaveis, cenarios Bear/Base/Bull, analise qualitativa com IA, radar de noticias e muito mais.</p>
     <a href="https://app.brasilhorizonte.com.br" class="cta-btn">Acessar iAcoes &rarr;</a>
-  </div>
+  </section>
+
+  </article>
 
   <!-- DISCLAIMER -->
-  <div class="disclaimer">
-    <div class="disclaimer-title">Isencao de Responsabilidade (Disclaimer)</div>
+  <footer class="disclaimer" role="contentinfo">
+    <h2 class="disclaimer-title">Isencao de Responsabilidade (Disclaimer)</h2>
     <p class="disclaimer-text">
       As analises, precos alvo e relatorios apresentados nesta pagina sao gerados automaticamente por Inteligencia Artificial e algoritmos financeiros (ValuAI By Brasil Horizonte). Estas informacoes tem carater estritamente educativo e informativo, nao configurando recomendacao de compra ou venda de ativos, nem garantia de rentabilidade futura. Investimentos em renda variavel envolvem riscos. A Inteligencia Artificial pode cometer erros de interpretacao ou calculo (alucinacoes). Sempre consulte um profissional certificado e realize sua propria diligencia antes de tomar qualquer decisao financeira.
     </p>
     <div class="footer-copy">
-      &copy; ${new Date().getFullYear()} ValuAI by <a href="https://brasilhorizonte.com.br" target="_blank">Brasil Horizonte</a>. Todos os direitos reservados. Dados atualizados em ${today}. Balanco: ${f.lastBalanceDate}.
+      &copy; ${new Date().getFullYear()} ValuAI by <a href="https://brasilhorizonte.com.br" target="_blank" rel="noopener">Brasil Horizonte</a>. Todos os direitos reservados. Dados atualizados em ${today}. Balanco: ${f.lastBalanceDate}.
     </div>
-  </div>
+  </footer>
 
-</div>
+</main>
 
 <script>
 (function() {
