@@ -247,6 +247,10 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+
+  <!-- Google Analytics (GA4) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-858T7GLTMJ"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${titleTag}</title>
   <meta name="description" content="${desc}">
