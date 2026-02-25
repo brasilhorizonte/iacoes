@@ -17,8 +17,8 @@
   <meta property="og:url" content="https://iacoes.com.br/AZEV3">
   <meta property="og:site_name" content="iAcoes — Analise de Acoes | Brasil Horizonte">
   <meta property="og:locale" content="pt_BR">
-  <meta property="article:published_time" content="2026-02-25T19:00:59.891Z">
-  <meta property="article:modified_time" content="2026-02-25T19:00:59.891Z">
+  <meta property="article:published_time" content="2026-02-25T19:11:16.090Z">
+  <meta property="article:modified_time" content="2026-02-25T19:11:16.090Z">
   <meta property="article:section" content="Analise Fundamentalista">
   <meta property="article:tag" content="AZEV3">
   <meta property="article:tag" content="Valuation">
@@ -40,8 +40,8 @@
     "@type": "Article",
     "headline": "AZEV3 — Preco Justo e Analise Fundamentalista 2026",
     "description": "AZEV3 vale a pena? Preco justo de R$ 0,00 (Graham), R$ 0,00 (Bazin) e R$ -1,47 (Gordon). P/L -1,33, DY 0.0%, ROE -16.0%. Analise fundamentalista completa.",
-    "datePublished": "2026-02-25T19:00:59.891Z",
-    "dateModified": "2026-02-25T19:00:59.891Z",
+    "datePublished": "2026-02-25T19:11:16.090Z",
+    "dateModified": "2026-02-25T19:11:16.090Z",
     "author": { "@type": "Organization", "name": "Brasil Horizonte", "url": "https://brasilhorizonte.com.br" },
     "publisher": {
       "@type": "Organization",
@@ -149,17 +149,58 @@
     .nav-iacoes-acoes {
       color: #fff; font-weight: 700;
     }
+    .nav-search {
+      position: relative; flex: 1; max-width: 320px; margin: 0 1rem;
+    }
+    .nav-search-box {
+      display: flex; align-items: center; gap: 0.4rem;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px; padding: 0.35rem 0.7rem;
+      transition: all 0.2s;
+    }
+    .nav-search-box:focus-within {
+      background: rgba(255,255,255,0.12); border-color: rgba(182,143,64,0.5);
+    }
+    .nav-search-box svg { flex-shrink: 0; opacity: 0.5; }
+    .nav-search-box input {
+      background: none; border: none; outline: none; color: #fff;
+      font-family: 'Montserrat', sans-serif; font-size: 0.8rem;
+      width: 100%; min-width: 0;
+    }
+    .nav-search-box input::placeholder { color: rgba(255,255,255,0.4); }
+    .nav-search-dropdown {
+      display: none; position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+      background: #fff; border-radius: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      max-height: 320px; overflow-y: auto; z-index: 200;
+    }
+    .nav-search-dropdown.active { display: block; }
+    .nav-search-dropdown a {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.6rem 0.9rem; text-decoration: none; color: #0f172a;
+      border-bottom: 1px solid #f0f0f0; font-size: 0.82rem; transition: background 0.15s;
+    }
+    .nav-search-dropdown a:last-child { border-bottom: none; }
+    .nav-search-dropdown a:hover, .nav-search-dropdown a.hl { background: #f8f6f1; }
+    .nav-search-dropdown .s-ticker { font-weight: 700; font-family: 'SFMono-Regular',monospace; color: #0f172a; }
+    .nav-search-dropdown .s-name { color: #64748b; font-size: 0.75rem; margin-left: 0.5rem; }
+    .nav-search-dropdown .s-arrow { color: #B68F40; opacity: 0; transition: opacity 0.15s; }
+    .nav-search-dropdown a:hover .s-arrow, .nav-search-dropdown a.hl .s-arrow { opacity: 1; }
+    .nav-search-dropdown .s-empty { padding: 0.8rem; color: #94a3b8; font-size: 0.8rem; text-align: center; }
     .nav-links { display: flex; gap: 0.5rem; }
     .nav-btn {
       display: inline-flex; align-items: center; gap: 0.35rem;
       padding: 0.4rem 0.9rem; border-radius: 8px;
       font-size: 0.8rem; font-weight: 600; text-decoration: none;
-      transition: all 0.2s;
+      transition: all 0.2s; white-space: nowrap;
     }
     .nav-btn-gold { background: #B68F40; color: #041C24; }
     .nav-btn-gold:hover { background: #c9a44e; }
     .nav-btn-outline { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.2); }
     .nav-btn-outline:hover { background: rgba(255,255,255,0.08); }
+    @media (max-width: 640px) {
+      .nav-search { max-width: none; margin: 0 0.5rem; }
+      .nav-links { display: none; }
+    }
 
     /* ============ PAGE CONTAINER ============ */
     .page { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
@@ -731,6 +772,13 @@
     <a href="/" class="nav-iacoes" aria-label="iAcoes">
       <span class="nav-iacoes-i">i</span><span class="nav-iacoes-acoes">Acoes</span>
     </a>
+  </div>
+  <div class="nav-search">
+    <div class="nav-search-box">
+      <svg width="14" height="14" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2"><circle cx="6" cy="6" r="5"/><line x1="10" y1="10" x2="13" y2="13"/></svg>
+      <input type="text" id="nav-ticker-search" placeholder="Buscar ativo... ex: PETR4" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="nav-search-dropdown" id="nav-search-dropdown"></div>
   </div>
   <div class="nav-links">
     <a href="https://app.brasilhorizonte.com.br" class="nav-btn nav-btn-outline">Acessar App</a>
@@ -1496,6 +1544,42 @@
     var el = document.getElementById(id);
     if (el) el.addEventListener('input', calcGordon);
   });
+})();
+</script>
+<script>
+(function(){
+  var TICKERS=null, input=document.getElementById('nav-ticker-search'),
+      dd=document.getElementById('nav-search-dropdown'), hl=-1;
+  function load(){
+    if(TICKERS)return Promise.resolve(TICKERS);
+    return fetch('/tickers.json').then(function(r){return r.ok?r.json():[]})
+      .then(function(d){TICKERS=d;return d}).catch(function(){TICKERS=[];return[]});
+  }
+  function go(t){window.location.href='/'+t+'/';}
+  function render(items){
+    hl=-1;
+    if(!items.length){dd.innerHTML='<div class="s-empty">Nenhuma acao encontrada</div>';dd.classList.add('active');return;}
+    dd.innerHTML=items.map(function(t){
+      return '<a href="/'+t.ticker+'/" data-t="'+t.ticker+'"><div><span class="s-ticker">'+t.ticker+'</span>'+(t.name?'<span class="s-name">'+t.name+'</span>':'')+'</div><span class="s-arrow">&rarr;</span></a>';
+    }).join('');
+    dd.classList.add('active');
+  }
+  input.addEventListener('input',function(){
+    var v=input.value.trim().toUpperCase();
+    if(!v){dd.classList.remove('active');return;}
+    load().then(function(tk){
+      if(!tk.length){dd.classList.remove('active');return;}
+      var m=tk.filter(function(t){return t.ticker.indexOf(v)===0||(t.name&&t.name.toUpperCase().indexOf(v)>=0);}).slice(0,8);
+      render(m);
+    });
+  });
+  input.addEventListener('keydown',function(e){
+    var items=dd.querySelectorAll('a');
+    if(e.key==='ArrowDown'){e.preventDefault();hl=Math.min(hl+1,items.length-1);items.forEach(function(el,i){el.classList.toggle('hl',i===hl);});}
+    else if(e.key==='ArrowUp'){e.preventDefault();hl=Math.max(hl-1,0);items.forEach(function(el,i){el.classList.toggle('hl',i===hl);});}
+    else if(e.key==='Enter'){e.preventDefault();if(hl>=0&&items[hl])go(items[hl].dataset.t);else{var v=input.value.trim().toUpperCase();if(v)go(v);}}
+  });
+  document.addEventListener('click',function(e){if(!e.target.closest('.nav-search'))dd.classList.remove('active');});
 })();
 </script>
 

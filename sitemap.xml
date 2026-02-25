@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://iacoes.com.br/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
-  <url><loc>https://iacoes.com.br/ITUB4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/ITUB3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://iacoes.com.br/ITUB4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/PETR3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/PETR4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/VALE3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/ABEV3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/WEGE3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://iacoes.com.br/BBDC3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/BBDC4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://iacoes.com.br/BBDC3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/BPAC3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://iacoes.com.br/ITSA4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/ITSA3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://iacoes.com.br/ITSA4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/BBAS3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/SANB3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/VIVT3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
@@ -26,8 +26,8 @@
   <url><loc>https://iacoes.com.br/CXSE3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/RENT3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/EQTL3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://iacoes.com.br/CPLE3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/CPLE5</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://iacoes.com.br/CPLE3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/RADL3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/NEOE3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/ENEV3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
@@ -45,8 +45,8 @@
   <url><loc>https://iacoes.com.br/CSAN3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/KLBN3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/UGPA3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://iacoes.com.br/ISAE3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/ISAE4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://iacoes.com.br/ISAE3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/ENGI3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/CGAS3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/CSMG3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
@@ -67,8 +67,8 @@
   <url><loc>https://iacoes.com.br/ASAI3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/BNBR3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/ALUP3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://iacoes.com.br/GOAU3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/GOAU4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://iacoes.com.br/GOAU3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/CURY3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/DIRR3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/RAIZ4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
@@ -86,14 +86,14 @@
   <url><loc>https://iacoes.com.br/ALPA4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/USIM3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/USIM5</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://iacoes.com.br/POMO4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/POMO3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://iacoes.com.br/POMO4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/BPAN4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/HAPV3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/MGLU3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/COGN3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://iacoes.com.br/WHRL4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/WHRL3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://iacoes.com.br/WHRL4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/FRAS3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/VULC3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/UNIP6</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
@@ -102,11 +102,11 @@
   <url><loc>https://iacoes.com.br/BRKM3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/ODPV3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/ORVR3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://iacoes.com.br/BRSR3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/BRSR6</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://iacoes.com.br/BRSR3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/BEEF3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://iacoes.com.br/BMEB3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/BMEB4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://iacoes.com.br/BMEB3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/ABCB4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/SIMH3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/AZZA3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
@@ -136,8 +136,8 @@
   <url><loc>https://iacoes.com.br/YDUQ3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/RECV3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/SBFG3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://iacoes.com.br/FESA3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/FESA4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>https://iacoes.com.br/FESA3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/PLPL3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/EMAE4</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/LAVV3</loc><lastmod>2026-02-25</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
