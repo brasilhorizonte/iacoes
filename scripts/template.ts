@@ -1267,7 +1267,19 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     </div>
 
     <div class="methods-note">
-      <strong>Nota:</strong> Graham foca em empresas com lucro e patrimonio solidos. Bazin e para empresas com dividendos estaveis. Gordon (DDM) assume crescimento perpetuo dos dividendos. Todos tem limitacoes e devem ser combinados com outras analises.
+      <strong>Importante:</strong> Os valores apresentados nesta pagina sao estimativas calculadas por modelos matematicos e <strong>nao constituem recomendacao de compra, venda ou manutencao de ativos</strong>. Cada investidor deve conduzir sua propria analise, considerando o contexto da empresa, riscos setoriais, cenario macroeconomico e seu perfil de investimento.
+    </div>
+    <div class="methods-note">
+      <strong>Graham</strong> calcula o valor intrinseco com base no lucro por acao (LPA) e valor patrimonial por acao (VPA). E mais adequado para empresas lucrativas, com patrimonio solido e historico consistente. Empresas em crescimento acelerado ou com prejuizo podem apresentar distorcoes nesse modelo.
+    </div>
+    <div class="methods-note">
+      <strong>Bazin</strong> estima o preco justo a partir dos dividendos pagos, dividindo-os por uma taxa minima de retorno desejada (dividend yield). Funciona melhor para empresas maduras e boas pagadoras de dividendos. Empresas que reinvestem lucros ou que tem politica de dividendos irregular podem gerar resultados pouco representativos.
+    </div>
+    <div class="methods-note">
+      <strong>Gordon (DDM)</strong> projeta o valor presente de todos os dividendos futuros, assumindo um crescimento perpetuo constante. E util para empresas com dividendos estaveis e previssiveis, mas pode distorcer significativamente o resultado quando a taxa de crescimento se aproxima da taxa de desconto ou quando a empresa nao distribui proventos regularmente.
+    </div>
+    <div class="methods-note">
+      Utilize a <a href="https://app.brasilhorizonte.com.br/authnew" style="color:var(--accent);font-weight:600;">plataforma iAcoes</a> para aprofundar sua analise com dados completos, comparativos setoriais e ferramentas de valuation avancadas. Investir exige estudo — conheca a empresa, entenda os riscos e tome decisoes informadas.
     </div>
   </section>
 
