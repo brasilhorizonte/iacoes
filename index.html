@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iAções — A Primeira Plataforma de Stock Picking com IA do Brasil</title>
+    <meta name="description" content="Análise fundamentalista potencializada por Inteligência Artificial. Sem conflito de interesses. Metodologias Graham, Bazin e Gordon. Descubra as melhores ações da B3.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #FAFAF8;
+            --bg-white: #FFFFFF;
+            --bg-warm: #F5F4F0;
+            --bg-card: #FFFFFF;
+            --nav-bg: #2B3A2B;
+            --nav-bg-deep: #1E2B1E;
+            --gold: #B8923E;
+            --gold-light: #C9A44E;
+            --gold-dim: #B8923E10;
+            --gold-glow: #B8923E20;
+            --gold-bg: #FAF6EE;
+            --green-dark: #2B3A2B;
+            --green-mid: #3D5A3D;
+            --green-accent: #2D8C4E;
+            --green-bg: #E8F5E8;
+            --red: #C44040;
+            --text-primary: #1A1A18;
+            --text-secondary: #5A5850;
+            --text-tertiary: #8A8880;
+            --text-light: #B0ACA4;
+            --border: #E8E6E0;
+            --border-strong: #D4D0C8;
+            --font-display: 'DM Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-display);
+            background: var(--bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* NAV */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            padding: 0 2rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--nav-bg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #FFFFFF;
+            text-decoration: none;
+        }
+
+        .nav-logo .ia { color: var(--gold-light); }
+
+        .nav-logo .terminal-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1.1em;
+            background: var(--gold-light);
+            animation: blink 1s step-end infinite;
+            margin-left: 2px;
+            vertical-align: middle;
+        }
+
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .nav-links {
+            display: flex;
+            gap: 1.8rem;
+            align-items: center;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: #FFFFFF; }
+
+        .btn-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.5rem;
+            background: var(--green-dark);
+            color: #FFFFFF;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.88rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.25s;
+        }
+
+        .btn-cta:hover {
+            background: var(--green-mid);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(43, 58, 43, 0.25);
+        }
+
+        .btn-cta-nav {
+            background: var(--gold);
+            color: var(--nav-bg-deep);
+            font-weight: 700;
+            border-radius: 8px;
+            padding: 0.55rem 1.2rem;
+        }
+
+        .btn-cta-nav:hover {
+            background: var(--gold-light);
+            box-shadow: 0 4px 12px rgba(184, 146, 62, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--green-dark);
+            border: 1.5px solid var(--border-strong);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-warm);
+            border-color: var(--green-dark);
+            box-shadow: none;
+        }
+
+        /* HERO */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 7rem 2rem 4rem;
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero-content {
+            max-width: 850px;
+            text-align: center;
+            animation: fadeUp 0.8s ease-out;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-top: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeUp 0.7s ease-out 0.15s forwards;
+        }
+
+        .hero-brand-text {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .hero-brand-logo {
+            height: 60px;
+            width: auto;
+            filter: brightness(0) saturate(100%);
+            opacity: 0.55;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            background: var(--green-bg);
+            border: 1px solid rgba(45, 140, 78, 0.15);
+            border-radius: 100px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--green-accent);
+            margin-bottom: 2rem;
+            letter-spacing: 0.04em;
+            font-weight: 600;
+        }
+
+        .hero-badge .dot {
+            width: 6px; height: 6px;
+            background: var(--green-accent);
+            border-radius: 50%;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.8rem, 6vw, 4.8rem);
+            font-weight: 800;
+            line-height: 1.08;
+            letter-spacing: -0.035em;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--gold), #D4A84A, var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+        }
+
+        .hero-proof {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.8rem;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+        }
+
+        .hero-proof span { display: flex; align-items: center; gap: 0.4rem; }
+        .hero-proof .check { color: var(--green-accent); font-size: 1rem; font-weight: 700; }
+
+        /* TICKER */
+        .ticker-strip {
+            padding: 0.85rem 0;
+            overflow: hidden;
+            background: var(--nav-bg);
+        }
+
+        .ticker-track {
+            display: flex;
+            gap: 3rem;
+            animation: tickerScroll 40s linear infinite;
+            width: max-content;
+        }
+
+        @keyframes tickerScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            white-space: nowrap;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .ticker-item .ticker-code { color: rgba(255,255,255,0.8); font-weight: 600; }
+        .ticker-item .ticker-up { color: #5AE07A; }
+
+        /* PLATFORM PREVIEW */
+        .platform-section {
+            padding: 3rem 2rem 5rem;
+            display: flex;
+            justify-content: center;
+            background: var(--bg);
+        }
+
+        .platform-preview {
+            max-width: 1100px;
+            width: 100%;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(30, 43, 30, 0.15), 0 0 0 1px rgba(0,0,0,0.05);
+            animation: fadeUp 0.8s ease-out 0.2s both;
+        }
+
+        .platform-preview img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+
+        /* SECTION HEADERS */
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            margin-bottom: 0.8rem;
+        }
+
+        .section-desc {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            max-width: 560px;
+            line-height: 1.7;
+        }
+
+        /* STATS */
+        .stats-bar {
+            padding: 3.5rem 2rem;
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stats-grid {
+            display: flex;
+            justify-content: center;
+            gap: 3.5rem;
+            flex-wrap: wrap;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .stat-item { text-align: center; }
+
+        .stat-number {
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--green-dark);
+        }
+
+        .stat-label { font-size: 0.82rem; color: var(--text-tertiary); margin-top: 0.2rem; }
+
+        /* MODULES */
+        .modules { padding: 5rem 2rem; background: var(--bg); }
+        .modules-header { text-align: center; margin-bottom: 3.5rem; }
+        .modules-header .section-desc { margin: 0 auto; }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 1.5rem;
+            max-width: 920px;
+            margin: 0 auto;
+        }
+
+        .module-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2.2rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .module-card:nth-child(1)::before { background: var(--green-dark); }
+        .module-card:nth-child(2)::before { background: var(--gold); }
+
+        .module-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.06);
+            border-color: var(--border-strong);
+        }
+
+        .module-number {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--text-light);
+            letter-spacing: 0.1em;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .module-card h3 { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.7rem; }
+
+        .module-card:nth-child(1) h3 .prefix { font-family: var(--font-mono); color: var(--green-dark); }
+        .module-card:nth-child(2) h3 .prefix { font-family: var(--font-mono); color: var(--gold); }
+
+        .module-card .module-desc { color: var(--text-secondary); line-height: 1.65; margin-bottom: 1.3rem; }
+
+        .module-features { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .module-features li {
+            display: flex; align-items: flex-start; gap: 0.5rem;
+            font-size: 0.88rem; color: var(--text-secondary);
+        }
+
+        .module-features li::before {
+            content: '→'; color: var(--gold);
+            font-family: var(--font-mono); font-weight: 700; flex-shrink: 0;
+        }
+
+        /* FEATURES */
+        .features { padding: 5rem 2rem; background: var(--bg-white); border-top: 1px solid var(--border); }
+        .features-header { text-align: center; margin-bottom: 3.5rem; }
+        .features-header .section-desc { margin: 0 auto; }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+            gap: 1.2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.8rem;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--border-strong);
+            background: var(--bg-white);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+        }
+
+        .feature-icon {
+            width: 44px; height: 44px;
+            background: var(--gold-bg);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .feature-card h3 .mono { font-family: var(--font-mono); color: var(--green-dark); font-size: 0.9rem; }
+        .feature-card p { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.6; }
+
+        .feature-tag {
+            display: inline-block; margin-top: 0.8rem;
+            padding: 0.2rem 0.6rem;
+            font-family: var(--font-mono); font-size: 0.65rem; border-radius: 5px;
+            background: var(--green-bg); color: var(--green-accent);
+            border: 1px solid rgba(45, 140, 78, 0.12);
+            font-weight: 600;
+        }
+
+        .feature-tag.gold {
+            background: var(--gold-bg); color: var(--gold);
+            border-color: rgba(184, 146, 62, 0.15);
+        }
+
+        /* METHODOLOGY */
+        .methodology {
+            padding: 5rem 2rem;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+        }
+
+        .methodology-inner { max-width: 1000px; margin: 0 auto; }
+        .methodology-header { text-align: center; margin-bottom: 3.5rem; }
+        .methodology-header .section-desc { margin: 0 auto; }
+
+        .method-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .method-card {
+            background: var(--bg-white); border: 1px solid var(--border);
+            border-radius: 14px; padding: 2rem; text-align: center; transition: all 0.3s;
+        }
+
+        .method-card:hover {
+            border-color: var(--border-strong);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+        }
+
+        .method-icon { font-size: 2.2rem; margin-bottom: 0.8rem; }
+        .method-card h4 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.4rem; }
+
+        .method-card .method-subtitle {
+            font-family: var(--font-mono); font-size: 0.68rem; color: var(--gold);
+            letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.7rem; font-weight: 600;
+        }
+
+        .method-card p { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6; }
+
+        /* DIFFERENTIALS */
+        .differentials { padding: 5rem 2rem; background: var(--bg-white); border-top: 1px solid var(--border); }
+        .diff-inner { max-width: 960px; margin: 0 auto; }
+        .diff-header { text-align: center; margin-bottom: 3.5rem; }
+        .diff-header .section-desc { margin: 0 auto; }
+
+        .diff-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem;
+        }
+
+        .diff-item {
+            display: flex; gap: 1rem; padding: 1.3rem;
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 12px; transition: all 0.25s;
+        }
+
+        .diff-item:hover { border-color: var(--border-strong); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+
+        .diff-icon {
+            width: 40px; height: 40px; flex-shrink: 0;
+            background: var(--gold-bg); border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.05rem;
+        }
+
+        .diff-item h4 { font-size: 0.92rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .diff-item p { color: var(--text-secondary); font-size: 0.82rem; line-height: 1.5; }
+
+        /* COMPARISON */
+        .comparison {
+            padding: 5rem 2rem; background: var(--bg);
+            border-top: 1px solid var(--border);
+        }
+
+        .comparison-inner { max-width: 860px; margin: 0 auto; }
+        .comparison-header { text-align: center; margin-bottom: 2.5rem; }
+        .comparison-header .section-desc { margin: 0 auto; }
+
+        .comp-table-wrap {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .comp-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+
+        .comp-table thead th {
+            padding: 1rem;
+            font-weight: 700;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.82rem;
+            background: var(--bg);
+            color: var(--text-secondary);
+        }
+
+        .comp-table thead th:first-child { text-align: left; padding-left: 1.5rem; }
+        .comp-table thead th:last-child { color: var(--green-dark); font-weight: 800; }
+
+        .comp-table tbody td {
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-tertiary);
+        }
+
+        .comp-table tbody tr:last-child td { border-bottom: none; }
+        .comp-table tbody td:first-child { text-align: left; padding-left: 1.5rem; color: var(--text-primary); font-weight: 500; }
+        .comp-table tbody td:last-child { background: rgba(45, 140, 78, 0.03); }
+        .comp-table .yes { color: var(--green-accent); font-weight: 700; }
+        .comp-table .no { color: var(--text-light); }
+        .comp-table .partial { color: var(--text-tertiary); }
+
+        /* PRICING */
+        .pricing { padding: 5rem 2rem; background: var(--bg-white); border-top: 1px solid var(--border); }
+        .pricing-inner { max-width: 920px; margin: 0 auto; }
+        .pricing-header { text-align: center; margin-bottom: 3.5rem; }
+        .pricing-header .section-desc { margin: 0 auto; }
+
+        .pricing-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 1.2rem; align-items: start;
+        }
+
+        .pricing-card {
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 16px; padding: 2rem; transition: all 0.3s; position: relative;
+        }
+
+        .pricing-card.featured {
+            border-color: var(--green-dark);
+            background: var(--bg-white);
+            box-shadow: 0 8px 32px rgba(43, 58, 43, 0.08);
+        }
+
+        .pricing-card.featured::before {
+            content: 'MAIS POPULAR';
+            position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+            padding: 0.25rem 0.9rem; background: var(--green-dark); color: #FFFFFF;
+            font-family: var(--font-mono); font-size: 0.62rem; font-weight: 700;
+            border-radius: 6px; letter-spacing: 0.08em;
+        }
+
+        .pricing-plan {
+            font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold);
+            text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.4rem; font-weight: 600;
+        }
+
+        .pricing-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.4rem; }
+
+        .pricing-price { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.2rem; }
+        .pricing-price .currency { font-size: 1.1rem; font-weight: 500; color: var(--text-tertiary); vertical-align: super; }
+        .pricing-price .period { font-size: 0.82rem; font-weight: 400; color: var(--text-tertiary); }
+
+        .pricing-desc { color: var(--text-secondary); font-size: 0.84rem; margin-bottom: 1.3rem; }
+
+        .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.8rem; }
+
+        .pricing-features li {
+            display: flex; align-items: center; gap: 0.5rem;
+            font-size: 0.85rem; color: var(--text-secondary);
+        }
+
+        .pricing-features li::before { content: '✓'; color: var(--green-accent); font-weight: 700; flex-shrink: 0; }
+        .pricing-card .btn-cta { width: 100%; justify-content: center; }
+        .pricing-annual { font-size: 0.8rem; color: var(--text-tertiary); margin-top: 0.3rem; text-align: center; }
+
+        /* RESOURCES COMPARISON */
+        .resources-comp { padding: 3rem 2rem 5rem; background: var(--bg-white); }
+        .resources-comp-inner { max-width: 860px; margin: 0 auto; }
+        .resources-comp-header { text-align: center; margin-bottom: 2.5rem; }
+        .resources-comp-header .section-desc { margin: 0 auto; }
+
+        .res-table-wrap {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .res-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+
+        .res-table thead th {
+            padding: 1rem;
+            font-weight: 700;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.82rem;
+            background: var(--nav-bg);
+            color: rgba(255,255,255,0.7);
+        }
+
+        .res-table thead th:first-child { text-align: left; padding-left: 1.5rem; color: #FFFFFF; }
+        .res-table thead th.highlight-col { background: var(--gold); color: var(--nav-bg-deep); font-weight: 800; }
+
+        .res-table tbody td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-tertiary);
+        }
+
+        .res-table tbody tr:last-child td { border-bottom: none; }
+        .res-table tbody td:first-child { text-align: left; padding-left: 1.5rem; color: var(--text-primary); font-weight: 500; }
+        .res-table tbody td.highlight-col { background: rgba(184, 146, 62, 0.05); }
+        .res-table .yes { color: var(--green-accent); font-weight: 700; }
+        .res-table .no { color: var(--border-strong); }
+
+        @media (max-width: 768px) {
+            .res-table { font-size: 0.74rem; }
+            .res-table thead th, .res-table tbody td { padding: 0.7rem 0.4rem; }
+        }
+
+        /* FAQ */
+        .faq { padding: 5rem 2rem; background: var(--bg); border-top: 1px solid var(--border); }
+        .faq-inner { max-width: 700px; margin: 0 auto; }
+        .faq-header { text-align: center; margin-bottom: 2.5rem; }
+        .faq-item { border-bottom: 1px solid var(--border); }
+
+        .faq-question {
+            width: 100%; background: none; border: none;
+            padding: 1.2rem 0; text-align: left; cursor: pointer;
+            font-family: var(--font-display); font-size: 0.95rem; font-weight: 600;
+            color: var(--text-primary);
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 1rem; transition: color 0.2s;
+        }
+
+        .faq-question:hover { color: var(--green-dark); }
+
+        .faq-question .faq-icon {
+            font-family: var(--font-mono); font-size: 1.1rem;
+            color: var(--gold); flex-shrink: 0; transition: transform 0.3s;
+        }
+
+        .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.4s ease; }
+        .faq-item.open .faq-answer { max-height: 300px; padding-bottom: 1.2rem; }
+        .faq-answer p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; }
+
+        /* FINAL CTA */
+        .final-cta {
+            padding: 6rem 2rem;
+            text-align: center;
+            background: var(--nav-bg);
+            color: #FFFFFF;
+        }
+
+        .final-cta-content { max-width: 650px; margin: 0 auto; }
+        .final-cta .section-label { color: var(--gold-light); }
+
+        .final-cta h2 {
+            font-size: clamp(2rem, 4.5vw, 3rem);
+            font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.8rem;
+            color: #FFFFFF;
+        }
+
+        .final-cta p { color: rgba(255,255,255,0.6); font-size: 1.1rem; margin-bottom: 2rem; }
+
+        .final-cta .btn-cta {
+            background: var(--gold);
+            color: var(--nav-bg-deep);
+            font-size: 1rem;
+            padding: 0.8rem 2rem;
+        }
+
+        .final-cta .btn-cta:hover { background: var(--gold-light); }
+
+        /* FOOTER */
+        footer {
+            padding: 2.5rem 2rem;
+            border-top: 1px solid var(--border);
+            background: var(--bg-white);
+        }
+
+        .footer-inner {
+            max-width: 1100px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 1rem;
+        }
+
+        .footer-brand {
+            display: flex; align-items: center; gap: 0.7rem;
+            font-size: 0.82rem; color: var(--text-tertiary);
+        }
+
+        .footer-brand a { color: var(--green-dark); text-decoration: none; font-weight: 600; }
+        .footer-brand img { height: 44px; width: auto; filter: brightness(0) saturate(100%); opacity: 0.45; }
+
+        .footer-links { display: flex; gap: 1.5rem; list-style: none; }
+        .footer-links a { color: var(--text-tertiary); text-decoration: none; font-size: 0.8rem; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--text-secondary); }
+
+        /* MOBILE */
+        .mobile-menu-btn {
+            display: none; background: none; border: none; cursor: pointer; padding: 0.5rem;
+        }
+
+        .mobile-menu-btn span {
+            display: block; width: 20px; height: 2px;
+            background: #FFFFFF; margin: 4px 0; transition: all 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .nav-links.show {
+                display: flex; flex-direction: column;
+                position: absolute; top: 100%; left: 0; right: 0;
+                background: var(--nav-bg); padding: 1.5rem 2rem;
+                border-bottom: 1px solid rgba(255,255,255,0.1); gap: 1rem;
+            }
+            .mobile-menu-btn { display: block; }
+            .hero h1 { font-size: 2.3rem; }
+            .hero-sub { font-size: 1.05rem; }
+            .features-grid, .modules-grid { grid-template-columns: 1fr; }
+            .stats-grid { gap: 2rem; }
+            .stat-number { font-size: 1.9rem; }
+            .comp-table { font-size: 0.76rem; }
+            .comp-table thead th, .comp-table tbody td { padding: 0.7rem 0.4rem; }
+            .footer-inner { flex-direction: column; text-align: center; }
+            .pricing-grid { grid-template-columns: 1fr; }
+            .hero-brand-logo { height: 44px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="#" class="nav-logo"><span class="ia">iA</span>ções<span class="terminal-cursor"></span></a>
+    <ul class="nav-links">
+        <li><a href="#modulos">Módulos</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#metodologia">Metodologia</a></li>
+        <li><a href="#precos">Preços</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="https://app.brasilhorizonte.com.br" class="btn-cta btn-cta-nav">Começar agora</a></li>
+    </ul>
+    <button class="mobile-menu-btn" onclick="document.querySelector('.nav-links').classList.toggle('show')">
+        <span></span><span></span><span></span>
+    </button>
+</nav>
+
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-badge"><span class="dot"></span> PIONEIRA NO BRASIL</div>
+        <h1>Stock Picking com<br><span class="highlight">Inteligência Artificial</span></h1>
+        <p class="hero-sub">Análise fundamentalista profunda das ações da B3, potencializada por IA. Sem conflito de interesses. Sem achismo. Só dados, método e inteligência.</p>
+        <div class="hero-brand">
+            <span class="hero-brand-text">by</span>
+            <img src="assets/img/institucional_branco_amarelo_3x.png" alt="Brasil Horizonte" class="hero-brand-logo">
+        </div>
+        <div class="hero-actions">
+            <a href="https://app.brasilhorizonte.com.br" class="btn-cta">Testar grátis por 7 dias →</a>
+            <a href="#modulos" class="btn-cta btn-outline">Conhecer a plataforma</a>
+        </div>
+        <div class="hero-proof">
+            <span><span class="check">✓</span> Sem carteira recomendada</span>
+            <span><span class="check">✓</span> 100% livre de conflito</span>
+            <span><span class="check">✓</span> Graham, Bazin & Gordon</span>
+        </div>
+    </div>
+</section>
+
+<div class="ticker-strip">
+    <div class="ticker-track">
+        <span class="ticker-item"><span class="ticker-code">WEGE3</span> Análise completa <span class="ticker-up">● COMPRA</span></span>
+        <span class="ticker-item"><span class="ticker-code">ITUB4</span> Margem de segurança: <span class="ticker-up">32%</span></span>
+        <span class="ticker-item"><span class="ticker-code">BBAS3</span> Dividend Yield: <span class="ticker-up">9.8%</span></span>
+        <span class="ticker-item"><span class="ticker-code">TAEE11</span> Preço Justo: <span class="ticker-up">R$ 42,30</span></span>
+        <span class="ticker-item"><span class="ticker-code">EGIE3</span> Score Graham: <span class="ticker-up">8.5/10</span></span>
+        <span class="ticker-item"><span class="ticker-code">VALE3</span> Análise setorial <span class="ticker-up">● ATUALIZADA</span></span>
+        <span class="ticker-item"><span class="ticker-code">FLRY3</span> Bazin DY: <span class="ticker-up">7.2%</span></span>
+        <span class="ticker-item"><span class="ticker-code">PSSA3</span> Gordon: <span class="ticker-up">upside 28%</span></span>
+        <span class="ticker-item"><span class="ticker-code">WEGE3</span> Análise completa <span class="ticker-up">● COMPRA</span></span>
+        <span class="ticker-item"><span class="ticker-code">ITUB4</span> Margem de segurança: <span class="ticker-up">32%</span></span>
+        <span class="ticker-item"><span class="ticker-code">BBAS3</span> Dividend Yield: <span class="ticker-up">9.8%</span></span>
+        <span class="ticker-item"><span class="ticker-code">TAEE11</span> Preço Justo: <span class="ticker-up">R$ 42,30</span></span>
+        <span class="ticker-item"><span class="ticker-code">EGIE3</span> Score Graham: <span class="ticker-up">8.5/10</span></span>
+        <span class="ticker-item"><span class="ticker-code">VALE3</span> Análise setorial <span class="ticker-up">● ATUALIZADA</span></span>
+        <span class="ticker-item"><span class="ticker-code">FLRY3</span> Bazin DY: <span class="ticker-up">7.2%</span></span>
+        <span class="ticker-item"><span class="ticker-code">PSSA3</span> Gordon: <span class="ticker-up">upside 28%</span></span>
+    </div>
+</div>
+
+<section class="platform-section">
+    <div class="platform-preview">
+        <img src="assets/img/dashboard-iacoes.png" alt="Dashboard iAções — Plataforma de análise fundamentalista com IA">
+    </div>
+</section>
+
+<div class="stats-bar">
+    <div class="stats-grid">
+        <div class="stat-item"><div class="stat-number">400+</div><div class="stat-label">Ações analisadas na B3</div></div>
+        <div class="stat-item"><div class="stat-number">3</div><div class="stat-label">Metodologias clássicas</div></div>
+        <div class="stat-item"><div class="stat-number">24/7</div><div class="stat-label">Monitoramento contínuo</div></div>
+        <div class="stat-item"><div class="stat-number">0</div><div class="stat-label">Conflitos de interesse</div></div>
+    </div>
+</div>
+
+<section class="modules" id="modulos">
+    <div class="modules-header">
+        <div class="section-label">Módulos</div>
+        <h2 class="section-title">Dois cérebros. Um objetivo.</h2>
+        <p class="section-desc">Cada módulo é uma IA especialista com uma missão clara: encontrar as melhores oportunidades para você.</p>
+    </div>
+    <div class="modules-grid">
+        <div class="module-card">
+            <div class="module-number">MÓDULO 01</div>
+            <h3><span class="prefix">iA</span>nalista</h3>
+            <p class="module-desc">Seu analista fundamentalista com IA. Faz a análise profunda que um CGA faria — mas em segundos, para todas as ações da B3.</p>
+            <ul class="module-features">
+                <li>Valuation automático por Graham, Bazin e Gordon</li>
+                <li>Cálculo de margem de segurança em tempo real</li>
+                <li>Score proprietário de qualidade fundamentalista</li>
+                <li>Análise setorial comparativa por IA</li>
+                <li>Relatórios com linguagem clara e objetiva</li>
+                <li>Alertas de oportunidade e sobrepreço</li>
+            </ul>
+        </div>
+        <div class="module-card">
+            <div class="module-number">MÓDULO 02</div>
+            <h3><span class="prefix">iA</span>locador</h3>
+            <p class="module-desc">Seu estrategista de alocação com IA. Define a distribuição ideal do portfólio com base no seu perfil e nos fundamentos do mercado.</p>
+            <ul class="module-features">
+                <li>Alocação inteligente por perfil de risco</li>
+                <li>Balanceamento dinâmico entre setores</li>
+                <li>Diversificação otimizada por correlação</li>
+                <li>Simulação de cenários macro</li>
+                <li>Rebalanceamento automático sugerido</li>
+                <li>Integração com a análise do iAnalista</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="features" id="features">
+    <div class="features-header">
+        <div class="section-label">Features</div>
+        <h2 class="section-title">Tudo que você precisa.<br>Nada que atrapalhe.</h2>
+        <p class="section-desc">Ferramentas pensadas para quem quer investir com método, profundidade e independência.</p>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card"><div class="feature-icon">📊</div><h3>Dashboard em Tempo Real</h3><p>Painel completo com indicadores fundamentalistas, preço justo, margem de segurança e score IA — tudo atualizado automaticamente.</p><span class="feature-tag gold">LIVE DATA</span></div>
+        <div class="feature-card"><div class="feature-icon">🎯</div><h3>Screening Inteligente</h3><p>Filtre ações da B3 por múltiplos critérios: P/L, P/VP, ROE, DY, margem de segurança, setor, liquidez e score IA.</p><span class="feature-tag">MULTI-FILTRO</span></div>
+        <div class="feature-card"><div class="feature-icon">🧠</div><h3>Relatórios IA</h3><p>Análises fundamentalistas completas escritas por IA, com base em dados reais e metodologias consagradas. Linguagem clara, sem jargão.</p><span class="feature-tag gold">IA GENERATIVA</span></div>
+        <div class="feature-card"><div class="feature-icon">⚖️</div><h3>Preço Justo Multi-Método</h3><p>Cálculo automático do valor intrínseco por Graham, Bazin e Gordon. Compare os 3 métodos lado a lado para cada ação.</p><span class="feature-tag">3 METODOLOGIAS</span></div>
+        <div class="feature-card"><div class="feature-icon">🔔</div><h3>Alertas Inteligentes</h3><p>Receba notificações quando uma ação entrar na zona de compra, quando o preço justo mudar, ou surgir uma oportunidade.</p><span class="feature-tag gold">PUSH + EMAIL</span></div>
+        <div class="feature-card"><div class="feature-icon">📈</div><h3>Backtesting de Estratégias</h3><p>Teste suas teses de investimento contra dados históricos. Veja como Graham, Bazin e Gordon performaram nos últimos anos.</p><span class="feature-tag">HISTÓRICO</span></div>
+        <div class="feature-card"><div class="feature-icon">🏢</div><h3>Análise Setorial</h3><p>Compare empresas do mesmo setor em um único painel. Identifique as mais eficientes, baratas e com melhores fundamentos.</p><span class="feature-tag">COMPARATIVO</span></div>
+        <div class="feature-card"><div class="feature-icon">🛡️</div><h3>Zero Conflito de Interesses</h3><p>Não somos corretora. Não vendemos produtos. Não temos carteira recomendada. Nosso único compromisso é com a análise.</p><span class="feature-tag gold">INDEPENDENTE</span></div>
+        <div class="feature-card"><div class="feature-icon">🤖</div><h3><span class="mono">AIrton</span> — Assistente IA</h3><p>Converse com o AIrton. Pergunte sobre ações, peça comparações, tire dúvidas sobre fundamentos. Ele sabe tudo da B3.</p><span class="feature-tag gold">CHAT IA</span></div>
+    </div>
+</section>
+
+<section class="methodology" id="metodologia">
+    <div class="methodology-inner">
+        <div class="methodology-header">
+            <div class="section-label">Metodologia</div>
+            <h2 class="section-title">Métodos clássicos.<br>Execução de IA.</h2>
+            <p class="section-desc">As mesmas metodologias consagradas que os melhores analistas usam, agora com velocidade e escala de inteligência artificial.</p>
+        </div>
+        <div class="method-cards">
+            <div class="method-card"><div class="method-icon">📐</div><div class="method-subtitle">Value Investing</div><h4>Benjamin Graham</h4><p>Cálculo do valor intrínseco com margem de segurança. Análise de P/L, P/VP, endividamento, liquidez corrente e estabilidade de lucros.</p></div>
+            <div class="method-card"><div class="method-icon">💰</div><div class="method-subtitle">Dividendos</div><h4>Décio Bazin</h4><p>Foco em boas pagadoras de dividendos. Filtragem por dividend yield mínimo de 6%, consistência de pagamentos e baixo endividamento.</p></div>
+            <div class="method-card"><div class="method-icon">📈</div><div class="method-subtitle">Crescimento</div><h4>Modelo de Gordon</h4><p>Avaliação por desconto de dividendos futuros. Projeta o crescimento sustentável dos proventos para estimar o preço justo a longo prazo.</p></div>
+        </div>
+    </div>
+</section>
+
+<section class="differentials">
+    <div class="diff-inner">
+        <div class="diff-header">
+            <div class="section-label">Por que iAções</div>
+            <h2 class="section-title">O que nos torna diferentes</h2>
+            <p class="section-desc">Não somos uma corretora. Não temos carteira recomendada. Somos a ferramenta do investidor que pensa por conta própria.</p>
+        </div>
+        <div class="diff-grid">
+            <div class="diff-item"><div class="diff-icon">🚫</div><div><h4>Sem conflito de interesses</h4><p>Não vendemos ativos, fundos ou produtos financeiros. Receita 100% por assinatura.</p></div></div>
+            <div class="diff-item"><div class="diff-icon">🧠</div><div><h4>IA + Análise Fundamentalista</h4><p>Inteligência artificial combinada com métodos consagrados de valuation.</p></div></div>
+            <div class="diff-item"><div class="diff-icon">⚡</div><div><h4>Análise em segundos</h4><p>O que levaria horas de estudo, a IA entrega em instantes com profundidade.</p></div></div>
+            <div class="diff-item"><div class="diff-icon">🎓</div><div><h4>CGA por trás da IA</h4><p>Lógica analítica validada por analista certificado pela APIMEC.</p></div></div>
+            <div class="diff-item"><div class="diff-icon">🇧🇷</div><div><h4>100% focado no Brasil</h4><p>Feito para a B3. Dados em reais, normas brasileiras, particularidades locais.</p></div></div>
+            <div class="diff-item"><div class="diff-icon">🔄</div><div><h4>Atualização contínua</h4><p>Dados e análises sempre atualizados com os últimos balanços e cotações.</p></div></div>
+        </div>
+    </div>
+</section>
+
+<section class="comparison">
+    <div class="comparison-inner">
+        <div class="comparison-header">
+            <div class="section-label">Comparativo</div>
+            <h2 class="section-title">iAções vs. Mercado</h2>
+            <p class="section-desc">Veja como nos posicionamos frente às alternativas tradicionais.</p>
+        </div>
+        <div class="comp-table-wrap">
+            <table class="comp-table">
+                <thead><tr><th></th><th>Corretoras</th><th>Casas de Research</th><th>iAções ✦</th></tr></thead>
+                <tbody>
+                    <tr><td>Sem conflito de interesses</td><td class="no">✗</td><td class="partial">~</td><td class="yes">✓</td></tr>
+                    <tr><td>Análise por IA</td><td class="no">✗</td><td class="no">✗</td><td class="yes">✓</td></tr>
+                    <tr><td>Multi-metodologia</td><td class="no">✗</td><td class="partial">Parcial</td><td class="yes">✓</td></tr>
+                    <tr><td>Cobertura ampla (400+ ações)</td><td class="partial">~50</td><td class="partial">~100</td><td class="yes">400+</td></tr>
+                    <tr><td>Screening avançado</td><td class="partial">Básico</td><td class="no">✗</td><td class="yes">✓</td></tr>
+                    <tr><td>Assistente IA conversacional</td><td class="no">✗</td><td class="no">✗</td><td class="yes">AIrton</td></tr>
+                    <tr><td>Alocação inteligente</td><td class="no">✗</td><td class="partial">Manual</td><td class="yes">✓</td></tr>
+                    <tr><td>Validação por analista CGA</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section class="pricing" id="precos">
+    <div class="pricing-inner">
+        <div class="pricing-header">
+            <div class="section-label">Planos</div>
+            <h2 class="section-title">Invista em análise de verdade</h2>
+            <p class="section-desc">Escolha o plano ideal para o seu momento como investidor.</p>
+        </div>
+        <div class="pricing-grid">
+            <div class="pricing-card">
+                <div class="pricing-plan">IANALISTA</div>
+                <h3>Inteligência artificial para análise de mercado</h3>
+                <div class="pricing-price"><span class="currency">R$</span>39,90<span class="period">/mês</span></div>
+                <p class="pricing-annual">ou R$ 399/ano</p>
+                <p class="pricing-desc">Para quem quer análise fundamentalista com IA.</p>
+                <ul class="pricing-features">
+                    <li>SCORE — Análise qualitativa de empresas</li>
+                    <li>ValuAI — Valuation automatizado por IA</li>
+                    <li>Validador de Teses de investimento</li>
+                    <li>Análise Qualitativa detalhada</li>
+                </ul>
+                <a href="https://app.brasilhorizonte.com.br" class="btn-cta btn-outline">Começar grátis</a>
+            </div>
+            <div class="pricing-card">
+                <div class="pricing-plan">IALOCADOR</div>
+                <h3>Ferramentas completas de alocação e análise</h3>
+                <div class="pricing-price"><span class="currency">R$</span>59,90<span class="period">/mês</span></div>
+                <p class="pricing-annual">ou R$ 599/ano</p>
+                <p class="pricing-desc">Para quem quer picking + alocação inteligente.</p>
+                <ul class="pricing-features">
+                    <li>Tudo do plano IAnalista</li>
+                    <li>Dashboard de mercado completo</li>
+                    <li>Rankings de ações</li>
+                    <li>Radar de oportunidades</li>
+                    <li>Gestão de Carteira</li>
+                    <li>Otimização de portfólio (Markowitz)</li>
+                </ul>
+                <a href="https://app.brasilhorizonte.com.br" class="btn-cta btn-outline">Começar grátis</a>
+            </div>
+            <div class="pricing-card featured">
+                <div class="pricing-plan">FUNDAMENTALISTA</div>
+                <h3>Acesso completo com relatórios, Excel e IA</h3>
+                <div class="pricing-price"><span class="currency">R$</span>79,90<span class="period">/mês</span></div>
+                <p class="pricing-annual">ou R$ 799/ano</p>
+                <p class="pricing-desc">Para o investidor que quer tudo, sem limitações.</p>
+                <ul class="pricing-features">
+                    <li>Tudo do plano IAlocador</li>
+                    <li>Relatórios de análise exclusivos</li>
+                    <li>Conteúdos audiovisuais</li>
+                    <li>Modelos em Excel com valuation completo</li>
+                    <li>Download de planilhas de empresas</li>
+                    <li>Lives mensais exclusivas</li>
+                    <li>Acesso a grupo fechado de membros</li>
+                    <li>Prioridade em respostas e suporte</li>
+                </ul>
+                <a href="https://app.brasilhorizonte.com.br" class="btn-cta">Começar grátis →</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="resources-comp">
+    <div class="resources-comp-inner">
+        <div class="resources-comp-header">
+            <div class="section-label">Comparativo</div>
+            <h2 class="section-title">Comparativo de Recursos</h2>
+            <p class="section-desc">Cada plano inclui todos os recursos dos planos anteriores.</p>
+        </div>
+        <div class="res-table-wrap">
+            <table class="res-table">
+                <thead><tr><th>Recursos</th><th>IAnalista</th><th>IAlocador</th><th class="highlight-col">Fundamentalista</th></tr></thead>
+                <tbody>
+                    <tr><td>Score</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>ValuAI</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Validador de Teses</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Análise Qualitativa</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Dashboard diário</td><td class="no">—</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Rankings de Screenings</td><td class="no">—</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Radar de Oportunidades</td><td class="no">—</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Gestão de Carteiras</td><td class="no">—</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Otimização de portfólio (Markowitz)</td><td class="no">—</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Relatórios exclusivos</td><td class="no">—</td><td class="no">—</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Conteúdo Audiovisual</td><td class="no">—</td><td class="no">—</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Acesso à comunidade</td><td class="no">—</td><td class="no">—</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Atualizações mensais de estratégia</td><td class="no">—</td><td class="no">—</td><td class="yes highlight-col">✓</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section class="faq" id="faq">
+    <div class="faq-inner">
+        <div class="faq-header">
+            <div class="section-label">Dúvidas</div>
+            <h2 class="section-title">Perguntas Frequentes</h2>
+        </div>
+        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">O iAções é uma casa de análise ou corretora?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Nenhum dos dois. O iAções é uma plataforma de tecnologia que oferece ferramentas de análise fundamentalista potencializadas por IA. Não fazemos recomendações de compra/venda, não vendemos ativos e não somos uma corretora.</p></div></div>
+        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Como funciona a análise por IA?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Nossa IA processa dados financeiros públicos das empresas listadas na B3 e aplica as metodologias de Graham, Bazin e Gordon de forma automatizada. Tudo validado por analista CGA certificado pela APIMEC.</p></div></div>
+        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Quem é o analista por trás da plataforma?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Lucas Mello, analista certificado (CGA) pela APIMEC. A IA executa as análises com base nos critérios técnicos definidos por ele, garantindo rigor metodológico em escala.</p></div></div>
+        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">O que significa "zero conflito de interesses"?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Nossa receita vem 100% das assinaturas. Não ganhamos comissão por operações, não vendemos fundos, não fazemos co-distribuição. Nosso compromisso é exclusivamente com a qualidade da análise.</p></div></div>
+        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Posso cancelar a qualquer momento?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Sim. Planos mensais podem ser cancelados a qualquer momento sem multa. O plano anual pode ser cancelado com reembolso proporcional nos primeiros 30 dias.</p></div></div>
+        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Quem é o AIrton?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Nosso assistente de IA conversacional. Pergunte sobre qualquer ação da B3, peça comparações, tire dúvidas sobre indicadores. Como ter um analista disponível 24/7.</p></div></div>
+    </div>
+</section>
+
+<section class="final-cta" id="acesso">
+    <div class="final-cta-content">
+        <div class="section-label">Comece agora</div>
+        <h2>Pare de adivinhar.<br>Comece a <span style="color: var(--gold-light)">analisar</span>.</h2>
+        <p>7 dias grátis. Sem cartão de crédito. Sem compromisso.</p>
+        <a href="https://app.brasilhorizonte.com.br" class="btn-cta">Criar conta gratuita →</a>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <img src="assets/img/institucional_branco_amarelo_3x.png" alt="Brasil Horizonte">
+            <span>Uma plataforma <a href="https://brasilhorizonte.com.br" target="_blank">Brasil Horizonte</a></span>
+        </div>
+        <ul class="footer-links">
+            <li><a href="#">Termos de Uso</a></li>
+            <li><a href="#">Política de Privacidade</a></li>
+            <li><a href="#">Contato</a></li>
+            <li><a href="#">Blog</a></li>
+        </ul>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "iacoes-lp",
+  "version": "1.0.0",
+  "description": "Landing page da iAções — Stock Picking com IA | Brasil Horizonte",
+  "scripts": {
+    "dev": "npx serve ."
+  },
+  "private": true
+}
