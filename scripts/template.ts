@@ -178,20 +178,20 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   const ogTitle = `${f.symbol} vale a pena? Preco Justo R$ ${fmt(grahamFV)} (Graham) | iAcoes`;
   const faqItems = [
     {
-      q: `Qual o preco justo de ${f.symbol}?`,
-      a: `Segundo o metodo de Graham, o preco justo de ${f.symbol} e R$ ${fmt(grahamFV)}. Pelo metodo de Bazin (dividendos), o preco justo e R$ ${fmt(bazinFV)}. Pelo modelo de Gordon (DDM), o preco justo e R$ ${fmt(gordonFV)}. A cotacao atual e R$ ${fmt(f.price)}.`
+      q: `Quais os principais indicadores fundamentalistas de ${f.symbol}?`,
+      a: `${f.symbol} apresenta P/L de ${fmtNum(f.pl)}, P/VP de ${fmtNum(f.pvp)}, ROE de ${fmtPctShort(f.roe)}, ROIC de ${fmtPctShort(f.roic)}, Margem Liquida de ${fmtPctShort(f.netMargin)}, EV/EBITDA de ${fmtNum(f.evEbitda)} e Div. Liq./EBITDA de ${fmtNum(f.debtEbitda)}. Esses indicadores ajudam a avaliar a saude financeira, rentabilidade e eficiencia operacional da empresa.`
     },
     {
-      q: `${f.symbol} esta cara ou barata?`,
-      a: `Com P/L de ${fmtNum(f.pl)} e P/VP de ${fmtNum(f.pvp)}, ${f.symbol} ${grahamFV > f.price ? 'esta sendo negociada abaixo do preco justo de Graham (R$ ' + fmt(grahamFV) + '), sugerindo que pode estar barata' : 'esta sendo negociada acima do preco justo de Graham (R$ ' + fmt(grahamFV) + '), sugerindo cautela'}. E importante considerar multiplas metodologias e o contexto do setor de ${f.sector}.`
+      q: `Em qual setor ${f.symbol} atua e quem sao seus concorrentes?`,
+      a: `${f.symbol} (${f.companyName}) atua no setor de ${f.sector}${f.industry ? ', segmento de ' + f.industry : ''}. A empresa compete com outras companhias listadas na B3 dentro do mesmo setor. Para uma analise comparativa, e importante avaliar os multiplos setoriais como P/L, EV/EBITDA e margens operacionais em relacao aos pares de mercado.`
     },
     {
-      q: `${f.symbol} paga bons dividendos?`,
-      a: `${f.symbol} possui Dividend Yield de ${fmtPctShort(f.divYield)}${divTTM > 0 ? ' e pagou R$ ' + fmt(divTTM) + ' por acao nos ultimos 12 meses' : ''}. ${bazinFV > 0 && bazinFV > f.price ? 'Pelo metodo de Bazin, a acao esta atrativa para dividendos, com preco justo de R$ ' + fmt(bazinFV) + '.' : 'Avalie o historico de pagamentos antes de investir focando em dividendos.'}`
+      q: `Como esta a rentabilidade e as margens de ${f.symbol}?`,
+      a: `${f.symbol} possui ROE de ${fmtPctShort(f.roe)} e ROIC de ${fmtPctShort(f.roic)}, que medem o retorno sobre o patrimonio e sobre o capital investido, respectivamente. A Margem Bruta e de ${fmtPctShort(f.grossMargin)}, a Margem EBITDA de ${fmtPctShort(f.ebitdaMargin)} e a Margem Liquida de ${fmtPctShort(f.netMargin)}. Esses numeros refletem a capacidade da empresa de gerar lucro a partir de suas operacoes.`
     },
     {
-      q: `Quais os indicadores fundamentalistas de ${f.symbol}?`,
-      a: `Os principais indicadores de ${f.symbol} sao: P/L ${fmtNum(f.pl)}, P/VP ${fmtNum(f.pvp)}, ROE ${fmtPctShort(f.roe)}, ROIC ${fmtPctShort(f.roic)}, Margem Liquida ${fmtPctShort(f.netMargin)}, Div. Yield ${fmtPctShort(f.divYield)}, EV/EBITDA ${fmtNum(f.evEbitda)} e Div. Liq./EBITDA ${fmtNum(f.debtEbitda)}.`
+      q: `Qual o historico de dividendos de ${f.symbol}?`,
+      a: `${f.symbol} possui Dividend Yield atual de ${fmtPctShort(f.divYield)}${divTTM > 0 ? ' e distribuiu R$ ' + fmt(divTTM) + ' por acao nos ultimos 12 meses' : ''}. O historico de dividendos e um dos fatores analisados para entender a politica de remuneracao ao acionista e a consistencia dos pagamentos ao longo dos anos.`
     }
   ];
 
@@ -1371,7 +1371,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   <section class="cta-card animate-in" aria-label="Acesse a plataforma">
     <h2>Analise completa na plataforma</h2>
     <p>Acesse premissas editaveis, cenarios Bear/Base/Bull, analise qualitativa com IA, radar de noticias e muito mais.</p>
-    <a href="https://app.brasilhorizonte.com.br" class="cta-btn">Acessar iAcoes &rarr;</a>
+    <a href="https://app.brasilhorizonte.com.br" class="cta-btn">Acessar Gr&aacute;tis &rarr;</a>
   </section>
 
   </article>
