@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<script>
+(function() {
+    var path = window.location.pathname;
+    var upper = path.toUpperCase();
+    if (upper !== path) {
+        window.location.replace(window.location.origin + upper);
+    }
+})();
+</script>
+<title>Redirecionando...</title>
+</head>
+<body></body>
+</html>
