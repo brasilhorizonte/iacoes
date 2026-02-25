@@ -3,7 +3,17 @@
   "version": "1.0.0",
   "description": "Landing page da iAções — Stock Picking com IA | Brasil Horizonte",
   "scripts": {
-    "dev": "npx serve ."
+    "dev": "npx serve .",
+    "generate": "npx tsx scripts/generate-pages.ts",
+    "generate:test": "npx tsx scripts/generate-pages.ts VALE3 PETR4 WEGE3"
   },
-  "private": true
+  "private": true,
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.0",
+    "dotenv": "^16.4.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.0"
+  }
 }

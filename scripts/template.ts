@@ -1,0 +1,249 @@
+import type { FinancialData, ComprehensiveValuation } from './types';
+
+const fmt = (n: number, dec = 2): string => n.toLocaleString('pt-BR', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+const fmtPct = (n: number): string => (n * 100).toFixed(1) + '%';
+const fmtBRL = (n: number): string => `R$ ${fmt(n)}`;
+const fmtMM = (n: number): string => {
+  if (Math.abs(n) >= 1e9) return `R$ ${fmt(n / 1e9)} bi`;
+  if (Math.abs(n) >= 1e6) return `R$ ${fmt(n / 1e6, 0)} mi`;
+  return `R$ ${fmt(n, 0)}`;
+};
+
+const upsideClass = (upside: number): string => upside >= 0 ? 'upside-positive' : 'upside-negative';
+const upsideLabel = (upside: number): string => upside >= 0 ? `+${fmtPct(upside)}` : fmtPct(upside);
+
+export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuation): string => {
+  const f = data.fundamentals;
+  const today = new Date().toLocaleDateString('pt-BR');
+  const desc = data.businessSummary
+    ? data.businessSummary.substring(0, 160) + '...'
+    : `Análise fundamentalista completa de ${f.symbol} (${f.name}) com valuation por 5 metodologias: DCF, Graham, Bazin, Gordon e EVA.`;
+
+  const methodRows = val.results
+    .filter(r => r.fairValue > 0)
+    .map(r => `
+      <tr>
+        <td>${r.method}</td>
+        <td>${fmtBRL(r.fairValue)}</td>
+        <td>${(r.weight * 100).toFixed(0)}%</td>
+        <td class="${upsideClass(r.upside)}">${upsideLabel(r.upside)}</td>
+      </tr>
+    `).join('');
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${f.symbol} — Análise Fundamentalista e Valuation | iAções</title>
+    <meta name="description" content="${desc}">
+    <meta name="keywords" content="${f.symbol},${f.name},valuation,análise fundamentalista,B3,ações,preço justo">
+    <meta property="og:title" content="${f.symbol} — Preço Justo ${fmtBRL(val.weightedFairValue)} | iAções">
+    <meta property="og:description" content="${desc}">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://iacoes.com.br/${f.symbol}">
+    <meta property="og:site_name" content="iAções — Brasil Horizonte">
+    <link rel="canonical" href="https://iacoes.com.br/${f.symbol}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "${f.symbol} — Análise de Valuation",
+      "description": "${desc}",
+      "datePublished": "${new Date().toISOString()}",
+      "dateModified": "${new Date().toISOString()}",
+      "author": { "@type": "Organization", "name": "Brasil Horizonte" },
+      "publisher": { "@type": "Organization", "name": "iAções by Brasil Horizonte" }
+    }
+    </script>
+    <style>
+        :root {
+            --bg: #FAFAF8; --bg-white: #FFFFFF; --nav-bg: #2B3A2B; --nav-bg-deep: #1E2B1E;
+            --gold: #B8923E; --gold-light: #C9A44E; --gold-bg: #FAF6EE;
+            --green-accent: #2D8C4E; --green-bg: #E8F5E8;
+            --text-primary: #1A1A18; --text-secondary: #5A5850; --text-tertiary: #8A8880;
+            --border: #E8E6E0; --border-strong: #D4D0C8;
+            --font-display: 'DM Sans', sans-serif; --font-mono: 'JetBrains Mono', monospace;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-display); background: var(--bg); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+
+        /* NAV */
+        nav { position: sticky; top: 0; z-index: 100; padding: 0 2rem; height: 64px; display: flex; align-items: center; justify-content: space-between; background: var(--nav-bg); }
+        .nav-logo { display: flex; align-items: center; font-family: var(--font-mono); font-weight: 700; font-size: 1.25rem; color: #FFF; text-decoration: none; }
+        .nav-logo .ia { color: var(--gold-light); }
+        .nav-cta { display: inline-flex; align-items: center; padding: 0.55rem 1.2rem; background: var(--gold); color: var(--nav-bg-deep); font-weight: 700; font-size: 0.88rem; border-radius: 8px; text-decoration: none; transition: all 0.25s; }
+        .nav-cta:hover { background: var(--gold-light); }
+
+        /* CONTAINER */
+        .container { max-width: 960px; margin: 0 auto; padding: 2rem; }
+
+        /* HEADER */
+        .ticker-header { padding: 2.5rem 0; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+        .ticker-badge { display: inline-block; padding: 0.2rem 0.6rem; font-family: var(--font-mono); font-size: 0.65rem; border-radius: 5px; background: var(--green-bg); color: var(--green-accent); border: 1px solid rgba(45,140,78,0.12); font-weight: 600; margin-bottom: 0.6rem; }
+        .ticker-symbol { font-size: 2.8rem; font-weight: 800; letter-spacing: -0.03em; }
+        .ticker-name { font-size: 1.1rem; color: var(--text-secondary); margin-top: 0.2rem; }
+        .ticker-sector { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-tertiary); margin-top: 0.4rem; text-transform: uppercase; letter-spacing: 0.08em; }
+        .ticker-price-row { display: flex; align-items: baseline; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+        .ticker-price { font-size: 2rem; font-weight: 800; }
+        .ticker-change { font-size: 0.9rem; font-weight: 600; }
+
+        /* VALUATION BOX */
+        .valuation-box { background: var(--bg-white); border: 2px solid var(--gold); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; text-align: center; }
+        .valuation-label { font-family: var(--font-mono); font-size: 0.72rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; margin-bottom: 0.5rem; }
+        .valuation-price { font-size: 3rem; font-weight: 800; letter-spacing: -0.03em; }
+        .valuation-upside { font-size: 1.2rem; font-weight: 700; margin-top: 0.3rem; }
+        .upside-positive { color: var(--green-accent); }
+        .upside-negative { color: #C44040; }
+        .valuation-range { display: flex; justify-content: center; gap: 2rem; margin-top: 1rem; font-size: 0.85rem; color: var(--text-tertiary); }
+        .valuation-range span { font-family: var(--font-mono); }
+
+        /* METRICS GRID */
+        .metrics-section { margin-bottom: 2rem; }
+        .section-label { font-family: var(--font-mono); font-size: 0.72rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; margin-bottom: 1rem; }
+        .section-title { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 1.2rem; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; }
+        .metric-card { background: var(--bg-white); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; }
+        .metric-label { font-size: 0.75rem; color: var(--text-tertiary); margin-bottom: 0.2rem; }
+        .metric-value { font-size: 1.15rem; font-weight: 700; font-family: var(--font-mono); }
+
+        /* TABLE */
+        .methods-table { width: 100%; border-collapse: collapse; margin-bottom: 2rem; background: var(--bg-white); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+        .methods-table thead th { padding: 1rem; font-weight: 700; text-align: center; border-bottom: 1px solid var(--border); font-size: 0.82rem; background: var(--bg); color: var(--text-secondary); }
+        .methods-table thead th:first-child { text-align: left; padding-left: 1.5rem; }
+        .methods-table tbody td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); text-align: center; font-family: var(--font-mono); font-size: 0.88rem; }
+        .methods-table tbody td:first-child { text-align: left; padding-left: 1.5rem; font-family: var(--font-display); font-weight: 600; }
+        .methods-table tbody tr:last-child td { border-bottom: none; }
+
+        /* SUMMARY */
+        .summary-box { background: var(--bg-white); border: 1px solid var(--border); border-radius: 14px; padding: 1.8rem; margin-bottom: 2rem; }
+        .summary-box p { color: var(--text-secondary); font-size: 0.92rem; line-height: 1.7; }
+
+        /* CTA */
+        .cta-section { text-align: center; padding: 3rem 2rem; background: var(--nav-bg); border-radius: 16px; margin-bottom: 2rem; }
+        .cta-section h2 { color: #FFF; font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .cta-section p { color: rgba(255,255,255,0.6); margin-bottom: 1.5rem; }
+        .cta-btn { display: inline-flex; padding: 0.8rem 2rem; background: var(--gold); color: var(--nav-bg-deep); font-weight: 700; font-size: 1rem; border-radius: 10px; text-decoration: none; transition: all 0.25s; }
+        .cta-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+        /* FOOTER */
+        .page-footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--text-tertiary); border-top: 1px solid var(--border); }
+        .page-footer a { color: var(--text-secondary); }
+
+        /* DISCLAIMER */
+        .disclaimer { background: var(--gold-bg); border: 1px solid rgba(184,146,62,0.15); border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: 2rem; font-size: 0.78rem; color: var(--text-tertiary); line-height: 1.6; }
+
+        @media (max-width: 768px) {
+            .ticker-symbol { font-size: 2rem; }
+            .valuation-price { font-size: 2.2rem; }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/" class="nav-logo"><span class="ia">iA</span>ções</a>
+    <a href="https://app.brasilhorizonte.com.br" class="nav-cta">Acessar plataforma</a>
+</nav>
+
+<div class="container">
+
+    <div class="ticker-header">
+        <div class="ticker-badge">${f.sector}</div>
+        <div class="ticker-symbol">${f.symbol}</div>
+        <div class="ticker-name">${f.name}</div>
+        <div class="ticker-sector">${f.subSector} &bull; ${f.type}</div>
+        <div class="ticker-price-row">
+            <span class="ticker-price">${fmtBRL(f.price)}</span>
+            <span class="ticker-change ${f.changeDay >= 0 ? 'upside-positive' : 'upside-negative'}">${f.changeDay >= 0 ? '+' : ''}${fmtPct(f.changeDay)} hoje</span>
+        </div>
+    </div>
+
+    <div class="valuation-box">
+        <div class="valuation-label">Preço Justo (Média Ponderada)</div>
+        <div class="valuation-price">${fmtBRL(val.weightedFairValue)}</div>
+        <div class="valuation-upside ${upsideClass(val.totalUpside)}">
+            Upside: ${upsideLabel(val.totalUpside)}
+        </div>
+        <div class="valuation-range">
+            <div>Min: <span>${fmtBRL(val.priceRange.min)}</span></div>
+            <div>Max: <span>${fmtBRL(val.priceRange.max)}</span></div>
+        </div>
+    </div>
+
+    <div class="metrics-section">
+        <div class="section-label">Indicadores Fundamentalistas</div>
+        <div class="metrics-grid">
+            <div class="metric-card"><div class="metric-label">P/L</div><div class="metric-value">${fmt(f.pl, 1)}x</div></div>
+            <div class="metric-card"><div class="metric-label">P/VP</div><div class="metric-value">${fmt(f.pvp, 1)}x</div></div>
+            <div class="metric-card"><div class="metric-label">ROE</div><div class="metric-value">${fmtPct(f.roe)}</div></div>
+            <div class="metric-card"><div class="metric-label">ROIC</div><div class="metric-value">${fmtPct(f.roic)}</div></div>
+            <div class="metric-card"><div class="metric-label">Div. Yield</div><div class="metric-value">${fmtPct(f.divYield)}</div></div>
+            <div class="metric-card"><div class="metric-label">EV/EBITDA</div><div class="metric-value">${fmt(f.evEbitda, 1)}x</div></div>
+            <div class="metric-card"><div class="metric-label">Margem Líquida</div><div class="metric-value">${fmtPct(f.netMargin)}</div></div>
+            <div class="metric-card"><div class="metric-label">Margem EBITDA</div><div class="metric-value">${fmtPct(f.ebitdaMargin)}</div></div>
+            <div class="metric-card"><div class="metric-label">Dív. Líq./EBITDA</div><div class="metric-value">${fmt(f.debtEbitda, 1)}x</div></div>
+            <div class="metric-card"><div class="metric-label">LPA</div><div class="metric-value">${fmtBRL(f.lpa)}</div></div>
+            <div class="metric-card"><div class="metric-label">VPA</div><div class="metric-value">${fmtBRL(f.vpa)}</div></div>
+            <div class="metric-card"><div class="metric-label">Market Cap</div><div class="metric-value">${fmtMM(f.marketCap)}</div></div>
+        </div>
+    </div>
+
+    <div class="metrics-section">
+        <div class="section-label">Valuation por Metodologia</div>
+        <table class="methods-table">
+            <thead><tr><th>Método</th><th>Preço Justo</th><th>Peso</th><th>Upside</th></tr></thead>
+            <tbody>${methodRows}</tbody>
+        </table>
+    </div>
+
+    ${data.businessSummary ? `
+    <div class="metrics-section">
+        <div class="section-label">Sobre a Empresa</div>
+        <div class="summary-box"><p>${data.businessSummary}</p></div>
+    </div>
+    ` : ''}
+
+    <div class="disclaimer">
+        Esta análise é gerada automaticamente por inteligência artificial com base em dados públicos e metodologias consagradas (DCF, Graham, Bazin, Gordon, EVA).
+        Não constitui recomendação de compra ou venda de ativos. Dados atualizados em ${today}.
+        A Brasil Horizonte não é uma corretora e não vende produtos financeiros.
+    </div>
+
+    <div class="cta-section">
+        <h2>Análise completa na plataforma</h2>
+        <p>Acesse premissas editáveis, cenários Bear/Base/Bull, matriz de sensibilidade e mais.</p>
+        <a href="https://app.brasilhorizonte.com.br" class="cta-btn">Acessar iAções →</a>
+    </div>
+
+</div>
+
+<div class="page-footer">
+    <p>© ${new Date().getFullYear()} <a href="https://brasilhorizonte.com.br" target="_blank">Brasil Horizonte</a> — iAções. Dados via BRAPI. Atualizado em ${today}.</p>
+</div>
+
+</body>
+</html>`;
+};
+
+export const generateSitemap = (tickers: string[]): string => {
+  const today = new Date().toISOString().split('T')[0];
+  const urls = [
+    `  <url><loc>https://iacoes.com.br/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>`,
+    ...tickers.map(t =>
+      `  <url><loc>https://iacoes.com.br/${t}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>`
+    )
+  ];
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.join('\n')}
+</urlset>`;
+};
+
+export const generateRobots = (): string => `User-agent: *
+Allow: /
+Sitemap: https://iacoes.com.br/sitemap.xml
+`;
