@@ -243,3 +243,17 @@ export const getAllTickers = async (): Promise<string[]> => {
   if (error || !data) return [];
   return data.map((r: any) => String(r.symbol).toUpperCase()).filter(Boolean);
 };
+
+export const getTickersWithNames = async (): Promise<{ ticker: string; name: string }[]> => {
+  const { data, error } = await supabase
+    .from('brapi_quotes')
+    .select('symbol, short_name, long_name')
+    .gt('market_cap', 0)
+    .order('market_cap', { ascending: false });
+
+  if (error || !data) return [];
+  return data.map((r: any) => ({
+    ticker: String(r.symbol).toUpperCase(),
+    name: String(r.short_name || r.long_name || '').trim()
+  })).filter(t => t.ticker);
+};

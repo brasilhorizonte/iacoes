@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { getAllTickers } from './supabase';
+import { getAllTickers, getTickersWithNames } from './supabase';
 import { getFinancialData, performValuation } from './valuation';
 import { generateTickerHTML, generateSitemap, generateRobots } from './template';
 import { SCENARIO_PRESETS, DEFAULT_COST_OF_DEBT } from './constants';
@@ -83,7 +83,7 @@ async function main() {
     if (i + BATCH_SIZE < tickers.length) await sleep(DELAY_MS);
   }
 
-  // Generate sitemap and robots.txt
+  // Generate sitemap, robots.txt and tickers.json
   if (generated.length > 0) {
     const sitemap = generateSitemap(generated);
     writeFileSync(join(ROOT, 'sitemap.xml'), sitemap, 'utf-8');
@@ -92,6 +92,12 @@ async function main() {
     const robots = generateRobots();
     writeFileSync(join(ROOT, 'robots.txt'), robots, 'utf-8');
     console.log('🤖 robots.txt gerado');
+
+    // Generate tickers.json for search autocomplete
+    const allTickers = await getTickersWithNames();
+    const tickersIndex = allTickers.filter(t => generated.includes(t.ticker));
+    writeFileSync(join(ROOT, 'tickers.json'), JSON.stringify(tickersIndex), 'utf-8');
+    console.log(`🔍 tickers.json gerado (${tickersIndex.length} tickers)`);
   }
 
   console.log(`\n✅ Concluído: ${success} geradas, ${failed} falhas (de ${tickers.length} total)\n`);
