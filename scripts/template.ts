@@ -900,6 +900,14 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       height: 200px; margin-top: 1rem;
     }
     .nota-radar-svg { max-width: 260px; width: 100%; }
+    .nota-categories { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
+    .nota-categories-title { font-weight: 700; font-size: 0.9rem; color: #0f172a; margin-bottom: 0.25rem; }
+    .nota-cat-item { border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.6rem 0.75rem; }
+    .nota-cat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; }
+    .nota-cat-name { font-size: 0.8rem; color: #334155; font-weight: 600; }
+    .nota-cat-score { font-size: 0.8rem; font-weight: 700; }
+    .nota-cat-bar { height: 6px; border-radius: 3px; background: #f1f5f9; overflow: hidden; }
+    .nota-cat-bar-fill { height: 100%; border-radius: 3px; }
     .nota-overlay {
       position: absolute; bottom: 0; left: 0; right: 0;
       height: 70%; display: flex; flex-direction: column;
@@ -1319,26 +1327,32 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     </div>
 
     <div class="nota-blurred">
-      <p class="nota-blurred-text">
-        Com base na análise da Brasil Horizonte Research, segue o resumo do resultado da ${f.name} (${f.symbol}). A nota qualitativa avalia critérios como Governança Corporativa, Management, Riscos da Indústria, Vantagens Competitivas, Barreiras à Entrada e Poder de Barganha para determinar a qualidade estrutural da empresa além dos números financeiros.
-      </p>
-
-      <div class="nota-radar-placeholder">
-        <svg class="nota-radar-svg" viewBox="0 0 300 260" fill="none">
-          <!-- Radar grid -->
-          <polygon points="150,30 250,100 220,210 80,210 50,100" stroke="#e2e8f0" stroke-width="1" fill="none"/>
-          <polygon points="150,60 220,110 200,190 100,190 80,110" stroke="#e2e8f0" stroke-width="1" fill="none"/>
-          <polygon points="150,90 190,120 180,170 120,170 110,120" stroke="#e2e8f0" stroke-width="1" fill="none"/>
-          <!-- Radar fill -->
-          <polygon points="150,55 230,105 195,195 105,185 70,115" fill="rgba(182,143,64,0.15)" stroke="#B68F40" stroke-width="2"/>
-          <!-- Labels -->
-          <text x="150" y="22" text-anchor="middle" font-size="10" fill="#64748b" font-family="Montserrat">Governança</text>
-          <text x="265" y="100" text-anchor="start" font-size="10" fill="#64748b" font-family="Montserrat">Management</text>
-          <text x="235" y="225" text-anchor="start" font-size="10" fill="#64748b" font-family="Montserrat">Indústria</text>
-          <text x="65" y="225" text-anchor="end" font-size="10" fill="#64748b" font-family="Montserrat">Poder Barganha</text>
-          <text x="35" y="100" text-anchor="end" font-size="10" fill="#64748b" font-family="Montserrat">Riscos</text>
-          <text x="150" y="255" text-anchor="middle" font-size="10" fill="#64748b" font-family="Montserrat">Vantagens Competitivas</text>
-        </svg>
+      <div class="nota-categories">
+        <div class="nota-categories-title">Scores por Categoria</div>
+        <div class="nota-cat-item">
+          <div class="nota-cat-header"><span class="nota-cat-name">Governança</span><span class="nota-cat-score" style="color:#0f172a">?.?</span></div>
+          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:70%;background:#0f172a"></div></div>
+        </div>
+        <div class="nota-cat-item">
+          <div class="nota-cat-header"><span class="nota-cat-name">Management</span><span class="nota-cat-score" style="color:#0f172a">?.?</span></div>
+          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:68%;background:#0f172a"></div></div>
+        </div>
+        <div class="nota-cat-item">
+          <div class="nota-cat-header"><span class="nota-cat-name">Indústria</span><span class="nota-cat-score" style="color:#ef4444">?.?</span></div>
+          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:50%;background:#ef4444"></div></div>
+        </div>
+        <div class="nota-cat-item">
+          <div class="nota-cat-header"><span class="nota-cat-name">Vantagens Competitivas / Barreiras à Entrada</span><span class="nota-cat-score" style="color:#B68F40">?.?</span></div>
+          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:75%;background:#B68F40"></div></div>
+        </div>
+        <div class="nota-cat-item">
+          <div class="nota-cat-header"><span class="nota-cat-name">Poder de Barganha</span><span class="nota-cat-score" style="color:#B68F40">?.?</span></div>
+          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:72%;background:#B68F40"></div></div>
+        </div>
+        <div class="nota-cat-item">
+          <div class="nota-cat-header"><span class="nota-cat-name">Riscos e Estrutura</span><span class="nota-cat-score" style="color:#ef4444">?.?</span></div>
+          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:45%;background:#ef4444"></div></div>
+        </div>
       </div>
     </div>
 
@@ -1347,7 +1361,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
       </div>
       <div class="nota-overlay-title">Análise Qualitativa com IA</div>
-      <div class="nota-overlay-sub">Acesse a nota qualitativa completa de ${f.symbol}, radar de categorias e insights gerados por IA na plataforma Brasil Horizonte.</div>
+      <div class="nota-overlay-sub">Acesse a nota qualitativa completa de ${f.symbol} com mais de 50 perguntas de auditoria em 6 categorias: Governança, Management, Indústria, Vantagens Competitivas, Poder de Barganha e Riscos &amp; Estrutura.</div>
       <a href="https://app.brasilhorizonte.com.br/authnew" class="nota-overlay-btn">Desbloquear Análise &rarr;</a>
     </div>
   </section>
