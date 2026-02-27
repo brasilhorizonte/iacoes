@@ -1440,7 +1440,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   <section class="cta-card animate-in" aria-label="Acesse a plataforma">
     <h2>Análise completa na plataforma</h2>
     <p>Acesse premissas editáveis, cenários Bear/Base/Bull, análise qualitativa com IA, radar de notícias e muito mais.</p>
-    <a href="https://app.brasilhorizonte.com.br/authnew" class="cta-btn">Acessar Gr&aacute;tis &rarr;</a>
+    <a href="https://app.brasilhorizonte.com.br/authnew" class="cta-btn">Teste a sua tese de investimento gr&aacute;tis &rarr;</a>
   </section>
 
   </article>
