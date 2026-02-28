@@ -229,3 +229,20 @@ export interface SupabaseFinancials {
   brapi: RawBrapiQuote[];
   dividends: RawDividend[];
 }
+
+export interface PeerTicker {
+  ticker: string;
+  name: string;
+  sector: string;
+  price: number;
+}
+
+export interface TickerIndexEntry {
+  ticker: string;
+  name: string;
+  sector: string;
+  price: number;
+  pl: number;
+  divYield: number;
+  marketCap: number;
+}

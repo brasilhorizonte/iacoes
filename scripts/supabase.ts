@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import type {
   RawIncomeStatement, RawBalanceSheet, RawCashFlow,
-  RawBrapiQuote, RawDividend, SupabaseFinancials
+  RawBrapiQuote, RawDividend, SupabaseFinancials,
+  PeerTicker, TickerIndexEntry
 } from './types';
 
 const SUPABASE_URL = process.env.SUPABASE_URL!;
@@ -256,4 +257,32 @@ export const getTickersWithNames = async (): Promise<{ ticker: string; name: str
     ticker: String(r.symbol).toUpperCase(),
     name: String(r.short_name || r.long_name || '').trim()
   })).filter(t => t.ticker);
+};
+
+export const getAllTickersWithSector = async (): Promise<TickerIndexEntry[]> => {
+  const { data, error } = await supabase
+    .from('brapi_quotes')
+    .select('symbol, short_name, long_name, sector, price, regular_market_price, pl, dividend_yield, market_cap')
+    .gt('market_cap', 0)
+    .order('market_cap', { ascending: false });
+
+  if (error || !data) { console.warn('getAllTickersWithSector error:', error?.message); return []; }
+  return data.map((r: any) => ({
+    ticker: String(r.symbol).toUpperCase(),
+    name: String(r.short_name || r.long_name || '').trim(),
+    sector: String(r.sector || '').trim(),
+    price: toNumber(r.price) || toNumber(r.regular_market_price),
+    pl: toNumber(r.pl),
+    divYield: toNumber(r.dividend_yield),
+    marketCap: toNumber(r.market_cap)
+  })).filter(t => t.ticker);
+};
+
+export const getPeersBySector = (allTickers: TickerIndexEntry[], ticker: string, limit = 8): PeerTicker[] => {
+  const current = allTickers.find(t => t.ticker === ticker);
+  if (!current || !current.sector) return [];
+  return allTickers
+    .filter(t => t.ticker !== ticker && t.sector === current.sector && t.price > 0)
+    .slice(0, limit)
+    .map(t => ({ ticker: t.ticker, name: t.name, sector: t.sector, price: t.price }));
 };

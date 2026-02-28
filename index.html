@@ -755,6 +755,67 @@
         .faq-item.open .faq-answer { max-height: 300px; padding-bottom: 1.2rem; }
         .faq-answer p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; }
 
+        /* POPULAR TICKERS */
+        .popular-tickers {
+            padding: 5rem 2rem;
+            background: var(--bg-white);
+            border-top: 1px solid var(--border);
+        }
+        .popular-inner { max-width: 1100px; margin: 0 auto; }
+        .popular-header { text-align: center; margin-bottom: 2.5rem; }
+        .popular-header .section-desc { margin: 0 auto; }
+        .popular-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        .popular-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem 0.8rem;
+            text-decoration: none;
+            color: inherit;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .popular-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(184, 146, 62, 0.1);
+        }
+        .popular-ticker {
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: block;
+        }
+        .popular-name {
+            font-size: 0.68rem;
+            color: var(--text-tertiary);
+            display: block;
+            margin-top: 0.15rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .popular-all {
+            text-align: center;
+        }
+        .popular-all a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .popular-all a:hover { color: var(--gold-light); text-decoration: underline; }
+
         /* FINAL CTA */
         .final-cta {
             padding: 6rem 2rem;
@@ -856,24 +917,27 @@
     }
     </script>
 
-    <!-- Schema.org JSON-LD: WebPage -->
+    <!-- Schema.org JSON-LD: WebSite with SearchAction -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
-        "@type": "WebPage",
-        "name": "iAções — A Primeira Plataforma de Stock Picking com IA do Brasil",
-        "description": "Análise fundamentalista potencializada por Inteligência Artificial. Sem conflito de interesses. Metodologias Graham, Bazin e Gordon. Descubra as melhores ações da B3.",
+        "@type": "WebSite",
+        "name": "iAções",
         "url": "https://iacoes.com.br/",
+        "description": "Análise fundamentalista de ações da B3 com preço justo por Graham, Bazin e Gordon. Plataforma potencializada por Inteligência Artificial.",
         "inLanguage": "pt-BR",
-        "isPartOf": {
-            "@type": "WebSite",
-            "name": "iAções",
-            "url": "https://iacoes.com.br/"
-        },
         "publisher": {
             "@type": "Organization",
             "name": "Brasil Horizonte",
             "url": "https://brasilhorizonte.com.br"
+        },
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://iacoes.com.br/{ticker}"
+            },
+            "query-input": "required name=ticker"
         }
     }
     </script>
@@ -1272,6 +1336,15 @@
     </div>
 </section>
 
+<section class="final-cta" id="acesso">
+    <div class="final-cta-content">
+        <div class="section-label">Comece agora</div>
+        <h2>Pare de adivinhar.<br>Comece a <span style="color: var(--gold-light)">analisar</span>.</h2>
+        <p>Sem cartão de crédito. Sem compromisso.</p>
+        <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta">Testar grátis →</a>
+    </div>
+</section>
+
 <section class="faq" id="faq">
     <div class="faq-inner">
         <div class="faq-header">
@@ -1295,12 +1368,38 @@
     </div>
 </section>
 
-<section class="final-cta" id="acesso">
-    <div class="final-cta-content">
-        <div class="section-label">Comece agora</div>
-        <h2>Pare de adivinhar.<br>Comece a <span style="color: var(--gold-light)">analisar</span>.</h2>
-        <p>Sem cartão de crédito. Sem compromisso.</p>
-        <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta">Testar grátis →</a>
+<section class="popular-tickers" id="acoes">
+    <div class="popular-inner">
+        <div class="popular-header">
+            <div class="section-label">Ações analisadas</div>
+            <h2 class="section-title">Análises disponíveis</h2>
+            <p class="section-desc">Acesse a análise fundamentalista completa com preço justo por Graham, Bazin e Gordon.</p>
+        </div>
+        <div class="popular-grid">
+            <a href="/PETR4/" class="popular-card"><span class="popular-ticker">PETR4</span><span class="popular-name">Petrobras</span></a>
+            <a href="/VALE3/" class="popular-card"><span class="popular-ticker">VALE3</span><span class="popular-name">Vale</span></a>
+            <a href="/ITUB4/" class="popular-card"><span class="popular-ticker">ITUB4</span><span class="popular-name">Itaú Unibanco</span></a>
+            <a href="/BBDC4/" class="popular-card"><span class="popular-ticker">BBDC4</span><span class="popular-name">Bradesco</span></a>
+            <a href="/WEGE3/" class="popular-card"><span class="popular-ticker">WEGE3</span><span class="popular-name">WEG</span></a>
+            <a href="/BBAS3/" class="popular-card"><span class="popular-ticker">BBAS3</span><span class="popular-name">Banco do Brasil</span></a>
+            <a href="/ABEV3/" class="popular-card"><span class="popular-ticker">ABEV3</span><span class="popular-name">Ambev</span></a>
+            <a href="/RENT3/" class="popular-card"><span class="popular-ticker">RENT3</span><span class="popular-name">Localiza</span></a>
+            <a href="/SUZB3/" class="popular-card"><span class="popular-ticker">SUZB3</span><span class="popular-name">Suzano</span></a>
+            <a href="/JBSS3/" class="popular-card"><span class="popular-ticker">JBSS3</span><span class="popular-name">JBS</span></a>
+            <a href="/GGBR4/" class="popular-card"><span class="popular-ticker">GGBR4</span><span class="popular-name">Gerdau</span></a>
+            <a href="/RADL3/" class="popular-card"><span class="popular-ticker">RADL3</span><span class="popular-name">Raia Drogasil</span></a>
+            <a href="/EQTL3/" class="popular-card"><span class="popular-ticker">EQTL3</span><span class="popular-name">Equatorial</span></a>
+            <a href="/RAIL3/" class="popular-card"><span class="popular-ticker">RAIL3</span><span class="popular-name">Rumo</span></a>
+            <a href="/LREN3/" class="popular-card"><span class="popular-ticker">LREN3</span><span class="popular-name">Lojas Renner</span></a>
+            <a href="/VIVT3/" class="popular-card"><span class="popular-ticker">VIVT3</span><span class="popular-name">Telefônica Brasil</span></a>
+            <a href="/TOTS3/" class="popular-card"><span class="popular-ticker">TOTS3</span><span class="popular-name">Totvs</span></a>
+            <a href="/PRIO3/" class="popular-card"><span class="popular-ticker">PRIO3</span><span class="popular-name">PRIO</span></a>
+            <a href="/EGIE3/" class="popular-card"><span class="popular-ticker">EGIE3</span><span class="popular-name">Engie Brasil</span></a>
+            <a href="/TAEE11/" class="popular-card"><span class="popular-ticker">TAEE11</span><span class="popular-name">Taesa</span></a>
+        </div>
+        <div class="popular-all">
+            <a href="/acoes/">Ver todas as ações analisadas →</a>
+        </div>
     </div>
 </section>
 

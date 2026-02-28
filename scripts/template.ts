@@ -1,4 +1,4 @@
-import type { FinancialData, ComprehensiveValuation, RawIncomeStatement, RawBalanceSheet, RawCashFlow, RawDividend } from './types';
+import type { FinancialData, ComprehensiveValuation, RawIncomeStatement, RawBalanceSheet, RawCashFlow, RawDividend, PeerTicker, TickerIndexEntry } from './types';
 
 // --- Formatters ---
 const fmt = (n: number, dec = 2): string => {
@@ -71,7 +71,7 @@ const getYear = (d: string): string => {
 };
 
 // --- Main Template ---
-export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuation): string => {
+export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuation, peers: PeerTicker[] = []): string => {
   const f = data.fundamentals;
   const today = new Date().toLocaleDateString('pt-BR');
   // desc, titleTag, ogTitle and faqItems are defined after graham/bazin/gordon calculations below
@@ -176,22 +176,39 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   const desc = `${f.symbol} vale a pena? Preço justo de R$ ${fmt(grahamFV)} (Graham), R$ ${fmt(bazinFV)} (Bazin) e R$ ${fmt(gordonFV)} (Gordon). P/L ${fmtNum(f.pl)}, DY ${fmtPctShort(f.divYield)}, ROE ${fmtPctShort(f.roe)}. Análise fundamentalista completa.`;
   const titleTag = `${f.symbol} Preço Justo e Valuation ${new Date().getFullYear()} | Análise Fundamentalista | iAções`;
   const ogTitle = `${f.symbol} vale a pena? Preço Justo R$ ${fmt(grahamFV)} (Graham) | iAções`;
+  const sectorSlug = (f.sector || '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
   const faqItems = [
     {
       q: `Quais os principais indicadores fundamentalistas de ${f.symbol}?`,
       a: `${f.symbol} apresenta P/L de ${fmtNum(f.pl)}, P/VP de ${fmtNum(f.pvp)}, ROE de ${fmtPctShort(f.roe)}, ROIC de ${fmtPctShort(f.roic)}, Margem Líquida de ${fmtPctShort(f.netMargin)}, EV/EBITDA de ${fmtNum(f.evEbitda)} e Div. Liq./EBITDA de ${fmtNum(f.debtEbitda)}. Esses indicadores ajudam a avaliar a saúde financeira, rentabilidade e eficiência operacional da empresa.`
     },
     {
-      q: `Em qual setor ${f.symbol} atua e quem são seus concorrentes?`,
-      a: `${f.symbol} (${f.companyName}) atua no setor de ${f.sector}${f.industry ? ', segmento de ' + f.industry : ''}. A empresa compete com outras companhias listadas na B3 dentro do mesmo setor. Para uma análise comparativa, é importante avaliar os múltiplos setoriais como P/L, EV/EBITDA e margens operacionais em relação aos pares de mercado.`
+      q: `Em qual setor ${f.symbol} atua?`,
+      a: `${f.symbol} (${f.name}) atua no setor de ${f.sector}${f.subSector ? ', segmento de ' + f.subSector : ''}. A empresa está listada na B3 (bolsa brasileira). Para uma análise comparativa com outros ativos do mesmo setor, é possível avaliar múltiplos como P/L, EV/EBITDA e margens operacionais em relação aos pares de mercado.`
     },
     {
-      q: `Como está a rentabilidade e as margens de ${f.symbol}?`,
+      q: `Quais são as margens e a rentabilidade de ${f.symbol}?`,
       a: `${f.symbol} possui ROE de ${fmtPctShort(f.roe)} e ROIC de ${fmtPctShort(f.roic)}, que medem o retorno sobre o patrimônio e sobre o capital investido, respectivamente. A Margem Bruta é de ${fmtPctShort(f.grossMargin)}, a Margem EBITDA de ${fmtPctShort(f.ebitdaMargin)} e a Margem Líquida de ${fmtPctShort(f.netMargin)}. Esses números refletem a capacidade da empresa de gerar lucro a partir de suas operações.`
     },
     {
       q: `Qual o histórico de dividendos de ${f.symbol}?`,
-      a: `${f.symbol} possui Dividend Yield atual de ${fmtPctShort(f.divYield)}${divTTM > 0 ? ' e distribuiu R$ ' + fmt(divTTM) + ' por ação nos últimos 12 meses' : ''}. O histórico de dividendos é um dos fatores analisados para entender a política de remuneração ao acionista e a consistência dos pagamentos ao longo dos anos.`
+      a: `${f.symbol} possui Dividend Yield de ${fmtPctShort(f.divYield)}${divTTM > 0 ? ' e distribuiu R$ ' + fmt(divTTM) + ' por ação nos últimos 12 meses' : ''}. O histórico de dividendos é um dos fatores analisados para entender a política de remuneração ao acionista e a consistência dos pagamentos ao longo dos anos.`
+    },
+    {
+      q: `Qual o preço justo de ${f.symbol} pelo método de Graham?`,
+      a: `Pelo método de Graham, o preço justo estimado de ${f.symbol} é de R$ ${fmt(grahamFV)}. Esse cálculo utiliza a fórmula de valor intrínseco de Benjamin Graham, baseada no lucro por ação (LPA = R$ ${fmt(f.lpa)}) e no valor patrimonial por ação (VPA = R$ ${fmt(f.vpa)}). A fórmula é: Valor Intrínseco = √(22,5 × LPA × VPA), com ajuste por margem de segurança. É um método mais adequado para empresas lucrativas com patrimônio sólido.`
+    },
+    {
+      q: `Qual o preço justo de ${f.symbol} pelo método de Bazin?`,
+      a: `Pelo método de Bazin, o preço justo estimado de ${f.symbol} é de R$ ${fmt(bazinFV)}. A metodologia de Décio Bazin calcula o preço máximo que um investidor deveria pagar para obter um dividend yield mínimo de 6%. A fórmula é: Preço Justo = Dividendo Médio (5 anos) ÷ 0,06. ${avgDiv5y > 0 ? 'A média de dividendos dos últimos 5 anos foi de R$ ' + fmt(avgDiv5y) + ' por ação.' : 'A empresa não possui histórico suficiente de dividendos para este cálculo.'}`
+    },
+    {
+      q: `Qual o preço justo de ${f.symbol} pelo modelo de Gordon?`,
+      a: `Pelo modelo de Gordon (DDM — Dividend Discount Model), o preço justo estimado de ${f.symbol} é de R$ ${fmt(gordonFV)}. O modelo calcula o valor presente de todos os dividendos futuros projetados, utilizando a fórmula: P = D1 ÷ (r − g), onde D1 é o dividendo projetado para o próximo ano, r é a taxa de desconto e g é a taxa de crescimento perpétuo dos dividendos. É um modelo mais adequado para empresas com dividendos estáveis e previsíveis.`
+    },
+    {
+      q: `Qual o nível de endividamento de ${f.symbol}?`,
+      a: `${f.symbol} possui Dívida Líquida/EBITDA de ${fmtNum(f.debtEbitda, 2)}x, Dívida Bruta/Patrimônio de ${fmtNum(f.debtEquity, 2)}x e Liquidez Corrente de ${fmtNum(f.currentLiquidity, 2)}x. A Dívida Líquida/EBITDA indica quantos anos de geração operacional seriam necessários para quitar a dívida líquida. A Liquidez Corrente mostra a capacidade de honrar obrigações de curto prazo com ativos circulantes.`
     }
   ];
 
@@ -313,8 +330,9 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "iAções", "item": "https://iacoes.com.br/" },
-      { "@type": "ListItem", "position": 2, "name": "Ações", "item": "https://iacoes.com.br/" },
-      { "@type": "ListItem", "position": 3, "name": "${f.symbol}", "item": "https://iacoes.com.br/${f.symbol}" }
+      { "@type": "ListItem", "position": 2, "name": "Ações", "item": "https://iacoes.com.br/acoes/" },
+      { "@type": "ListItem", "position": 3, "name": "${f.sector || 'Setor'}", "item": "https://iacoes.com.br/acoes/#setor-${encodeURIComponent((f.sector || '').toLowerCase().replace(/[^a-z0-9]+/g, '-'))}" },
+      { "@type": "ListItem", "position": 4, "name": "${f.symbol}", "item": "https://iacoes.com.br/${f.symbol}" }
     ]
   }
   </script>
@@ -956,6 +974,44 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     .breadcrumb a:hover { color: #B68F40; text-decoration: underline; }
     .breadcrumb [aria-current="page"] { color: #0f172a; font-weight: 600; }
 
+    /* ============ PEERS (AÇÕES DO MESMO SETOR) ============ */
+    .peers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .peer-card {
+      background: #fff; border: 1px solid #e2e8f0;
+      border-radius: 10px; padding: 0.9rem;
+      text-decoration: none; color: inherit;
+      transition: all 0.2s;
+      display: flex; flex-direction: column; gap: 0.2rem;
+    }
+    .peer-card:hover {
+      border-color: #B68F40; box-shadow: 0 2px 12px rgba(182,143,64,0.1);
+      transform: translateY(-1px);
+    }
+    .peer-ticker {
+      font-family: 'SFMono-Regular', Consolas, monospace;
+      font-size: 0.95rem; font-weight: 700; color: #0f172a;
+    }
+    .peer-name {
+      font-size: 0.7rem; color: #64748b;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .peer-price {
+      font-family: 'SFMono-Regular', Consolas, monospace;
+      font-size: 0.8rem; font-weight: 600; color: #475569;
+      margin-top: 0.15rem;
+    }
+    .peers-more {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      margin-top: 0.75rem; font-size: 0.82rem; font-weight: 600;
+      color: #B68F40; text-decoration: none;
+    }
+    .peers-more:hover { text-decoration: underline; }
+
     /* ============ FAQ ============ */
     .faq-section { }
     .faq-list { margin-top: 1rem; }
@@ -1037,7 +1093,8 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
 <nav class="breadcrumb" aria-label="Breadcrumb">
   <ol>
     <li><a href="/">iAções</a></li>
-    <li><a href="/">Ações</a></li>
+    <li><a href="/acoes/">Ações</a></li>
+    ${f.sector ? `<li><a href="/acoes/#setor-${encodeURIComponent(f.sector.toLowerCase().replace(/[^a-z0-9]+/g, '-'))}">${f.sector}</a></li>` : ''}
     <li aria-current="page">${f.symbol}</li>
   </ol>
 </nav>
@@ -1438,6 +1495,24 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     </div>` : ''}
   </section>
 
+  ${peers.length > 0 ? `
+  <!-- AÇÕES DO MESMO SETOR -->
+  <section class="section-card animate-in" aria-label="Ações do setor de ${f.sector}">
+    <div class="section-header-row">
+      <h2 class="section-title font-playfair">Ações do setor de ${f.sector}</h2>
+      <span class="section-sub">Outras empresas do mesmo setor na B3</span>
+    </div>
+    <div class="peers-grid">
+      ${peers.map(p => `
+      <a href="/${p.ticker}/" class="peer-card">
+        <span class="peer-ticker">${p.ticker}</span>
+        <span class="peer-name">${p.name}</span>
+        <span class="peer-price">R$ ${fmt(p.price)}</span>
+      </a>`).join('')}
+    </div>
+    <a href="/acoes/#setor-${sectorSlug}" class="peers-more">Ver todas as ações de ${f.sector} &rarr;</a>
+  </section>` : ''}
+
   <!-- FAQ SEO -->
   <section class="section-card animate-in faq-section" aria-label="Perguntas Frequentes sobre ${f.symbol}">
     <h2 class="section-title font-playfair">Perguntas Frequentes sobre ${f.symbol}</h2>
@@ -1598,10 +1673,274 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
 </html>`;
 };
 
+// --- Index Page (/acoes/index.html) ---
+export const generateIndexHTML = (tickers: TickerIndexEntry[]): string => {
+  const today = new Date().toLocaleDateString('pt-BR');
+  const year = new Date().getFullYear();
+  const sectors = [...new Set(tickers.map(t => t.sector).filter(Boolean))].sort();
+  const sectorSlug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+  const tickerRows = tickers.map(t => `
+    <tr data-sector="${t.sector}">
+      <td><a href="/${t.ticker}/" class="idx-ticker-link">${t.ticker}</a></td>
+      <td class="idx-name">${t.name}</td>
+      <td>${t.sector}</td>
+      <td class="idx-num">${t.price > 0 ? 'R$ ' + fmt(t.price) : '-'}</td>
+      <td class="idx-num">${t.pl > 0 ? fmtNum(t.pl) : '-'}</td>
+      <td class="idx-num">${t.divYield > 0 ? fmtPctShort(t.divYield) : '-'}</td>
+      <td class="idx-num">${fmtBig(t.marketCap)}</td>
+    </tr>`).join('');
+
+  const sectorFilters = sectors.map(s =>
+    `<button class="idx-filter-btn" data-filter="${s}" onclick="filterSector('${s}')">${s}</button>`
+  ).join('');
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-858T7GLTMJ"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todas as Ações da B3 — Análise Fundamentalista e Preço Justo ${year} | iAções</title>
+  <meta name="description" content="Lista completa de ${tickers.length} ações da B3 com indicadores fundamentalistas: P/L, Dividend Yield, preço justo por Graham, Bazin e Gordon. Análise fundamentalista atualizada em ${today}.">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <meta name="author" content="Brasil Horizonte">
+  <link rel="canonical" href="https://iacoes.com.br/acoes/">
+  <meta property="og:title" content="Todas as Ações da B3 — Análise Fundamentalista ${year} | iAções">
+  <meta property="og:description" content="Lista completa de ${tickers.length} ações da B3 com indicadores fundamentalistas atualizados.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://iacoes.com.br/acoes/">
+  <meta property="og:site_name" content="iAções — Análise de Ações | Brasil Horizonte">
+  <meta property="og:locale" content="pt_BR">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800&family=Montserrat:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Ações da B3 — Análise Fundamentalista",
+    "description": "Lista de ${tickers.length} ações da bolsa brasileira com indicadores fundamentalistas e preço justo.",
+    "numberOfItems": ${tickers.length},
+    "itemListElement": [
+      ${tickers.slice(0, 50).map((t, i) => `{
+        "@type": "ListItem",
+        "position": ${i + 1},
+        "name": "${t.ticker} — ${t.name}",
+        "url": "https://iacoes.com.br/${t.ticker}"
+      }`).join(',\n      ')}
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "iAções", "item": "https://iacoes.com.br/" },
+      { "@type": "ListItem", "position": 2, "name": "Ações", "item": "https://iacoes.com.br/acoes/" }
+    ]
+  }
+  </script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 16px; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #f5f3ef; color: #0f172a;
+      -webkit-font-smoothing: antialiased; line-height: 1.5;
+    }
+    .font-playfair { font-family: 'Playfair Display', serif; }
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.5rem; height: 56px;
+      background: #041C24; border-bottom: 1px solid rgba(182,143,64,0.2);
+    }
+    .nav-left { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-brand { display: flex; align-items: center; text-decoration: none; }
+    .nav-logo-bh { height: 28px; opacity: 0.95; }
+    .nav-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.2); }
+    .nav-iacoes {
+      text-decoration: none; display: flex; align-items: baseline;
+      font-family: 'JetBrains Mono', monospace; font-size: 1.15rem;
+      font-weight: 700; letter-spacing: -0.01em;
+    }
+    .nav-iacoes-i { color: #B68F40; }
+    .nav-iacoes-acoes { color: #fff; }
+    .nav-cursor {
+      display: inline-block; width: 2px; height: 1.1em;
+      background: #B68F40; margin-left: 2px; vertical-align: middle;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+    .nav-links { display: flex; gap: 0.5rem; }
+    .nav-btn {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      padding: 0.4rem 0.9rem; border-radius: 8px;
+      font-size: 0.8rem; font-weight: 600; text-decoration: none;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .nav-btn-gold { background: #B68F40; color: #041C24; }
+    .nav-btn-gold:hover { background: #c9a44e; }
+    .nav-btn-outline { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+    .nav-btn-outline:hover { background: rgba(255,255,255,0.08); }
+    @media (max-width: 640px) { .nav-links { display: none; } }
+
+    .breadcrumb { max-width: 1200px; margin: 0 auto; padding: 0.6rem 1.5rem; }
+    .breadcrumb ol { list-style: none; display: flex; gap: 0.3rem; font-size: 0.7rem; color: #94a3b8; }
+    .breadcrumb li::after { content: '/'; margin-left: 0.3rem; }
+    .breadcrumb li:last-child::after { content: ''; }
+    .breadcrumb a { color: #64748b; text-decoration: none; }
+    .breadcrumb a:hover { color: #B68F40; text-decoration: underline; }
+    .breadcrumb [aria-current="page"] { color: #0f172a; font-weight: 600; }
+
+    .page { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+    .page-header { margin-bottom: 1.5rem; }
+    .page-header h1 { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 800; margin-bottom: 0.3rem; }
+    .page-header p { color: #64748b; font-size: 0.9rem; }
+    .page-header .count { font-weight: 700; color: #0f172a; }
+
+    .idx-filters {
+      display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.25rem;
+    }
+    .idx-filter-btn {
+      padding: 0.3rem 0.7rem; border: 1px solid #e2e8f0; border-radius: 6px;
+      background: #fff; font-size: 0.7rem; font-weight: 600; color: #475569;
+      cursor: pointer; transition: all 0.15s; font-family: 'Montserrat', sans-serif;
+    }
+    .idx-filter-btn:hover, .idx-filter-btn.active {
+      background: #041C24; color: #fff; border-color: #041C24;
+    }
+
+    .idx-card {
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
+      overflow: hidden;
+    }
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .idx-table {
+      width: 100%; border-collapse: collapse; font-size: 0.82rem;
+    }
+    .idx-table thead th {
+      padding: 0.7rem 0.9rem; text-align: left; font-size: 0.65rem;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+      color: #94a3b8; border-bottom: 1px solid #e2e8f0;
+      white-space: nowrap; position: sticky; top: 0; background: #fff;
+    }
+    .idx-table tbody td {
+      padding: 0.6rem 0.9rem; border-bottom: 1px solid #f8fafc;
+      white-space: nowrap;
+    }
+    .idx-table tbody tr:hover { background: #fafaf8; }
+    .idx-ticker-link {
+      font-family: 'SFMono-Regular', Consolas, monospace;
+      font-weight: 700; color: #0f172a; text-decoration: none;
+      font-size: 0.85rem;
+    }
+    .idx-ticker-link:hover { color: #B68F40; text-decoration: underline; }
+    .idx-name { color: #64748b; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
+    .idx-num {
+      font-family: 'SFMono-Regular', Consolas, monospace;
+      text-align: right; font-size: 0.8rem;
+    }
+    .idx-table thead th:nth-child(n+4) { text-align: right; }
+
+    .footer-disc {
+      text-align: center; padding: 2rem 1.5rem; border-top: 1px solid #e2e8f0; margin-top: 1.5rem;
+    }
+    .footer-disc p { font-size: 0.72rem; color: #94a3b8; max-width: 800px; margin: 0 auto; line-height: 1.6; }
+    .footer-disc a { color: #64748b; text-decoration: none; }
+    @media (max-width: 768px) {
+      .page { padding: 1rem; }
+      .page-header h1 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-left">
+    <a href="/" class="nav-brand"><img src="/assets/img/institucional_branco_amarelo_3x.png" alt="Brasil Horizonte" class="nav-logo-bh"></a>
+    <span class="nav-divider"></span>
+    <a href="/" class="nav-iacoes"><span class="nav-iacoes-i">iA</span><span class="nav-iacoes-acoes">ções</span><span class="nav-cursor"></span></a>
+  </div>
+  <div class="nav-links">
+    <a href="https://app.brasilhorizonte.com.br/authnew" class="nav-btn nav-btn-outline">Acessar App</a>
+    <a href="https://app.brasilhorizonte.com.br/authnew" class="nav-btn nav-btn-gold">Assinar Plano</a>
+  </div>
+</nav>
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <ol>
+    <li><a href="/">iAções</a></li>
+    <li aria-current="page">Ações</li>
+  </ol>
+</nav>
+
+<main class="page">
+  <header class="page-header">
+    <h1 class="font-playfair">Todas as Ações da B3</h1>
+    <p><span class="count">${tickers.length}</span> ações com análise fundamentalista e preço justo por Graham, Bazin e Gordon. Dados atualizados em ${today}.</p>
+  </header>
+
+  <div class="idx-filters">
+    <button class="idx-filter-btn active" onclick="filterSector('')">Todos</button>
+    ${sectorFilters}
+  </div>
+
+  <div class="idx-card">
+    <div class="table-scroll">
+      <table class="idx-table" id="idx-table">
+        <thead>
+          <tr>
+            <th>Ticker</th><th>Empresa</th><th>Setor</th>
+            <th>Preço</th><th>P/L</th><th>DY</th><th>Market Cap</th>
+          </tr>
+        </thead>
+        <tbody id="idx-tbody">
+          ${sectors.map(s => `<tr id="setor-${sectorSlug(s)}" class="idx-sector-anchor"><td colspan="7" style="background:#f8f6f1;padding:0.5rem 0.9rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#B68F40;border-bottom:1px solid #e2e8f0;">${s}</td></tr>
+          ${tickers.filter(t => t.sector === s).map(t => `<tr data-sector="${t.sector}">
+            <td><a href="/${t.ticker}/" class="idx-ticker-link">${t.ticker}</a></td>
+            <td class="idx-name">${t.name}</td>
+            <td>${t.sector}</td>
+            <td class="idx-num">${t.price > 0 ? 'R$ ' + fmt(t.price) : '-'}</td>
+            <td class="idx-num">${t.pl > 0 ? fmtNum(t.pl) : '-'}</td>
+            <td class="idx-num">${t.divYield > 0 ? fmtPctShort(t.divYield) : '-'}</td>
+            <td class="idx-num">${fmtBig(t.marketCap)}</td>
+          </tr>`).join('')}`).join('\n          ')}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer class="footer-disc">
+    <p>&copy; ${new Date().getFullYear()} ValuAI by <a href="https://brasilhorizonte.com.br" target="_blank">Brasil Horizonte</a>. Dados atualizados em ${today}. As informações não constituem recomendação de investimento.</p>
+  </footer>
+</main>
+
+<script>
+function filterSector(sector) {
+  var rows = document.querySelectorAll('#idx-tbody tr[data-sector]');
+  var anchors = document.querySelectorAll('.idx-sector-anchor');
+  var btns = document.querySelectorAll('.idx-filter-btn');
+  btns.forEach(function(b) { b.classList.toggle('active', b.getAttribute('data-filter') === sector || (!sector && !b.getAttribute('data-filter'))); });
+  rows.forEach(function(r) { r.style.display = (!sector || r.getAttribute('data-sector') === sector) ? '' : 'none'; });
+  anchors.forEach(function(a) {
+    var s = a.id.replace('setor-', '');
+    a.style.display = (!sector || a.id === 'setor-' + sector.toLowerCase().replace(/[^a-z0-9]+/g, '-')) ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>`;
+};
+
 export const generateSitemap = (tickers: string[]): string => {
   const today = new Date().toISOString().split('T')[0];
   const urls = [
     `  <url><loc>https://iacoes.com.br/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>`,
+    `  <url><loc>https://iacoes.com.br/acoes/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>`,
     ...tickers.map(t =>
       `  <url><loc>https://iacoes.com.br/${t}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>`
     )
