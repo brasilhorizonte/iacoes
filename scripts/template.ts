@@ -1541,7 +1541,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       As análises, preços alvo e relatórios apresentados nesta página são gerados automaticamente por Inteligência Artificial e algoritmos financeiros (ValuAI By Brasil Horizonte). Estas informações têm caráter estritamente educativo e informativo, não configurando recomendação de compra ou venda de ativos, nem garantia de rentabilidade futura. Investimentos em renda variável envolvem riscos. A Inteligência Artificial pode cometer erros de interpretação ou cálculo (alucinações). Sempre consulte um profissional certificado e realize sua própria diligência antes de tomar qualquer decisão financeira.
     </p>
     <div class="footer-logos">
-      <img src="/assets/img/institucional_branco_amarelo_3x.png" alt="Brasil Horizonte" class="footer-logo-bh">
+      <a href="https://brasilhorizonte.com.br" target="_blank" rel="noopener"><img src="/assets/img/institucional_branco_amarelo_3x.png" alt="Brasil Horizonte" class="footer-logo-bh"></a>
       <span class="footer-x">&times;</span>
       <span class="footer-iacoes"><span class="footer-iacoes-i">i</span>Ações</span>
     </div>
