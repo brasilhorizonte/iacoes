@@ -10,8 +10,8 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iAções — A Primeira Plataforma de Stock Picking com IA do Brasil</title>
-    <meta name="description" content="Análise fundamentalista potencializada por Inteligência Artificial. Sem conflito de interesses. Metodologias Graham, Bazin e Gordon. Descubra as melhores ações da B3.">
-    <meta name="keywords" content="iAções, análise fundamentalista, valuation, ações B3, preço justo, Graham, Bazin, Gordon, stock picking, inteligência artificial, investimentos, bolsa brasileira, IA, Brasil Horizonte">
+    <meta name="description" content="Análise fundamentalista potencializada por Inteligência Artificial. Sem conflito de interesses. Metodologias Graham, Bazin, Gordon e DCF. Descubra as melhores ações da B3.">
+    <meta name="keywords" content="iAções, análise fundamentalista, valuation, ações B3, preço justo, Graham, Bazin, Gordon, DCF, fluxo de caixa descontado, stock picking, inteligência artificial, investimentos, bolsa brasileira, IA, Brasil Horizonte">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
     <meta name="author" content="Brasil Horizonte">
     <meta name="theme-color" content="#093848">
@@ -21,7 +21,7 @@
 
     <!-- Open Graph -->
     <meta property="og:title" content="iAções — Stock Picking com Inteligência Artificial">
-    <meta property="og:description" content="Análise fundamentalista potencializada por IA. Metodologias Graham, Bazin e Gordon para mais de 300 ações da B3. Sem conflito de interesses.">
+    <meta property="og:description" content="Análise fundamentalista potencializada por IA. Metodologias Graham, Bazin, Gordon e DCF para mais de 300 ações da B3. Sem conflito de interesses.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://iacoes.com.br/">
     <meta property="og:site_name" content="iAções — Análise de Ações | Brasil Horizonte">
@@ -34,7 +34,7 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="iAções — Stock Picking com Inteligência Artificial">
-    <meta name="twitter:description" content="Análise fundamentalista com IA. Graham, Bazin e Gordon para +300 ações da B3.">
+    <meta name="twitter:description" content="Análise fundamentalista com IA. Graham, Bazin, Gordon e DCF para +300 ações da B3.">
     <meta name="twitter:image" content="https://iacoes.com.br/assets/img/og-brasilhorizonte.png">
     <meta name="twitter:image:alt" content="Brasil Horizonte — iAções">
 
@@ -555,6 +555,99 @@
 
         .method-card p { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6; }
 
+        .method-card-featured {
+            grid-column: 1 / -1;
+            background: #093848;
+            color: #FFFFFF;
+            border-color: transparent;
+            position: relative;
+            text-align: left;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 3rem;
+            padding: 2.5rem;
+        }
+        .method-card-featured:hover {
+            border-color: var(--gold);
+            background: #0a3f50;
+        }
+        .method-card-featured p {
+            color: rgba(255,255,255,0.8);
+        }
+        .method-card-featured .method-subtitle {
+            color: #B8923E;
+        }
+        .method-card-featured h4 {
+            color: #FFFFFF;
+        }
+        .method-featured-left {
+            flex: 1;
+        }
+        .method-featured-left h3 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+            color: #FFFFFF;
+        }
+        .method-featured-left .method-lead {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.95rem;
+            margin-bottom: 1.2rem;
+        }
+        .method-featured-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .method-featured-right .feat-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            font-size: 0.88rem;
+            color: rgba(255,255,255,0.85);
+        }
+        .feat-item .feat-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        @media (max-width: 768px) {
+            .method-card-featured {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+        }
+        .method-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #B8923E;
+            color: #093848;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            letter-spacing: 0.08em;
+        }
+        .btn-cta-gold {
+            display: inline-block;
+            background: #B8923E;
+            color: #093848;
+            margin-top: 1rem;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-cta-gold:hover {
+            background: #C9A44E;
+        }
+
         /* DIFFERENTIALS */
         .differentials { padding: 5rem 2rem; background: var(--bg-white); border-top: 1px solid var(--border); }
         .diff-inner { max-width: 960px; margin: 0 auto; }
@@ -925,7 +1018,7 @@
         "@type": "WebSite",
         "name": "iAções",
         "url": "https://iacoes.com.br/",
-        "description": "Análise fundamentalista de ações da B3 com preço justo por Graham, Bazin e Gordon. Plataforma potencializada por Inteligência Artificial.",
+        "description": "Análise fundamentalista de ações da B3 com preço justo por Graham, Bazin, Gordon e DCF. Plataforma potencializada por Inteligência Artificial.",
         "inLanguage": "pt-BR",
         "publisher": {
             "@type": "Organization",
@@ -962,7 +1055,7 @@
                 "name": "Como funciona a análise por IA?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Nossa IA processa dados financeiros públicos das empresas listadas na B3 e aplica as metodologias de Graham, Bazin e Gordon de forma automatizada. Tudo validado por analista CNPI certificado pela APIMEC."
+                    "text": "Nossa IA processa dados financeiros públicos das empresas listadas na B3 e aplica as metodologias de Graham, Bazin e Gordon de forma automatizada. No DCF, você monta seu próprio valuation e a IA analisa criticamente suas premissas. Tudo validado por analista CNPI certificado pela APIMEC."
                 }
             },
             {
@@ -1098,7 +1191,7 @@
         <div class="hero-proof">
             <span><span class="check">✓</span> Sem carteira recomendada</span>
             <span><span class="check">✓</span> 100% livre de conflito</span>
-            <span><span class="check">✓</span> Graham, Bazin & Gordon</span>
+            <span><span class="check">✓</span> Graham, Bazin, Gordon & DCF</span>
         </div>
     </div>
 </section>
@@ -1146,7 +1239,7 @@
             <h3><span class="prefix">iA</span>nalista</h3>
             <p class="module-desc">Seu analista fundamentalista com IA. Faz a análise profunda que um analista CNPI faria — mas em segundos, para todas as ações da B3.</p>
             <ul class="module-features">
-                <li>Valuation automático por Graham, Bazin e Gordon</li>
+                <li>Valuation por Graham, Bazin, Gordon e DCF</li>
                 <li>Cálculo de margem de segurança em tempo real</li>
                 <li>Score proprietário de qualidade fundamentalista</li>
                 <li>Análise setorial comparativa por IA</li>
@@ -1180,9 +1273,9 @@
         <div class="feature-card"><div class="feature-icon">📊</div><h3>Dashboard em Tempo Real</h3><p>Painel completo com indicadores fundamentalistas, preço justo, margem de segurança e score IA — tudo atualizado automaticamente.</p><span class="feature-tag gold">LIVE DATA</span></div>
         <div class="feature-card"><div class="feature-icon">🎯</div><h3>Screening Inteligente</h3><p>Filtre ações da B3 por múltiplos critérios: P/L, P/VP, ROE, DY, margem de segurança, setor, liquidez e score IA.</p><span class="feature-tag">MULTI-FILTRO</span></div>
         <div class="feature-card"><div class="feature-icon">🧠</div><h3>Relatórios IA</h3><p>Análises fundamentalistas completas escritas por IA, com base em dados reais e metodologias consagradas. Linguagem clara, sem jargão.</p><span class="feature-tag gold">IA GENERATIVA</span></div>
-        <div class="feature-card"><div class="feature-icon">⚖️</div><h3>Preço Justo Multi-Método</h3><p>Cálculo automático do valor intrínseco por Graham, Bazin e Gordon. Compare os 3 métodos lado a lado para cada ação.</p><span class="feature-tag">3 METODOLOGIAS</span></div>
+        <div class="feature-card"><div class="feature-icon">⚖️</div><h3>Preço Justo Multi-Método</h3><p>Calcule o valor intrínseco por Graham, Bazin, Gordon e DCF. Compare os 4 métodos lado a lado para cada ação.</p><span class="feature-tag">4 METODOLOGIAS</span></div>
         <div class="feature-card"><div class="feature-icon">🔔</div><h3>Alertas Inteligentes</h3><p>Receba notificações quando uma ação entrar na zona de compra, quando o preço justo mudar, ou surgir uma oportunidade.</p><span class="feature-tag gold">PUSH + EMAIL</span></div>
-        <div class="feature-card"><div class="feature-icon">📈</div><h3>Backtesting de Estratégias</h3><p>Teste suas teses de investimento contra dados históricos. Veja como Graham, Bazin e Gordon performaram nos últimos anos.</p><span class="feature-tag">HISTÓRICO</span></div>
+        <div class="feature-card"><div class="feature-icon">📈</div><h3>Backtesting de Estratégias</h3><p>Teste suas teses de investimento contra dados históricos. Veja como Graham, Bazin, Gordon e DCF performaram nos últimos anos.</p><span class="feature-tag">HISTÓRICO</span></div>
         <div class="feature-card"><div class="feature-icon">🏢</div><h3>Análise Setorial</h3><p>Compare empresas do mesmo setor em um único painel. Identifique as mais eficientes, baratas e com melhores fundamentos.</p><span class="feature-tag">COMPARATIVO</span></div>
         <div class="feature-card"><div class="feature-icon">🛡️</div><h3>Zero Conflito de Interesses</h3><p>Não somos corretora. Não vendemos produtos. Não temos carteira recomendada. Nosso único compromisso é com a análise.</p><span class="feature-tag gold">INDEPENDENTE</span></div>
         <div class="feature-card"><div class="feature-icon">🤖</div><h3><span class="mono">AIrton</span> — Assistente IA</h3><p>Converse com o AIrton. Pergunte sobre ações, peça comparações, tire dúvidas sobre fundamentos. Ele sabe tudo da B3.</p><span class="feature-tag gold">CHAT IA</span></div>
@@ -1200,6 +1293,20 @@
             <div class="method-card"><div class="method-icon">📐</div><div class="method-subtitle">Value Investing</div><h4>Benjamin Graham</h4><p>Cálculo do valor intrínseco com margem de segurança. Análise de P/L, P/VP, endividamento, liquidez corrente e estabilidade de lucros.</p></div>
             <div class="method-card"><div class="method-icon">💰</div><div class="method-subtitle">Dividendos</div><h4>Décio Bazin</h4><p>Foco em boas pagadoras de dividendos. Filtragem por dividend yield mínimo de 6%, consistência de pagamentos e baixo endividamento.</p></div>
             <div class="method-card"><div class="method-icon">📈</div><div class="method-subtitle">Crescimento</div><h4>Modelo de Gordon</h4><p>Avaliação por desconto de dividendos futuros. Projeta o crescimento sustentável dos proventos para estimar o preço justo a longo prazo.</p></div>
+            <div class="method-card method-card-featured">
+                <span class="method-badge">NOVO</span>
+                <div class="method-featured-left">
+                    <div class="method-subtitle">Fluxo de Caixa Descontado</div>
+                    <h3>Seu Valuation.<br>Nossa IA.</h3>
+                    <p class="method-lead">Monte suas premissas — a IA questiona cada uma.</p>
+                    <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta btn-cta-gold" onclick="_iaTrack('cta_click')">Montar meu Valuation →</a>
+                </div>
+                <div class="method-featured-right">
+                    <div class="feat-item"><span class="feat-icon">📊</span><span>Projete receita, margens e crescimento com dados reais da B3</span></div>
+                    <div class="feat-item"><span class="feat-icon">🤖</span><span>A IA questiona suas premissas e aponta inconsistências</span></div>
+                    <div class="feat-item"><span class="feat-icon">🎯</span><span>Chegue ao preço justo com confiança e margem de segurança</span></div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -1353,7 +1460,7 @@
             <h2 class="section-title">Perguntas Frequentes</h2>
         </div>
         <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">O iAções é uma casa de análise ou corretora?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Nenhum dos dois. O iAções é uma plataforma de tecnologia que oferece ferramentas de análise fundamentalista potencializadas por IA. Não fazemos recomendações de compra/venda, não vendemos ativos e não somos uma corretora.</p></div></div>
-        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Como funciona a análise por IA?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Nossa IA processa dados financeiros públicos das empresas listadas na B3 e aplica as metodologias de Graham, Bazin e Gordon de forma automatizada. Tudo validado por analista CNPI certificado pela APIMEC.</p></div></div>
+        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Como funciona a análise por IA?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Nossa IA processa dados financeiros públicos das empresas listadas na B3 e aplica as metodologias de Graham, Bazin e Gordon de forma automatizada. No DCF, você monta seu próprio valuation e a IA analisa criticamente suas premissas. Tudo validado por analista CNPI certificado pela APIMEC.</p></div></div>
         <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Quem está por trás da plataforma?<span class="faq-icon">+</span></button><div class="faq-answer"><p>A plataforma foi desenvolvida por profissionais certificados — analista CNPI (APIMEC) e gestor CGA (ANBIMA). A IA executa as análises com base nos critérios técnicos definidos por eles, garantindo rigor metodológico em escala.</p></div></div>
         <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">O que significa "zero conflito de interesses"?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Nossa receita vem 100% das assinaturas. Não ganhamos comissão por operações, não vendemos fundos, não fazemos co-distribuição. Nosso compromisso é exclusivamente com a qualidade da análise.</p></div></div>
         <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Posso cancelar a qualquer momento?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Sim. Planos mensais podem ser cancelados a qualquer momento sem multa. O plano anual pode ser cancelado com reembolso proporcional nos primeiros 30 dias.</p></div></div>
@@ -1374,7 +1481,7 @@
         <div class="popular-header">
             <div class="section-label">Ações analisadas</div>
             <h2 class="section-title">Análises disponíveis</h2>
-            <p class="section-desc">Acesse a análise fundamentalista completa com preço justo por Graham, Bazin e Gordon.</p>
+            <p class="section-desc">Acesse a análise fundamentalista completa com preço justo por Graham, Bazin, Gordon e DCF.</p>
         </div>
         <div class="popular-grid">
             <a href="/PETR4/" class="popular-card"><span class="popular-ticker">PETR4</span><span class="popular-name">Petrobras</span></a>
