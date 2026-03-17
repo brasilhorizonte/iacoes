@@ -6,7 +6,7 @@
     <!-- Google Analytics (GA4) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-858T7GLTMJ"></script>
     <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
-    <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();function _iaTrack(ev){var u=new URLSearchParams(location.search);fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify({session_id:_iaS,page_path:location.pathname.replace(/\/index\.html$/,'').replace(/\/$/,'')||'/',referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview'})}).catch(function(){})}_iaTrack();</script>
+    <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();function _iaTrack(ev){var u=new URLSearchParams(location.search);fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify({session_id:_iaS,page_path:location.pathname.replace(/\/index\.html$/,'').replace(/\/$/,'')||'/',referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview'})}).catch(function(){})}_iaTrack();function _iaClick(e){e.preventDefault();var url=e.currentTarget.href;_iaTrack('cta_click');setTimeout(function(){window.location.href=url},150)}</script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iAções — A Primeira Plataforma de Stock Picking com IA do Brasil</title>
@@ -1168,7 +1168,7 @@
         <li><a href="#metodologia">Metodologia</a></li>
         <li><a href="#precos">Preços</a></li>
         <li><a href="#faq">FAQ</a></li>
-        <li><a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta btn-cta-nav">Testar grátis</a></li>
+        <li><a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta btn-cta-nav" onclick="_iaClick(event)">Testar grátis</a></li>
     </ul>
     <button class="mobile-menu-btn" onclick="document.querySelector('.nav-links').classList.toggle('show')">
         <span></span><span></span><span></span>
@@ -1185,7 +1185,7 @@
             <a href="https://brasilhorizonte.com.br" target="_blank" rel="noopener"><img src="assets/img/institucional_branco_amarelo_3x.png" alt="Brasil Horizonte" class="hero-brand-logo"></a>
         </div>
         <div class="hero-actions">
-            <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta">Testar grátis →</a>
+            <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta" onclick="_iaClick(event)">Testar grátis →</a>
             <a href="#modulos" class="btn-cta btn-outline">Conhecer a plataforma</a>
         </div>
         <div class="hero-proof">
@@ -1299,7 +1299,7 @@
                     <div class="method-subtitle">Fluxo de Caixa Descontado</div>
                     <h3>Seu Valuation.<br>Nossa IA.</h3>
                     <p class="method-lead">Monte suas premissas — a IA questiona cada uma.</p>
-                    <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta btn-cta-gold" onclick="_iaTrack('cta_click')">Montar meu Valuation →</a>
+                    <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta btn-cta-gold" onclick="_iaClick(event)">Montar meu Valuation →</a>
                 </div>
                 <div class="method-featured-right">
                     <div class="feat-item"><span class="feat-icon">📊</span><span>Projete receita, margens e crescimento com dados reais da B3</span></div>
@@ -1374,7 +1374,7 @@
                     <li>Validador de Teses de investimento</li>
                     <li>Análise Qualitativa detalhada</li>
                 </ul>
-                <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta btn-outline">Testar grátis</a>
+                <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta btn-outline" onclick="_iaClick(event)">Testar grátis</a>
             </div>
             <div class="pricing-card">
                 <div class="pricing-plan">IALOCADOR</div>
@@ -1390,7 +1390,7 @@
                     <li>Gestão de Carteira</li>
                     <li>Otimização de portfólio (Markowitz)</li>
                 </ul>
-                <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta btn-outline">Testar grátis</a>
+                <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta btn-outline" onclick="_iaClick(event)">Testar grátis</a>
             </div>
             <div class="pricing-card featured">
                 <div class="pricing-plan">FUNDAMENTALISTA</div>
@@ -1408,7 +1408,7 @@
                     <li>Acesso a grupo fechado de membros</li>
                     <li>Prioridade em respostas e suporte</li>
                 </ul>
-                <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta">Testar grátis →</a>
+                <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta" onclick="_iaClick(event)">Testar grátis →</a>
             </div>
         </div>
     </div>
@@ -1449,7 +1449,7 @@
         <div class="section-label">Comece agora</div>
         <h2>Pare de adivinhar.<br>Comece a <span style="color: var(--gold-light)">analisar</span>.</h2>
         <p>Sem cartão de crédito. Sem compromisso.</p>
-        <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta">Testar grátis →</a>
+        <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta" onclick="_iaClick(event)">Testar grátis →</a>
     </div>
 </section>
 
