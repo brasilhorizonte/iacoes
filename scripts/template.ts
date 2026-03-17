@@ -268,7 +268,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   <!-- Google Analytics (GA4) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-858T7GLTMJ"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
-  <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();function _iaTrack(ev){var u=new URLSearchParams(location.search);fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},body:JSON.stringify({session_id:_iaS,page_path:location.pathname.replace(/\/index\.html$/,'').replace(/\/$/,'')||'/',referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview'})}).catch(function(){})}_iaTrack();</script>
+  <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();function _iaTrack(ev){var u=new URLSearchParams(location.search);fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},body:JSON.stringify({session_id:_iaS,page_path:location.pathname.replace(/\/index\.html$/,'').replace(/\/$/,'')||'/',referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview'})}).catch(function(){})}function _iaCtaTrack(e){e.preventDefault();_iaTrack('cta_click');var h=e.currentTarget.href;setTimeout(function(){window.location.href=h},150)}_iaTrack();</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${titleTag}</title>
   <meta name="description" content="${desc}">
@@ -1085,8 +1085,8 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     <div class="nav-search-dropdown" id="nav-search-dropdown"></div>
   </div>
   <div class="nav-links">
-    <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="nav-btn nav-btn-outline" onclick="_iaTrack('cta_click')">Acessar App</a>
-    <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="nav-btn nav-btn-gold" onclick="_iaTrack('cta_click')">Assinar Plano</a>
+    <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="nav-btn nav-btn-outline" onclick="_iaCtaTrack(event)">Acessar App</a>
+    <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="nav-btn nav-btn-gold" onclick="_iaCtaTrack(event)">Assinar Plano</a>
   </div>
 </nav>
 
@@ -1350,7 +1350,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       <strong>Gordon (DDM)</strong> projeta o valor presente de todos os dividendos futuros, assumindo um crescimento perpétuo constante. É útil para empresas com dividendos estáveis e previsíveis, mas pode distorcer significativamente o resultado quando a taxa de crescimento se aproxima da taxa de desconto ou quando a empresa não distribui proventos regularmente.
     </div>
     <div class="methods-note">
-      Utilize a <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" style="color:var(--accent);font-weight:600;" onclick="_iaTrack('cta_click')">plataforma iAções</a> para aprofundar sua análise com dados completos, comparativos setoriais e ferramentas de valuation avançadas. Investir exige estudo — conheça a empresa, entenda os riscos e tome decisões informadas.
+      Utilize a <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" style="color:var(--accent);font-weight:600;" onclick="_iaCtaTrack(event)">plataforma iAções</a> para aprofundar sua análise com dados completos, comparativos setoriais e ferramentas de valuation avançadas. Investir exige estudo — conheça a empresa, entenda os riscos e tome decisões informadas.
     </div>
   </section>
 
@@ -1420,7 +1420,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       </div>
       <div class="nota-overlay-title">Análise Qualitativa com IA</div>
       <div class="nota-overlay-sub">Acesse a nota qualitativa completa de ${f.symbol} com mais de 50 perguntas de auditoria em 6 categorias: Governança, Management, Indústria, Vantagens Competitivas, Poder de Barganha e Riscos &amp; Estrutura.</div>
-      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="nota-overlay-btn" onclick="_iaTrack('cta_click')">Desbloquear Análise &rarr;</a>
+      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="nota-overlay-btn" onclick="_iaCtaTrack(event)">Desbloquear Análise &rarr;</a>
     </div>
   </section>
 
@@ -1530,7 +1530,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   <section class="cta-card animate-in" aria-label="Acesse a plataforma">
     <h2>Análise completa na plataforma</h2>
     <p>Acesse premissas editáveis, cenários Bear/Base/Bull, análise qualitativa com IA, radar de notícias e muito mais.</p>
-    <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="cta-btn" onclick="_iaTrack('cta_click')">Teste a sua tese de investimento gr&aacute;tis &rarr;</a>
+    <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="cta-btn" onclick="_iaCtaTrack(event)">Teste a sua tese de investimento gr&aacute;tis &rarr;</a>
   </section>
 
   </article>
@@ -1702,7 +1702,7 @@ export const generateIndexHTML = (tickers: TickerIndexEntry[]): string => {
   <meta charset="UTF-8">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-858T7GLTMJ"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
-  <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();function _iaTrack(ev){var u=new URLSearchParams(location.search);fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},body:JSON.stringify({session_id:_iaS,page_path:location.pathname.replace(/\/index\.html$/,'').replace(/\/$/,'')||'/',referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview'})}).catch(function(){})}_iaTrack();</script>
+  <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();function _iaTrack(ev){var u=new URLSearchParams(location.search);fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},body:JSON.stringify({session_id:_iaS,page_path:location.pathname.replace(/\/index\.html$/,'').replace(/\/$/,'')||'/',referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview'})}).catch(function(){})}function _iaCtaTrack(e){e.preventDefault();_iaTrack('cta_click');var h=e.currentTarget.href;setTimeout(function(){window.location.href=h},150)}_iaTrack();</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Todas as Ações da B3 — Análise Fundamentalista e Preço Justo ${year} | iAções</title>
   <meta name="description" content="Lista completa de ${tickers.length} ações da B3 com indicadores fundamentalistas: P/L, Dividend Yield, preço justo por Graham, Bazin e Gordon. Análise fundamentalista atualizada em ${today}.">
@@ -1868,8 +1868,8 @@ export const generateIndexHTML = (tickers: TickerIndexEntry[]): string => {
     <a href="/" class="nav-iacoes"><span class="nav-iacoes-i">iA</span><span class="nav-iacoes-acoes">ções</span><span class="nav-cursor"></span></a>
   </div>
   <div class="nav-links">
-    <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="nav-btn nav-btn-outline" onclick="_iaTrack('cta_click')">Acessar App</a>
-    <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="nav-btn nav-btn-gold" onclick="_iaTrack('cta_click')">Assinar Plano</a>
+    <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="nav-btn nav-btn-outline" onclick="_iaCtaTrack(event)">Acessar App</a>
+    <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="nav-btn nav-btn-gold" onclick="_iaCtaTrack(event)">Assinar Plano</a>
   </div>
 </nav>
 
