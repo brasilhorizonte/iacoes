@@ -7,7 +7,7 @@
 - **Organizacao GitHub:** `brasilhorizonte`
 - **Repositorio:** `brasilhorizonte/iacoes`
 - **GitHub Pages:** `https://brasilhorizonte.github.io/iacoes/`
-- **Dominio futuro:** `https://iacoes.com.br`
+- **Dominio:** `https://iacoes.com.br`
 - **Plataforma principal:** `https://app.brasilhorizonte.com.br`
 
 ## Arquitetura
@@ -30,6 +30,8 @@ iacoes/
 ├── PETR4/index.html         # Pagina de ticker (gerada automaticamente)
 ├── VALE3/index.html         # Pagina de ticker (gerada automaticamente)
 ├── WEGE3/index.html         # Pagina de ticker (gerada automaticamente)
+├── acoes/index.html         # Pagina indice com todos os tickers (gerada automaticamente)
+├── 404.html                 # Redirect case-insensitive para tickers
 ├── assets/
 │   └── img/
 │       ├── dashboard-iacoes.png
@@ -43,6 +45,9 @@ iacoes/
 │   └── constants.ts         # Constantes (taxas, pesos, cenarios)
 ├── robots.txt               # Gerado automaticamente
 ├── sitemap.xml              # Gerado automaticamente
+├── tickers.json             # Lista de tickers gerada (usado pela busca)
+├── CNAME                    # Dominio iacoes.com.br
+├── .nojekyll                # Desabilita processamento Jekyll no GitHub Pages
 ├── vercel.json              # Config Vercel (cleanUrls, headers)
 ├── package.json             # Scripts npm e dependencias
 ├── .env                     # Credenciais Supabase (NAO commitado)
@@ -78,6 +83,16 @@ SUPABASE_ANON_KEY=...
 | `brapi_dividends` | Historico de dividendos | `ticker`/`symbol`, `amount`, `ex_date` |
 
 O script tenta consultar tanto por coluna `symbol` quanto `ticker`, e testa variantes do ticker (ex: `VALE3`, `vale3`, `VALE3.SA`).
+
+### Tabela de analytics
+
+| Tabela | Conteudo | Colunas-chave |
+|---|---|---|
+| `iacoes_page_views` | Pageviews e cliques de CTA | `session_id`, `page_path`, `event_type` (`pageview` ou `cta_click`), `referrer`, `utm_source`, `utm_medium`, `utm_campaign`, `device_type`, `screen_width`, `browser`, `os`, `created_at` |
+
+- RLS habilitado com policy "Allow anon insert" para o role `anon`
+- O tracking usa fetch com `keepalive:true` para sobreviver a navegacao
+- Cliques de CTA usam `_iaClick(event)` que faz `preventDefault()` + tracking + redirect com 150ms de delay, garantindo que o fetch e disparado antes da navegacao
 
 ## Metodologias de Valuation
 
@@ -127,7 +142,7 @@ Cada pagina gerada contem:
 7. **Endividamento & Liquidez** — Div.Liq/EBITDA, Div.Bruta/PL, Liquidez Corrente
 8. **Cards de Metodo** — Graham, Bazin, Gordon com premissas ajustaveis e preco justo
 9. **Resumo de Negocio** — Descricao longa da empresa (longBusinessSummary)
-10. **Nota Qualitativa** — Secao com paywall (conteudo blur + radar chart + CTA)
+10. **Nota Qualitativa** — Secao com paywall (conteudo blur + barras de progresso por categoria + CTA)
 11. **Demonstracoes Financeiras** — DRE, Balanco, Fluxo de Caixa, Dividendos (tabelas com 10 anos)
 12. **FAQ** — 4 perguntas frequentes dinamicas por ticker (Schema.org FAQPage)
 13. **CTA** — Link para a plataforma paga
@@ -137,16 +152,18 @@ Cada pagina gerada contem:
 - `<title>`, `<meta description>`, `<meta keywords>`, OpenGraph tags
 - Schema.org (JSON-LD) com tipo `Article`
 - `<link rel="canonical">` apontando para `https://iacoes.com.br/{TICKER}`
-- Cada pagina e self-contained (CSS inline, sem JS externo)
+- Cada pagina e self-contained (CSS inline, sem JS externo exceto GA4 e tracking Supabase)
 
 ## Landing Page (index.html)
 
 A landing page institucional e escrita manualmente (nao gerada). Contem:
 - Hero section com proposta de valor
-- Secao de metodologias (Graham, Bazin, Gordon, DCF)
+- Secao de metodologias (Graham, Bazin, Gordon, DCF com layout 2 colunas)
 - Secao de diferenciais (sem conflito de interesse, IA, etc.)
+- Secao de precos (3 planos: IAnalista, IAlocador, IAgente)
+- FAQ expandido (14 perguntas com Schema.org)
 - Screenshot do dashboard
-- CTA para cadastro
+- Multiplos CTAs com tracking (`_iaClick`) apontando para `/authnew`
 - Design system: DM Sans + JetBrains Mono, paleta verde escuro (#2B3A2B) + dourado (#B8923E)
 
 ## Design System
@@ -183,13 +200,27 @@ A landing page institucional e escrita manualmente (nao gerada). Contem:
 3. Busca lista de tickers ativos (market_cap > 0, ordenado por market_cap desc)
 4. Processa em batches de 5 com 300ms de delay entre batches
 5. Para cada ticker: fetch dados → calcula valuation → gera HTML → salva em `/{TICKER}/index.html`
-6. Gera `sitemap.xml` e `robots.txt`
-7. Resultado: arquivos estaticos prontos para commit e push
+6. Gera `sitemap.xml`, `robots.txt` e `tickers.json`
+7. Gera `/acoes/index.html` (pagina indice com todos os tickers)
+8. Resultado: arquivos estaticos prontos para commit e push
+
+## Analytics
+
+Todas as paginas (landing, ticker, indice) incluem:
+
+1. **Google Analytics (GA4)** — tag `G-858T7GLTMJ`
+2. **Supabase self-hosted analytics** — insere na tabela `iacoes_page_views` via REST API com anon key
+
+### Eventos rastreados
+- `pageview` — dispara automaticamente ao carregar qualquer pagina
+- `cta_click` — dispara ao clicar em qualquer CTA que aponta para `app.brasilhorizonte.com.br`
+
+### Implementacao tecnica
+- `_iaTrack(eventType)` — funcao base que faz POST na tabela com `keepalive:true`
+- `_iaClick(event)` — handler de clique para CTAs: faz `preventDefault()`, dispara `_iaTrack('cta_click')`, e redireciona apos 150ms. Isso garante que o fetch e iniciado antes da navegacao para o dominio externo.
+- Dados coletados: session_id, page_path, referrer, UTMs, device_type, screen_width, browser, OS
 
 ## TODO / Roadmap
 
 - [ ] Configurar GitHub Actions para regeneracao automatica (cron diario)
-- [ ] Migrar dominio `iacoes.com.br` para GitHub Pages (ou Vercel)
-- [ ] Gerar paginas para todos os ~400 tickers ativos
 - [ ] Unificar design system entre landing page e paginas de ticker
-- [ ] Adicionar link de volta para landing page nas paginas de ticker
