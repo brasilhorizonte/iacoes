@@ -275,13 +275,13 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   <meta name="keywords" content="${f.symbol}, ${f.symbol} preço justo, ${f.symbol} vale a pena, ${f.symbol} dividendos, ${f.symbol} valuation, ${f.name}, análise fundamentalista ${f.symbol}, ações ${f.sector}, B3, Graham, Bazin, Gordon">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
   <meta name="author" content="Brasil Horizonte">
-  <link rel="canonical" href="https://iacoes.com.br/${f.symbol}">
+  <link rel="canonical" href="https://iacoes.com.br/${f.symbol}/">
 
   <!-- Open Graph -->
   <meta property="og:title" content="${ogTitle}">
   <meta property="og:description" content="${desc}">
   <meta property="og:type" content="article">
-  <meta property="og:url" content="https://iacoes.com.br/${f.symbol}">
+  <meta property="og:url" content="https://iacoes.com.br/${f.symbol}/">
   <meta property="og:site_name" content="iAções — Análise de Ações | Brasil Horizonte">
   <meta property="og:locale" content="pt_BR">
   <meta property="article:published_time" content="${new Date().toISOString()}">
@@ -315,7 +315,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       "name": "iAções by Brasil Horizonte",
       "url": "https://iacoes.com.br"
     },
-    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://iacoes.com.br/${f.symbol}" },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://iacoes.com.br/${f.symbol}/" },
     "about": {
       "@type": "FinancialProduct",
       "name": "${f.symbol} - ${f.name}",
@@ -333,7 +333,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       { "@type": "ListItem", "position": 1, "name": "iAções", "item": "https://iacoes.com.br/" },
       { "@type": "ListItem", "position": 2, "name": "Ações", "item": "https://iacoes.com.br/acoes/" },
       { "@type": "ListItem", "position": 3, "name": "${f.sector || 'Setor'}", "item": "https://iacoes.com.br/acoes/#setor-${encodeURIComponent((f.sector || '').toLowerCase().replace(/[^a-z0-9]+/g, '-'))}" },
-      { "@type": "ListItem", "position": 4, "name": "${f.symbol}", "item": "https://iacoes.com.br/${f.symbol}" }
+      { "@type": "ListItem", "position": 4, "name": "${f.symbol}", "item": "https://iacoes.com.br/${f.symbol}/" }
     ]
   }
   </script>
@@ -879,6 +879,40 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     }
     .cta-btn:hover { background: #c9a44e; transform: translateY(-1px); }
 
+    /* ============ CTA VALUATION ============ */
+    .cta-valuation {
+      background: linear-gradient(135deg, #0f172a 0%, #1a2a1a 100%);
+      border-radius: 16px; padding: 2rem 2rem;
+      margin: 1.5rem 0;
+    }
+    .cta-valuation-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 1.5rem; flex-wrap: wrap;
+    }
+    .cta-valuation-text { flex: 1; min-width: 240px; }
+    .cta-valuation-title {
+      font-family: 'Playfair Display', serif;
+      color: #fff; font-size: 1.35rem; font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    .cta-valuation-desc {
+      color: rgba(255,255,255,0.65); font-size: 0.88rem;
+      line-height: 1.5; margin: 0;
+    }
+    .cta-valuation-desc strong { color: rgba(255,255,255,0.9); }
+    .cta-valuation-btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.75rem 1.8rem; background: #B68F40; color: #0f172a;
+      font-weight: 700; font-size: 0.92rem; border-radius: 10px;
+      text-decoration: none; transition: all 0.2s; white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .cta-valuation-btn:hover { background: #c9a44e; transform: translateY(-1px); }
+    @media (max-width: 640px) {
+      .cta-valuation-inner { flex-direction: column; text-align: center; }
+      .cta-valuation-btn { width: 100%; justify-content: center; }
+    }
+
     /* ============ NOTA QUALITATIVA (PAYWALL) ============ */
     .nota-section { position: relative; overflow: hidden; }
     .nota-header {
@@ -1337,6 +1371,17 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
 
     </div>
 
+    <!-- CTA VALUATION -->
+    <div class="cta-valuation">
+      <div class="cta-valuation-inner">
+        <div class="cta-valuation-text">
+          <h2 class="cta-valuation-title">Quer ir além com ${f.symbol}?</h2>
+          <p class="cta-valuation-desc">Na plataforma, você ajusta <strong>todas as premissas</strong> — taxa de desconto, crescimento, margens — e compara cenários Bear, Base e Bull em tempo real com 5 metodologias de valuation.</p>
+        </div>
+        <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="cta-valuation-btn" onclick="_iaClick(event)">Calcular preço justo de ${f.symbol} &rarr;</a>
+      </div>
+    </div>
+
     <div class="methods-note">
       <strong>Importante:</strong> Os valores apresentados nesta página são estimativas calculadas por modelos matemáticos e <strong>não constituem recomendação de compra, venda ou manutenção de ativos</strong>. Cada investidor deve conduzir sua própria análise, considerando o contexto da empresa, riscos setoriais, cenário macroeconômico e seu perfil de investimento.
     </div>
@@ -1731,7 +1776,7 @@ export const generateIndexHTML = (tickers: TickerIndexEntry[]): string => {
         "@type": "ListItem",
         "position": ${i + 1},
         "name": "${t.ticker} — ${t.name}",
-        "url": "https://iacoes.com.br/${t.ticker}"
+        "url": "https://iacoes.com.br/${t.ticker}/"
       }`).join(',\n      ')}
     ]
   }
@@ -1941,10 +1986,10 @@ function filterSector(sector) {
 export const generateSitemap = (tickers: string[]): string => {
   const today = new Date().toISOString().split('T')[0];
   const urls = [
-    `  <url><loc>https://iacoes.com.br/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>`,
+    `  <url><loc>https://iacoes.com.br/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>`,
     `  <url><loc>https://iacoes.com.br/acoes/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>`,
     ...tickers.map(t =>
-      `  <url><loc>https://iacoes.com.br/${t}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>`
+      `  <url><loc>https://iacoes.com.br/${t}/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>`
     )
   ];
   return `<?xml version="1.0" encoding="UTF-8"?>
