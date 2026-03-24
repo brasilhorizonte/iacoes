@@ -15,3 +15,6 @@ package-lock.json
 # Env
 .env
 .env.local
+
+# SEO audit reports (local only)
+seo-audit-*.html

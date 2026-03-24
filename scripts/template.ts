@@ -74,6 +74,7 @@ const getYear = (d: string): string => {
 export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuation, peers: PeerTicker[] = []): string => {
   const f = data.fundamentals;
   const today = new Date().toLocaleDateString('pt-BR');
+  const todayISO = new Date().toISOString().split('T')[0] + 'T03:00:00.000Z';
   // desc, titleTag, ogTitle and faqItems are defined after graham/bazin/gordon calculations below
 
   // Prepare financial statements
@@ -284,17 +285,25 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   <meta property="og:url" content="https://iacoes.com.br/${f.symbol}/">
   <meta property="og:site_name" content="iAções — Análise de Ações | Brasil Horizonte">
   <meta property="og:locale" content="pt_BR">
-  <meta property="article:published_time" content="${new Date().toISOString()}">
-  <meta property="article:modified_time" content="${new Date().toISOString()}">
+  <meta property="article:published_time" content="${todayISO}">
+  <meta property="article:modified_time" content="${todayISO}">
   <meta property="article:section" content="Análise Fundamentalista">
   <meta property="article:tag" content="${f.symbol}">
   <meta property="article:tag" content="Valuation">
   <meta property="article:tag" content="${f.sector}">
 
+  <!-- Open Graph Image -->
+  <meta property="og:image" content="https://iacoes.com.br/assets/img/og-brasilhorizonte.png">
+  <meta property="og:image:width" content="300">
+  <meta property="og:image:height" content="300">
+  <meta property="og:image:alt" content="${f.symbol} — Análise Fundamentalista | iAções">
+
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${ogTitle}">
   <meta name="twitter:description" content="${desc}">
+  <meta name="twitter:image" content="https://iacoes.com.br/assets/img/og-brasilhorizonte.png">
+  <meta name="twitter:image:alt" content="${f.symbol} — Análise Fundamentalista | iAções">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -307,13 +316,20 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     "@type": "Article",
     "headline": "${f.symbol} — Preço Justo e Análise Fundamentalista ${new Date().getFullYear()}",
     "description": "${desc}",
-    "datePublished": "${new Date().toISOString()}",
-    "dateModified": "${new Date().toISOString()}",
+    "datePublished": "${todayISO}",
+    "dateModified": "${todayISO}",
     "author": { "@type": "Organization", "name": "Brasil Horizonte", "url": "https://brasilhorizonte.com.br" },
     "publisher": {
       "@type": "Organization",
       "name": "iAções by Brasil Horizonte",
-      "url": "https://iacoes.com.br"
+      "url": "https://iacoes.com.br",
+      "logo": { "@type": "ImageObject", "url": "https://iacoes.com.br/assets/img/institucional_branco_amarelo_3x.png" },
+      "sameAs": [
+        "https://br.linkedin.com/company/brasil-horizonte",
+        "https://x.com/brasilhorizont",
+        "https://www.instagram.com/brasil.horizonte/",
+        "https://t.me/brasilhorizonte"
+      ]
     },
     "mainEntityOfPage": { "@type": "WebPage", "@id": "https://iacoes.com.br/${f.symbol}/" },
     "about": {
@@ -1760,6 +1776,17 @@ export const generateIndexHTML = (tickers: TickerIndexEntry[]): string => {
   <meta property="og:url" content="https://iacoes.com.br/acoes/">
   <meta property="og:site_name" content="iAções — Análise de Ações | Brasil Horizonte">
   <meta property="og:locale" content="pt_BR">
+  <meta property="og:image" content="https://iacoes.com.br/assets/img/og-brasilhorizonte.png">
+  <meta property="og:image:alt" content="Todas as Ações da B3 — iAções">
+  <meta name="keywords" content="ações B3, análise fundamentalista, preço justo, valuation, Graham, Bazin, Gordon, bolsa brasileira, investimentos, P/L, dividend yield, ROE, iAções, Brasil Horizonte">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Todas as Ações da B3 — Análise Fundamentalista ${year} | iAções">
+  <meta name="twitter:description" content="Lista completa de ${tickers.length} ações da B3 com indicadores fundamentalistas atualizados.">
+  <meta name="twitter:image" content="https://iacoes.com.br/assets/img/og-brasilhorizonte.png">
+  <meta name="twitter:image:alt" content="Todas as Ações da B3 — iAções">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800&family=Montserrat:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">

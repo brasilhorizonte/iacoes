@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { mkdirSync, writeFileSync } from 'fs';
+import { mkdirSync, writeFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { getAllTickers, getTickersWithNames, getAllTickersWithSector, getPeersBySector } from './supabase';
 import { getFinancialData, performValuation } from './valuation';
@@ -103,17 +103,23 @@ async function main() {
       console.log(`\n📋 /acoes/index.html gerado (${indexTickers.length} tickers)`);
     }
 
-    const sitemap = generateSitemap(generated);
+    // Sitemap includes ALL existing ticker pages on disk, not just current run
+    const allTickerDirs = readdirSync(ROOT).filter(d => {
+      if (d === 'acoes' || d === 'assets' || d === 'scripts' || d === 'node_modules' || d.startsWith('.')) return false;
+      const p = join(ROOT, d, 'index.html');
+      try { return statSync(p).isFile(); } catch { return false; }
+    });
+    const sitemap = generateSitemap(allTickerDirs);
     writeFileSync(join(ROOT, 'sitemap.xml'), sitemap, 'utf-8');
-    console.log('📄 sitemap.xml gerado');
+    console.log(`📄 sitemap.xml gerado (${allTickerDirs.length} tickers)`);
 
     const robots = generateRobots();
     writeFileSync(join(ROOT, 'robots.txt'), robots, 'utf-8');
     console.log('🤖 robots.txt gerado');
 
-    // Generate tickers.json for search autocomplete
+    // Generate tickers.json — includes ALL tickers with pages on disk
     const allTickers = await getTickersWithNames();
-    const tickersIndex = allTickers.filter(t => generated.includes(t.ticker));
+    const tickersIndex = allTickers.filter(t => allTickerDirs.includes(t.ticker));
     writeFileSync(join(ROOT, 'tickers.json'), JSON.stringify(tickersIndex), 'utf-8');
     console.log(`🔍 tickers.json gerado (${tickersIndex.length} tickers)`);
   }

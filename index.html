@@ -938,6 +938,78 @@
 
         .final-cta .btn-cta:hover { background: var(--gold-light); }
 
+        /* ABOUT / SOBRE NOS */
+        .about { padding: 5rem 2rem; background: var(--bg-white); border-top: 1px solid var(--border); }
+        .about-inner { max-width: 1000px; margin: 0 auto; }
+        .about-header { text-align: center; margin-bottom: 3rem; }
+        .about-header .section-desc { margin: 0 auto; }
+        .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 2.5rem; }
+        .about-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 2rem;
+            transition: all 0.2s;
+        }
+        .about-card:hover { border-color: var(--gold); box-shadow: 0 4px 20px rgba(184, 146, 62, 0.08); }
+        .about-card-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .about-avatar {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: var(--nav-bg);
+            color: var(--gold-light);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-mono);
+            font-weight: 700; font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .about-name { font-weight: 700; font-size: 1.05rem; color: var(--text-primary); line-height: 1.3; }
+        .about-credential {
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600;
+            color: var(--gold); background: var(--gold-dim);
+            padding: 0.2rem 0.6rem; border-radius: 4px;
+            margin-top: 0.25rem;
+        }
+        .about-bio { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.7; }
+        .about-bottom {
+            text-align: center;
+            padding-top: 1rem;
+        }
+        .about-bottom p { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.7; max-width: 700px; margin: 0 auto 1.5rem; }
+        .about-social { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .about-social a {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 0.82rem; font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .about-social a:hover { border-color: var(--gold); color: var(--gold); }
+        .about-social svg { width: 16px; height: 16px; }
+
+        @media (max-width: 768px) {
+            .about-grid { grid-template-columns: 1fr; }
+        }
+
+        /* FOOTER SOCIAL */
+        .footer-social { display: flex; gap: 0.8rem; align-items: center; }
+        .footer-social a {
+            display: flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px;
+            border-radius: 6px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text-tertiary);
+            transition: all 0.2s;
+        }
+        .footer-social a:hover { border-color: var(--gold); color: var(--gold); }
+        .footer-social svg { width: 16px; height: 16px; }
+
         /* FOOTER */
         footer {
             padding: 2.5rem 2rem;
@@ -1001,13 +1073,55 @@
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "Brasil Horizonte",
+        "alternateName": "Brasil Horizonte — Gestão, Research e Consultoria",
         "url": "https://brasilhorizonte.com.br",
         "logo": "https://iacoes.com.br/assets/img/institucional_branco_amarelo_3x.png",
-        "sameAs": [],
+        "sameAs": [
+            "https://br.linkedin.com/company/brasil-horizonte",
+            "https://www.linkedin.com/in/gabriel-dantas-a-melo-cnpi-8796b4158/",
+            "https://www.linkedin.com/in/lucastnm/",
+            "https://x.com/brasilhorizont",
+            "https://www.instagram.com/brasil.horizonte/",
+            "https://t.me/brasilhorizonte"
+        ],
         "brand": {
             "@type": "Brand",
             "name": "iAções"
-        }
+        },
+        "founder": [
+            {
+                "@type": "Person",
+                "name": "Gabriel Dantas de A. Melo",
+                "jobTitle": "Analista CNPI — Especialista em Valuation",
+                "description": "Especialista em avaliação de ativos e estruturação de projetos, com experiência em consultoria financeira e mercado de capitais. Atuou como analista em casas como Thoreos, Investor, e em projetos de Bid Advisory e Project Finance na EY-Parthenon. Envolvido na estruturação de mais de R$ 70 bilhões em investimentos.",
+                "hasCredential": {
+                    "@type": "EducationalOccupationalCredential",
+                    "credentialCategory": "Professional Certification",
+                    "name": "CNPI — Certificado Nacional do Profissional de Investimento",
+                    "recognizedBy": {
+                        "@type": "Organization",
+                        "name": "APIMEC"
+                    }
+                },
+                "sameAs": "https://www.linkedin.com/in/gabriel-dantas-a-melo-cnpi-8796b4158/"
+            },
+            {
+                "@type": "Person",
+                "name": "Lucas T. Noronha Mello",
+                "jobTitle": "Gestor CGA — Gestor de Fundos de Ações",
+                "description": "Investidor fundamentalista com anos de experiência em mercado de capitais e gestão de fundos de ações. Formado em Administração de Empresas pelo IBMEC. Acumulou experiência como analista em uma das maiores assets independentes de Minas Gerais e como gestor de fundos na maior asset do Sul do Brasil.",
+                "hasCredential": {
+                    "@type": "EducationalOccupationalCredential",
+                    "credentialCategory": "Professional Certification",
+                    "name": "CGA — Certificação de Gestores ANBIMA",
+                    "recognizedBy": {
+                        "@type": "Organization",
+                        "name": "ANBIMA"
+                    }
+                },
+                "sameAs": "https://www.linkedin.com/in/lucastnm/"
+            }
+        ]
     }
     </script>
 
@@ -1161,12 +1275,13 @@
 <body>
 
 <nav>
-    <a href="#" class="nav-logo"><span class="ia">iA</span>ções<span class="terminal-cursor"></span></a>
+    <a href="/" class="nav-logo"><span class="ia">iA</span>ções<span class="terminal-cursor"></span></a>
     <ul class="nav-links">
         <li><a href="#modulos">Módulos</a></li>
         <li><a href="#features">Features</a></li>
         <li><a href="#metodologia">Metodologia</a></li>
         <li><a href="#precos">Preços</a></li>
+        <li><a href="#sobre">Sobre</a></li>
         <li><a href="#faq">FAQ</a></li>
         <li><a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta btn-cta-nav" onclick="_iaClick(event)">Testar grátis</a></li>
     </ul>
@@ -1454,6 +1569,47 @@
     </div>
 </section>
 
+<section class="about" id="sobre">
+    <div class="about-inner">
+        <div class="about-header">
+            <div class="section-label">Quem Somos</div>
+            <h2 class="section-title">Análises feitas por profissionais certificados</h2>
+            <p class="section-desc">Toda a metodologia e os critérios analíticos do iAções são definidos e validados por profissionais com certificações reconhecidas pelo mercado.</p>
+        </div>
+        <div class="about-grid">
+            <div class="about-card">
+                <div class="about-card-header">
+                    <div class="about-avatar">GM</div>
+                    <div>
+                        <div class="about-name">Gabriel Dantas de A. Melo</div>
+                        <div class="about-credential">CNPI — APIMEC</div>
+                    </div>
+                </div>
+                <p class="about-bio">Especialista em avaliação de ativos e estruturação de projetos. Atuou como analista em casas como Thoreos e Investor, e em projetos de Bid Advisory e Project Finance na EY-Parthenon. Envolvido na estruturação de mais de R$ 70 bilhões em investimentos.</p>
+            </div>
+            <div class="about-card">
+                <div class="about-card-header">
+                    <div class="about-avatar">LM</div>
+                    <div>
+                        <div class="about-name">Lucas T. Noronha Mello</div>
+                        <div class="about-credential">CGA — ANBIMA</div>
+                    </div>
+                </div>
+                <p class="about-bio">Investidor fundamentalista e gestor de fundo de ações. Formado em Administração pelo IBMEC. Acumulou experiência como analista em uma das maiores assets independentes de Minas Gerais e como gestor de fundos na maior asset do Sul do Brasil.</p>
+            </div>
+        </div>
+        <div class="about-bottom">
+            <p>Uma plataforma <strong>Brasil Horizonte</strong> — Gestão, Research e Consultoria. Acompanhe nossas análises e novidades do mercado nos canais oficiais.</p>
+            <div class="about-social">
+                <a href="https://br.linkedin.com/company/brasil-horizonte" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>LinkedIn</a>
+                <a href="https://x.com/brasilhorizont" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>Twitter / X</a>
+                <a href="https://www.instagram.com/brasil.horizonte/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>Instagram</a>
+                <a href="https://t.me/brasilhorizonte" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.492-1.302.48-.428-.012-1.252-.242-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>Telegram</a>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section class="faq" id="faq">
     <div class="faq-inner">
         <div class="faq-header">
@@ -1524,6 +1680,12 @@
             <li><a href="#">Contato</a></li>
             <li><a href="#">Blog</a></li>
         </ul>
+        <div class="footer-social">
+            <a href="https://br.linkedin.com/company/brasil-horizonte" target="_blank" rel="noopener" title="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+            <a href="https://x.com/brasilhorizont" target="_blank" rel="noopener" title="Twitter / X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+            <a href="https://www.instagram.com/brasil.horizonte/" target="_blank" rel="noopener" title="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+            <a href="https://t.me/brasilhorizonte" target="_blank" rel="noopener" title="Telegram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.492-1.302.48-.428-.012-1.252-.242-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></a>
+        </div>
     </div>
 </footer>
 
