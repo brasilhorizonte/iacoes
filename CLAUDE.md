@@ -144,27 +144,36 @@ Cada pagina gerada contem:
 9. **Resumo de Negocio** — Descricao longa da empresa (longBusinessSummary)
 10. **Nota Qualitativa** — Secao com paywall (conteudo blur + barras de progresso por categoria + CTA)
 11. **Demonstracoes Financeiras** — DRE, Balanco, Fluxo de Caixa, Dividendos (tabelas com 10 anos)
-12. **FAQ** — 4 perguntas frequentes dinamicas por ticker (Schema.org FAQPage)
+12. **FAQ** — 8 perguntas frequentes dinamicas por ticker (Schema.org FAQPage)
 13. **CTA** — Link para a plataforma paga
 14. **Footer** — Logos BH + iAcoes, disclaimer legal
 
-### SEO
-- `<title>`, `<meta description>`, `<meta keywords>`, OpenGraph tags
-- Schema.org (JSON-LD) com tipo `Article`
-- `<link rel="canonical">` apontando para `https://iacoes.com.br/{TICKER}`
+### SEO & Meta Tags
+- `<title>`, `<meta description>`, `<meta keywords>`, `<meta robots>`
+- Open Graph completo: `og:title`, `og:description`, `og:type`, `og:url`, `og:image`, `og:locale`, `og:site_name`, `article:published_time`, `article:tag`
+- Twitter Card: `summary_large_image` com `twitter:image` e `twitter:image:alt`
+- Schema.org (JSON-LD): `Article` com `publisher.sameAs` (LinkedIn, Twitter, Instagram, Telegram), `BreadcrumbList` (4 niveis), `FAQPage` (8 Q&As), `FinancialProduct`
+- `<link rel="canonical">` apontando para `https://iacoes.com.br/{TICKER}/`
+- `datePublished`/`dateModified` estavel por dia (ISO com hora fixa)
 - Cada pagina e self-contained (CSS inline, sem JS externo exceto GA4 e tracking Supabase)
 
 ## Landing Page (index.html)
 
 A landing page institucional e escrita manualmente (nao gerada). Contem:
 - Hero section com proposta de valor
+- Secao de modulos (iAnalista, iAlocador)
+- Secao de features (14 cards)
 - Secao de metodologias (Graham, Bazin, Gordon, DCF com layout 2 colunas)
 - Secao de diferenciais (sem conflito de interesse, IA, etc.)
-- Secao de precos (3 planos: IAnalista, IAlocador, IAgente)
-- FAQ expandido (14 perguntas com Schema.org)
-- Screenshot do dashboard
+- Secao comparativa de recursos (tabela IAnalista vs IAlocador vs Fundamentalista)
+- Secao de precos (3 planos: IAnalista, IAlocador, Fundamentalista)
+- Secao "Sobre Nos" (#sobre) — bios dos fundadores com credenciais CNPI (APIMEC) e CGA (ANBIMA), links sociais (LinkedIn, Twitter/X, Instagram, Telegram)
+- FAQ expandido (14 perguntas com Schema.org FAQPage)
+- Secao de acoes populares (20 tickers + link para /acoes/)
+- Footer com links sociais (LinkedIn, Twitter/X, Instagram, Telegram)
 - Multiplos CTAs com tracking (`_iaClick`) apontando para `/authnew`
-- Design system: DM Sans + JetBrains Mono, paleta verde escuro (#2B3A2B) + dourado (#B8923E)
+- Design system: DM Sans + JetBrains Mono, paleta verde escuro (#093848) + dourado (#B8923E)
+- Schema.org: Organization (com `founder` Person + `hasCredential` + `sameAs` 6 links), WebSite (com SearchAction), FAQPage (14 Q&As)
 
 ## Design System
 
@@ -200,8 +209,8 @@ A landing page institucional e escrita manualmente (nao gerada). Contem:
 3. Busca lista de tickers ativos (market_cap > 0, ordenado por market_cap desc)
 4. Processa em batches de 5 com 300ms de delay entre batches
 5. Para cada ticker: fetch dados → calcula valuation → gera HTML → salva em `/{TICKER}/index.html`
-6. Gera `sitemap.xml`, `robots.txt` e `tickers.json`
-7. Gera `/acoes/index.html` (pagina indice com todos os tickers)
+6. Gera `sitemap.xml` (inclui TODAS as paginas de ticker existentes no disco, nao apenas as da execucao atual), `robots.txt` e `tickers.json`
+7. Gera `/acoes/index.html` (pagina indice com todos os tickers, inclui Twitter Card, og:image e keywords)
 8. Resultado: arquivos estaticos prontos para commit e push
 
 ## Analytics
@@ -220,7 +229,19 @@ Todas as paginas (landing, ticker, indice) incluem:
 - `_iaClick(event)` — handler de clique para CTAs: faz `preventDefault()`, dispara `_iaTrack('cta_click')`, e redireciona apos 150ms. Isso garante que o fetch e iniciado antes da navegacao para o dominio externo.
 - Dados coletados: session_id, page_path, referrer, UTMs, device_type, screen_width, browser, OS
 
+## Redes Sociais
+
+- **LinkedIn (empresa):** https://br.linkedin.com/company/brasil-horizonte
+- **Twitter/X:** https://x.com/brasilhorizont
+- **Instagram:** https://www.instagram.com/brasil.horizonte/
+- **Telegram:** https://t.me/brasilhorizonte
+- **LinkedIn (Gabriel, CNPI):** https://www.linkedin.com/in/gabriel-dantas-a-melo-cnpi-8796b4158/
+- **LinkedIn (Lucas, CGA):** https://www.linkedin.com/in/lucastnm/
+
 ## TODO / Roadmap
 
 - [ ] Configurar GitHub Actions para regeneracao automatica (cron diario)
 - [ ] Unificar design system entre landing page e paginas de ticker
+- [ ] Criar imagem OG 1200x630 (atual e 300x300)
+- [ ] Adicionar informacoes de contato visiveis (email/telefone)
+- [ ] Adicionar SpeakableSpecification para AEO
