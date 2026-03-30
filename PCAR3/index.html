@@ -561,6 +561,51 @@
       font-weight: 600; color: #475569;
     }
     .fin-table tbody tr:hover { background: #fafaf8; }
+    .fin-transposed .sticky-col {
+      position: sticky; left: 0; background: #fff; z-index: 1;
+      font-family: 'Montserrat', sans-serif; font-weight: 600;
+      color: #475569; text-align: left; min-width: 120px;
+    }
+    .fin-transposed thead th.sticky-col { background: #fff; }
+    .div-lead-card {
+      margin-top: 1.5rem; padding: 2rem; border-radius: 12px;
+      background: linear-gradient(135deg, #041C24 0%, #0a2e3a 100%);
+      text-align: center; color: #fff;
+    }
+    .div-lead-icon { margin-bottom: 0.75rem; color: #B68F40; }
+    .div-lead-title {
+      font-family: 'Playfair Display', serif; font-size: 1.15rem;
+      font-weight: 700; margin-bottom: 0.4rem;
+    }
+    .div-lead-sub {
+      font-size: 0.82rem; color: rgba(255,255,255,0.7);
+      margin-bottom: 1.25rem; max-width: 420px; margin-left: auto; margin-right: auto;
+    }
+    .div-lead-form {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+      justify-content: center; max-width: 500px; margin: 0 auto;
+    }
+    .div-lead-form input {
+      flex: 1; min-width: 160px; padding: 0.65rem 0.9rem;
+      border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+      background: rgba(255,255,255,0.08); color: #fff;
+      font-size: 0.85rem; font-family: 'Montserrat', sans-serif;
+    }
+    .div-lead-form input::placeholder { color: rgba(255,255,255,0.4); }
+    .div-lead-form input:focus { outline: none; border-color: #B68F40; background: rgba(255,255,255,0.12); }
+    .div-lead-btn {
+      width: 100%; padding: 0.7rem; border: none; border-radius: 8px;
+      background: #B68F40; color: #041C24; font-weight: 700;
+      font-size: 0.88rem; cursor: pointer; transition: all 0.2s;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .div-lead-btn:hover { background: #c9a44e; }
+    .div-lead-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .div-lead-success { margin-top: 1rem; }
+    .div-lead-success p { color: #10b981; font-weight: 600; font-size: 0.9rem; }
+    @media (max-width: 640px) {
+      .div-lead-form input { min-width: 100%; }
+    }
 
     /* ============ SANITY CHECK ============ */
     .sanity-table {
@@ -906,7 +951,9 @@
   <!-- Google Analytics (GA4) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-858T7GLTMJ"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
-  <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();function _iaTrack(ev){var u=new URLSearchParams(location.search);fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify({session_id:_iaS,page_path:location.pathname.replace(//index\.html$/,'').replace(//$/,'')||'/',referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview'})}).catch(function(){})}_iaTrack();function _iaClick(e){e.preventDefault();var url=e.currentTarget.href;_iaTrack('cta_click');setTimeout(function(){window.location.href=url},150)}</script>
+  <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();function _iaTrack(ev){var u=new URLSearchParams(location.search);fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify({session_id:_iaS,page_path:location.pathname.replace(//index\.html$/,'').replace(//$/,'')||'/',referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview'})}).catch(function(){})}_iaTrack();function _iaClick(e){e.preventDefault();var url=e.currentTarget.href;_iaTrack('cta_click');setTimeout(function(){window.location.href=url},150)}
+var _iaDivData=[{"e":"2022-04-27","a":0.35446,"t":"JCP","p":"2022-06-15"},{"e":"2021-05-05","a":1.7010939,"t":"JCP","p":"2021-06-15"},{"e":"2021-05-05","a":0.47578895,"t":"DIVIDENDO","p":"2021-06-14"},{"e":"2020-04-30","a":0.5820241,"t":"DIVIDENDO","p":"2020-06-15"},{"e":"2019-06-27","a":0.12955678,"t":"JCP","p":"2019-08-16"},{"e":"2019-03-29","a":0.679223,"t":"JCP","p":"2019-05-22"},{"e":"2019-03-28","a":0.6792238,"t":"JCP","p":"2019-05-22"},{"e":"2018-12-05","a":0.252186,"t":"JCP","p":"2018-12-13"},{"e":"2018-12-04","a":0.25218603,"t":"JCP","p":"2018-12-12"},{"e":"2018-10-03","a":0.405994,"t":"JCP","p":"2018-11-27"},{"e":"2018-10-02","a":0.4059942,"t":"JCP","p":"2018-11-26"},{"e":"2018-05-04","a":0.264626,"t":"JCP","p":"2018-06-12"},{"e":"2018-05-03","a":0.26462665,"t":"JCP","p":"2018-06-12"},{"e":"2018-03-29","a":0.32187843,"t":"JCP","p":"2018-05-24"},{"e":"2018-02-04","a":0.321878,"t":"JCP","p":"2018-05-25"},{"e":"2017-12-07","a":0.286583,"t":"JCP","p":"2017-12-15"},{"e":"2017-12-06","a":0.2864325,"t":"JCP","p":"2017-12-15"},{"e":"2016-04-27","a":0.013703,"t":"DIVIDENDO","p":"2016-04-27"},{"e":"2015-10-30","a":0.136365,"t":"DIVIDENDO","p":"2015-11-10"},{"e":"2015-07-28","a":0.136365,"t":"DIVIDENDO","p":"2015-07-28"},{"e":"2015-05-18","a":0.136365,"t":"DIVIDENDO","p":"2015-05-18"},{"e":"2015-04-24","a":0.68899125,"t":"DIVIDENDO","p":"2015-06-24"},{"e":"2014-11-10","a":0.127272,"t":"DIVIDENDO","p":"2014-11-20"},{"e":"2014-08-01","a":0.127272,"t":"DIVIDENDO","p":"2014-08-01"},{"e":"2014-05-05","a":0.127272,"t":"DIVIDENDO","p":"2014-05-05"},{"e":"2014-04-16","a":0.5353953,"t":"DIVIDENDO","p":"2014-06-13"},{"e":"2013-10-25","a":0.118182,"t":"DIVIDENDO","p":"2013-10-25"},{"e":"2013-07-31","a":0.13,"t":"DIVIDENDO","p":"2013-08-13"},{"e":"2013-07-31","a":0.118182,"t":"DIVIDENDO","p":"2013-07-31"},{"e":"2013-05-03","a":0.118182,"t":"DIVIDENDO","p":"2013-05-02"},{"e":"2013-04-17","a":0.59371644,"t":"DIVIDENDO","p":"2013-06-14"},{"e":"2012-11-12","a":0.1,"t":"DIVIDENDO","p":"2012-11-23"},{"e":"2012-07-31","a":0.1,"t":"DIVIDENDO","p":"2012-08-13"},{"e":"2012-06-11","a":0.1,"t":"DIVIDENDO","p":"2012-06-20"},{"e":"2012-04-27","a":0.3729506,"t":"DIVIDENDO","p":"2012-04-26"},{"e":"2011-11-14","a":0.08181818,"t":"DIVIDENDO","p":"2011-11-14"},{"e":"2011-08-01","a":0.09,"t":"DIVIDENDO","p":"2011-08-10"},{"e":"2011-08-01","a":0.08181818,"t":"DIVIDENDO","p":"2011-08-01"},{"e":"2011-05-19","a":0.09,"t":"DIVIDENDO","p":"2011-05-27"},{"e":"2011-05-19","a":0.08181818,"t":"DIVIDENDO","p":"2011-05-18"},{"e":"2011-03-31","a":0.40954638,"t":"DIVIDENDO","p":"2011-03-30"},{"e":"2010-11-17","a":0.07272727,"t":"DIVIDENDO","p":"2010-11-17"},{"e":"2010-08-03","a":0.07272727,"t":"DIVIDENDO","p":"2010-08-03"},{"e":"2010-05-17","a":0.07272727,"t":"DIVIDENDO","p":"2010-05-16"},{"e":"2010-04-29","a":0.35793027,"t":"DIVIDENDO","p":"2010-06-28"},{"e":"2009-11-18","a":0.06004073,"t":"DIVIDENDO","p":"2009-11-17"},{"e":"2009-08-11","a":0.12325687,"t":"DIVIDENDO","p":"2009-08-10"},{"e":"2009-04-30","a":0.24899957,"t":"DIVIDENDO","p":"2009-06-25"},{"e":"2008-04-30","a":0.20804,"t":"DIVIDENDO","p":"2008-04-30"},{"e":"2007-04-30","a":0.16903,"t":"DIVIDENDO","p":"2007-04-30"},{"e":"2006-04-27","a":0.51689,"t":"DIVIDENDO","p":"2006-04-27"},{"e":"2005-04-29","a":0.75138,"t":"DIVIDENDO","p":"2005-04-29"},{"e":"2004-04-30","a":0.46261,"t":"DIVIDENDO","p":"2004-04-30"},{"e":"2003-04-30","a":0.52516,"t":"DIVIDENDO","p":"2003-04-30"},{"e":"2002-04-29","a":0.53753,"t":"DIVIDENDO","p":"2002-04-29"},{"e":"2000-12-28","a":0.558805,"t":"JCP","p":"2000-12-28"},{"e":"2000-11-30","a":0.37314,"t":"JCP","p":"2000-11-30"},{"e":"2000-10-31","a":0.886208,"t":"JCP","p":"2000-10-31"},{"e":"2000-04-13","a":0.188,"t":"DIVIDENDO","p":"2000-04-13"},{"e":"1999-04-30","a":0.512058,"t":"JCP","p":"1999-04-30"},{"e":"1999-04-30","a":0.0641732,"t":"DIVIDENDO","p":"1999-04-30"},{"e":"1998-04-28","a":0.489655,"t":"JCP","p":"1998-04-28"},{"e":"1998-04-28","a":0.045251,"t":"DIVIDENDO","p":"1998-04-28"},{"e":"1997-04-28","a":0.433668,"t":"DIVIDENDO","p":"1997-04-28"},{"e":"1996-04-09","a":0.31,"t":"DIVIDENDO","p":"1996-04-09"}];
+function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.querySelector('button');btn.disabled=true;btn.textContent='Enviando...';var name=f.name.value.trim();var email=f.email.value.trim();fetch(_iaB+'/rest/v1/iacoes_email_leads',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},body:JSON.stringify({name:name,email:email,ticker:ticker,source:'dividendos'})}).then(function(){_iaTrack('lead_dividendos');var csv='Data Ex;Valor por Acao;Tipo;Data Pagamento\n';_iaDivData.forEach(function(d){csv+=d.e+';'+d.a+';'+d.t+';'+d.p+'\n';});var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='dividendos_'+ticker+'.csv';a.click();URL.revokeObjectURL(url);f.style.display='none';document.getElementById('div-lead-success-'+ticker).style.display='block';}).catch(function(){btn.disabled=false;btn.textContent='Erro — tente novamente';});return false;}</script>
 </head>
 <body>
 
@@ -958,9 +1005,9 @@
     </div>
     <div class="company-right">
       <div class="price-label">Cotação Atual</div>
-      <div class="price-value" id="live-price"><sup>R$</sup>2,33</div>
+      <div class="price-value" id="live-price"><sup>R$</sup>2,31</div>
       <div class="price-changes">
-        <span id="live-change-day" class="val-negative">-2.5% dia</span>
+        <span id="live-change-day" class="val-negative">-3.4% dia</span>
         <span class="val-negative">-0.1% 12m</span>
       </div>
       <div class="price-date" id="live-date">Dados de 30/03/2026</div>
@@ -969,7 +1016,7 @@
 
   <!-- INTRO ANALYSIS (SEO) -->
   <section class="intro-analysis animate-in" aria-label="Análise fundamentalista de PCAR3">
-    <p><strong>PCAR3</strong> é a ação ordinária de <strong>Companhia Brasileira de Distribuicao</strong>, negociada na B3 (bolsa brasileira) no setor de Consumo Não Cíclico, segmento de Alimentos. Com cotação atual de <strong>R$ 2,33</strong> e valor de mercado de R$ 1,17 B, a empresa é analisada abaixo por 3 metodologias clássicas de valuation: Graham, Bazin e Gordon (DDM).</p>
+    <p><strong>PCAR3</strong> é a ação ordinária de <strong>Companhia Brasileira de Distribuicao</strong>, negociada na B3 (bolsa brasileira) no setor de Consumo Não Cíclico, segmento de Alimentos. Com cotação atual de <strong>R$ 2,31</strong> e valor de mercado de R$ 1,17 B, a empresa é analisada abaixo por 3 metodologias clássicas de valuation: Graham, Bazin e Gordon (DDM).</p>
     <p>A análise fundamentalista de PCAR3 utiliza 3 métodos clássicos de valuation — <strong>Graham</strong>, <strong>Bazin</strong> e <strong>Gordon (DDM)</strong> — para estimar o preço justo da ação com premissas ajustáveis. Confira os resultados abaixo e ajuste as premissas para sua própria análise.</p>
     <p>Os múltiplos de valuation e EV/EBITDA de 10,4x. e a margem líquida de -4.3%. Abaixo, você encontra todos os indicadores fundamentalistas, demonstrações financeiras históricas e o preço justo calculado com premissas ajustáveis.</p>
   </section>
@@ -980,8 +1027,8 @@
     <div class="metrics-grid">
       <div class="metric-box"><span class="metric-label">Valor de Mercado</span><span class="metric-value ">R$ 1,17 B</span></div>
       <div class="metric-box"><span class="metric-label">Valor da Firma (EV)</span><span class="metric-value ">R$ 10,20 B</span></div>
-      <div class="metric-box"><span class="metric-label">Nro. Ações</span><span class="metric-value ">503,27 M</span></div>
-      <div class="metric-box"><span class="metric-label">Volume Médio (3M)</span><span class="metric-value ">9,84 M</span></div>
+      <div class="metric-box"><span class="metric-label">Nro. Ações</span><span class="metric-value ">507,63 M</span></div>
+      <div class="metric-box"><span class="metric-label">Volume Médio (3M)</span><span class="metric-value ">10,18 M</span></div>
       <div class="metric-box"><span class="metric-label">Min. 52 Semanas</span><span class="metric-value ">R$ 1,89</span></div>
       <div class="metric-box"><span class="metric-label">Max. 52 Semanas</span><span class="metric-value ">R$ 4,95</span></div>
     </div>
@@ -1033,7 +1080,7 @@
         <h3 class="section-title font-playfair">Preço Justo (Métodos Clássicos)</h3>
         <span class="section-sub">Graham, Bazin e Gordon com premissas auditáveis</span>
       </div>
-      <div class="section-price-ref">Cotação Atual<br><strong>R$ 2,33</strong></div>
+      <div class="section-price-ref">Cotação Atual<br><strong>R$ 2,31</strong></div>
     </div>
     <div class="methods-grid methods-grid-3">
 
@@ -1102,7 +1149,7 @@
           </div>
           <div class="method-upside-row">
             <span class="method-fv-label">Upside</span>
-            <span class="method-upside val-positive" id="bazin-upside">+262.1%</span>
+            <span class="method-upside val-positive" id="bazin-upside">+265.3%</span>
           </div>
 
           <div class="premissas-section">
@@ -1150,7 +1197,7 @@
           </div>
           <div class="method-upside-row">
             <span class="method-fv-label">Upside</span>
-            <span class="method-upside val-negative" id="gordon-upside">-598.9%</span>
+            <span class="method-upside val-negative" id="gordon-upside">-603.2%</span>
           </div>
 
           <div class="premissas-section">
@@ -1304,94 +1351,9 @@
       <span class="fin-tab active">DRE</span>
     </div>
     <div class="table-scroll">
-      <table class="fin-table">
-        <thead>
-          <tr>
-            <th>Período</th><th>Receita Total</th><th>Lucro Bruto</th>
-            <th>EBIT</th><th>Lucro Antes IR</th><th>Lucro Líquido</th>
-          </tr>
-        </thead>
-        <tbody>
-    <tr>
-      <td>2025</td>
-      <td>R$ 19,11 B</td>
-      <td>R$ 5,27 B</td>
-      <td>R$ -169,00 M</td>
-      <td>R$ -1,43 B</td>
-      <td class="val-negative">R$ -815,00 M</td>
-    </tr>
-    <tr>
-      <td>2024</td>
-      <td>R$ 18,79 B</td>
-      <td>R$ 5,17 B</td>
-      <td>R$ -436,00 M</td>
-      <td>R$ -1,68 B</td>
-      <td class="val-negative">R$ -2,40 B</td>
-    </tr>
-    <tr>
-      <td>2023</td>
-      <td>R$ 19,25 B</td>
-      <td>R$ 4,82 B</td>
-      <td>R$ 677,00 M</td>
-      <td>R$ -332,00 M</td>
-      <td class="val-negative">R$ -2,13 B</td>
-    </tr>
-    <tr>
-      <td>2022</td>
-      <td>R$ 17,32 B</td>
-      <td>R$ 4,30 B</td>
-      <td>R$ -565,00 M</td>
-      <td>R$ -1,32 B</td>
-      <td class="val-negative">R$ -4,00 M</td>
-    </tr>
-    <tr>
-      <td>2021</td>
-      <td>R$ 51,29 B</td>
-      <td>R$ 12,95 B</td>
-      <td>R$ 1,69 B</td>
-      <td>R$ 369,00 M</td>
-      <td class="val-positive">R$ 960,00 M</td>
-    </tr>
-    <tr>
-      <td>2020</td>
-      <td>R$ 51,25 B</td>
-      <td>R$ 13,75 B</td>
-      <td>R$ 2,63 B</td>
-      <td>R$ 1,90 B</td>
-      <td class="val-positive">R$ 2,33 B</td>
-    </tr>
-    <tr>
-      <td>2019</td>
-      <td>R$ 56,64 B</td>
-      <td>R$ 12,19 B</td>
-      <td>R$ 1,97 B</td>
-      <td>R$ 760,00 M</td>
-      <td class="val-positive">R$ 836,00 M</td>
-    </tr>
-    <tr>
-      <td>2018</td>
-      <td>R$ 49,39 B</td>
-      <td>R$ 11,55 B</td>
-      <td>R$ 2,18 B</td>
-      <td>R$ 1,70 B</td>
-      <td class="val-positive">R$ 1,18 B</td>
-    </tr>
-    <tr>
-      <td>2017</td>
-      <td>R$ 44,63 B</td>
-      <td>R$ 10,70 B</td>
-      <td>R$ 1,51 B</td>
-      <td>R$ 779,00 M</td>
-      <td class="val-positive">R$ 865,00 M</td>
-    </tr>
-    <tr>
-      <td>2016</td>
-      <td>R$ 41,45 B</td>
-      <td>R$ 9,52 B</td>
-      <td>R$ 856,00 M</td>
-      <td>R$ -47,00 M</td>
-      <td class="val-negative">R$ -1,08 B</td>
-    </tr></tbody>
+      <table class="fin-table fin-transposed">
+        <thead><tr><th class="sticky-col"></th><th>2016</th><th>2017</th><th>2018</th><th>2019</th><th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th></tr></thead>
+        <tbody><tr><td class="sticky-col">Receita Total</td><td>R$ 41,45 B</td><td>R$ 44,63 B</td><td>R$ 49,39 B</td><td>R$ 56,64 B</td><td>R$ 51,25 B</td><td>R$ 51,29 B</td><td>R$ 17,32 B</td><td>R$ 19,25 B</td><td>R$ 18,79 B</td><td>R$ 19,11 B</td></tr><tr><td class="sticky-col">Lucro Bruto</td><td>R$ 9,52 B</td><td>R$ 10,70 B</td><td>R$ 11,55 B</td><td>R$ 12,19 B</td><td>R$ 13,75 B</td><td>R$ 12,95 B</td><td>R$ 4,30 B</td><td>R$ 4,82 B</td><td>R$ 5,17 B</td><td>R$ 5,27 B</td></tr><tr><td class="sticky-col">EBIT</td><td>R$ 856,00 M</td><td>R$ 1,51 B</td><td>R$ 2,18 B</td><td>R$ 1,97 B</td><td>R$ 2,63 B</td><td>R$ 1,69 B</td><td>R$ -565,00 M</td><td>R$ 677,00 M</td><td>R$ -436,00 M</td><td>R$ -169,00 M</td></tr><tr><td class="sticky-col">Lucro Antes IR</td><td>R$ -47,00 M</td><td>R$ 779,00 M</td><td>R$ 1,70 B</td><td>R$ 760,00 M</td><td>R$ 1,90 B</td><td>R$ 369,00 M</td><td>R$ -1,32 B</td><td>R$ -332,00 M</td><td>R$ -1,68 B</td><td>R$ -1,43 B</td></tr><tr><td class="sticky-col">Lucro Líquido</td><td><span class="val-negative">R$ -1,08 B</span></td><td><span class="val-positive">R$ 865,00 M</span></td><td><span class="val-positive">R$ 1,18 B</span></td><td><span class="val-positive">R$ 836,00 M</span></td><td><span class="val-positive">R$ 2,33 B</span></td><td><span class="val-positive">R$ 960,00 M</span></td><td><span class="val-negative">R$ -4,00 M</span></td><td><span class="val-negative">R$ -2,13 B</span></td><td><span class="val-negative">R$ -2,40 B</span></td><td><span class="val-negative">R$ -815,00 M</span></td></tr></tbody>
       </table>
     </div>
 
@@ -1401,94 +1363,9 @@
       <span class="fin-tab active">Balanço</span>
     </div>
     <div class="table-scroll">
-      <table class="fin-table">
-        <thead>
-          <tr>
-            <th>Período</th><th>Ativo Total</th><th>Caixa</th>
-            <th>Passivo Total</th><th>Dívida LP</th><th>Patrimônio Líq.</th>
-          </tr>
-        </thead>
-        <tbody>
-    <tr>
-      <td>2025</td>
-      <td>R$ 18,43 B</td>
-      <td>R$ 2,01 B</td>
-      <td>R$ 16,30 B</td>
-      <td>-</td>
-      <td>R$ 2,12 B</td>
-    </tr>
-    <tr>
-      <td>2024</td>
-      <td>R$ 19,70 B</td>
-      <td>R$ 2,65 B</td>
-      <td>R$ 16,77 B</td>
-      <td>-</td>
-      <td>R$ 2,94 B</td>
-    </tr>
-    <tr>
-      <td>2023</td>
-      <td>R$ 22,05 B</td>
-      <td>R$ 3,75 B</td>
-      <td>R$ 17,33 B</td>
-      <td>-</td>
-      <td>R$ 4,72 B</td>
-    </tr>
-    <tr>
-      <td>2022</td>
-      <td>R$ 43,84 B</td>
-      <td>R$ 3,75 B</td>
-      <td>R$ 30,11 B</td>
-      <td>-</td>
-      <td>R$ 13,73 B</td>
-    </tr>
-    <tr>
-      <td>2021</td>
-      <td>R$ 49,44 B</td>
-      <td>R$ 8,27 B</td>
-      <td>R$ 33,06 B</td>
-      <td>-</td>
-      <td>R$ 16,38 B</td>
-    </tr>
-    <tr>
-      <td>2020</td>
-      <td>R$ 53,30 B</td>
-      <td>R$ 8,71 B</td>
-      <td>R$ 36,49 B</td>
-      <td>-</td>
-      <td>R$ 16,81 B</td>
-    </tr>
-    <tr>
-      <td>2019</td>
-      <td>R$ 58,48 B</td>
-      <td>R$ 7,95 B</td>
-      <td>R$ 44,93 B</td>
-      <td>-</td>
-      <td>R$ 13,55 B</td>
-    </tr>
-    <tr>
-      <td>2018</td>
-      <td>R$ 52,85 B</td>
-      <td>R$ 4,37 B</td>
-      <td>R$ 38,91 B</td>
-      <td>-</td>
-      <td>R$ 13,94 B</td>
-    </tr>
-    <tr>
-      <td>2017</td>
-      <td>R$ 47,93 B</td>
-      <td>R$ 3,79 B</td>
-      <td>R$ 34,64 B</td>
-      <td>-</td>
-      <td>R$ 13,29 B</td>
-    </tr>
-    <tr>
-      <td>2016</td>
-      <td>R$ 45,22 B</td>
-      <td>R$ 5,11 B</td>
-      <td>R$ 32,62 B</td>
-      <td>-</td>
-      <td>R$ 12,60 B</td>
-    </tr></tbody>
+      <table class="fin-table fin-transposed">
+        <thead><tr><th class="sticky-col"></th><th>2016</th><th>2017</th><th>2018</th><th>2019</th><th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th></tr></thead>
+        <tbody><tr><td class="sticky-col">Ativo Total</td><td>R$ 45,22 B</td><td>R$ 47,93 B</td><td>R$ 52,85 B</td><td>R$ 58,48 B</td><td>R$ 53,30 B</td><td>R$ 49,44 B</td><td>R$ 43,84 B</td><td>R$ 22,05 B</td><td>R$ 19,70 B</td><td>R$ 18,43 B</td></tr><tr><td class="sticky-col">Caixa</td><td>R$ 5,11 B</td><td>R$ 3,79 B</td><td>R$ 4,37 B</td><td>R$ 7,95 B</td><td>R$ 8,71 B</td><td>R$ 8,27 B</td><td>R$ 3,75 B</td><td>R$ 3,75 B</td><td>R$ 2,65 B</td><td>R$ 2,01 B</td></tr><tr><td class="sticky-col">Passivo Total</td><td>R$ 32,62 B</td><td>R$ 34,64 B</td><td>R$ 38,91 B</td><td>R$ 44,93 B</td><td>R$ 36,49 B</td><td>R$ 33,06 B</td><td>R$ 30,11 B</td><td>R$ 17,33 B</td><td>R$ 16,77 B</td><td>R$ 16,30 B</td></tr><tr><td class="sticky-col">Dívida LP</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr><tr><td class="sticky-col">Patrimônio Líq.</td><td>R$ 12,60 B</td><td>R$ 13,29 B</td><td>R$ 13,94 B</td><td>R$ 13,55 B</td><td>R$ 16,81 B</td><td>R$ 16,38 B</td><td>R$ 13,73 B</td><td>R$ 4,72 B</td><td>R$ 2,94 B</td><td>R$ 2,12 B</td></tr></tbody>
       </table>
     </div>
 
@@ -1498,119 +1375,43 @@
       <span class="fin-tab active">Fluxo de Caixa</span>
     </div>
     <div class="table-scroll">
-      <table class="fin-table">
-        <thead>
-          <tr>
-            <th>Período</th><th>FCO</th><th>FCI</th>
-            <th>FCF</th><th>CAPEX</th><th>Dividendos Pagos</th>
-          </tr>
-        </thead>
-        <tbody>
-    <tr>
-      <td>2025</td>
-      <td>R$ 1,35 B</td>
-      <td>R$ -507,00 M</td>
-      <td>R$ -1,49 B</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr>
-    <tr>
-      <td>2024</td>
-      <td>R$ 1,36 B</td>
-      <td>R$ 338,00 M</td>
-      <td>R$ -2,04 B</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr>
-    <tr>
-      <td>2023</td>
-      <td>R$ 563,00 M</td>
-      <td>R$ -1,60 B</td>
-      <td>R$ -1,70 B</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr>
-    <tr>
-      <td>2022</td>
-      <td>R$ -216,00 M</td>
-      <td>R$ 2,83 B</td>
-      <td>R$ -4,70 B</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr>
-    <tr>
-      <td>2021</td>
-      <td>R$ 2,73 B</td>
-      <td>R$ -77,00 M</td>
-      <td>R$ -2,74 B</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr>
-    <tr>
-      <td>2020</td>
-      <td>R$ 4,74 B</td>
-      <td>R$ -4,29 B</td>
-      <td>R$ -281,00 M</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr>
-    <tr>
-      <td>2019</td>
-      <td>R$ 1,14 B</td>
-      <td>R$ -3,27 B</td>
-      <td>R$ 1,89 B</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr>
-    <tr>
-      <td>2018</td>
-      <td>R$ 2,59 B</td>
-      <td>R$ -1,90 B</td>
-      <td>R$ 42,00 M</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr>
-    <tr>
-      <td>2017</td>
-      <td>R$ 1,90 B</td>
-      <td>R$ -1,59 B</td>
-      <td>R$ -2,09 B</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr>
-    <tr>
-      <td>2016</td>
-      <td>R$ -1,30 B</td>
-      <td>R$ -2,02 B</td>
-      <td>R$ 1,48 B</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr></tbody>
+      <table class="fin-table fin-transposed">
+        <thead><tr><th class="sticky-col"></th><th>2016</th><th>2017</th><th>2018</th><th>2019</th><th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th></tr></thead>
+        <tbody><tr><td class="sticky-col">FCO</td><td>R$ -1,30 B</td><td>R$ 1,90 B</td><td>R$ 2,59 B</td><td>R$ 1,14 B</td><td>R$ 4,74 B</td><td>R$ 2,73 B</td><td>R$ -216,00 M</td><td>R$ 563,00 M</td><td>R$ 1,36 B</td><td>R$ 1,35 B</td></tr><tr><td class="sticky-col">FCI</td><td>R$ -2,02 B</td><td>R$ -1,59 B</td><td>R$ -1,90 B</td><td>R$ -3,27 B</td><td>R$ -4,29 B</td><td>R$ -77,00 M</td><td>R$ 2,83 B</td><td>R$ -1,60 B</td><td>R$ 338,00 M</td><td>R$ -507,00 M</td></tr><tr><td class="sticky-col">FCF</td><td>R$ 1,48 B</td><td>R$ -2,09 B</td><td>R$ 42,00 M</td><td>R$ 1,89 B</td><td>R$ -281,00 M</td><td>R$ -2,74 B</td><td>R$ -4,70 B</td><td>R$ -1,70 B</td><td>R$ -2,04 B</td><td>R$ -1,49 B</td></tr><tr><td class="sticky-col">CAPEX</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr><tr><td class="sticky-col">Div. Pagos</td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td></tr></tbody>
       </table>
     </div>
 
     
-    <!-- DIVIDENDOS -->
+    <!-- DIVIDENDOS RESUMO ANUAL -->
     <div class="fin-tabs" style="margin-top:1.5rem;">
-      <span class="fin-tab active">Dividendos</span>
+      <span class="fin-tab active">Dividendos por Ano</span>
     </div>
     <div class="table-scroll">
-      <table class="fin-table">
-        <thead>
-          <tr><th>Ano</th><th>Total Pago</th><th>Qtd. Pagamentos</th></tr>
-        </thead>
+      <table class="fin-table fin-transposed">
+        <thead><tr><th class="sticky-col"></th><th>2013</th><th>2014</th><th>2015</th><th>2016</th><th>2017</th><th>2018</th><th>2019</th><th>2020</th><th>2021</th><th>2022</th></tr></thead>
         <tbody>
-    <tr><td>2022</td><td>R$ 0,35</td><td>1</td></tr>
-    <tr><td>2021</td><td>R$ 2,18</td><td>2</td></tr>
-    <tr><td>2020</td><td>R$ 0,58</td><td>1</td></tr>
-    <tr><td>2019</td><td>R$ 1,49</td><td>3</td></tr>
-    <tr><td>2018</td><td>R$ 2,49</td><td>8</td></tr>
-    <tr><td>2017</td><td>R$ 0,57</td><td>2</td></tr>
-    <tr><td>2016</td><td>R$ 0,01</td><td>1</td></tr>
-    <tr><td>2015</td><td>R$ 1,10</td><td>4</td></tr>
-    <tr><td>2014</td><td>R$ 0,92</td><td>4</td></tr>
-    <tr><td>2013</td><td>R$ 1,08</td><td>5</td></tr></tbody>
+          <tr><td class="sticky-col">Total Pago</td><td>R$ 1,08</td><td>R$ 0,92</td><td>R$ 1,10</td><td>R$ 0,01</td><td>R$ 0,57</td><td>R$ 2,49</td><td>R$ 1,49</td><td>R$ 0,58</td><td>R$ 2,18</td><td>R$ 0,35</td></tr>
+          <tr><td class="sticky-col">Pagamentos</td><td>5</td><td>4</td><td>4</td><td>1</td><td>2</td><td>8</td><td>3</td><td>1</td><td>2</td><td>1</td></tr>
+        </tbody>
       </table>
+    </div>
+
+    
+    <!-- LEAD COLLECTOR: HISTÓRICO COMPLETO DE DIVIDENDOS -->
+    <div class="div-lead-card" id="div-lead-card-PCAR3">
+      <div class="div-lead-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </div>
+      <div class="div-lead-title">Histórico Completo de Dividendos de PCAR3</div>
+      <div class="div-lead-sub">65 pagamentos desde 1996 — JCP, dividendos e rendimentos com datas e valores por ação.</div>
+      <form class="div-lead-form" id="div-lead-form-PCAR3" onsubmit="return _iaLeadSubmit(event,'PCAR3')">
+        <input type="text" name="name" placeholder="Seu nome" required>
+        <input type="email" name="email" placeholder="Seu melhor e-mail" required>
+        <button type="submit" class="div-lead-btn">Baixar histórico completo <span>&rarr;</span></button>
+      </form>
+      <div class="div-lead-success" id="div-lead-success-PCAR3" style="display:none">
+        <p>Pronto! O download vai começar automaticamente.</p>
+      </div>
     </div>
   </section>
 
@@ -1631,37 +1432,37 @@
       <a href="/RADL3/" class="peer-card">
         <span class="peer-ticker">RADL3</span>
         <span class="peer-name">RADL3</span>
-        <span class="peer-price">R$ 23,59</span>
+        <span class="peer-price">R$ 23,41</span>
       </a>
       <a href="/HYPE3/" class="peer-card">
         <span class="peer-ticker">HYPE3</span>
         <span class="peer-name">HYPE3</span>
-        <span class="peer-price">R$ 22,18</span>
+        <span class="peer-price">R$ 22,20</span>
       </a>
       <a href="/NATU3/" class="peer-card">
         <span class="peer-ticker">NATU3</span>
         <span class="peer-name">NATU3</span>
-        <span class="peer-price">R$ 9,47</span>
+        <span class="peer-price">R$ 9,33</span>
       </a>
       <a href="/ASAI3/" class="peer-card">
         <span class="peer-ticker">ASAI3</span>
         <span class="peer-name">ASAI3</span>
-        <span class="peer-price">R$ 8,88</span>
+        <span class="peer-price">R$ 8,87</span>
       </a>
       <a href="/GMAT3/" class="peer-card">
         <span class="peer-ticker">GMAT3</span>
         <span class="peer-name">GMAT3</span>
-        <span class="peer-price">R$ 4,50</span>
+        <span class="peer-price">R$ 4,48</span>
       </a>
       <a href="/SLCE3/" class="peer-card">
         <span class="peer-ticker">SLCE3</span>
         <span class="peer-name">SLCE3</span>
-        <span class="peer-price">R$ 18,70</span>
+        <span class="peer-price">R$ 18,71</span>
       </a>
       <a href="/TTEN3/" class="peer-card">
         <span class="peer-ticker">TTEN3</span>
         <span class="peer-name">TTEN3</span>
-        <span class="peer-price">R$ 15,60</span>
+        <span class="peer-price">R$ 15,53</span>
       </a>
     </div>
     <a href="/acoes/#setor-consumo-n-o-c-clico" class="peers-more">Ver todas as ações de Consumo Não Cíclico &rarr;</a>
@@ -1736,7 +1537,7 @@
 
 <script>
 (function() {
-  var price = 2.33;
+  var price = 2.31;
   var lpa = -1.6605645;
   var vpa = 4.3276553;
   var divTTM = 0;

@@ -115,7 +115,7 @@
       {
         "@type": "Question",
         "name": "Qual o preço justo de TUPY3 pelo método de Graham?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Pelo método de Graham, o preço justo estimado de TUPY3 é de R$ 0,00. Esse cálculo utiliza a fórmula de valor intrínseco de Benjamin Graham, baseada no lucro por ação (LPA = R$ -4,99) e no valor patrimonial por ação (VPA = R$ 27,84). A fórmula é: Valor Intrínseco = √(22,5 × LPA × VPA), com ajuste por margem de segurança. É um método mais adequado para empresas lucrativas com patrimônio sólido." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Pelo método de Graham, o preço justo estimado de TUPY3 é de R$ 0,00. Esse cálculo utiliza a fórmula de valor intrínseco de Benjamin Graham, baseada no lucro por ação (LPA = R$ -4,99) e no valor patrimonial por ação (VPA = R$ 27,54). A fórmula é: Valor Intrínseco = √(22,5 × LPA × VPA), com ajuste por margem de segurança. É um método mais adequado para empresas lucrativas com patrimônio sólido." }
       },
       {
         "@type": "Question",
@@ -561,6 +561,51 @@
       font-weight: 600; color: #475569;
     }
     .fin-table tbody tr:hover { background: #fafaf8; }
+    .fin-transposed .sticky-col {
+      position: sticky; left: 0; background: #fff; z-index: 1;
+      font-family: 'Montserrat', sans-serif; font-weight: 600;
+      color: #475569; text-align: left; min-width: 120px;
+    }
+    .fin-transposed thead th.sticky-col { background: #fff; }
+    .div-lead-card {
+      margin-top: 1.5rem; padding: 2rem; border-radius: 12px;
+      background: linear-gradient(135deg, #041C24 0%, #0a2e3a 100%);
+      text-align: center; color: #fff;
+    }
+    .div-lead-icon { margin-bottom: 0.75rem; color: #B68F40; }
+    .div-lead-title {
+      font-family: 'Playfair Display', serif; font-size: 1.15rem;
+      font-weight: 700; margin-bottom: 0.4rem;
+    }
+    .div-lead-sub {
+      font-size: 0.82rem; color: rgba(255,255,255,0.7);
+      margin-bottom: 1.25rem; max-width: 420px; margin-left: auto; margin-right: auto;
+    }
+    .div-lead-form {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+      justify-content: center; max-width: 500px; margin: 0 auto;
+    }
+    .div-lead-form input {
+      flex: 1; min-width: 160px; padding: 0.65rem 0.9rem;
+      border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+      background: rgba(255,255,255,0.08); color: #fff;
+      font-size: 0.85rem; font-family: 'Montserrat', sans-serif;
+    }
+    .div-lead-form input::placeholder { color: rgba(255,255,255,0.4); }
+    .div-lead-form input:focus { outline: none; border-color: #B68F40; background: rgba(255,255,255,0.12); }
+    .div-lead-btn {
+      width: 100%; padding: 0.7rem; border: none; border-radius: 8px;
+      background: #B68F40; color: #041C24; font-weight: 700;
+      font-size: 0.88rem; cursor: pointer; transition: all 0.2s;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .div-lead-btn:hover { background: #c9a44e; }
+    .div-lead-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .div-lead-success { margin-top: 1rem; }
+    .div-lead-success p { color: #10b981; font-weight: 600; font-size: 0.9rem; }
+    @media (max-width: 640px) {
+      .div-lead-form input { min-width: 100%; }
+    }
 
     /* ============ SANITY CHECK ============ */
     .sanity-table {
@@ -906,7 +951,9 @@
   <!-- Google Analytics (GA4) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-858T7GLTMJ"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
-  <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();function _iaTrack(ev){var u=new URLSearchParams(location.search);fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify({session_id:_iaS,page_path:location.pathname.replace(//index\.html$/,'').replace(//$/,'')||'/',referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview'})}).catch(function(){})}_iaTrack();function _iaClick(e){e.preventDefault();var url=e.currentTarget.href;_iaTrack('cta_click');setTimeout(function(){window.location.href=url},150)}</script>
+  <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();function _iaTrack(ev){var u=new URLSearchParams(location.search);fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify({session_id:_iaS,page_path:location.pathname.replace(//index\.html$/,'').replace(//$/,'')||'/',referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview'})}).catch(function(){})}_iaTrack();function _iaClick(e){e.preventDefault();var url=e.currentTarget.href;_iaTrack('cta_click');setTimeout(function(){window.location.href=url},150)}
+var _iaDivData=[{"e":"2024-12-30","a":1.3922799,"t":"JCP","p":"2025-01-15"},{"e":"2024-05-29","a":0.15346524,"t":"DIVIDENDO","p":"2024-10-30"},{"e":"2024-01-22","a":0.25542748,"t":"JCP","p":"2024-07-30"},{"e":"2023-10-25","a":0.26295274,"t":"JCP","p":"2024-03-26"},{"e":"2023-04-28","a":0.28732815,"t":"JCP","p":"2023-10-17"},{"e":"2023-04-28","a":0.45412296,"t":"DIVIDENDO","p":"2023-10-17"},{"e":"2022-12-29","a":0.22676244,"t":"JCP","p":"2023-04-04"},{"e":"2022-10-31","a":0.2248695,"t":"JCP","p":"2022-10-31"},{"e":"2021-12-29","a":0.1537379,"t":"JCP","p":"2022-01-27"},{"e":"2021-11-18","a":0.14213966,"t":"JCP","p":"2021-11-25"},{"e":"2021-08-19","a":0.13622792,"t":"JCP","p":"2021-08-26"},{"e":"2019-05-21","a":0.1733973,"t":"DIVIDENDO","p":"2019-06-18"},{"e":"2019-03-19","a":0.6935895,"t":"JCP","p":"2019-03-28"},{"e":"2019-03-19","a":0.26009607,"t":"DIVIDENDO","p":"2019-03-28"},{"e":"2018-11-12","a":0.1499779,"t":"DIVIDENDO","p":"2018-11-26"},{"e":"2018-11-12","a":0.19681686,"t":"JCP","p":"2018-11-26"},{"e":"2018-08-13","a":0.26009607,"t":"JCP","p":"2018-08-24"},{"e":"2018-05-14","a":0.26009607,"t":"JCP","p":"2018-05-25"},{"e":"2018-03-16","a":0.34679806,"t":"DIVIDENDO","p":"2018-03-27"},{"e":"2017-11-17","a":0.06001894,"t":"JCP","p":"2017-11-30"},{"e":"2017-11-17","a":0.2867758,"t":"DIVIDENDO","p":"2017-11-30"},{"e":"2017-08-18","a":0.34679475,"t":"JCP","p":"2017-08-31"},{"e":"2017-06-13","a":0.34679475,"t":"JCP","p":"2017-06-28"},{"e":"2017-04-03","a":0.11097432,"t":"JCP","p":"2017-04-13"},{"e":"2016-11-16","a":0.17339738,"t":"JCP","p":"2016-11-28"},{"e":"2016-11-07","a":0.11097432,"t":"JCP","p":"2016-11-07"},{"e":"2016-08-10","a":0.30072445,"t":"JCP","p":"2016-08-23"},{"e":"2015-08-13","a":0.74221236,"t":"JCP","p":"2015-08-24"},{"e":"2014-12-17","a":0.17610788,"t":"JCP","p":"2014-12-30"},{"e":"2014-04-11","a":0.17441736,"t":"JCP","p":"2014-04-10"},{"e":"2013-04-12","a":0.18412092,"t":"JCP","p":"2013-06-11"},{"e":"2013-04-12","a":0.06415038,"t":"DIVIDENDO","p":"2013-04-11"},{"e":"2012-04-30","a":0.84034,"t":"JCP","p":"2012-04-29"},{"e":"2012-04-30","a":0.63832,"t":"DIVIDENDO","p":"2012-04-29"},{"e":"2011-04-29","a":0.72991,"t":"JCP","p":"2011-04-28"},{"e":"2011-04-29","a":0.40661,"t":"DIVIDENDO","p":"2011-04-28"},{"e":"2010-04-28","a":0.6298472,"t":"JCP","p":"2010-06-15"},{"e":"2010-04-28","a":0.5069699,"t":"DIVIDENDO","p":"2010-06-15"},{"e":"2009-04-28","a":0.48690897,"t":"JCP","p":"2009-05-29"},{"e":"2009-04-28","a":0.28681943,"t":"DIVIDENDO","p":"2009-05-29"},{"e":"2008-04-30","a":0.28276,"t":"DIVIDENDO","p":"2008-04-30"},{"e":"2005-04-28","a":0.1561,"t":"JCP","p":"2005-06-20"},{"e":"2004-04-29","a":0.037,"t":"JCP","p":"2004-06-30"},{"e":"2002-04-26","a":0.2217,"t":"JCP","p":"2002-06-27"},{"e":"2001-04-20","a":0.1917,"t":"JCP","p":"2001-05-31"},{"e":"2000-03-30","a":0.1634,"t":"JCP","p":"2000-05-31"}];
+function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.querySelector('button');btn.disabled=true;btn.textContent='Enviando...';var name=f.name.value.trim();var email=f.email.value.trim();fetch(_iaB+'/rest/v1/iacoes_email_leads',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},body:JSON.stringify({name:name,email:email,ticker:ticker,source:'dividendos'})}).then(function(){_iaTrack('lead_dividendos');var csv='Data Ex;Valor por Acao;Tipo;Data Pagamento\n';_iaDivData.forEach(function(d){csv+=d.e+';'+d.a+';'+d.t+';'+d.p+'\n';});var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='dividendos_'+ticker+'.csv';a.click();URL.revokeObjectURL(url);f.style.display='none';document.getElementById('div-lead-success-'+ticker).style.display='block';}).catch(function(){btn.disabled=false;btn.textContent='Erro — tente novamente';});return false;}</script>
 </head>
 <body>
 
@@ -958,9 +1005,9 @@
     </div>
     <div class="company-right">
       <div class="price-label">Cotação Atual</div>
-      <div class="price-value" id="live-price"><sup>R$</sup>12,93</div>
+      <div class="price-value" id="live-price"><sup>R$</sup>12,79</div>
       <div class="price-changes">
-        <span id="live-change-day" class="val-positive">+5.4% dia</span>
+        <span id="live-change-day" class="val-positive">+4.2% dia</span>
         <span class="val-negative">-0.3% 12m</span>
       </div>
       <div class="price-date" id="live-date">Dados de 30/03/2026</div>
@@ -969,7 +1016,7 @@
 
   <!-- INTRO ANALYSIS (SEO) -->
   <section class="intro-analysis animate-in" aria-label="Análise fundamentalista de TUPY3">
-    <p><strong>TUPY3</strong> é a ação ordinária de <strong>Tupy S.A.</strong>, negociada na B3 (bolsa brasileira) no setor de Consumo Cíclico, segmento de Material Rodoviário. Com cotação atual de <strong>R$ 12,93</strong> e valor de mercado de R$ 1,63 B, a empresa é analisada abaixo por 3 metodologias clássicas de valuation: Graham, Bazin e Gordon (DDM).</p>
+    <p><strong>TUPY3</strong> é a ação ordinária de <strong>Tupy S.A.</strong>, negociada na B3 (bolsa brasileira) no setor de Consumo Cíclico, segmento de Material Rodoviário. Com cotação atual de <strong>R$ 12,79</strong> e valor de mercado de R$ 1,63 B, a empresa é analisada abaixo por 3 metodologias clássicas de valuation: Graham, Bazin e Gordon (DDM).</p>
     <p>A análise fundamentalista de TUPY3 utiliza 3 métodos clássicos de valuation — <strong>Graham</strong>, <strong>Bazin</strong> e <strong>Gordon (DDM)</strong> — para estimar o preço justo da ação com premissas ajustáveis. Confira os resultados abaixo e ajuste as premissas para sua própria análise.</p>
     <p>Negocia a um P/L de 19,7x e EV/EBITDA de 7,2x. O retorno sobre patrimônio (ROE) é de 2.4%, e a margem líquida de 0.8%. Abaixo, você encontra todos os indicadores fundamentalistas, demonstrações financeiras históricas e o preço justo calculado com premissas ajustáveis.</p>
   </section>
@@ -980,8 +1027,8 @@
     <div class="metrics-grid">
       <div class="metric-box"><span class="metric-label">Valor de Mercado</span><span class="metric-value ">R$ 1,63 B</span></div>
       <div class="metric-box"><span class="metric-label">Valor da Firma (EV)</span><span class="metric-value ">R$ 4,02 B</span></div>
-      <div class="metric-box"><span class="metric-label">Nro. Ações</span><span class="metric-value ">125,69 M</span></div>
-      <div class="metric-box"><span class="metric-label">Volume Médio (3M)</span><span class="metric-value ">760,80 K</span></div>
+      <div class="metric-box"><span class="metric-label">Nro. Ações</span><span class="metric-value ">127,07 M</span></div>
+      <div class="metric-box"><span class="metric-label">Volume Médio (3M)</span><span class="metric-value ">835,10 K</span></div>
       <div class="metric-box"><span class="metric-label">Min. 52 Semanas</span><span class="metric-value ">R$ 10,59</span></div>
       <div class="metric-box"><span class="metric-label">Max. 52 Semanas</span><span class="metric-value ">R$ 24,71</span></div>
     </div>
@@ -999,7 +1046,7 @@
       <div class="metric-box"><span class="metric-label">EV/EBIT</span><span class="metric-value ">7,18</span></div>
       <div class="metric-box"><span class="metric-label">Div. Yield</span><span class="metric-value ">0.0%</span></div>
       <div class="metric-box"><span class="metric-label">LPA</span><span class="metric-value ">R$ -4,99</span></div>
-      <div class="metric-box"><span class="metric-label">VPA</span><span class="metric-value ">R$ 27,84</span></div>
+      <div class="metric-box"><span class="metric-label">VPA</span><span class="metric-value ">R$ 27,54</span></div>
     </div>
   </section>
 
@@ -1033,7 +1080,7 @@
         <h3 class="section-title font-playfair">Preço Justo (Métodos Clássicos)</h3>
         <span class="section-sub">Graham, Bazin e Gordon com premissas auditáveis</span>
       </div>
-      <div class="section-price-ref">Cotação Atual<br><strong>R$ 12,93</strong></div>
+      <div class="section-price-ref">Cotação Atual<br><strong>R$ 12,79</strong></div>
     </div>
     <div class="methods-grid methods-grid-3">
 
@@ -1081,7 +1128,7 @@
 
           <div class="premissa-info-row">
             <span>LPA:</span> <strong>R$ -4,99</strong>
-            <span style="margin-left:0.75rem">VPA:</span> <strong>R$ 27,84</strong>
+            <span style="margin-left:0.75rem">VPA:</span> <strong>R$ 27,54</strong>
           </div>
         </div>
       </div>
@@ -1102,7 +1149,7 @@
           </div>
           <div class="method-upside-row">
             <span class="method-fv-label">Upside</span>
-            <span class="method-upside val-negative" id="bazin-upside">-4.9%</span>
+            <span class="method-upside val-negative" id="bazin-upside">-3.8%</span>
           </div>
 
           <div class="premissas-section">
@@ -1150,7 +1197,7 @@
           </div>
           <div class="method-upside-row">
             <span class="method-fv-label">Upside</span>
-            <span class="method-upside val-negative" id="gordon-upside">-370.2%</span>
+            <span class="method-upside val-negative" id="gordon-upside">-373.1%</span>
           </div>
 
           <div class="premissas-section">
@@ -1304,94 +1351,9 @@
       <span class="fin-tab active">DRE</span>
     </div>
     <div class="table-scroll">
-      <table class="fin-table">
-        <thead>
-          <tr>
-            <th>Período</th><th>Receita Total</th><th>Lucro Bruto</th>
-            <th>EBIT</th><th>Lucro Antes IR</th><th>Lucro Líquido</th>
-          </tr>
-        </thead>
-        <tbody>
-    <tr>
-      <td>2024</td>
-      <td>R$ 10,67 B</td>
-      <td>R$ 1,93 B</td>
-      <td>R$ 559,67 M</td>
-      <td>R$ 259,13 M</td>
-      <td class="val-positive">R$ 82,44 M</td>
-    </tr>
-    <tr>
-      <td>2023</td>
-      <td>R$ 11,37 B</td>
-      <td>R$ 1,94 B</td>
-      <td>R$ 829,64 M</td>
-      <td>R$ 538,14 M</td>
-      <td class="val-positive">R$ 517,01 M</td>
-    </tr>
-    <tr>
-      <td>2022</td>
-      <td>R$ 10,18 B</td>
-      <td>R$ 1,89 B</td>
-      <td>R$ 784,93 M</td>
-      <td>R$ 643,08 M</td>
-      <td class="val-positive">R$ 502,22 M</td>
-    </tr>
-    <tr>
-      <td>2021</td>
-      <td>R$ 7,08 B</td>
-      <td>R$ 1,12 B</td>
-      <td>R$ 435,22 M</td>
-      <td>R$ 288,03 M</td>
-      <td class="val-positive">R$ 202,91 M</td>
-    </tr>
-    <tr>
-      <td>2020</td>
-      <td>R$ 4,26 B</td>
-      <td>R$ 685,00 M</td>
-      <td>R$ 216,81 M</td>
-      <td>R$ -124,13 M</td>
-      <td class="val-negative">R$ -76,21 M</td>
-    </tr>
-    <tr>
-      <td>2019</td>
-      <td>R$ 5,16 B</td>
-      <td>R$ 834,95 M</td>
-      <td>R$ 356,59 M</td>
-      <td>R$ 338,57 M</td>
-      <td class="val-positive">R$ 278,93 M</td>
-    </tr>
-    <tr>
-      <td>2018</td>
-      <td>R$ 4,83 B</td>
-      <td>R$ 795,93 M</td>
-      <td>R$ 369,88 M</td>
-      <td>R$ 357,27 M</td>
-      <td class="val-positive">R$ 271,72 M</td>
-    </tr>
-    <tr>
-      <td>2017</td>
-      <td>R$ 3,71 B</td>
-      <td>R$ 606,19 M</td>
-      <td>R$ 190,15 M</td>
-      <td>R$ 133,94 M</td>
-      <td class="val-positive">R$ 153,40 M</td>
-    </tr>
-    <tr>
-      <td>2016</td>
-      <td>R$ 3,26 B</td>
-      <td>R$ 464,80 M</td>
-      <td>R$ -184,66 M</td>
-      <td>R$ -237,00 M</td>
-      <td class="val-negative">R$ -181,46 M</td>
-    </tr>
-    <tr>
-      <td>2015</td>
-      <td>R$ 3,43 B</td>
-      <td>R$ 650,14 M</td>
-      <td>R$ 322,22 M</td>
-      <td>R$ 336,80 M</td>
-      <td class="val-positive">R$ 220,13 M</td>
-    </tr></tbody>
+      <table class="fin-table fin-transposed">
+        <thead><tr><th class="sticky-col"></th><th>2015</th><th>2016</th><th>2017</th><th>2018</th><th>2019</th><th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th></tr></thead>
+        <tbody><tr><td class="sticky-col">Receita Total</td><td>R$ 3,43 B</td><td>R$ 3,26 B</td><td>R$ 3,71 B</td><td>R$ 4,83 B</td><td>R$ 5,16 B</td><td>R$ 4,26 B</td><td>R$ 7,08 B</td><td>R$ 10,18 B</td><td>R$ 11,37 B</td><td>R$ 10,67 B</td></tr><tr><td class="sticky-col">Lucro Bruto</td><td>R$ 650,14 M</td><td>R$ 464,80 M</td><td>R$ 606,19 M</td><td>R$ 795,93 M</td><td>R$ 834,95 M</td><td>R$ 685,00 M</td><td>R$ 1,12 B</td><td>R$ 1,89 B</td><td>R$ 1,94 B</td><td>R$ 1,93 B</td></tr><tr><td class="sticky-col">EBIT</td><td>R$ 322,22 M</td><td>R$ -184,66 M</td><td>R$ 190,15 M</td><td>R$ 369,88 M</td><td>R$ 356,59 M</td><td>R$ 216,81 M</td><td>R$ 435,22 M</td><td>R$ 784,93 M</td><td>R$ 829,64 M</td><td>R$ 559,67 M</td></tr><tr><td class="sticky-col">Lucro Antes IR</td><td>R$ 336,80 M</td><td>R$ -237,00 M</td><td>R$ 133,94 M</td><td>R$ 357,27 M</td><td>R$ 338,57 M</td><td>R$ -124,13 M</td><td>R$ 288,03 M</td><td>R$ 643,08 M</td><td>R$ 538,14 M</td><td>R$ 259,13 M</td></tr><tr><td class="sticky-col">Lucro Líquido</td><td><span class="val-positive">R$ 220,13 M</span></td><td><span class="val-negative">R$ -181,46 M</span></td><td><span class="val-positive">R$ 153,40 M</span></td><td><span class="val-positive">R$ 271,72 M</span></td><td><span class="val-positive">R$ 278,93 M</span></td><td><span class="val-negative">R$ -76,21 M</span></td><td><span class="val-positive">R$ 202,91 M</span></td><td><span class="val-positive">R$ 502,22 M</span></td><td><span class="val-positive">R$ 517,01 M</span></td><td><span class="val-positive">R$ 82,44 M</span></td></tr></tbody>
       </table>
     </div>
 
@@ -1401,94 +1363,9 @@
       <span class="fin-tab active">Balanço</span>
     </div>
     <div class="table-scroll">
-      <table class="fin-table">
-        <thead>
-          <tr>
-            <th>Período</th><th>Ativo Total</th><th>Caixa</th>
-            <th>Passivo Total</th><th>Dívida LP</th><th>Patrimônio Líq.</th>
-          </tr>
-        </thead>
-        <tbody>
-    <tr>
-      <td>2024</td>
-      <td>R$ 11,51 B</td>
-      <td>R$ 2,38 B</td>
-      <td>R$ 11,51 B</td>
-      <td>R$ 4,13 B</td>
-      <td>R$ 3,50 B</td>
-    </tr>
-    <tr>
-      <td>2023</td>
-      <td>R$ 10,28 B</td>
-      <td>R$ 1,59 B</td>
-      <td>R$ 10,28 B</td>
-      <td>R$ 3,13 B</td>
-      <td>R$ 3,33 B</td>
-    </tr>
-    <tr>
-      <td>2022</td>
-      <td>R$ 10,24 B</td>
-      <td>R$ 1,51 B</td>
-      <td>R$ 10,24 B</td>
-      <td>R$ 3,24 B</td>
-      <td>R$ 3,03 B</td>
-    </tr>
-    <tr>
-      <td>2021</td>
-      <td>R$ 7,51 B</td>
-      <td>R$ 1,27 B</td>
-      <td>R$ 7,51 B</td>
-      <td>R$ 2,10 B</td>
-      <td>R$ 2,75 B</td>
-    </tr>
-    <tr>
-      <td>2020</td>
-      <td>R$ 6,11 B</td>
-      <td>R$ 1,43 B</td>
-      <td>R$ 6,11 B</td>
-      <td>R$ 1,82 B</td>
-      <td>R$ 2,55 B</td>
-    </tr>
-    <tr>
-      <td>2019</td>
-      <td>R$ 5,12 B</td>
-      <td>R$ 840,03 M</td>
-      <td>R$ 5,12 B</td>
-      <td>R$ 1,42 B</td>
-      <td>R$ 2,39 B</td>
-    </tr>
-    <tr>
-      <td>2018</td>
-      <td>R$ 4,91 B</td>
-      <td>R$ 713,73 M</td>
-      <td>R$ 4,91 B</td>
-      <td>R$ 1,36 B</td>
-      <td>R$ 2,20 B</td>
-    </tr>
-    <tr>
-      <td>2017</td>
-      <td>R$ 4,61 B</td>
-      <td>R$ 866,45 M</td>
-      <td>R$ 4,61 B</td>
-      <td>R$ 1,17 B</td>
-      <td>R$ 1,98 B</td>
-    </tr>
-    <tr>
-      <td>2016</td>
-      <td>R$ 4,77 B</td>
-      <td>R$ 1,20 B</td>
-      <td>R$ 4,77 B</td>
-      <td>R$ 1,56 B</td>
-      <td>R$ 2,01 B</td>
-    </tr>
-    <tr>
-      <td>2015</td>
-      <td>R$ 5,75 B</td>
-      <td>R$ 1,52 B</td>
-      <td>R$ 5,75 B</td>
-      <td>R$ 2,01 B</td>
-      <td>R$ 2,41 B</td>
-    </tr></tbody>
+      <table class="fin-table fin-transposed">
+        <thead><tr><th class="sticky-col"></th><th>2015</th><th>2016</th><th>2017</th><th>2018</th><th>2019</th><th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th></tr></thead>
+        <tbody><tr><td class="sticky-col">Ativo Total</td><td>R$ 5,75 B</td><td>R$ 4,77 B</td><td>R$ 4,61 B</td><td>R$ 4,91 B</td><td>R$ 5,12 B</td><td>R$ 6,11 B</td><td>R$ 7,51 B</td><td>R$ 10,24 B</td><td>R$ 10,28 B</td><td>R$ 11,51 B</td></tr><tr><td class="sticky-col">Caixa</td><td>R$ 1,52 B</td><td>R$ 1,20 B</td><td>R$ 866,45 M</td><td>R$ 713,73 M</td><td>R$ 840,03 M</td><td>R$ 1,43 B</td><td>R$ 1,27 B</td><td>R$ 1,51 B</td><td>R$ 1,59 B</td><td>R$ 2,38 B</td></tr><tr><td class="sticky-col">Passivo Total</td><td>R$ 5,75 B</td><td>R$ 4,77 B</td><td>R$ 4,61 B</td><td>R$ 4,91 B</td><td>R$ 5,12 B</td><td>R$ 6,11 B</td><td>R$ 7,51 B</td><td>R$ 10,24 B</td><td>R$ 10,28 B</td><td>R$ 11,51 B</td></tr><tr><td class="sticky-col">Dívida LP</td><td>R$ 2,01 B</td><td>R$ 1,56 B</td><td>R$ 1,17 B</td><td>R$ 1,36 B</td><td>R$ 1,42 B</td><td>R$ 1,82 B</td><td>R$ 2,10 B</td><td>R$ 3,24 B</td><td>R$ 3,13 B</td><td>R$ 4,13 B</td></tr><tr><td class="sticky-col">Patrimônio Líq.</td><td>R$ 2,41 B</td><td>R$ 2,01 B</td><td>R$ 1,98 B</td><td>R$ 2,20 B</td><td>R$ 2,39 B</td><td>R$ 2,55 B</td><td>R$ 2,75 B</td><td>R$ 3,03 B</td><td>R$ 3,33 B</td><td>R$ 3,50 B</td></tr></tbody>
       </table>
     </div>
 
@@ -1498,119 +1375,43 @@
       <span class="fin-tab active">Fluxo de Caixa</span>
     </div>
     <div class="table-scroll">
-      <table class="fin-table">
-        <thead>
-          <tr>
-            <th>Período</th><th>FCO</th><th>FCI</th>
-            <th>FCF</th><th>CAPEX</th><th>Dividendos Pagos</th>
-          </tr>
-        </thead>
-        <tbody>
-    <tr>
-      <td>2024</td>
-      <td>R$ 1,35 B</td>
-      <td>R$ -640,09 M</td>
-      <td>R$ -151,69 M</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr>
-    <tr>
-      <td>2023</td>
-      <td>R$ 829,13 M</td>
-      <td>R$ -735,21 M</td>
-      <td>R$ 48,13 M</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr>
-    <tr>
-      <td>2022</td>
-      <td>R$ 375,05 M</td>
-      <td>R$ -1,06 B</td>
-      <td>R$ 923,56 M</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr>
-    <tr>
-      <td>2021</td>
-      <td>R$ 324,27 M</td>
-      <td>R$ -171,01 M</td>
-      <td>R$ -383,31 M</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr>
-    <tr>
-      <td>2020</td>
-      <td>R$ 291,66 M</td>
-      <td>R$ -122,77 M</td>
-      <td>R$ 289,72 M</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr>
-    <tr>
-      <td>2019</td>
-      <td>R$ 566,66 M</td>
-      <td>R$ -268,55 M</td>
-      <td>R$ -179,61 M</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr>
-    <tr>
-      <td>2018</td>
-      <td>R$ 577,39 M</td>
-      <td>R$ -166,59 M</td>
-      <td>R$ -591,39 M</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr>
-    <tr>
-      <td>2017</td>
-      <td>R$ 268,67 M</td>
-      <td>R$ -119,19 M</td>
-      <td>R$ -448,59 M</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr>
-    <tr>
-      <td>2016</td>
-      <td>R$ 280,30 M</td>
-      <td>R$ -124,58 M</td>
-      <td>R$ -394,27 M</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr>
-    <tr>
-      <td>2015</td>
-      <td>R$ 490,83 M</td>
-      <td>R$ -158,54 M</td>
-      <td>R$ -338,22 M</td>
-      <td>-</td>
-      <td class="">-</td>
-    </tr></tbody>
+      <table class="fin-table fin-transposed">
+        <thead><tr><th class="sticky-col"></th><th>2015</th><th>2016</th><th>2017</th><th>2018</th><th>2019</th><th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th></tr></thead>
+        <tbody><tr><td class="sticky-col">FCO</td><td>R$ 490,83 M</td><td>R$ 280,30 M</td><td>R$ 268,67 M</td><td>R$ 577,39 M</td><td>R$ 566,66 M</td><td>R$ 291,66 M</td><td>R$ 324,27 M</td><td>R$ 375,05 M</td><td>R$ 829,13 M</td><td>R$ 1,35 B</td></tr><tr><td class="sticky-col">FCI</td><td>R$ -158,54 M</td><td>R$ -124,58 M</td><td>R$ -119,19 M</td><td>R$ -166,59 M</td><td>R$ -268,55 M</td><td>R$ -122,77 M</td><td>R$ -171,01 M</td><td>R$ -1,06 B</td><td>R$ -735,21 M</td><td>R$ -640,09 M</td></tr><tr><td class="sticky-col">FCF</td><td>R$ -338,22 M</td><td>R$ -394,27 M</td><td>R$ -448,59 M</td><td>R$ -591,39 M</td><td>R$ -179,61 M</td><td>R$ 289,72 M</td><td>R$ -383,31 M</td><td>R$ 923,56 M</td><td>R$ 48,13 M</td><td>R$ -151,69 M</td></tr><tr><td class="sticky-col">CAPEX</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr><tr><td class="sticky-col">Div. Pagos</td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td></tr></tbody>
       </table>
     </div>
 
     
-    <!-- DIVIDENDOS -->
+    <!-- DIVIDENDOS RESUMO ANUAL -->
     <div class="fin-tabs" style="margin-top:1.5rem;">
-      <span class="fin-tab active">Dividendos</span>
+      <span class="fin-tab active">Dividendos por Ano</span>
     </div>
     <div class="table-scroll">
-      <table class="fin-table">
-        <thead>
-          <tr><th>Ano</th><th>Total Pago</th><th>Qtd. Pagamentos</th></tr>
-        </thead>
+      <table class="fin-table fin-transposed">
+        <thead><tr><th class="sticky-col"></th><th>2014</th><th>2015</th><th>2016</th><th>2017</th><th>2018</th><th>2019</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th></tr></thead>
         <tbody>
-    <tr><td>2024</td><td>R$ 1,80</td><td>3</td></tr>
-    <tr><td>2023</td><td>R$ 1,00</td><td>3</td></tr>
-    <tr><td>2022</td><td>R$ 0,45</td><td>2</td></tr>
-    <tr><td>2021</td><td>R$ 0,43</td><td>3</td></tr>
-    <tr><td>2019</td><td>R$ 1,13</td><td>3</td></tr>
-    <tr><td>2018</td><td>R$ 1,21</td><td>5</td></tr>
-    <tr><td>2017</td><td>R$ 1,15</td><td>5</td></tr>
-    <tr><td>2016</td><td>R$ 0,59</td><td>3</td></tr>
-    <tr><td>2015</td><td>R$ 0,74</td><td>1</td></tr>
-    <tr><td>2014</td><td>R$ 0,35</td><td>2</td></tr></tbody>
+          <tr><td class="sticky-col">Total Pago</td><td>R$ 0,35</td><td>R$ 0,74</td><td>R$ 0,59</td><td>R$ 1,15</td><td>R$ 1,21</td><td>R$ 1,13</td><td>R$ 0,43</td><td>R$ 0,45</td><td>R$ 1,00</td><td>R$ 1,80</td></tr>
+          <tr><td class="sticky-col">Pagamentos</td><td>2</td><td>1</td><td>3</td><td>5</td><td>5</td><td>3</td><td>3</td><td>2</td><td>3</td><td>3</td></tr>
+        </tbody>
       </table>
+    </div>
+
+    
+    <!-- LEAD COLLECTOR: HISTÓRICO COMPLETO DE DIVIDENDOS -->
+    <div class="div-lead-card" id="div-lead-card-TUPY3">
+      <div class="div-lead-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </div>
+      <div class="div-lead-title">Histórico Completo de Dividendos de TUPY3</div>
+      <div class="div-lead-sub">46 pagamentos desde 2000 — JCP, dividendos e rendimentos com datas e valores por ação.</div>
+      <form class="div-lead-form" id="div-lead-form-TUPY3" onsubmit="return _iaLeadSubmit(event,'TUPY3')">
+        <input type="text" name="name" placeholder="Seu nome" required>
+        <input type="email" name="email" placeholder="Seu melhor e-mail" required>
+        <button type="submit" class="div-lead-btn">Baixar histórico completo <span>&rarr;</span></button>
+      </form>
+      <div class="div-lead-success" id="div-lead-success-TUPY3" style="display:none">
+        <p>Pronto! O download vai começar automaticamente.</p>
+      </div>
     </div>
   </section>
 
@@ -1626,42 +1427,42 @@
       <a href="/RENT3/" class="peer-card">
         <span class="peer-ticker">RENT3</span>
         <span class="peer-name">RENT3</span>
-        <span class="peer-price">R$ 45,45</span>
+        <span class="peer-price">R$ 45,08</span>
       </a>
       <a href="/LREN3/" class="peer-card">
         <span class="peer-ticker">LREN3</span>
         <span class="peer-name">LREN3</span>
-        <span class="peer-price">R$ 14,99</span>
+        <span class="peer-price">R$ 14,17</span>
       </a>
       <a href="/SMFT3/" class="peer-card">
         <span class="peer-ticker">SMFT3</span>
         <span class="peer-name">SMFT3</span>
-        <span class="peer-price">R$ 18,61</span>
+        <span class="peer-price">R$ 18,52</span>
       </a>
       <a href="/ALPA3/" class="peer-card">
         <span class="peer-ticker">ALPA3</span>
         <span class="peer-name">ALPA3</span>
-        <span class="peer-price">R$ 11,51</span>
+        <span class="peer-price">R$ 11,47</span>
       </a>
       <a href="/POMO3/" class="peer-card">
         <span class="peer-ticker">POMO3</span>
         <span class="peer-name">POMO3</span>
-        <span class="peer-price">R$ 5,71</span>
+        <span class="peer-price">R$ 5,68</span>
       </a>
       <a href="/WHRL3/" class="peer-card">
         <span class="peer-ticker">WHRL3</span>
         <span class="peer-name">WHRL3</span>
-        <span class="peer-price">R$ 4,05</span>
+        <span class="peer-price">R$ 4,09</span>
       </a>
       <a href="/VIVA3/" class="peer-card">
         <span class="peer-ticker">VIVA3</span>
         <span class="peer-name">VIVA3</span>
-        <span class="peer-price">R$ 25,48</span>
+        <span class="peer-price">R$ 25,28</span>
       </a>
       <a href="/FRAS3/" class="peer-card">
         <span class="peer-ticker">FRAS3</span>
         <span class="peer-name">FRAS3</span>
-        <span class="peer-price">R$ 21,38</span>
+        <span class="peer-price">R$ 21,58</span>
       </a>
     </div>
     <a href="/acoes/#setor-consumo-c-clico" class="peers-more">Ver todas as ações de Consumo Cíclico &rarr;</a>
@@ -1690,7 +1491,7 @@
       </div>
       <div class="faq-item">
         <dt class="faq-question">Qual o preço justo de TUPY3 pelo método de Graham?</dt>
-        <dd class="faq-answer">Pelo método de Graham, o preço justo estimado de TUPY3 é de R$ 0,00. Esse cálculo utiliza a fórmula de valor intrínseco de Benjamin Graham, baseada no lucro por ação (LPA = R$ -4,99) e no valor patrimonial por ação (VPA = R$ 27,84). A fórmula é: Valor Intrínseco = √(22,5 × LPA × VPA), com ajuste por margem de segurança. É um método mais adequado para empresas lucrativas com patrimônio sólido.</dd>
+        <dd class="faq-answer">Pelo método de Graham, o preço justo estimado de TUPY3 é de R$ 0,00. Esse cálculo utiliza a fórmula de valor intrínseco de Benjamin Graham, baseada no lucro por ação (LPA = R$ -4,99) e no valor patrimonial por ação (VPA = R$ 27,54). A fórmula é: Valor Intrínseco = √(22,5 × LPA × VPA), com ajuste por margem de segurança. É um método mais adequado para empresas lucrativas com patrimônio sólido.</dd>
       </div>
       <div class="faq-item">
         <dt class="faq-question">Qual o preço justo de TUPY3 pelo método de Bazin?</dt>
@@ -1736,9 +1537,9 @@
 
 <script>
 (function() {
-  var price = 12.93;
+  var price = 12.79;
   var lpa = -4.9902909;
-  var vpa = 27.84117770830737;
+  var vpa = 27.53972644155075;
   var divTTM = 0;
   var divData = [{"y":2000,"a":0.1634},{"y":2001,"a":0.1917},{"y":2002,"a":0.2217},{"y":2004,"a":0.037},{"y":2005,"a":0.1561},{"y":2008,"a":0.28276},{"y":2009,"a":0.7737284},{"y":2010,"a":1.1368171},{"y":2011,"a":1.13652},{"y":2012,"a":1.47866},{"y":2013,"a":0.2482713},{"y":2014,"a":0.35052523999999996},{"y":2015,"a":0.74221236},{"y":2016,"a":0.58509615},{"y":2017,"a":1.15135856},{"y":2018,"a":1.21378496},{"y":2019,"a":1.12708287},{"y":2021,"a":0.43210548},{"y":2022,"a":0.45163194},{"y":2023,"a":1.00440385},{"y":2024,"a":1.80117262}];
 
