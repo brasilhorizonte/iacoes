@@ -31,6 +31,32 @@ jobs:
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: npm run generate
 
+      - name: Gerar redirects lowercase (Linux case-sensitive)
+        run: |
+          for dir in $(find . -maxdepth 1 -type d -regex './[A-Z].*' ! -name '.git' ! -name '.github'); do
+            ticker=$(basename "$dir")
+            lower=$(echo "$ticker" | tr '[:upper:]' '[:lower:]')
+            if [ "$lower" != "$ticker" ] && [ ! -d "./$lower" ]; then
+              mkdir -p "./$lower"
+              cat > "./$lower/index.html" <<REDIR
+          <!DOCTYPE html>
+          <html lang="pt-BR">
+          <head>
+            <meta charset="UTF-8">
+            <title>${ticker} — Análise Fundamentalista | iAções</title>
+            <link rel="canonical" href="https://iacoes.com.br/${ticker}/">
+            <meta http-equiv="refresh" content="0; url=https://iacoes.com.br/${ticker}/">
+            <meta name="robots" content="noindex, follow">
+          </head>
+          <body>
+            <p>Redirecionando para <a href="/${ticker}/">${ticker}</a>...</p>
+          </body>
+          </html>
+          REDIR
+            fi
+          done
+          echo "Redirects lowercase gerados"
+
       - name: Commit e push se houver mudanças
         run: |
           git config user.name "github-actions[bot]"

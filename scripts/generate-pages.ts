@@ -3,7 +3,7 @@ import { mkdirSync, writeFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { getAllTickers, getTickersWithNames, getAllTickersWithSector, getPeersBySector, fetchQualitativeScore, saveQualitativeCache } from './supabase';
 import { getFinancialData, performValuation } from './valuation';
-import { generateTickerHTML, generateIndexHTML, generateSitemap, generateRobots, generateLowercaseRedirect } from './template';
+import { generateTickerHTML, generateIndexHTML, generateSitemap, generateRobots } from './template';
 import { SCENARIO_PRESETS, DEFAULT_COST_OF_DEBT } from './constants';
 import type { ValuationAssumptions, TickerIndexEntry, PeerTicker } from './types';
 
@@ -36,14 +36,6 @@ async function generatePage(ticker: string): Promise<boolean> {
     const dir = join(ROOT, ticker);
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, 'index.html'), html, 'utf-8');
-
-    // Generate lowercase redirect (e.g., /petr4/ → /PETR4/)
-    const lower = ticker.toLowerCase();
-    if (lower !== ticker) {
-      const lowerDir = join(ROOT, lower);
-      mkdirSync(lowerDir, { recursive: true });
-      writeFileSync(join(lowerDir, 'index.html'), generateLowercaseRedirect(ticker), 'utf-8');
-    }
 
     const upside = (val.totalUpside * 100).toFixed(1);
     console.log(`  ✓ ${ticker}: R$ ${data.price.toFixed(2)} → R$ ${val.weightedFairValue.toFixed(2)} (${upside}%)`);
