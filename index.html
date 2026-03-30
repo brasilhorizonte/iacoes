@@ -1002,8 +1002,19 @@
             font-family: var(--font-mono);
             font-weight: 700; font-size: 1.1rem;
             flex-shrink: 0;
+            overflow: hidden;
+        }
+        .about-avatar img {
+            width: 100%; height: 100%;
+            object-fit: cover;
         }
         .about-name { font-weight: 700; font-size: 1.05rem; color: var(--text-primary); line-height: 1.3; }
+        .about-linkedin {
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            margin-top: 0.75rem; font-size: 0.78rem; font-weight: 600;
+            color: #0a66c2; text-decoration: none;
+        }
+        .about-linkedin:hover { text-decoration: underline; }
         .about-credential {
             display: inline-flex; align-items: center; gap: 0.3rem;
             font-family: var(--font-mono); font-size: 0.7rem; font-weight: 600;
@@ -1656,23 +1667,25 @@
         <div class="about-grid">
             <div class="about-card">
                 <div class="about-card-header">
-                    <div class="about-avatar">GM</div>
+                    <div class="about-avatar"><img src="assets/img/gabriel.jpg" alt="Gabriel Dantas de A. Melo" loading="lazy"></div>
                     <div>
-                        <div class="about-name">Gabriel Dantas de A. Melo</div>
+                        <div class="about-name"><a href="https://www.linkedin.com/in/gabriel-dantas-a-melo-cnpi-8796b4158/" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">Gabriel Dantas de A. Melo</a></div>
                         <div class="about-credential">CNPI — APIMEC</div>
                     </div>
                 </div>
                 <p class="about-bio">Especialista em avaliação de ativos e estruturação de projetos. Atuou como analista em casas como Thoreos e Investor, e em projetos de Bid Advisory e Project Finance na EY-Parthenon. Envolvido na estruturação de mais de R$ 70 bilhões em investimentos.</p>
+                <a href="https://www.linkedin.com/in/gabriel-dantas-a-melo-cnpi-8796b4158/" target="_blank" rel="noopener" class="about-linkedin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg> LinkedIn</a>
             </div>
             <div class="about-card">
                 <div class="about-card-header">
-                    <div class="about-avatar">LM</div>
+                    <div class="about-avatar"><img src="assets/img/lucas.png" alt="Lucas T. Noronha Mello" loading="lazy"></div>
                     <div>
-                        <div class="about-name">Lucas T. Noronha Mello</div>
+                        <div class="about-name"><a href="https://www.linkedin.com/in/lucastnm/" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">Lucas T. Noronha Mello</a></div>
                         <div class="about-credential">CGA — ANBIMA</div>
                     </div>
                 </div>
                 <p class="about-bio">Investidor fundamentalista e gestor de fundo de ações. Formado em Administração pelo IBMEC. Acumulou experiência como analista em uma das maiores assets independentes de Minas Gerais e como gestor de fundos na maior asset do Sul do Brasil.</p>
+                <a href="https://www.linkedin.com/in/lucastnm/" target="_blank" rel="noopener" class="about-linkedin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg> LinkedIn</a>
             </div>
         </div>
         <div class="about-bottom">
@@ -1683,6 +1696,7 @@
                 <a href="https://x.com/brasilhorizont" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>Twitter / X</a>
                 <a href="https://www.instagram.com/brasil.horizonte/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>Instagram</a>
                 <a href="https://t.me/brasilhorizonte" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.492-1.302.48-.428-.012-1.252-.242-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>Telegram</a>
+                <a href="https://open.spotify.com/show/4cAx0dQM1WjRXlDoYbMVN7" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>Podcast</a>
             </div>
         </div>
     </div>
