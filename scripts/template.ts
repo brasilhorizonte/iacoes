@@ -261,15 +261,33 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   const upsideColor = totalUpside > 0.1 ? 'val-positive' : totalUpside < -0.1 ? 'val-negative' : 'val-neutral';
   const upsideFmt = totalUpside >= 0 ? `+${fmtPctShort(totalUpside)}` : fmtPctShort(totalUpside);
 
+  // --- SEO: Intro analysis paragraphs ---
+  const introVerdict = totalUpside > 0.1 ? 'potencial de valorização'
+    : totalUpside < -0.1 ? 'possível sobrevalorização' : 'preço próximo ao valor justo';
+  const introVerdictClass = totalUpside > 0.1 ? 'intro-verdict-up'
+    : totalUpside < -0.1 ? 'intro-verdict-down' : 'intro-verdict-neutral';
+  const introVerdictLabel = totalUpside > 0.1 ? `Upside de ${upsideFmt}`
+    : totalUpside < -0.1 ? `Downside de ${upsideFmt}` : `Neutro (${upsideFmt})`;
+  const dyText = Number.isFinite(f.divYield) && f.divYield > 0
+    ? `, com dividend yield de ${fmtPctShort(f.divYield)} nos últimos 12 meses`
+    : '';
+  const roeText = Number.isFinite(f.roe) && f.roe > 0
+    ? `O retorno sobre patrimônio (ROE) é de ${fmtPctShort(f.roe)}, `
+    : '';
+  const marginText = Number.isFinite(f.netMargin)
+    ? `e a margem líquida de ${fmtPctShort(f.netMargin)}.`
+    : '.';
+  const plText = Number.isFinite(f.pl) && f.pl > 0
+    ? `Negocia a um P/L de ${fmtNum(f.pl, 1)}x`
+    : 'Os múltiplos de valuation';
+  const evEbitdaText = Number.isFinite(f.evEbitda) && f.evEbitda > 0
+    ? ` e EV/EBITDA de ${fmtNum(f.evEbitda, 1)}x`
+    : '';
+
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-
-  <!-- Google Analytics (GA4) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-858T7GLTMJ"></script>
-  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
-  <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();function _iaTrack(ev){var u=new URLSearchParams(location.search);fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify({session_id:_iaS,page_path:location.pathname.replace(/\/index\.html$/,'').replace(/\/$/,'')||'/',referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview'})}).catch(function(){})}_iaTrack();function _iaClick(e){e.preventDefault();var url=e.currentTarget.href;_iaTrack('cta_click');setTimeout(function(){window.location.href=url},150)}</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${titleTag}</title>
   <meta name="description" content="${desc}">
@@ -524,6 +542,25 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       text-align: right; margin-top: 0.3rem; text-transform: uppercase;
       letter-spacing: 0.08em;
     }
+
+    /* ============ INTRO ANALYSIS (SEO) ============ */
+    .intro-analysis {
+      background: #fff; border-radius: 12px; padding: 1.5rem 2rem;
+      margin-bottom: 1.5rem; border: 1px solid #e2e0da;
+    }
+    .intro-analysis p {
+      font-size: 0.95rem; line-height: 1.75; color: #334155;
+      margin-bottom: 0.75rem;
+    }
+    .intro-analysis p:last-child { margin-bottom: 0; }
+    .intro-analysis strong { color: #0f172a; }
+    .intro-analysis .intro-verdict {
+      display: inline-block; padding: 0.25rem 0.75rem; border-radius: 6px;
+      font-weight: 700; font-size: 0.85rem; margin-top: 0.5rem;
+    }
+    .intro-verdict-up { background: rgba(16,185,129,0.1); color: #10b981; }
+    .intro-verdict-down { background: rgba(239,68,68,0.1); color: #ef4444; }
+    .intro-verdict-neutral { background: rgba(100,116,139,0.1); color: #64748b; }
 
     /* ============ SECTION FIELDSETS ============ */
     .metrics-section {
@@ -1113,6 +1150,11 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       animation: fadeInUp 0.4s ease-out both;
     }
   </style>
+
+  <!-- Google Analytics (GA4) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-858T7GLTMJ"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
+  <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();function _iaTrack(ev){var u=new URLSearchParams(location.search);fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify({session_id:_iaS,page_path:location.pathname.replace(/\/index\\.html$/,'').replace(/\/$/,'')||'/',referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview'})}).catch(function(){})}_iaTrack();function _iaClick(e){e.preventDefault();var url=e.currentTarget.href;_iaTrack('cta_click');setTimeout(function(){window.location.href=url},150)}</script>
 </head>
 <body>
 
@@ -1172,6 +1214,13 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       <div class="price-date">Dados de ${today}</div>
     </div>
   </header>
+
+  <!-- INTRO ANALYSIS (SEO) -->
+  <section class="intro-analysis animate-in" aria-label="Análise fundamentalista de ${f.symbol}">
+    <p><strong>${f.symbol}</strong> é a ação ${f.type === 'PN' ? 'preferencial' : f.type === 'ON' ? 'ordinária' : ''} de <strong>${f.name}</strong>, negociada na B3 (bolsa brasileira) no setor de ${f.sector}${f.subSector ? ', segmento de ' + f.subSector : ''}. Com cotação atual de <strong>R$ ${fmt(f.price)}</strong> e valor de mercado de ${fmtBig(f.marketCap)}, a empresa é analisada abaixo por 3 metodologias clássicas de valuation: Graham, Bazin e Gordon (DDM).</p>
+    <p>O preço justo estimado pelo <strong>método de Graham</strong> é de R$ ${fmt(grahamFV)}, pelo <strong>método de Bazin</strong> é de R$ ${fmt(bazinFV)}, e pelo <strong>modelo de Gordon</strong> é de R$ ${fmt(gordonFV)}. A análise aponta ${introVerdict} para ${f.symbol}. <span class="intro-verdict ${introVerdictClass}">${introVerdictLabel}</span></p>
+    <p>${plText}${evEbitdaText}${dyText}. ${roeText}${marginText} Abaixo, você encontra todos os indicadores fundamentalistas, demonstrações financeiras históricas e o preço justo calculado com premissas ajustáveis.</p>
+  </section>
 
   <!-- MERCADO & ESTRUTURA -->
   <section class="metrics-section animate-in" aria-label="Mercado e Estrutura">

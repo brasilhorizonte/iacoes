@@ -2,12 +2,6 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-
-    <!-- Google Analytics (GA4) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-858T7GLTMJ"></script>
-    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
-    <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();function _iaTrack(ev){var u=new URLSearchParams(location.search);fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify({session_id:_iaS,page_path:location.pathname.replace(/\/index\.html$/,'').replace(/\/$/,'')||'/',referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview'})}).catch(function(){})}_iaTrack();function _iaClick(e){e.preventDefault();var url=e.currentTarget.href;_iaTrack('cta_click');setTimeout(function(){window.location.href=url},150)}</script>
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iAções — A Primeira Plataforma de Stock Picking com IA do Brasil</title>
     <meta name="description" content="Análise fundamentalista potencializada por Inteligência Artificial. Sem conflito de interesses. Metodologias Graham, Bazin, Gordon e DCF. Descubra as melhores ações da B3.">
@@ -849,6 +843,51 @@
         .faq-item.open .faq-answer { max-height: 300px; padding-bottom: 1.2rem; }
         .faq-answer p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; }
 
+        /* QUICK LINKS BAR (SEO internal linking) */
+        .quick-links {
+            padding: 2rem 2rem 1.5rem;
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+        }
+        .quick-links-inner {
+            max-width: 1100px; margin: 0 auto; text-align: center;
+        }
+        .quick-links-title {
+            font-family: var(--font-mono); font-size: 0.7rem;
+            color: var(--text-tertiary); text-transform: uppercase;
+            letter-spacing: 0.12em; margin-bottom: 1rem; font-weight: 600;
+        }
+        .quick-links-grid {
+            display: flex; flex-wrap: wrap; gap: 0.5rem;
+            justify-content: center;
+        }
+        .quick-link {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            padding: 0.45rem 0.9rem;
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 8px; text-decoration: none;
+            font-family: var(--font-mono); font-size: 0.78rem;
+            font-weight: 600; color: var(--text-primary);
+            transition: all 0.2s;
+        }
+        .quick-link:hover {
+            border-color: var(--gold); color: var(--gold);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(184,146,62,0.12);
+        }
+        .quick-link-name {
+            font-family: var(--font-display); font-weight: 400;
+            font-size: 0.7rem; color: var(--text-tertiary);
+        }
+        .quick-links-all {
+            margin-top: 0.75rem;
+        }
+        .quick-links-all a {
+            font-size: 0.78rem; color: var(--gold); text-decoration: none;
+            font-weight: 600;
+        }
+        .quick-links-all a:hover { text-decoration: underline; }
+
         /* POPULAR TICKERS */
         .popular-tickers {
             padding: 5rem 2rem;
@@ -1278,6 +1317,11 @@
         ]
     }
     </script>
+
+    <!-- Google Analytics (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-858T7GLTMJ"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
+    <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();function _iaTrack(ev){var u=new URLSearchParams(location.search);fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify({session_id:_iaS,page_path:location.pathname.replace(/\/index\.html$/,'').replace(/\/$/,'')||'/',referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview'})}).catch(function(){})}_iaTrack();function _iaClick(e){e.preventDefault();var url=e.currentTarget.href;_iaTrack('cta_click');setTimeout(function(){window.location.href=url},150)}</script>
 </head>
 <body>
 
@@ -1348,6 +1392,33 @@
         <div class="stat-item"><div class="stat-number">0</div><div class="stat-label">Conflitos de interesse</div></div>
     </div>
 </div>
+
+<!-- QUICK LINKS (SEO: crawlable links to top ticker pages) -->
+<section class="quick-links">
+    <div class="quick-links-inner">
+        <div class="quick-links-title">Análises em destaque</div>
+        <div class="quick-links-grid">
+            <a href="/PETR4/" class="quick-link">PETR4 <span class="quick-link-name">Petrobras</span></a>
+            <a href="/VALE3/" class="quick-link">VALE3 <span class="quick-link-name">Vale</span></a>
+            <a href="/ITUB4/" class="quick-link">ITUB4 <span class="quick-link-name">Itaú</span></a>
+            <a href="/BBAS3/" class="quick-link">BBAS3 <span class="quick-link-name">BB</span></a>
+            <a href="/WEGE3/" class="quick-link">WEGE3 <span class="quick-link-name">WEG</span></a>
+            <a href="/B3SA3/" class="quick-link">B3SA3 <span class="quick-link-name">B3</span></a>
+            <a href="/ABEV3/" class="quick-link">ABEV3 <span class="quick-link-name">Ambev</span></a>
+            <a href="/BBDC4/" class="quick-link">BBDC4 <span class="quick-link-name">Bradesco</span></a>
+            <a href="/RENT3/" class="quick-link">RENT3 <span class="quick-link-name">Localiza</span></a>
+            <a href="/SUZB3/" class="quick-link">SUZB3 <span class="quick-link-name">Suzano</span></a>
+            <a href="/JBSS3/" class="quick-link">JBSS3 <span class="quick-link-name">JBS</span></a>
+            <a href="/PRIO3/" class="quick-link">PRIO3 <span class="quick-link-name">PRIO</span></a>
+            <a href="/EGIE3/" class="quick-link">EGIE3 <span class="quick-link-name">Engie</span></a>
+            <a href="/TAEE11/" class="quick-link">TAEE11 <span class="quick-link-name">Taesa</span></a>
+            <a href="/EQTL3/" class="quick-link">EQTL3 <span class="quick-link-name">Equatorial</span></a>
+        </div>
+        <div class="quick-links-all">
+            <a href="/acoes/">Ver todas as 310+ ações analisadas →</a>
+        </div>
+    </div>
+</section>
 
 <section class="modules" id="modulos">
     <div class="modules-header">

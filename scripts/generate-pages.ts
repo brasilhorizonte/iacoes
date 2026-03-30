@@ -124,6 +124,23 @@ async function main() {
     console.log(`🔍 tickers.json gerado (${tickersIndex.length} tickers)`);
   }
 
+  // Ping search engines to re-crawl sitemap
+  console.log('\n🔔 Pingando search engines...');
+  const sitemapUrl = 'https://iacoes.com.br/sitemap.xml';
+  const pingUrls = [
+    `https://www.google.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`,
+    `https://www.bing.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`,
+  ];
+  for (const url of pingUrls) {
+    try {
+      const res = await fetch(url);
+      const engine = url.includes('google') ? 'Google' : 'Bing';
+      console.log(`   ${engine}: ${res.ok ? '✓ OK' : '✗ ' + res.status}`);
+    } catch (err: any) {
+      console.warn(`   Ping falhou: ${err.message}`);
+    }
+  }
+
   console.log(`\n✅ Concluído: ${success} geradas, ${failed} falhas (de ${tickers.length} total)\n`);
 }
 
