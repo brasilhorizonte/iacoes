@@ -561,51 +561,6 @@
       font-weight: 600; color: #475569;
     }
     .fin-table tbody tr:hover { background: #fafaf8; }
-    .fin-transposed .sticky-col {
-      position: sticky; left: 0; background: #fff; z-index: 1;
-      font-family: 'Montserrat', sans-serif; font-weight: 600;
-      color: #475569; text-align: left; min-width: 120px;
-    }
-    .fin-transposed thead th.sticky-col { background: #fff; }
-    .div-lead-card {
-      margin-top: 1.5rem; padding: 2rem; border-radius: 12px;
-      background: linear-gradient(135deg, #041C24 0%, #0a2e3a 100%);
-      text-align: center; color: #fff;
-    }
-    .div-lead-icon { margin-bottom: 0.75rem; color: #B68F40; }
-    .div-lead-title {
-      font-family: 'Playfair Display', serif; font-size: 1.15rem;
-      font-weight: 700; margin-bottom: 0.4rem;
-    }
-    .div-lead-sub {
-      font-size: 0.82rem; color: rgba(255,255,255,0.7);
-      margin-bottom: 1.25rem; max-width: 420px; margin-left: auto; margin-right: auto;
-    }
-    .div-lead-form {
-      display: flex; flex-wrap: wrap; gap: 0.5rem;
-      justify-content: center; max-width: 500px; margin: 0 auto;
-    }
-    .div-lead-form input {
-      flex: 1; min-width: 160px; padding: 0.65rem 0.9rem;
-      border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
-      background: rgba(255,255,255,0.08); color: #fff;
-      font-size: 0.85rem; font-family: 'Montserrat', sans-serif;
-    }
-    .div-lead-form input::placeholder { color: rgba(255,255,255,0.4); }
-    .div-lead-form input:focus { outline: none; border-color: #B68F40; background: rgba(255,255,255,0.12); }
-    .div-lead-btn {
-      width: 100%; padding: 0.7rem; border: none; border-radius: 8px;
-      background: #B68F40; color: #041C24; font-weight: 700;
-      font-size: 0.88rem; cursor: pointer; transition: all 0.2s;
-      font-family: 'Montserrat', sans-serif;
-    }
-    .div-lead-btn:hover { background: #c9a44e; }
-    .div-lead-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .div-lead-success { margin-top: 1rem; }
-    .div-lead-success p { color: #10b981; font-weight: 600; font-size: 0.9rem; }
-    @media (max-width: 640px) {
-      .div-lead-form input { min-width: 100%; }
-    }
 
     /* ============ SANITY CHECK ============ */
     .sanity-table {
@@ -951,9 +906,7 @@
   <!-- Google Analytics (GA4) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-858T7GLTMJ"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
-  <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();function _iaTrack(ev){var u=new URLSearchParams(location.search);fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify({session_id:_iaS,page_path:location.pathname.replace(//index\.html$/,'').replace(//$/,'')||'/',referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview'})}).catch(function(){})}_iaTrack();function _iaClick(e){e.preventDefault();var url=e.currentTarget.href;_iaTrack('cta_click');setTimeout(function(){window.location.href=url},150)}
-var _iaDivData=[{"e":"2025-04-29","a":0.6587,"t":"DIVIDENDO","p":"2025-12-26"},{"e":"2024-04-30","a":0.7588896,"t":"DIVIDENDO","p":"2024-11-28"},{"e":"2024-01-12","a":0.001110412,"t":"JCP","p":"2024-12-30"},{"e":"2023-04-28","a":0.12507479,"t":"DIVIDENDO","p":"2023-12-05"},{"e":"2022-11-28","a":0.3559796,"t":"DIVIDENDO","p":"2022-12-09"},{"e":"2022-11-23","a":0.39728,"t":"DIVIDENDO","p":"2022-11-30"},{"e":"2022-04-28","a":0.13,"t":"DIVIDENDO","p":"2022-06-23"},{"e":"2021-11-25","a":0.16,"t":"DIVIDENDO","p":"2021-12-14"},{"e":"2021-08-24","a":0.15,"t":"DIVIDENDO","p":"2021-12-31"},{"e":"2021-04-29","a":0.1,"t":"DIVIDENDO","p":"2021-05-13"},{"e":"2020-12-15","a":0.17,"t":"DIVIDENDO","p":"2020-12-23"},{"e":"2020-12-15","a":0.03,"t":"DIVIDENDO","p":"2020-12-22"},{"e":"2020-05-29","a":0.08,"t":"DIVIDENDO","p":"2020-06-23"},{"e":"2019-11-11","a":0.07,"t":"DIVIDENDO","p":"2019-12-16"},{"e":"2019-04-30","a":0.01,"t":"DIVIDENDO","p":"2019-05-13"},{"e":"2019-04-29","a":0.01,"t":"DIVIDENDO","p":"2019-05-12"},{"e":"2019-03-25","a":0.03,"t":"DIVIDENDO","p":"2019-04-03"},{"e":"2018-04-25","a":0.06,"t":"DIVIDENDO","p":"2018-12-18"},{"e":"2017-04-25","a":0.04,"t":"DIVIDENDO","p":"2017-12-08"},{"e":"2016-04-14","a":0.01,"t":"DIVIDENDO","p":"2016-12-14"},{"e":"2010-04-29","a":0.27755162,"t":"DIVIDENDO","p":"2010-05-13"},{"e":"2009-04-30","a":0.16386762,"t":"DIVIDENDO","p":"2009-12-30"},{"e":"2008-04-07","a":0.7769822,"t":"DIVIDENDO","p":"2008-12-30"},{"e":"2007-12-21","a":0.40809035,"t":"JCP","p":"2008-01-08"},{"e":"2007-12-21","a":3.8528214,"t":"DIVIDENDO","p":"2008-01-08"},{"e":"2007-08-31","a":0.21496513,"t":"JCP","p":"2007-12-27"},{"e":"2007-04-26","a":0.221808,"t":"JCP","p":"2007-12-21"},{"e":"2007-04-26","a":0.090169,"t":"DIVIDENDO","p":"2007-12-21"},{"e":"2006-04-19","a":0.217,"t":"JCP","p":"2006-04-19"},{"e":"2006-04-19","a":0.0437,"t":"DIVIDENDO","p":"2006-04-19"},{"e":"2004-04-29","a":0.07550016,"t":"DIVIDENDO","p":"2004-04-29"},{"e":"2004-03-23","a":0.14122285,"t":"JCP","p":"2004-03-23"},{"e":"2002-05-29","a":0.0623,"t":"DIVIDENDO","p":"2002-05-29"},{"e":"2000-04-11","a":0.0753,"t":"DIVIDENDO","p":"2000-04-11"}];
-function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.querySelector('button');btn.disabled=true;btn.textContent='Enviando...';var name=f.name.value.trim();var email=f.email.value.trim();fetch(_iaB+'/rest/v1/iacoes_email_leads',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},body:JSON.stringify({name:name,email:email,ticker:ticker,source:'dividendos'})}).then(function(){_iaTrack('lead_dividendos');var csv='Data Ex;Valor por Acao;Tipo;Data Pagamento\n';_iaDivData.forEach(function(d){csv+=d.e+';'+d.a+';'+d.t+';'+d.p+'\n';});var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='dividendos_'+ticker+'.csv';a.click();URL.revokeObjectURL(url);f.style.display='none';document.getElementById('div-lead-success-'+ticker).style.display='block';}).catch(function(){btn.disabled=false;btn.textContent='Erro — tente novamente';});return false;}</script>
+  <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();function _iaTrack(ev){var u=new URLSearchParams(location.search);fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify({session_id:_iaS,page_path:location.pathname.replace(//index\.html$/,'').replace(//$/,'')||'/',referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview'})}).catch(function(){})}_iaTrack();function _iaClick(e){e.preventDefault();var url=e.currentTarget.href;_iaTrack('cta_click');setTimeout(function(){window.location.href=url},150)}</script>
 </head>
 <body>
 
@@ -1028,7 +981,7 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
       <div class="metric-box"><span class="metric-label">Valor de Mercado</span><span class="metric-value ">R$ 15,42 B</span></div>
       <div class="metric-box"><span class="metric-label">Valor da Firma (EV)</span><span class="metric-value ">R$ 22,58 B</span></div>
       <div class="metric-box"><span class="metric-label">Nro. Ações</span><span class="metric-value ">2,27 B</span></div>
-      <div class="metric-box"><span class="metric-label">Volume Médio (3M)</span><span class="metric-value ">17,50 K</span></div>
+      <div class="metric-box"><span class="metric-label">Volume Médio (3M)</span><span class="metric-value ">8,80 K</span></div>
       <div class="metric-box"><span class="metric-label">Min. 52 Semanas</span><span class="metric-value ">R$ 5,30</span></div>
       <div class="metric-box"><span class="metric-label">Max. 52 Semanas</span><span class="metric-value ">R$ 7,00</span></div>
     </div>
@@ -1351,9 +1304,94 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
       <span class="fin-tab active">DRE</span>
     </div>
     <div class="table-scroll">
-      <table class="fin-table fin-transposed">
-        <thead><tr><th class="sticky-col"></th><th>2015</th><th>2016</th><th>2017</th><th>2018</th><th>2019</th><th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th></tr></thead>
-        <tbody><tr><td class="sticky-col">Receita Total</td><td>R$ 4,19 B</td><td>R$ 4,51 B</td><td>R$ 5,15 B</td><td>R$ 5,49 B</td><td>R$ 5,60 B</td><td>R$ 5,87 B</td><td>R$ 8,12 B</td><td>R$ 8,51 B</td><td>R$ 10,38 B</td><td>R$ 10,86 B</td></tr><tr><td class="sticky-col">Lucro Bruto</td><td>R$ 866,48 M</td><td>R$ 1,09 B</td><td>R$ 1,41 B</td><td>R$ 1,37 B</td><td>R$ 1,50 B</td><td>R$ 1,78 B</td><td>R$ 2,34 B</td><td>R$ 2,92 B</td><td>R$ 3,51 B</td><td>R$ 3,46 B</td></tr><tr><td class="sticky-col">EBIT</td><td>R$ 279,96 M</td><td>R$ 538,96 M</td><td>R$ 730,02 M</td><td>R$ 797,98 M</td><td>R$ 741,53 M</td><td>R$ 1,17 B</td><td>R$ 1,65 B</td><td>R$ 2,02 B</td><td>R$ 2,88 B</td><td>R$ 2,53 B</td></tr><tr><td class="sticky-col">Lucro Antes IR</td><td>R$ 597,23 M</td><td>R$ 421,48 M</td><td>R$ 522,73 M</td><td>R$ 562,54 M</td><td>R$ 594,70 M</td><td>R$ 964,80 M</td><td>R$ 1,30 B</td><td>R$ 1,74 B</td><td>R$ 2,55 B</td><td>R$ 2,19 B</td></tr><tr><td class="sticky-col">Lucro Líquido</td><td><span class="val-positive">R$ 520,23 M</span></td><td><span class="val-positive">R$ 351,56 M</span></td><td><span class="val-positive">R$ 613,53 M</span></td><td><span class="val-positive">R$ 455,39 M</span></td><td><span class="val-positive">R$ 469,12 M</span></td><td><span class="val-positive">R$ 718,54 M</span></td><td><span class="val-positive">R$ 1,03 B</span></td><td><span class="val-positive">R$ 1,56 B</span></td><td><span class="val-positive">R$ 2,23 B</span></td><td><span class="val-positive">R$ 1,98 B</span></td></tr></tbody>
+      <table class="fin-table">
+        <thead>
+          <tr>
+            <th>Período</th><th>Receita Total</th><th>Lucro Bruto</th>
+            <th>EBIT</th><th>Lucro Antes IR</th><th>Lucro Líquido</th>
+          </tr>
+        </thead>
+        <tbody>
+    <tr>
+      <td>2024</td>
+      <td>R$ 10,86 B</td>
+      <td>R$ 3,46 B</td>
+      <td>R$ 2,53 B</td>
+      <td>R$ 2,19 B</td>
+      <td class="val-positive">R$ 1,98 B</td>
+    </tr>
+    <tr>
+      <td>2023</td>
+      <td>R$ 10,38 B</td>
+      <td>R$ 3,51 B</td>
+      <td>R$ 2,88 B</td>
+      <td>R$ 2,55 B</td>
+      <td class="val-positive">R$ 2,23 B</td>
+    </tr>
+    <tr>
+      <td>2022</td>
+      <td>R$ 8,51 B</td>
+      <td>R$ 2,92 B</td>
+      <td>R$ 2,02 B</td>
+      <td>R$ 1,74 B</td>
+      <td class="val-positive">R$ 1,56 B</td>
+    </tr>
+    <tr>
+      <td>2021</td>
+      <td>R$ 8,12 B</td>
+      <td>R$ 2,34 B</td>
+      <td>R$ 1,65 B</td>
+      <td>R$ 1,30 B</td>
+      <td class="val-positive">R$ 1,03 B</td>
+    </tr>
+    <tr>
+      <td>2020</td>
+      <td>R$ 5,87 B</td>
+      <td>R$ 1,78 B</td>
+      <td>R$ 1,17 B</td>
+      <td>R$ 964,80 M</td>
+      <td class="val-positive">R$ 718,54 M</td>
+    </tr>
+    <tr>
+      <td>2019</td>
+      <td>R$ 5,60 B</td>
+      <td>R$ 1,50 B</td>
+      <td>R$ 741,53 M</td>
+      <td>R$ 594,70 M</td>
+      <td class="val-positive">R$ 469,12 M</td>
+    </tr>
+    <tr>
+      <td>2018</td>
+      <td>R$ 5,49 B</td>
+      <td>R$ 1,37 B</td>
+      <td>R$ 797,98 M</td>
+      <td>R$ 562,54 M</td>
+      <td class="val-positive">R$ 455,39 M</td>
+    </tr>
+    <tr>
+      <td>2017</td>
+      <td>R$ 5,15 B</td>
+      <td>R$ 1,41 B</td>
+      <td>R$ 730,02 M</td>
+      <td>R$ 522,73 M</td>
+      <td class="val-positive">R$ 613,53 M</td>
+    </tr>
+    <tr>
+      <td>2016</td>
+      <td>R$ 4,51 B</td>
+      <td>R$ 1,09 B</td>
+      <td>R$ 538,96 M</td>
+      <td>R$ 421,48 M</td>
+      <td class="val-positive">R$ 351,56 M</td>
+    </tr>
+    <tr>
+      <td>2015</td>
+      <td>R$ 4,19 B</td>
+      <td>R$ 866,48 M</td>
+      <td>R$ 279,96 M</td>
+      <td>R$ 597,23 M</td>
+      <td class="val-positive">R$ 520,23 M</td>
+    </tr></tbody>
       </table>
     </div>
 
@@ -1363,9 +1401,94 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
       <span class="fin-tab active">Balanço</span>
     </div>
     <div class="table-scroll">
-      <table class="fin-table fin-transposed">
-        <thead><tr><th class="sticky-col"></th><th>2015</th><th>2016</th><th>2017</th><th>2018</th><th>2019</th><th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th></tr></thead>
-        <tbody><tr><td class="sticky-col">Ativo Total</td><td>R$ 6,86 B</td><td>R$ 7,79 B</td><td>R$ 8,60 B</td><td>R$ 9,06 B</td><td>R$ 9,96 B</td><td>R$ 12,24 B</td><td>R$ 12,13 B</td><td>R$ 12,79 B</td><td>R$ 14,27 B</td><td>R$ 17,82 B</td></tr><tr><td class="sticky-col">Caixa</td><td>R$ 798,63 M</td><td>R$ 1,17 B</td><td>R$ 1,08 B</td><td>R$ 833,19 M</td><td>R$ 1,47 B</td><td>R$ 2,45 B</td><td>R$ 1,55 B</td><td>R$ 1,68 B</td><td>R$ 1,29 B</td><td>R$ 3,61 B</td></tr><tr><td class="sticky-col">Passivo Total</td><td>R$ 6,86 B</td><td>R$ 7,79 B</td><td>R$ 8,60 B</td><td>R$ 9,06 B</td><td>R$ 9,96 B</td><td>R$ 12,24 B</td><td>R$ 12,13 B</td><td>R$ 12,79 B</td><td>R$ 14,27 B</td><td>R$ 17,82 B</td></tr><tr><td class="sticky-col">Dívida LP</td><td>R$ 1,08 B</td><td>R$ 1,98 B</td><td>R$ 2,67 B</td><td>R$ 2,80 B</td><td>R$ 3,42 B</td><td>R$ 3,19 B</td><td>R$ 3,30 B</td><td>R$ 4,81 B</td><td>R$ 4,49 B</td><td>R$ 6,03 B</td></tr><tr><td class="sticky-col">Patrimônio Líq.</td><td>R$ 1,84 B</td><td>R$ 2,12 B</td><td>R$ 2,58 B</td><td>R$ 3,01 B</td><td>R$ 3,30 B</td><td>R$ 3,37 B</td><td>R$ 3,36 B</td><td>R$ 2,89 B</td><td>R$ 4,65 B</td><td>R$ 4,99 B</td></tr></tbody>
+      <table class="fin-table">
+        <thead>
+          <tr>
+            <th>Período</th><th>Ativo Total</th><th>Caixa</th>
+            <th>Passivo Total</th><th>Dívida LP</th><th>Patrimônio Líq.</th>
+          </tr>
+        </thead>
+        <tbody>
+    <tr>
+      <td>2024</td>
+      <td>R$ 17,82 B</td>
+      <td>R$ 3,61 B</td>
+      <td>R$ 17,82 B</td>
+      <td>R$ 6,03 B</td>
+      <td>R$ 4,99 B</td>
+    </tr>
+    <tr>
+      <td>2023</td>
+      <td>R$ 14,27 B</td>
+      <td>R$ 1,29 B</td>
+      <td>R$ 14,27 B</td>
+      <td>R$ 4,49 B</td>
+      <td>R$ 4,65 B</td>
+    </tr>
+    <tr>
+      <td>2022</td>
+      <td>R$ 12,79 B</td>
+      <td>R$ 1,68 B</td>
+      <td>R$ 12,79 B</td>
+      <td>R$ 4,81 B</td>
+      <td>R$ 2,89 B</td>
+    </tr>
+    <tr>
+      <td>2021</td>
+      <td>R$ 12,13 B</td>
+      <td>R$ 1,55 B</td>
+      <td>R$ 12,13 B</td>
+      <td>R$ 3,30 B</td>
+      <td>R$ 3,36 B</td>
+    </tr>
+    <tr>
+      <td>2020</td>
+      <td>R$ 12,24 B</td>
+      <td>R$ 2,45 B</td>
+      <td>R$ 12,24 B</td>
+      <td>R$ 3,19 B</td>
+      <td>R$ 3,37 B</td>
+    </tr>
+    <tr>
+      <td>2019</td>
+      <td>R$ 9,96 B</td>
+      <td>R$ 1,47 B</td>
+      <td>R$ 9,96 B</td>
+      <td>R$ 3,42 B</td>
+      <td>R$ 3,30 B</td>
+    </tr>
+    <tr>
+      <td>2018</td>
+      <td>R$ 9,06 B</td>
+      <td>R$ 833,19 M</td>
+      <td>R$ 9,06 B</td>
+      <td>R$ 2,80 B</td>
+      <td>R$ 3,01 B</td>
+    </tr>
+    <tr>
+      <td>2017</td>
+      <td>R$ 8,60 B</td>
+      <td>R$ 1,08 B</td>
+      <td>R$ 8,60 B</td>
+      <td>R$ 2,67 B</td>
+      <td>R$ 2,58 B</td>
+    </tr>
+    <tr>
+      <td>2016</td>
+      <td>R$ 7,79 B</td>
+      <td>R$ 1,17 B</td>
+      <td>R$ 7,79 B</td>
+      <td>R$ 1,98 B</td>
+      <td>R$ 2,12 B</td>
+    </tr>
+    <tr>
+      <td>2015</td>
+      <td>R$ 6,86 B</td>
+      <td>R$ 798,63 M</td>
+      <td>R$ 6,86 B</td>
+      <td>R$ 1,08 B</td>
+      <td>R$ 1,84 B</td>
+    </tr></tbody>
       </table>
     </div>
 
@@ -1375,43 +1498,119 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
       <span class="fin-tab active">Fluxo de Caixa</span>
     </div>
     <div class="table-scroll">
-      <table class="fin-table fin-transposed">
-        <thead><tr><th class="sticky-col"></th><th>2015</th><th>2016</th><th>2017</th><th>2018</th><th>2019</th><th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th></tr></thead>
-        <tbody><tr><td class="sticky-col">FCO</td><td>R$ 556,62 M</td><td>R$ 140,70 M</td><td>R$ 531,18 M</td><td>R$ 749,85 M</td><td>R$ 986,03 M</td><td>R$ 1,58 B</td><td>R$ 1,07 B</td><td>R$ 1,70 B</td><td>R$ 1,87 B</td><td>R$ 2,23 B</td></tr><tr><td class="sticky-col">FCI</td><td>R$ -680,80 M</td><td>R$ -712,39 M</td><td>R$ 265,64 M</td><td>R$ -530,13 M</td><td>R$ -1,63 B</td><td>R$ -702,37 M</td><td>R$ -786,90 M</td><td>R$ -1,32 B</td><td>R$ -729,85 M</td><td>R$ -1,89 B</td></tr><tr><td class="sticky-col">FCF</td><td>R$ 110,83 M</td><td>R$ 713,70 M</td><td>R$ 95,71 M</td><td>R$ -461,93 M</td><td>R$ 159,15 M</td><td>R$ -269,23 M</td><td>R$ -1,06 B</td><td>R$ -330,76 M</td><td>R$ -1,02 B</td><td>R$ 636,05 M</td></tr><tr><td class="sticky-col">CAPEX</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr><tr><td class="sticky-col">Div. Pagos</td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td><td><span class="">-</span></td></tr></tbody>
+      <table class="fin-table">
+        <thead>
+          <tr>
+            <th>Período</th><th>FCO</th><th>FCI</th>
+            <th>FCF</th><th>CAPEX</th><th>Dividendos Pagos</th>
+          </tr>
+        </thead>
+        <tbody>
+    <tr>
+      <td>2024</td>
+      <td>R$ 2,23 B</td>
+      <td>R$ -1,89 B</td>
+      <td>R$ 636,05 M</td>
+      <td>-</td>
+      <td class="">-</td>
+    </tr>
+    <tr>
+      <td>2023</td>
+      <td>R$ 1,87 B</td>
+      <td>R$ -729,85 M</td>
+      <td>R$ -1,02 B</td>
+      <td>-</td>
+      <td class="">-</td>
+    </tr>
+    <tr>
+      <td>2022</td>
+      <td>R$ 1,70 B</td>
+      <td>R$ -1,32 B</td>
+      <td>R$ -330,76 M</td>
+      <td>-</td>
+      <td class="">-</td>
+    </tr>
+    <tr>
+      <td>2021</td>
+      <td>R$ 1,07 B</td>
+      <td>R$ -786,90 M</td>
+      <td>R$ -1,06 B</td>
+      <td>-</td>
+      <td class="">-</td>
+    </tr>
+    <tr>
+      <td>2020</td>
+      <td>R$ 1,58 B</td>
+      <td>R$ -702,37 M</td>
+      <td>R$ -269,23 M</td>
+      <td>-</td>
+      <td class="">-</td>
+    </tr>
+    <tr>
+      <td>2019</td>
+      <td>R$ 986,03 M</td>
+      <td>R$ -1,63 B</td>
+      <td>R$ 159,15 M</td>
+      <td>-</td>
+      <td class="">-</td>
+    </tr>
+    <tr>
+      <td>2018</td>
+      <td>R$ 749,85 M</td>
+      <td>R$ -530,13 M</td>
+      <td>R$ -461,93 M</td>
+      <td>-</td>
+      <td class="">-</td>
+    </tr>
+    <tr>
+      <td>2017</td>
+      <td>R$ 531,18 M</td>
+      <td>R$ 265,64 M</td>
+      <td>R$ 95,71 M</td>
+      <td>-</td>
+      <td class="">-</td>
+    </tr>
+    <tr>
+      <td>2016</td>
+      <td>R$ 140,70 M</td>
+      <td>R$ -712,39 M</td>
+      <td>R$ 713,70 M</td>
+      <td>-</td>
+      <td class="">-</td>
+    </tr>
+    <tr>
+      <td>2015</td>
+      <td>R$ 556,62 M</td>
+      <td>R$ -680,80 M</td>
+      <td>R$ 110,83 M</td>
+      <td>-</td>
+      <td class="">-</td>
+    </tr></tbody>
       </table>
     </div>
 
     
-    <!-- DIVIDENDOS RESUMO ANUAL -->
+    <!-- DIVIDENDOS -->
     <div class="fin-tabs" style="margin-top:1.5rem;">
-      <span class="fin-tab active">Dividendos por Ano</span>
+      <span class="fin-tab active">Dividendos</span>
     </div>
     <div class="table-scroll">
-      <table class="fin-table fin-transposed">
-        <thead><tr><th class="sticky-col"></th><th>2016</th><th>2017</th><th>2018</th><th>2019</th><th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th></tr></thead>
+      <table class="fin-table">
+        <thead>
+          <tr><th>Ano</th><th>Total Pago</th><th>Qtd. Pagamentos</th></tr>
+        </thead>
         <tbody>
-          <tr><td class="sticky-col">Total Pago</td><td>R$ 0,01</td><td>R$ 0,04</td><td>R$ 0,06</td><td>R$ 0,12</td><td>R$ 0,28</td><td>R$ 0,41</td><td>R$ 0,88</td><td>R$ 0,13</td><td>R$ 0,76</td><td>R$ 0,66</td></tr>
-          <tr><td class="sticky-col">Pagamentos</td><td>1</td><td>1</td><td>1</td><td>4</td><td>3</td><td>3</td><td>3</td><td>1</td><td>2</td><td>1</td></tr>
-        </tbody>
+    <tr><td>2025</td><td>R$ 0,66</td><td>1</td></tr>
+    <tr><td>2024</td><td>R$ 0,76</td><td>2</td></tr>
+    <tr><td>2023</td><td>R$ 0,13</td><td>1</td></tr>
+    <tr><td>2022</td><td>R$ 0,88</td><td>3</td></tr>
+    <tr><td>2021</td><td>R$ 0,41</td><td>3</td></tr>
+    <tr><td>2020</td><td>R$ 0,28</td><td>3</td></tr>
+    <tr><td>2019</td><td>R$ 0,12</td><td>4</td></tr>
+    <tr><td>2018</td><td>R$ 0,06</td><td>1</td></tr>
+    <tr><td>2017</td><td>R$ 0,04</td><td>1</td></tr>
+    <tr><td>2016</td><td>R$ 0,01</td><td>1</td></tr></tbody>
       </table>
-    </div>
-
-    
-    <!-- LEAD COLLECTOR: HISTÓRICO COMPLETO DE DIVIDENDOS -->
-    <div class="div-lead-card" id="div-lead-card-EQPA3">
-      <div class="div-lead-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      </div>
-      <div class="div-lead-title">Histórico Completo de Dividendos de EQPA3</div>
-      <div class="div-lead-sub">34 pagamentos desde 2000 — JCP, dividendos e rendimentos com datas e valores por ação.</div>
-      <form class="div-lead-form" id="div-lead-form-EQPA3" onsubmit="return _iaLeadSubmit(event,'EQPA3')">
-        <input type="text" name="name" placeholder="Seu nome" required>
-        <input type="email" name="email" placeholder="Seu melhor e-mail" required>
-        <button type="submit" class="div-lead-btn">Baixar histórico completo <span>&rarr;</span></button>
-      </form>
-      <div class="div-lead-success" id="div-lead-success-EQPA3" style="display:none">
-        <p>Pronto! O download vai começar automaticamente.</p>
-      </div>
     </div>
   </section>
 
@@ -1427,42 +1626,42 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
       <a href="/PETR4/" class="peer-card">
         <span class="peer-ticker">PETR4</span>
         <span class="peer-name">PETR4</span>
-        <span class="peer-price">R$ 49,95</span>
+        <span class="peer-price">R$ 50,16</span>
       </a>
       <a href="/PETR3/" class="peer-card">
         <span class="peer-ticker">PETR3</span>
         <span class="peer-name">PETR3</span>
-        <span class="peer-price">R$ 55,30</span>
+        <span class="peer-price">R$ 55,48</span>
       </a>
       <a href="/AXIA3/" class="peer-card">
         <span class="peer-ticker">AXIA3</span>
         <span class="peer-name">AXIA3</span>
-        <span class="peer-price">R$ 56,37</span>
+        <span class="peer-price">R$ 56,55</span>
       </a>
       <a href="/PRIO3/" class="peer-card">
         <span class="peer-ticker">PRIO3</span>
         <span class="peer-name">PRIO3</span>
-        <span class="peer-price">R$ 71,95</span>
+        <span class="peer-price">R$ 71,85</span>
       </a>
       <a href="/CPFE3/" class="peer-card">
         <span class="peer-ticker">CPFE3</span>
         <span class="peer-name">CPFE3</span>
-        <span class="peer-price">R$ 47,88</span>
+        <span class="peer-price">R$ 47,78</span>
       </a>
       <a href="/EQTL3/" class="peer-card">
         <span class="peer-ticker">EQTL3</span>
         <span class="peer-name">EQTL3</span>
-        <span class="peer-price">R$ 39,55</span>
+        <span class="peer-price">R$ 39,71</span>
       </a>
       <a href="/ENEV3/" class="peer-card">
         <span class="peer-ticker">ENEV3</span>
         <span class="peer-name">ENEV3</span>
-        <span class="peer-price">R$ 24,09</span>
+        <span class="peer-price">R$ 24,07</span>
       </a>
       <a href="/CPLE3/" class="peer-card">
         <span class="peer-ticker">CPLE3</span>
         <span class="peer-name">CPLE3</span>
-        <span class="peer-price">R$ 15,04</span>
+        <span class="peer-price">R$ 15,05</span>
       </a>
     </div>
     <a href="/acoes/#setor-energia" class="peers-more">Ver todas as ações de Energia &rarr;</a>

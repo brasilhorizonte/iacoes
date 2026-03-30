@@ -3,7 +3,7 @@ import { mkdirSync, writeFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { getAllTickers, getTickersWithNames, getAllTickersWithSector, getPeersBySector, fetchQualitativeScore, saveQualitativeCache } from './supabase';
 import { getFinancialData, performValuation } from './valuation';
-import { generateTickerHTML, generateIndexHTML, generateSitemap, generateRobots } from './template';
+import { generateTickerHTML, generateIndexHTML, generateSectorPage, generateSitemap, generateRobots } from './template';
 import { SCENARIO_PRESETS, DEFAULT_COST_OF_DEBT } from './constants';
 import type { ValuationAssumptions, TickerIndexEntry, PeerTicker } from './types';
 
@@ -102,6 +102,19 @@ async function main() {
       mkdirSync(acoesDir, { recursive: true });
       writeFileSync(join(acoesDir, 'index.html'), indexHTML, 'utf-8');
       console.log(`\n📋 /acoes/index.html gerado (${indexTickers.length} tickers)`);
+
+      // Generate sector pages (/acoes/{setor}/index.html)
+      const sectors = [...new Set(indexTickers.map(t => t.sector).filter(Boolean))].sort();
+      const sectorSlug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      for (const sector of sectors) {
+        const sectorTickers = indexTickers.filter(t => t.sector === sector).sort((a, b) => b.marketCap - a.marketCap);
+        if (sectorTickers.length === 0) continue;
+        const slug = sectorSlug(sector);
+        const sectorDir = join(ROOT, 'acoes', slug);
+        mkdirSync(sectorDir, { recursive: true });
+        writeFileSync(join(sectorDir, 'index.html'), generateSectorPage(sector, sectorTickers), 'utf-8');
+      }
+      console.log(`📂 ${sectors.length} páginas de setor geradas (/acoes/{setor}/)`);
     }
 
     // Sitemap includes ALL existing ticker pages on disk, not just current run
@@ -112,7 +125,9 @@ async function main() {
       const p = join(ROOT, d, 'index.html');
       try { return statSync(p).isFile(); } catch { return false; }
     });
-    const sitemap = generateSitemap(allTickerDirs);
+    // Get sectors for sitemap
+    const allSectors = [...new Set(allTickerData.map(t => t.sector).filter(Boolean))].sort();
+    const sitemap = generateSitemap(allTickerDirs, allSectors);
     writeFileSync(join(ROOT, 'sitemap.xml'), sitemap, 'utf-8');
     console.log(`📄 sitemap.xml gerado (${allTickerDirs.length} tickers)`);
 

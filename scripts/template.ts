@@ -197,8 +197,9 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   }
 
   // SEO: meta description, title, FAQ
-  const desc = `${f.symbol} vale a pena? Preço justo de R$ ${fmt(grahamFV)} (Graham), R$ ${fmt(bazinFV)} (Bazin) e R$ ${fmt(gordonFV)} (Gordon). P/L ${fmtNum(f.pl)}, DY ${fmtPctShort(f.divYield)}, ROE ${fmtPctShort(f.roe)}. Análise fundamentalista completa.`;
-  const titleTag = `${f.symbol} Preço Justo e Valuation ${new Date().getFullYear()} | Análise Fundamentalista | iAções`;
+  const currentYear = new Date().getFullYear();
+  const desc = `${f.symbol} vale a pena? Preço justo de R$ ${fmt(grahamFV)} (Graham), R$ ${fmt(bazinFV)} (Bazin) e R$ ${fmt(gordonFV)} (Gordon). P/L ${fmtNum(f.pl)}, DY ${fmtPctShort(f.divYield)}, ROE ${fmtPctShort(f.roe)}. Histórico de dividendos e análise fundamentalista completa.`;
+  const titleTag = `${f.symbol} Preço Justo, Valuation e Dividendos ${currentYear} | Análise Fundamentalista | iAções`;
   const ogTitle = `${f.symbol} vale a pena? Preço Justo R$ ${fmt(grahamFV)} (Graham) | iAções`;
   const sectorSlug = (f.sector || '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
   const faqItems = [
@@ -216,7 +217,11 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     },
     {
       q: `Qual o histórico de dividendos de ${f.symbol}?`,
-      a: `${f.symbol} possui Dividend Yield de ${fmtPctShort(f.divYield)}${divTTM > 0 ? ' e distribuiu R$ ' + fmt(divTTM) + ' por ação nos últimos 12 meses' : ''}. O histórico de dividendos é um dos fatores analisados para entender a política de remuneração ao acionista e a consistência dos pagamentos ao longo dos anos.`
+      a: `${f.symbol} possui Dividend Yield de ${fmtPctShort(f.divYield)}${divTTM > 0 ? ' e distribuiu R$ ' + fmt(divTTM) + ' por ação nos últimos 12 meses' : ''}. ${divHistory.length > 0 ? 'O histórico completo inclui ' + divHistory.length + ' pagamentos (dividendos, JCP e rendimentos) desde ' + new Date(divHistory[divHistory.length - 1].exDate).getFullYear() + '.' : ''} O histórico de dividendos é um dos fatores analisados para entender a política de remuneração ao acionista e a consistência dos pagamentos ao longo dos anos.`
+    },
+    {
+      q: `Quanto ${f.symbol} pagou de dividendos em ${currentYear - 1}?`,
+      a: `${divByYear.has(String(currentYear - 1)) ? `Em ${currentYear - 1}, ${f.symbol} distribuiu R$ ${fmt(divByYear.get(String(currentYear - 1))!.total)} por ação em ${divByYear.get(String(currentYear - 1))!.count} pagamentos entre dividendos e JCP.` : `${f.symbol} não possui registros de dividendos pagos em ${currentYear - 1}.`} Para baixar o histórico completo de proventos com datas e valores, insira seu e-mail na seção de dividendos acima.`
     },
     {
       q: `Qual o preço justo de ${f.symbol} pelo método de Graham?`,
@@ -314,7 +319,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${titleTag}</title>
   <meta name="description" content="${desc}">
-  <meta name="keywords" content="${f.symbol}, ${f.symbol} preço justo, ${f.symbol} vale a pena, ${f.symbol} dividendos, ${f.symbol} valuation, ${f.name}, análise fundamentalista ${f.symbol}, ações ${f.sector}, B3, Graham, Bazin, Gordon">
+  <meta name="keywords" content="${f.symbol}, ${f.symbol} preço justo, ${f.symbol} vale a pena, ${f.symbol} dividendos, histórico dividendos ${f.symbol}, ${f.symbol} JCP, ${f.symbol} proventos, ${f.symbol} valuation, ${f.symbol} dividend yield, ${f.name}, análise fundamentalista ${f.symbol}, ações ${f.sector}, B3, Graham, Bazin, Gordon">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
   <meta name="author" content="Brasil Horizonte">
   <link rel="canonical" href="https://iacoes.com.br/${f.symbol}/">
@@ -2188,11 +2193,178 @@ function filterSector(sector) {
 </html>`;
 };
 
-export const generateSitemap = (tickers: string[]): string => {
+// --- Sector Page (/acoes/{setor}/index.html) ---
+export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[]): string => {
+  const today = new Date().toLocaleDateString('pt-BR');
+  const year = new Date().getFullYear();
+  const sectorSlug = sector.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const count = tickers.length;
+
+  const avgPL = tickers.filter(t => t.pl > 0).reduce((s, t) => s + t.pl, 0) / (tickers.filter(t => t.pl > 0).length || 1);
+  const avgDY = tickers.filter(t => t.divYield > 0).reduce((s, t) => s + t.divYield, 0) / (tickers.filter(t => t.divYield > 0).length || 1);
+  const totalMC = tickers.reduce((s, t) => s + t.marketCap, 0);
+
+  const rows = tickers.map(t => `
+    <tr>
+      <td><a href="/${t.ticker}/" class="idx-ticker-link">${t.ticker}</a></td>
+      <td class="idx-name">${t.name}</td>
+      <td class="idx-num">${t.price > 0 ? 'R$ ' + fmt(t.price) : '-'}</td>
+      <td class="idx-num">${t.pl > 0 ? fmtNum(t.pl) : '-'}</td>
+      <td class="idx-num">${t.divYield > 0 ? fmtPctShort(t.divYield) : '-'}</td>
+      <td class="idx-num">${fmtBig(t.marketCap)}</td>
+    </tr>`).join('');
+
+  const desc = `${count} ações do setor de ${sector} na B3 com análise fundamentalista, preço justo e dividendos. P/L médio: ${fmtNum(avgPL)}, DY médio: ${fmtPctShort(avgDY)}. Dados ${year}.`;
+
+  const faqItems = [
+    { q: `Quantas ações do setor de ${sector} existem na B3?`, a: `Atualmente existem ${count} ações do setor de ${sector} listadas na B3 com análise fundamentalista disponível no iAções. O valor de mercado combinado do setor é de ${fmtBig(totalMC)}.` },
+    { q: `Qual o P/L médio do setor de ${sector}?`, a: `O P/L (Preço/Lucro) médio das ${count} ações do setor de ${sector} é de ${fmtNum(avgPL)}. O P/L indica quantos anos de lucro seriam necessários para recuperar o investimento no preço atual.` },
+    { q: `Quais ações do setor de ${sector} pagam mais dividendos?`, a: `O Dividend Yield médio do setor de ${sector} é de ${fmtPctShort(avgDY)}. As ações com maior DY são: ${tickers.filter(t => t.divYield > 0).sort((a, b) => b.divYield - a.divYield).slice(0, 3).map(t => t.ticker + ' (' + fmtPctShort(t.divYield) + ')').join(', ') || 'dados não disponíveis'}.` },
+  ];
+
+  const faqSchema = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqItems.map(f => ({
+      "@type": "Question", "name": f.q,
+      "acceptedAnswer": { "@type": "Answer", "text": f.a }
+    }))
+  });
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ações do Setor de ${sector} ${year} | Análise Fundamentalista | iAções</title>
+  <meta name="description" content="${desc}">
+  <meta name="keywords" content="ações ${sector}, setor ${sector} B3, dividendos ${sector}, análise fundamentalista ${sector}, preço justo ${sector}">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://iacoes.com.br/acoes/${sectorSlug}/">
+  <meta property="og:title" content="Ações do Setor de ${sector} — Análise e Dividendos | iAções">
+  <meta property="og:description" content="${desc}">
+  <meta property="og:url" content="https://iacoes.com.br/acoes/${sectorSlug}/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:site_name" content="iAções">
+  <script type="application/ld+json">${faqSchema}</script>
+  <script type="application/ld+json">${JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type":"ListItem","position":1,"name":"Home","item":"https://iacoes.com.br/"},
+      {"@type":"ListItem","position":2,"name":"Ações","item":"https://iacoes.com.br/acoes/"},
+      {"@type":"ListItem","position":3,"name":sector,"item":`https://iacoes.com.br/acoes/${sectorSlug}/`}
+    ]
+  })}</script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Montserrat',sans-serif;background:#f5f3ef;color:#0f172a;line-height:1.6}
+    .nav{background:#041C24;padding:0.8rem 2rem;display:flex;align-items:center;justify-content:space-between}
+    .nav-logo{display:flex;align-items:center;gap:0.5rem;text-decoration:none}
+    .nav-logo img{height:28px}
+    .nav-brand{color:#fff;font-weight:700;font-size:1.1rem;display:flex;align-items:center;gap:0.3rem}
+    .nav-brand span:first-child{color:#B68F40}
+    .nav-links{display:flex;gap:1rem;align-items:center}
+    .nav-links a{color:rgba(255,255,255,0.8);text-decoration:none;font-size:0.82rem;font-weight:500}
+    .breadcrumb{padding:0.7rem 2rem;font-size:0.75rem;color:#64748b}
+    .breadcrumb a{color:#64748b;text-decoration:none}
+    .breadcrumb a:hover{color:#B68F40}
+    .page{max-width:1200px;margin:0 auto;padding:1.5rem}
+    .page-header{margin-bottom:1.5rem}
+    .page-header h1{font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:0.5rem}
+    .page-header p{color:#64748b;font-size:0.88rem}
+    .sector-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem}
+    .stat-card{background:#fff;border-radius:10px;padding:1rem;border:1px solid #e2e8f0;text-align:center}
+    .stat-card .stat-val{font-size:1.3rem;font-weight:700;color:#0f172a;font-family:'SFMono-Regular',monospace}
+    .stat-card .stat-lbl{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:#64748b;margin-top:0.2rem}
+    .idx-card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden}
+    .table-scroll{overflow-x:auto}
+    .idx-table{width:100%;border-collapse:collapse;font-size:0.82rem}
+    .idx-table th{padding:0.6rem 0.9rem;text-align:left;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:#64748b;border-bottom:2px solid #e2e8f0;position:sticky;top:0;background:#fff}
+    .idx-table td{padding:0.55rem 0.9rem;border-bottom:1px solid #f1f5f9}
+    .idx-table tbody tr:hover{background:#fafaf8}
+    .idx-num{font-family:'SFMono-Regular',monospace;text-align:right;font-size:0.8rem}
+    .idx-ticker-link{color:#B68F40;font-weight:700;text-decoration:none}
+    .idx-ticker-link:hover{text-decoration:underline}
+    .idx-name{color:#475569;font-size:0.78rem}
+    .faq-section{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:2rem;margin-top:1.5rem}
+    .faq-section h2{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:1rem}
+    .faq-item{padding:1rem 0;border-bottom:1px solid #f1f5f9}
+    .faq-item:last-child{border:none}
+    .faq-item h3{font-size:0.92rem;margin-bottom:0.4rem}
+    .faq-item p{color:#475569;font-size:0.85rem;line-height:1.7}
+    .footer-disc{text-align:center;padding:2rem;font-size:0.72rem;color:#94a3b8}
+    .footer-disc a{color:#B68F40}
+    .back-link{display:inline-block;margin-top:1rem;color:#B68F40;font-size:0.85rem;text-decoration:none;font-weight:600}
+    .back-link:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/assets/img/institucional_branco_amarelo_3x.png" alt="Brasil Horizonte" loading="lazy">
+    <span style="color:rgba(255,255,255,0.3);margin:0 0.3rem">|</span>
+    <span class="nav-brand"><span>iA</span>ções</span>
+  </a>
+  <div class="nav-links">
+    <a href="/acoes/">Todas as Ações</a>
+    <a href="https://app.brasilhorizonte.com.br" target="_blank" rel="noopener">Acessar App</a>
+  </div>
+</nav>
+<div class="breadcrumb">
+  <a href="/">Home</a> &rsaquo; <a href="/acoes/">Ações</a> &rsaquo; ${sector}
+</div>
+
+<main class="page">
+  <header class="page-header">
+    <h1 class="font-playfair">Ações do Setor de ${sector}</h1>
+    <p>${count} ações com análise fundamentalista e preço justo. Dados atualizados em ${today}.</p>
+  </header>
+
+  <div class="sector-stats">
+    <div class="stat-card"><div class="stat-val">${count}</div><div class="stat-lbl">Ações no setor</div></div>
+    <div class="stat-card"><div class="stat-val">${fmtNum(avgPL)}</div><div class="stat-lbl">P/L Médio</div></div>
+    <div class="stat-card"><div class="stat-val">${fmtPctShort(avgDY)}</div><div class="stat-lbl">DY Médio</div></div>
+    <div class="stat-card"><div class="stat-val">${fmtBig(totalMC)}</div><div class="stat-lbl">Market Cap Total</div></div>
+  </div>
+
+  <div class="idx-card">
+    <div class="table-scroll">
+      <table class="idx-table">
+        <thead>
+          <tr><th>Ticker</th><th>Empresa</th><th>Preço</th><th>P/L</th><th>DY</th><th>Market Cap</th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="faq-section">
+    <h2>Perguntas Frequentes — Setor de ${sector}</h2>
+    ${faqItems.map(f => `<div class="faq-item"><h3>${f.q}</h3><p>${f.a}</p></div>`).join('')}
+  </div>
+
+  <a href="/acoes/" class="back-link">&larr; Ver todos os setores</a>
+
+  <footer class="footer-disc">
+    <p>&copy; ${year} ValuAI by <a href="https://brasilhorizonte.com.br" target="_blank">Brasil Horizonte</a>. Dados atualizados em ${today}. As informações não constituem recomendação de investimento.</p>
+  </footer>
+</main>
+</body>
+</html>`;
+};
+
+export const generateSitemap = (tickers: string[], sectors: string[] = []): string => {
   const today = new Date().toISOString().split('T')[0];
+  const sectorSlug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   const urls = [
     `  <url><loc>https://iacoes.com.br/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>`,
     `  <url><loc>https://iacoes.com.br/acoes/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>`,
+    ...sectors.map(s =>
+      `  <url><loc>https://iacoes.com.br/acoes/${sectorSlug(s)}/</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>`
+    ),
     ...tickers.map(t =>
       `  <url><loc>https://iacoes.com.br/${t}/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>`
     )

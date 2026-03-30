@@ -2,6 +2,27 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://iacoes.com.br/</loc><lastmod>2026-03-30</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
   <url><loc>https://iacoes.com.br/acoes/</loc><lastmod>2026-03-30</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/bens-industriais/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/constru-o-e-imobili-rio/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/consumer-cyclical/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/consumo-c-clico/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/consumo-n-o-c-clico/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/educa-o/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/energia/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/holdings/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/industrials/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/infraestrutura/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/materiais/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/materiais-b-sicos/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/outros/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/real-estate/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/saneamento/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/sa-de/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/servi-os/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/servi-os-financeiros/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/tecnologia/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/telecomunica-es/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://iacoes.com.br/acoes/utilities/</loc><lastmod>2026-03-30</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>
   <url><loc>https://iacoes.com.br/AALR3/</loc><lastmod>2026-03-30</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/ABCB4/</loc><lastmod>2026-03-30</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
   <url><loc>https://iacoes.com.br/ABEV3/</loc><lastmod>2026-03-30</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
