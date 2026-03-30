@@ -14,6 +14,7 @@ const DELAY_MS = 300;
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
 let allTickerData: TickerIndexEntry[] = [];
+const tickerLastmod: Record<string, string> = {};
 
 async function generatePage(ticker: string): Promise<boolean> {
   try {
@@ -28,6 +29,17 @@ async function generatePage(ticker: string): Promise<boolean> {
     if (!val.weightedFairValue || !Number.isFinite(val.weightedFairValue)) {
       console.warn(`  ⚠ ${ticker}: valuation inválido, pulando`);
       return false;
+    }
+
+    // Extrair lastmod dinâmico (data mais recente dos dados financeiros)
+    const allDates = [
+      ...data._rawIncome.map(d => d.end_date),
+      ...data._rawBalance.map(d => d.end_date),
+      ...data._rawCashFlow.map(d => d.end_date),
+      ...data._rawDividends.map(d => d.exDate),
+    ].filter(Boolean).map(d => new Date(d).getTime()).filter(t => !isNaN(t));
+    if (allDates.length > 0) {
+      tickerLastmod[ticker] = new Date(Math.max(...allDates)).toISOString().split('T')[0];
     }
 
     const peers: PeerTicker[] = getPeersBySector(allTickerData, ticker, 8);
@@ -127,7 +139,7 @@ async function main() {
     });
     // Get sectors for sitemap
     const allSectors = [...new Set(allTickerData.map(t => t.sector).filter(Boolean))].sort();
-    const sitemap = generateSitemap(allTickerDirs, allSectors);
+    const sitemap = generateSitemap(allTickerDirs, allSectors, tickerLastmod);
     writeFileSync(join(ROOT, 'sitemap.xml'), sitemap, 'utf-8');
     console.log(`📄 sitemap.xml gerado (${allTickerDirs.length} tickers)`);
 

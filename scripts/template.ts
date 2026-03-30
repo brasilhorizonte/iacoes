@@ -2356,7 +2356,7 @@ export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[]):
 </html>`;
 };
 
-export const generateSitemap = (tickers: string[], sectors: string[] = []): string => {
+export const generateSitemap = (tickers: string[], sectors: string[] = [], lastmodMap: Record<string, string> = {}): string => {
   const today = new Date().toISOString().split('T')[0];
   const sectorSlug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   const urls = [
@@ -2366,7 +2366,7 @@ export const generateSitemap = (tickers: string[], sectors: string[] = []): stri
       `  <url><loc>https://iacoes.com.br/acoes/${sectorSlug(s)}/</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.85</priority></url>`
     ),
     ...tickers.map(t =>
-      `  <url><loc>https://iacoes.com.br/${t}/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>`
+      `  <url><loc>https://iacoes.com.br/${t}/</loc><lastmod>${lastmodMap[t] || today}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>`
     )
   ];
   return `<?xml version="1.0" encoding="UTF-8"?>
