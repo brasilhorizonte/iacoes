@@ -92,38 +92,50 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     return `<tr><td class="sticky-col">${label}</td>${cells}</tr>`;
   };
 
-  // DRE rows
-  const dreRows = incomeYearly.map(d => `
-    <tr>
-      <td>${getYear(d.end_date)}</td>
-      <td>${fmtBig(d.total_revenue)}</td>
-      <td>${fmtBig(d.gross_profit || 0)}</td>
-      <td>${fmtBig(d.ebit)}</td>
-      <td>${fmtBig(d.income_before_tax)}</td>
-      <td class="${colorClass(d.net_income)}">${fmtBig(d.net_income)}</td>
-    </tr>`).join('');
+  // --- Tabelas transpostas (anos na horizontal, métricas como linhas) ---
+  const transposeTable = (years: string[], metrics: { label: string; values: string[] }[]) => {
+    const headerCells = years.map(y => `<th>${y}</th>`).join('');
+    const rows = metrics.map(m => {
+      const cells = m.values.map(v => `<td>${v}</td>`).join('');
+      return `<tr><td class="sticky-col">${m.label}</td>${cells}</tr>`;
+    }).join('');
+    return { headerCells, rows };
+  };
 
-  // Balance rows
-  const balRows = balanceYearly.map(d => `
-    <tr>
-      <td>${getYear(d.end_date)}</td>
-      <td>${fmtBig(d.total_assets)}</td>
-      <td>${fmtBig(d.cash + (d.short_term_investments || 0))}</td>
-      <td>${fmtBig(d.total_liab)}</td>
-      <td>${fmtBig(d.long_term_debt)}</td>
-      <td>${fmtBig(d.total_stockholder_equity)}</td>
-    </tr>`).join('');
+  // Inverter para ano mais antigo → mais novo (esquerda → direita)
+  const incomeAsc = [...incomeYearly].reverse();
+  const balanceAsc = [...balanceYearly].reverse();
+  const cashFlowAsc = [...cashFlowYearly].reverse();
 
-  // CashFlow rows
-  const cfRows = cashFlowYearly.map(d => `
-    <tr>
-      <td>${getYear(d.end_date)}</td>
-      <td>${fmtBig(d.total_cash_from_operating_activities)}</td>
-      <td>${fmtBig(d.total_cashflows_from_investing_activities)}</td>
-      <td>${fmtBig(d.total_cash_from_financing_activities)}</td>
-      <td>${fmtBig(d.capital_expenditures)}</td>
-      <td class="${colorClass(d.dividends_paid)}">${fmtBig(d.dividends_paid)}</td>
-    </tr>`).join('');
+  // DRE transposta
+  const dreYears = incomeAsc.map(d => getYear(d.end_date));
+  const dreTable = transposeTable(dreYears, [
+    { label: 'Receita Total', values: incomeAsc.map(d => fmtBig(d.total_revenue)) },
+    { label: 'Lucro Bruto', values: incomeAsc.map(d => fmtBig(d.gross_profit || 0)) },
+    { label: 'EBIT', values: incomeAsc.map(d => fmtBig(d.ebit)) },
+    { label: 'Lucro Antes IR', values: incomeAsc.map(d => fmtBig(d.income_before_tax)) },
+    { label: 'Lucro Líquido', values: incomeAsc.map(d => `<span class="${colorClass(d.net_income)}">${fmtBig(d.net_income)}</span>`) },
+  ]);
+
+  // Balanço transposto
+  const balYears = balanceAsc.map(d => getYear(d.end_date));
+  const balTable = transposeTable(balYears, [
+    { label: 'Ativo Total', values: balanceAsc.map(d => fmtBig(d.total_assets)) },
+    { label: 'Caixa', values: balanceAsc.map(d => fmtBig(d.cash + (d.short_term_investments || 0))) },
+    { label: 'Passivo Total', values: balanceAsc.map(d => fmtBig(d.total_liab)) },
+    { label: 'Dívida LP', values: balanceAsc.map(d => fmtBig(d.long_term_debt)) },
+    { label: 'Patrimônio Líq.', values: balanceAsc.map(d => fmtBig(d.total_stockholder_equity)) },
+  ]);
+
+  // Fluxo de Caixa transposto
+  const cfYears = cashFlowAsc.map(d => getYear(d.end_date));
+  const cfTable = transposeTable(cfYears, [
+    { label: 'FCO', values: cashFlowAsc.map(d => fmtBig(d.total_cash_from_operating_activities)) },
+    { label: 'FCI', values: cashFlowAsc.map(d => fmtBig(d.total_cashflows_from_investing_activities)) },
+    { label: 'FCF', values: cashFlowAsc.map(d => fmtBig(d.total_cash_from_financing_activities)) },
+    { label: 'CAPEX', values: cashFlowAsc.map(d => fmtBig(d.capital_expenditures)) },
+    { label: 'Div. Pagos', values: cashFlowAsc.map(d => `<span class="${colorClass(d.dividends_paid)}">${fmtBig(d.dividends_paid)}</span>`) },
+  ]);
 
   // Dividends aggregation by year
   const divByYear = new Map<string, { total: number; count: number }>();
@@ -137,6 +149,17 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   const divYears = [...divByYear.entries()].sort((a, b) => Number(b[0]) - Number(a[0])).slice(0, 10);
   const divRows = divYears.map(([year, d]) => `
     <tr><td>${year}</td><td>${fmtBRL(d.total)}</td><td>${d.count}</td></tr>`).join('');
+
+  // Histórico completo de dividendos (individual, ordenado por data desc)
+  const divHistory = [...data._rawDividends]
+    .filter(d => d.amount > 0 && d.exDate)
+    .sort((a, b) => new Date(b.exDate).getTime() - new Date(a.exDate).getTime());
+  const divHistoryRows = divHistory.map(d => {
+    const ex = new Date(d.exDate).toLocaleDateString('pt-BR');
+    const pay = d.paymentDate ? new Date(d.paymentDate).toLocaleDateString('pt-BR') : '-';
+    const tipo = d.dividendType || '-';
+    return `<tr><td>${ex}</td><td>${fmtBRL(d.amount)}</td><td>${tipo}</td><td>${pay}</td></tr>`;
+  }).join('');
 
   // Classical methods data (Graham, Bazin, Gordon)
   const grahamResult = val.results.find(r => r.method === 'GRAHAM');
@@ -812,6 +835,51 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       font-weight: 600; color: #475569;
     }
     .fin-table tbody tr:hover { background: #fafaf8; }
+    .fin-transposed .sticky-col {
+      position: sticky; left: 0; background: #fff; z-index: 1;
+      font-family: 'Montserrat', sans-serif; font-weight: 600;
+      color: #475569; text-align: left; min-width: 120px;
+    }
+    .fin-transposed thead th.sticky-col { background: #fff; }
+    .div-lead-card {
+      margin-top: 1.5rem; padding: 2rem; border-radius: 12px;
+      background: linear-gradient(135deg, #041C24 0%, #0a2e3a 100%);
+      text-align: center; color: #fff;
+    }
+    .div-lead-icon { margin-bottom: 0.75rem; color: #B68F40; }
+    .div-lead-title {
+      font-family: 'Playfair Display', serif; font-size: 1.15rem;
+      font-weight: 700; margin-bottom: 0.4rem;
+    }
+    .div-lead-sub {
+      font-size: 0.82rem; color: rgba(255,255,255,0.7);
+      margin-bottom: 1.25rem; max-width: 420px; margin-left: auto; margin-right: auto;
+    }
+    .div-lead-form {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+      justify-content: center; max-width: 500px; margin: 0 auto;
+    }
+    .div-lead-form input {
+      flex: 1; min-width: 160px; padding: 0.65rem 0.9rem;
+      border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
+      background: rgba(255,255,255,0.08); color: #fff;
+      font-size: 0.85rem; font-family: 'Montserrat', sans-serif;
+    }
+    .div-lead-form input::placeholder { color: rgba(255,255,255,0.4); }
+    .div-lead-form input:focus { outline: none; border-color: #B68F40; background: rgba(255,255,255,0.12); }
+    .div-lead-btn {
+      width: 100%; padding: 0.7rem; border: none; border-radius: 8px;
+      background: #B68F40; color: #041C24; font-weight: 700;
+      font-size: 0.88rem; cursor: pointer; transition: all 0.2s;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .div-lead-btn:hover { background: #c9a44e; }
+    .div-lead-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .div-lead-success { margin-top: 1rem; }
+    .div-lead-success p { color: #10b981; font-weight: 600; font-size: 0.9rem; }
+    @media (max-width: 640px) {
+      .div-lead-form input { min-width: 100%; }
+    }
 
     /* ============ SANITY CHECK ============ */
     .sanity-table {
@@ -1157,7 +1225,9 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   <!-- Google Analytics (GA4) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-858T7GLTMJ"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
-  <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();function _iaTrack(ev){var u=new URLSearchParams(location.search);fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify({session_id:_iaS,page_path:location.pathname.replace(/\/index\\.html$/,'').replace(/\/$/,'')||'/',referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview'})}).catch(function(){})}_iaTrack();function _iaClick(e){e.preventDefault();var url=e.currentTarget.href;_iaTrack('cta_click');setTimeout(function(){window.location.href=url},150)}</script>
+  <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();function _iaTrack(ev){var u=new URLSearchParams(location.search);fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify({session_id:_iaS,page_path:location.pathname.replace(/\/index\\.html$/,'').replace(/\/$/,'')||'/',referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview'})}).catch(function(){})}_iaTrack();function _iaClick(e){e.preventDefault();var url=e.currentTarget.href;_iaTrack('cta_click');setTimeout(function(){window.location.href=url},150)}
+var _iaDivData=${JSON.stringify(divHistory.map(d => ({e:d.exDate,a:d.amount,t:d.dividendType||'',p:d.paymentDate||''})))};
+function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.querySelector('button');btn.disabled=true;btn.textContent='Enviando...';var name=f.name.value.trim();var email=f.email.value.trim();fetch(_iaB+'/rest/v1/iacoes_email_leads',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},body:JSON.stringify({name:name,email:email,ticker:ticker,source:'dividendos'})}).then(function(){_iaTrack('lead_dividendos');var csv='Data Ex;Valor por Acao;Tipo;Data Pagamento\\n';_iaDivData.forEach(function(d){csv+=d.e+';'+d.a+';'+d.t+';'+d.p+'\\n';});var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='dividendos_'+ticker+'.csv';a.click();URL.revokeObjectURL(url);f.style.display='none';document.getElementById('div-lead-success-'+ticker).style.display='block';}).catch(function(){btn.disabled=false;btn.textContent='Erro — tente novamente';});return false;}</script>
 </head>
 <body>
 
@@ -1546,14 +1616,9 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       <span class="fin-tab active">DRE</span>
     </div>
     <div class="table-scroll">
-      <table class="fin-table">
-        <thead>
-          <tr>
-            <th>Período</th><th>Receita Total</th><th>Lucro Bruto</th>
-            <th>EBIT</th><th>Lucro Antes IR</th><th>Lucro Líquido</th>
-          </tr>
-        </thead>
-        <tbody>${dreRows}</tbody>
+      <table class="fin-table fin-transposed">
+        <thead><tr><th class="sticky-col"></th>${dreTable.headerCells}</tr></thead>
+        <tbody>${dreTable.rows}</tbody>
       </table>
     </div>
 
@@ -1563,14 +1628,9 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       <span class="fin-tab active">Balanço</span>
     </div>
     <div class="table-scroll">
-      <table class="fin-table">
-        <thead>
-          <tr>
-            <th>Período</th><th>Ativo Total</th><th>Caixa</th>
-            <th>Passivo Total</th><th>Dívida LP</th><th>Patrimônio Líq.</th>
-          </tr>
-        </thead>
-        <tbody>${balRows}</tbody>
+      <table class="fin-table fin-transposed">
+        <thead><tr><th class="sticky-col"></th>${balTable.headerCells}</tr></thead>
+        <tbody>${balTable.rows}</tbody>
       </table>
     </div>` : ''}
 
@@ -1580,29 +1640,43 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       <span class="fin-tab active">Fluxo de Caixa</span>
     </div>
     <div class="table-scroll">
-      <table class="fin-table">
-        <thead>
-          <tr>
-            <th>Período</th><th>FCO</th><th>FCI</th>
-            <th>FCF</th><th>CAPEX</th><th>Dividendos Pagos</th>
-          </tr>
-        </thead>
-        <tbody>${cfRows}</tbody>
+      <table class="fin-table fin-transposed">
+        <thead><tr><th class="sticky-col"></th>${cfTable.headerCells}</tr></thead>
+        <tbody>${cfTable.rows}</tbody>
       </table>
     </div>` : ''}
 
     ${divYears.length > 0 ? `
-    <!-- DIVIDENDOS -->
+    <!-- DIVIDENDOS RESUMO ANUAL -->
     <div class="fin-tabs" style="margin-top:1.5rem;">
-      <span class="fin-tab active">Dividendos</span>
+      <span class="fin-tab active">Dividendos por Ano</span>
     </div>
     <div class="table-scroll">
-      <table class="fin-table">
-        <thead>
-          <tr><th>Ano</th><th>Total Pago</th><th>Qtd. Pagamentos</th></tr>
-        </thead>
-        <tbody>${divRows}</tbody>
+      <table class="fin-table fin-transposed">
+        <thead><tr><th class="sticky-col"></th>${[...divYears].reverse().map(([year]) => `<th>${year}</th>`).join('')}</tr></thead>
+        <tbody>
+          <tr><td class="sticky-col">Total Pago</td>${[...divYears].reverse().map(([, d]) => `<td>${fmtBRL(d.total)}</td>`).join('')}</tr>
+          <tr><td class="sticky-col">Pagamentos</td>${[...divYears].reverse().map(([, d]) => `<td>${d.count}</td>`).join('')}</tr>
+        </tbody>
       </table>
+    </div>` : ''}
+
+    ${divHistory.length > 0 ? `
+    <!-- LEAD COLLECTOR: HISTÓRICO COMPLETO DE DIVIDENDOS -->
+    <div class="div-lead-card" id="div-lead-card-${f.symbol}">
+      <div class="div-lead-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </div>
+      <div class="div-lead-title">Histórico Completo de Dividendos de ${f.symbol}</div>
+      <div class="div-lead-sub">${divHistory.length} pagamentos desde ${new Date(divHistory[divHistory.length - 1].exDate).getFullYear()} — JCP, dividendos e rendimentos com datas e valores por ação.</div>
+      <form class="div-lead-form" id="div-lead-form-${f.symbol}" onsubmit="return _iaLeadSubmit(event,'${f.symbol}')">
+        <input type="text" name="name" placeholder="Seu nome" required>
+        <input type="email" name="email" placeholder="Seu melhor e-mail" required>
+        <button type="submit" class="div-lead-btn">Baixar histórico completo <span>&rarr;</span></button>
+      </form>
+      <div class="div-lead-success" id="div-lead-success-${f.symbol}" style="display:none">
+        <p>Pronto! O download vai começar automaticamente.</p>
+      </div>
     </div>` : ''}
   </section>
 
