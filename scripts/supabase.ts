@@ -2,12 +2,18 @@ import { createClient } from '@supabase/supabase-js';
 import type {
   RawIncomeStatement, RawBalanceSheet, RawCashFlow,
   RawBrapiQuote, RawDividend, SupabaseFinancials,
-  PeerTicker, TickerIndexEntry
+  PeerTicker, TickerIndexEntry, QualitativeScore
 } from './types';
 
 const SUPABASE_URL = process.env.SUPABASE_URL!;
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY!;
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Service role client para tabelas com RLS restrito (ex: Qualitativo)
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const supabaseAdmin = SUPABASE_SERVICE_KEY
+  ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+  : null;
 
 // --- Helpers ---
 
@@ -276,6 +282,49 @@ export const getAllTickersWithSector = async (): Promise<TickerIndexEntry[]> => 
     divYield: toNumber(r.dividend_yield),
     marketCap: toNumber(r.market_cap)
   })).filter(t => t.ticker);
+};
+
+// Cache local de scores qualitativos (scores mudam raramente)
+import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
+const QUAL_CACHE_PATH = join(__dirname, 'qualitative-cache.json');
+
+let qualCache: Record<string, QualitativeScore> = {};
+try { qualCache = JSON.parse(readFileSync(QUAL_CACHE_PATH, 'utf-8')); } catch {}
+
+export const saveQualitativeCache = () => {
+  writeFileSync(QUAL_CACHE_PATH, JSON.stringify(qualCache, null, 2), 'utf-8');
+};
+
+export const fetchQualitativeScore = async (ticker: string): Promise<QualitativeScore | null> => {
+  const t = ticker.toUpperCase().trim();
+
+  // Tenta buscar do Supabase (requer service role key)
+  if (supabaseAdmin) {
+    const { data, error } = await supabaseAdmin
+      .from('Qualitativo')
+      .select('score_final,c1_score,c2_score,c3_score,c4_score,c5_score,c6_score')
+      .eq('ticker', t)
+      .is('user_id', null)
+      .limit(1);
+    if (!error && data && data.length) {
+      const r = data[0];
+      const score: QualitativeScore = {
+        scoreFinal: toNumber(r.score_final),
+        c1: toNumber(r.c1_score),
+        c2: toNumber(r.c2_score),
+        c3: toNumber(r.c3_score),
+        c4: toNumber(r.c4_score),
+        c5: toNumber(r.c5_score),
+        c6: toNumber(r.c6_score),
+      };
+      qualCache[t] = score;
+      return score;
+    }
+  }
+
+  // Fallback: lê do cache local
+  return qualCache[t] || null;
 };
 
 export const getPeersBySector = (allTickers: TickerIndexEntry[], ticker: string, limit = 8): PeerTicker[] => {

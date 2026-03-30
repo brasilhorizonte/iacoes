@@ -1,9 +1,9 @@
 import 'dotenv/config';
 import { mkdirSync, writeFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import { getAllTickers, getTickersWithNames, getAllTickersWithSector, getPeersBySector } from './supabase';
+import { getAllTickers, getTickersWithNames, getAllTickersWithSector, getPeersBySector, fetchQualitativeScore, saveQualitativeCache } from './supabase';
 import { getFinancialData, performValuation } from './valuation';
-import { generateTickerHTML, generateIndexHTML, generateSitemap, generateRobots } from './template';
+import { generateTickerHTML, generateIndexHTML, generateSitemap, generateRobots, generateLowercaseRedirect } from './template';
 import { SCENARIO_PRESETS, DEFAULT_COST_OF_DEBT } from './constants';
 import type { ValuationAssumptions, TickerIndexEntry, PeerTicker } from './types';
 
@@ -31,10 +31,19 @@ async function generatePage(ticker: string): Promise<boolean> {
     }
 
     const peers: PeerTicker[] = getPeersBySector(allTickerData, ticker, 8);
-    const html = generateTickerHTML(data, val, peers);
+    const qualScore = await fetchQualitativeScore(ticker);
+    const html = generateTickerHTML(data, val, peers, qualScore);
     const dir = join(ROOT, ticker);
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, 'index.html'), html, 'utf-8');
+
+    // Generate lowercase redirect (e.g., /petr4/ → /PETR4/)
+    const lower = ticker.toLowerCase();
+    if (lower !== ticker) {
+      const lowerDir = join(ROOT, lower);
+      mkdirSync(lowerDir, { recursive: true });
+      writeFileSync(join(lowerDir, 'index.html'), generateLowercaseRedirect(ticker), 'utf-8');
+    }
 
     const upside = (val.totalUpside * 100).toFixed(1);
     console.log(`  ✓ ${ticker}: R$ ${data.price.toFixed(2)} → R$ ${val.weightedFairValue.toFixed(2)} (${upside}%)`);
@@ -104,8 +113,10 @@ async function main() {
     }
 
     // Sitemap includes ALL existing ticker pages on disk, not just current run
+    // Excludes lowercase redirects (only uppercase canonical pages go in sitemap)
     const allTickerDirs = readdirSync(ROOT).filter(d => {
       if (d === 'acoes' || d === 'assets' || d === 'scripts' || d === 'node_modules' || d.startsWith('.')) return false;
+      if (d !== d.toUpperCase()) return false; // skip lowercase redirect dirs
       const p = join(ROOT, d, 'index.html');
       try { return statSync(p).isFile(); } catch { return false; }
     });
@@ -141,6 +152,7 @@ async function main() {
     }
   }
 
+  saveQualitativeCache();
   console.log(`\n✅ Concluído: ${success} geradas, ${failed} falhas (de ${tickers.length} total)\n`);
 }
 

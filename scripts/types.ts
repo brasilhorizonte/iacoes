@@ -171,6 +171,16 @@ export interface FinancialData {
   businessSummary?: string | null;
 }
 
+export interface QualitativeScore {
+  scoreFinal: number;
+  c1: number; // Governança
+  c2: number; // Management
+  c3: number; // Indústria
+  c4: number; // Vantagens Competitivas
+  c5: number; // Poder de Barganha
+  c6: number; // Riscos e Estrutura
+}
+
 export interface ValuationAssumptions {
   riskFreeRate: number;
   equityRiskPremium: number;

@@ -180,13 +180,12 @@
 
         /* HERO */
         .hero {
-            min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 7rem 2rem 4rem;
+            padding: 7rem 2rem 0;
             background: var(--bg-white);
-            border-bottom: 1px solid var(--border);
         }
 
         .hero-content {
@@ -363,9 +362,11 @@
 
         /* STATS */
         .stats-bar {
-            padding: 3.5rem 2rem;
-            background: var(--bg-white);
-            border-bottom: 1px solid var(--border);
+            width: 100%;
+            max-width: 850px;
+            padding: 3rem 0 3.5rem;
+            border-top: 1px solid var(--border);
+            margin-top: 3rem;
         }
 
         .stats-grid {
@@ -1334,7 +1335,7 @@
         <li><a href="#precos">Preços</a></li>
         <li><a href="#sobre">Sobre</a></li>
         <li><a href="#faq">FAQ</a></li>
-        <li><a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta btn-cta-nav" onclick="_iaClick(event)">Testar grátis</a></li>
+        <li><a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta btn-cta-nav" onclick="_iaClick(event)">Começar grátis</a></li>
     </ul>
     <button class="mobile-menu-btn" onclick="document.querySelector('.nav-links').classList.toggle('show')">
         <span></span><span></span><span></span>
@@ -1351,13 +1352,21 @@
             <a href="https://brasilhorizonte.com.br" target="_blank" rel="noopener"><img src="assets/img/institucional_branco_amarelo_3x.png" alt="Brasil Horizonte" class="hero-brand-logo"></a>
         </div>
         <div class="hero-actions">
-            <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta" onclick="_iaClick(event)">Testar grátis →</a>
+            <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta" onclick="_iaClick(event)">Descobrir ações baratas →</a>
             <a href="#modulos" class="btn-cta btn-outline">Conhecer a plataforma</a>
         </div>
         <div class="hero-proof">
             <span><span class="check">✓</span> Sem carteira recomendada</span>
             <span><span class="check">✓</span> 100% livre de conflito</span>
             <span><span class="check">✓</span> Graham, Bazin, Gordon & DCF</span>
+        </div>
+    </div>
+    <div class="stats-bar">
+        <div class="stats-grid">
+            <div class="stat-item"><div class="stat-number">300+</div><div class="stat-label">Ações analisadas na B3</div></div>
+            <div class="stat-item"><div class="stat-number">3</div><div class="stat-label">Metodologias clássicas</div></div>
+            <div class="stat-item"><div class="stat-number">24/7</div><div class="stat-label">Monitoramento contínuo</div></div>
+            <div class="stat-item"><div class="stat-number">0</div><div class="stat-label">Conflitos de interesse</div></div>
         </div>
     </div>
 </section>
@@ -1380,16 +1389,6 @@
         <span class="ticker-item"><span class="ticker-code">VALE3</span> Análise setorial <span class="ticker-up">● ATUALIZADA</span></span>
         <span class="ticker-item"><span class="ticker-code">FLRY3</span> Bazin DY: <span class="ticker-up">7.2%</span></span>
         <span class="ticker-item"><span class="ticker-code">PSSA3</span> Gordon: <span class="ticker-up">upside 28%</span></span>
-    </div>
-</div>
-
-
-<div class="stats-bar">
-    <div class="stats-grid">
-        <div class="stat-item"><div class="stat-number">300+</div><div class="stat-label">Ações analisadas na B3</div></div>
-        <div class="stat-item"><div class="stat-number">3</div><div class="stat-label">Metodologias clássicas</div></div>
-        <div class="stat-item"><div class="stat-number">24/7</div><div class="stat-label">Monitoramento contínuo</div></div>
-        <div class="stat-item"><div class="stat-number">0</div><div class="stat-label">Conflitos de interesse</div></div>
     </div>
 </div>
 
@@ -1568,7 +1567,7 @@
                     <li>Validador de Teses de investimento</li>
                     <li>Análise Qualitativa detalhada</li>
                 </ul>
-                <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta btn-outline" onclick="_iaClick(event)">Testar grátis</a>
+                <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta btn-outline" onclick="_iaClick(event)">Começar com IAnalista</a>
             </div>
             <div class="pricing-card">
                 <div class="pricing-plan">IALOCADOR</div>
@@ -1584,7 +1583,7 @@
                     <li>Gestão de Carteira</li>
                     <li>Otimização de portfólio (Markowitz)</li>
                 </ul>
-                <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta btn-outline" onclick="_iaClick(event)">Testar grátis</a>
+                <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta btn-outline" onclick="_iaClick(event)">Começar com IAlocador</a>
             </div>
             <div class="pricing-card featured">
                 <div class="pricing-plan">FUNDAMENTALISTA</div>
@@ -1602,7 +1601,7 @@
                     <li>Acesso a grupo fechado de membros</li>
                     <li>Prioridade em respostas e suporte</li>
                 </ul>
-                <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta" onclick="_iaClick(event)">Testar grátis →</a>
+                <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta" onclick="_iaClick(event)">Acesso completo →</a>
             </div>
         </div>
     </div>
@@ -1643,7 +1642,7 @@
         <div class="section-label">Comece agora</div>
         <h2>Pare de adivinhar.<br>Comece a <span style="color: var(--gold-light)">analisar</span>.</h2>
         <p>Sem cartão de crédito. Sem compromisso.</p>
-        <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta" onclick="_iaClick(event)">Testar grátis →</a>
+        <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta" onclick="_iaClick(event)">Criar conta grátis em 30s →</a>
     </div>
 </section>
 
@@ -1767,6 +1766,24 @@
         </div>
     </div>
 </footer>
+
+<!-- Scroll depth tracking -->
+<script>
+(function(){
+  var f={};
+  var m={scroll_25:'#modulos',scroll_50:'#metodologia',scroll_75:'#precos',scroll_100:'#sobre'};
+  if(!window.IntersectionObserver)return;
+  var o=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){var k=e.target.dataset.sm;if(k&&!f[k]){f[k]=1;_iaTrack(k)}}
+    })
+  },{threshold:0.1});
+  Object.keys(m).forEach(function(k){
+    var el=document.querySelector(m[k]);
+    if(el){el.dataset.sm=k;o.observe(el)}
+  })
+})();
+</script>
 
 </body>
 </html>

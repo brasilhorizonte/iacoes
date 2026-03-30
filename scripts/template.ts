@@ -1,4 +1,4 @@
-import type { FinancialData, ComprehensiveValuation, RawIncomeStatement, RawBalanceSheet, RawCashFlow, RawDividend, PeerTicker, TickerIndexEntry } from './types';
+import type { FinancialData, ComprehensiveValuation, RawIncomeStatement, RawBalanceSheet, RawCashFlow, RawDividend, PeerTicker, TickerIndexEntry, QualitativeScore } from './types';
 
 // --- Formatters ---
 const fmt = (n: number, dec = 2): string => {
@@ -71,7 +71,7 @@ const getYear = (d: string): string => {
 };
 
 // --- Main Template ---
-export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuation, peers: PeerTicker[] = []): string => {
+export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuation, peers: PeerTicker[] = [], qualScore: QualitativeScore | null = null): string => {
   const f = data.fundamentals;
   const today = new Date().toLocaleDateString('pt-BR');
   const todayISO = new Date().toISOString().split('T')[0] + 'T03:00:00.000Z';
@@ -1014,6 +1014,9 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     .nota-cat-score { font-size: 0.8rem; font-weight: 700; }
     .nota-cat-bar { height: 6px; border-radius: 3px; background: #f1f5f9; overflow: hidden; }
     .nota-cat-bar-fill { height: 100%; border-radius: 3px; }
+    .nota-detail-placeholder { padding: 1rem 0; }
+    .nota-detail-title { font-weight: 700; font-size: 0.9rem; color: #0f172a; margin-bottom: 0.5rem; }
+    .nota-detail-placeholder p { font-size: 0.85rem; color: #475569; line-height: 1.7; margin-bottom: 0.5rem; }
     .nota-overlay {
       position: absolute; bottom: 0; left: 0; right: 0;
       height: 70%; display: flex; flex-direction: column;
@@ -1206,19 +1209,19 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     </div>
     <div class="company-right">
       <div class="price-label">Cotação Atual</div>
-      <div class="price-value"><sup>R$</sup>${fmt(f.price)}</div>
+      <div class="price-value" id="live-price"><sup>R$</sup>${fmt(f.price)}</div>
       <div class="price-changes">
-        <span class="${f.changeDay >= 0 ? 'val-positive' : 'val-negative'}">${f.changeDay >= 0 ? '+' : ''}${fmtPctShort(f.changeDay)} dia</span>
+        <span id="live-change-day" class="${f.changeDay >= 0 ? 'val-positive' : 'val-negative'}">${f.changeDay >= 0 ? '+' : ''}${fmtPctShort(f.changeDay)} dia</span>
         <span class="${f.change12m >= 0 ? 'val-positive' : 'val-negative'}">${f.change12m >= 0 ? '+' : ''}${fmtPctShort(f.change12m)} 12m</span>
       </div>
-      <div class="price-date">Dados de ${today}</div>
+      <div class="price-date" id="live-date">Dados de ${today}</div>
     </div>
   </header>
 
   <!-- INTRO ANALYSIS (SEO) -->
   <section class="intro-analysis animate-in" aria-label="Análise fundamentalista de ${f.symbol}">
     <p><strong>${f.symbol}</strong> é a ação ${f.type === 'PN' ? 'preferencial' : f.type === 'ON' ? 'ordinária' : ''} de <strong>${f.name}</strong>, negociada na B3 (bolsa brasileira) no setor de ${f.sector}${f.subSector ? ', segmento de ' + f.subSector : ''}. Com cotação atual de <strong>R$ ${fmt(f.price)}</strong> e valor de mercado de ${fmtBig(f.marketCap)}, a empresa é analisada abaixo por 3 metodologias clássicas de valuation: Graham, Bazin e Gordon (DDM).</p>
-    <p>O preço justo estimado pelo <strong>método de Graham</strong> é de R$ ${fmt(grahamFV)}, pelo <strong>método de Bazin</strong> é de R$ ${fmt(bazinFV)}, e pelo <strong>modelo de Gordon</strong> é de R$ ${fmt(gordonFV)}. A análise aponta ${introVerdict} para ${f.symbol}. <span class="intro-verdict ${introVerdictClass}">${introVerdictLabel}</span></p>
+    <p>A análise fundamentalista de ${f.symbol} utiliza 3 métodos clássicos de valuation — <strong>Graham</strong>, <strong>Bazin</strong> e <strong>Gordon (DDM)</strong> — para estimar o preço justo da ação com premissas ajustáveis. Confira os resultados abaixo e ajuste as premissas para sua própria análise.</p>
     <p>${plText}${evEbitdaText}${dyText}. ${roeText}${marginText} Abaixo, você encontra todos os indicadores fundamentalistas, demonstrações financeiras históricas e o preço justo calculado com premissas ajustáveis.</p>
   </section>
 
@@ -1443,7 +1446,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
           <h2 class="cta-valuation-title">Quer ir além com ${f.symbol}?</h2>
           <p class="cta-valuation-desc">Na plataforma, você ajusta <strong>todas as premissas</strong> — taxa de desconto, crescimento, margens — e compara cenários Bear, Base e Bull em tempo real com 5 metodologias de valuation.</p>
         </div>
-        <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="cta-valuation-btn" onclick="_iaClick(event)">Calcular preço justo de ${f.symbol} &rarr;</a>
+        <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="cta-valuation-btn" onclick="_iaClick(event)">Fazer Seu Valuation Completo &rarr;</a>
       </div>
     </div>
 
@@ -1494,33 +1497,30 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       <span class="nota-sector-badge">Setor Qualitativo: ${f.sector}</span>
     </div>
 
+    ${qualScore ? `<div class="nota-categories">
+      <div class="nota-categories-title">Scores por Categoria</div>
+      ${[
+        { name: 'Governança', score: qualScore.c1 },
+        { name: 'Management', score: qualScore.c2 },
+        { name: 'Indústria', score: qualScore.c3 },
+        { name: 'Vantagens Competitivas', score: qualScore.c4 },
+        { name: 'Poder de Barganha', score: qualScore.c5 },
+        { name: 'Riscos e Estrutura', score: qualScore.c6 },
+      ].map(cat => {
+        const pct = Math.round((cat.score / 4) * 100);
+        const color = cat.score >= 3 ? '#10b981' : cat.score >= 2 ? '#B68F40' : '#ef4444';
+        return `<div class="nota-cat-item">
+          <div class="nota-cat-header"><span class="nota-cat-name">${cat.name}</span><span class="nota-cat-score" style="color:${color}">?.?</span></div>
+          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+        </div>`;
+      }).join('\n      ')}
+    </div>` : ''}
+
     <div class="nota-blurred">
-      <div class="nota-categories">
-        <div class="nota-categories-title">Scores por Categoria</div>
-        <div class="nota-cat-item">
-          <div class="nota-cat-header"><span class="nota-cat-name">Governança</span><span class="nota-cat-score" style="color:#0f172a">?.?</span></div>
-          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:70%;background:#0f172a"></div></div>
-        </div>
-        <div class="nota-cat-item">
-          <div class="nota-cat-header"><span class="nota-cat-name">Management</span><span class="nota-cat-score" style="color:#0f172a">?.?</span></div>
-          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:68%;background:#0f172a"></div></div>
-        </div>
-        <div class="nota-cat-item">
-          <div class="nota-cat-header"><span class="nota-cat-name">Indústria</span><span class="nota-cat-score" style="color:#ef4444">?.?</span></div>
-          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:50%;background:#ef4444"></div></div>
-        </div>
-        <div class="nota-cat-item">
-          <div class="nota-cat-header"><span class="nota-cat-name">Vantagens Competitivas / Barreiras à Entrada</span><span class="nota-cat-score" style="color:#B68F40">?.?</span></div>
-          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:75%;background:#B68F40"></div></div>
-        </div>
-        <div class="nota-cat-item">
-          <div class="nota-cat-header"><span class="nota-cat-name">Poder de Barganha</span><span class="nota-cat-score" style="color:#B68F40">?.?</span></div>
-          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:72%;background:#B68F40"></div></div>
-        </div>
-        <div class="nota-cat-item">
-          <div class="nota-cat-header"><span class="nota-cat-name">Riscos e Estrutura</span><span class="nota-cat-score" style="color:#ef4444">?.?</span></div>
-          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:45%;background:#ef4444"></div></div>
-        </div>
+      <div class="nota-detail-placeholder">
+        <div class="nota-detail-title">Detalhamento por Categoria</div>
+        <p>Análise qualitativa completa com mais de 50 perguntas de auditoria cobrindo governança corporativa, qualidade do management, dinâmica do setor, vantagens competitivas, poder de barganha e riscos estruturais.</p>
+        <p>Cada categoria é avaliada com perguntas específicas e respostas fundamentadas em dados públicos, relatórios anuais e fatos relevantes sobre ${f.name}.</p>
       </div>
     </div>
 
@@ -1529,7 +1529,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
       </div>
       <div class="nota-overlay-title">Análise Qualitativa com IA</div>
-      <div class="nota-overlay-sub">Acesse a nota qualitativa completa de ${f.symbol} com mais de 50 perguntas de auditoria em 6 categorias: Governança, Management, Indústria, Vantagens Competitivas, Poder de Barganha e Riscos &amp; Estrutura.</div>
+      <div class="nota-overlay-sub">Descubra a nota qualitativa de ${f.symbol} e o detalhamento completo das 6 categorias com respostas fundamentadas e auditoria por IA.</div>
       <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="nota-overlay-btn" onclick="_iaClick(event)">Desbloquear Análise &rarr;</a>
     </div>
   </section>
@@ -1777,6 +1777,43 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     else if(e.key==='Enter'){e.preventDefault();if(hl>=0&&items[hl])go(items[hl].dataset.t);else{var v=input.value.trim().toUpperCase();if(v)go(v);}}
   });
   document.addEventListener('click',function(e){if(!e.target.closest('.nav-search'))dd.classList.remove('active');});
+})();
+</script>
+
+<!-- Scroll depth tracking -->
+<script>
+(function(){
+  var f={};
+  var m={scroll_25:'.methods-section',scroll_50:'.nota-section',scroll_75:'[aria-label="Demonstrações Financeiras"]',scroll_100:'.faq-section'};
+  if(!window.IntersectionObserver)return;
+  var o=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){var k=e.target.dataset.sm;if(k&&!f[k]){f[k]=1;_iaTrack(k)}}
+    })
+  },{threshold:0.1});
+  Object.keys(m).forEach(function(k){
+    var el=document.querySelector(m[k]);
+    if(el){el.dataset.sm=k;o.observe(el)}
+  })
+})();
+</script>
+
+<!-- Live price update -->
+<script>
+(function(){
+  var sym='${f.symbol}';
+  fetch(_iaB+'/rest/v1/brapi_quotes?select=regular_market_price,regular_market_change_percent,updated_at&symbol=eq.'+sym+'&limit=1',{
+    headers:{'apikey':_iaK,'Authorization':'Bearer '+_iaK}
+  }).then(function(r){return r.json()}).then(function(d){
+    if(!d||!d[0]||!d[0].regular_market_price)return;
+    var q=d[0],p=q.regular_market_price,c=q.regular_market_change_percent||0;
+    var pe=document.getElementById('live-price');
+    var ce=document.getElementById('live-change-day');
+    var de=document.getElementById('live-date');
+    if(pe)pe.innerHTML='<sup>R$</sup>'+Number(p).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    if(ce){ce.className=c>=0?'val-positive':'val-negative';ce.textContent=(c>=0?'+':'')+Number(c).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'% dia';}
+    if(de&&q.updated_at){var dt=new Date(q.updated_at);de.textContent='Atualizado em '+dt.toLocaleDateString('pt-BR')+' '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
+  }).catch(function(){});
 })();
 </script>
 
@@ -2055,6 +2092,24 @@ function filterSector(sector) {
   });
 }
 </script>
+
+<!-- Scroll depth tracking -->
+<script>
+(function(){
+  var f={};
+  var m={scroll_50:'.idx-card',scroll_100:'.footer-disc'};
+  if(!window.IntersectionObserver)return;
+  var o=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){var k=e.target.dataset.sm;if(k&&!f[k]){f[k]=1;_iaTrack(k)}}
+    })
+  },{threshold:0.1});
+  Object.keys(m).forEach(function(k){
+    var el=document.querySelector(m[k]);
+    if(el){el.dataset.sm=k;o.observe(el)}
+  })
+})();
+</script>
 </body>
 </html>`;
 };
@@ -2073,6 +2128,20 @@ export const generateSitemap = (tickers: string[]): string => {
 ${urls.join('\n')}
 </urlset>`;
 };
+
+export const generateLowercaseRedirect = (ticker: string): string => `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>${ticker} — Análise Fundamentalista | iAções</title>
+  <link rel="canonical" href="https://iacoes.com.br/${ticker}/">
+  <meta http-equiv="refresh" content="0; url=https://iacoes.com.br/${ticker}/">
+  <meta name="robots" content="noindex, follow">
+</head>
+<body>
+  <p>Redirecionando para <a href="/${ticker}/">${ticker}</a>...</p>
+</body>
+</html>`;
 
 export const generateRobots = (): string => `User-agent: *
 Allow: /
