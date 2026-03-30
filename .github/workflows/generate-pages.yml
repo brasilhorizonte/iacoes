@@ -36,7 +36,7 @@ jobs:
           for dir in $(find . -maxdepth 1 -type d -regex './[A-Z].*' ! -name '.git' ! -name '.github'); do
             ticker=$(basename "$dir")
             lower=$(echo "$ticker" | tr '[:upper:]' '[:lower:]')
-            if [ "$lower" != "$ticker" ] && [ ! -d "./$lower" ]; then
+            if [ "$lower" != "$ticker" ]; then
               mkdir -p "./$lower"
               cat > "./$lower/index.html" <<REDIR
           <!DOCTYPE html>
