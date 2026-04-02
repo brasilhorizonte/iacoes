@@ -3,7 +3,7 @@ import { mkdirSync, writeFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { getAllTickers, getTickersWithNames, getAllTickersWithSector, getPeersBySector, fetchQualitativeScore, saveQualitativeCache } from './supabase';
 import { getFinancialData, performValuation } from './valuation';
-import { generateTickerHTML, generateIndexHTML, generateSectorPage, generateSitemap, generateRobots } from './template';
+import { generateTickerHTML, generateIndexHTML, generateSectorPage, generateSitemap, generateRobots, sectorSlug } from './template';
 import { SCENARIO_PRESETS, DEFAULT_COST_OF_DEBT } from './constants';
 import type { ValuationAssumptions, TickerIndexEntry, PeerTicker } from './types';
 
@@ -120,7 +120,6 @@ async function main() {
 
       // Generate sector pages (/acoes/{setor}/index.html)
       const sectors = [...new Set(indexTickers.map(t => t.sector).filter(Boolean))].sort();
-      const sectorSlug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       for (const sector of sectors) {
         const sectorTickers = indexTickers.filter(t => t.sector === sector).sort((a, b) => b.marketCap - a.marketCap);
         if (sectorTickers.length === 0) continue;

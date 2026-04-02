@@ -1,5 +1,9 @@
 import type { FinancialData, ComprehensiveValuation, RawIncomeStatement, RawBalanceSheet, RawCashFlow, RawDividend, PeerTicker, TickerIndexEntry, QualitativeScore } from './types';
 
+// --- Slug helper (normalizes accented chars to ASCII) ---
+export const sectorSlug = (s: string): string =>
+  s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
 // --- Formatters ---
 const fmt = (n: number, dec = 2): string => {
   if (!Number.isFinite(n)) return '-';
@@ -201,7 +205,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   const desc = `${f.symbol} vale a pena? Preço justo de R$ ${fmt(grahamFV)} (Graham), R$ ${fmt(bazinFV)} (Bazin) e R$ ${fmt(gordonFV)} (Gordon). P/L ${fmtNum(f.pl)}, DY ${fmtPctShort(f.divYield)}, ROE ${fmtPctShort(f.roe)}. Histórico de dividendos e análise fundamentalista completa.`;
   const titleTag = `${f.symbol} Preço Justo, Valuation e Dividendos ${currentYear} | Análise Fundamentalista | iAções`;
   const ogTitle = `${f.symbol} vale a pena? Preço Justo R$ ${fmt(grahamFV)} (Graham) | iAções`;
-  const sectorSlug = (f.sector || '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const sectorSlugVal = sectorSlug(f.sector || '');
   const faqItems = [
     {
       q: `Quais os principais indicadores fundamentalistas de ${f.symbol}?`,
@@ -1700,7 +1704,7 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
         <span class="peer-price">R$ ${fmt(p.price)}</span>
       </a>`).join('')}
     </div>
-    <a href="/acoes/#setor-${sectorSlug}" class="peers-more">Ver todas as ações de ${f.sector} &rarr;</a>
+    <a href="/acoes/#setor-${sectorSlugVal}" class="peers-more">Ver todas as ações de ${f.sector} &rarr;</a>
   </section>` : ''}
 
   <!-- FAQ SEO -->
@@ -1905,7 +1909,6 @@ export const generateIndexHTML = (tickers: TickerIndexEntry[]): string => {
   const today = new Date().toLocaleDateString('pt-BR');
   const year = new Date().getFullYear();
   const sectors = [...new Set(tickers.map(t => t.sector).filter(Boolean))].sort();
-  const sectorSlug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
   const tickerRows = tickers.map(t => `
     <tr data-sector="${t.sector}">
@@ -2197,7 +2200,7 @@ function filterSector(sector) {
 export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[]): string => {
   const today = new Date().toLocaleDateString('pt-BR');
   const year = new Date().getFullYear();
-  const sectorSlug = sector.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const slug = sectorSlug(sector);
   const count = tickers.length;
 
   const avgPL = tickers.filter(t => t.pl > 0).reduce((s, t) => s + t.pl, 0) / (tickers.filter(t => t.pl > 0).length || 1);
@@ -2240,10 +2243,10 @@ export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[]):
   <meta name="description" content="${desc}">
   <meta name="keywords" content="ações ${sector}, setor ${sector} B3, dividendos ${sector}, análise fundamentalista ${sector}, preço justo ${sector}">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://iacoes.com.br/acoes/${sectorSlug}/">
+  <link rel="canonical" href="https://iacoes.com.br/acoes/${slug}/">
   <meta property="og:title" content="Ações do Setor de ${sector} — Análise e Dividendos | iAções">
   <meta property="og:description" content="${desc}">
-  <meta property="og:url" content="https://iacoes.com.br/acoes/${sectorSlug}/">
+  <meta property="og:url" content="https://iacoes.com.br/acoes/${slug}/">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="pt_BR">
   <meta property="og:site_name" content="iAções">
@@ -2254,7 +2257,7 @@ export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[]):
     "itemListElement": [
       {"@type":"ListItem","position":1,"name":"Home","item":"https://iacoes.com.br/"},
       {"@type":"ListItem","position":2,"name":"Ações","item":"https://iacoes.com.br/acoes/"},
-      {"@type":"ListItem","position":3,"name":sector,"item":`https://iacoes.com.br/acoes/${sectorSlug}/`}
+      {"@type":"ListItem","position":3,"name":sector,"item":`https://iacoes.com.br/acoes/${slug}/`}
     ]
   })}</script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -2358,7 +2361,6 @@ export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[]):
 
 export const generateSitemap = (tickers: string[], sectors: string[] = [], lastmodMap: Record<string, string> = {}): string => {
   const today = new Date().toISOString().split('T')[0];
-  const sectorSlug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   const urls = [
     `  <url><loc>https://iacoes.com.br/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>`,
     `  <url><loc>https://iacoes.com.br/acoes/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>`,
