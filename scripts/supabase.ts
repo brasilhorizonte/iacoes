@@ -244,7 +244,7 @@ export const getAllTickers = async (): Promise<string[]> => {
   const { data, error } = await supabase
     .from('brapi_quotes')
     .select('symbol')
-    .gt('market_cap', 0)
+    .or('market_cap.gt.0,price.gt.0')
     .order('market_cap', { ascending: false });
 
   if (error || !data) return [];
@@ -255,7 +255,7 @@ export const getTickersWithNames = async (): Promise<{ ticker: string; name: str
   const { data, error } = await supabase
     .from('brapi_quotes')
     .select('symbol, short_name, long_name')
-    .gt('market_cap', 0)
+    .or('market_cap.gt.0,price.gt.0')
     .order('market_cap', { ascending: false });
 
   if (error || !data) return [];
@@ -269,7 +269,7 @@ export const getAllTickersWithSector = async (): Promise<TickerIndexEntry[]> => 
   const { data, error } = await supabase
     .from('brapi_quotes')
     .select('symbol, short_name, long_name, sector, price, regular_market_price, pl, dividend_yield, market_cap')
-    .gt('market_cap', 0)
+    .or('market_cap.gt.0,price.gt.0')
     .order('market_cap', { ascending: false });
 
   if (error || !data) { console.warn('getAllTickersWithSector error:', error?.message); return []; }

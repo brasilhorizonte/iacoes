@@ -194,19 +194,32 @@ Em `generate-pages.ts`:
 
 ---
 
-## Próximos Passos (Fase 2+)
+## Próximos Passos
 
 Documentados em `pipeline-seo-cro-iacoes.md` (pasta Marketing BH):
 
-- [ ] Solicitar indexação manual das top 10 páginas no Google Search Console
+**Concluídos em 30/03/2026:**
+- [x] Diversificar copy dos CTAs (7 variações contextuais)
+- [x] Scroll depth tracking (Intersection Observer, 3 tipos de página)
+- [x] Nota Qualitativa com barras reais do Supabase
+- [x] GitHub Actions para regeneração diária
+- [x] Preço em tempo real nas ticker pages
+- [x] Reduzir hero, mostrar valor imediato
+- [x] Submissão do sitemap no GSC + indexação manual top 10
+- [x] 20 páginas por setor geradas
+- [x] Lead collector "Histórico de Dividendos" (captura nome + email)
+- [x] Tabelas financeiras transpostas
+- [x] SEO de dividendos (title, keywords, FAQ com dados reais)
+- [x] FAQ expandida com Schema.org FAQPage por setor
+- [x] Fotos dos sócios + Spotify podcast
+- [x] Cache qualitativo local
+
+**Pendentes:**
 - [ ] Criar imagem OG 1200×630 (atual é 300×300)
-- [x] Diversificar copy dos CTAs (5 dos 7 dizem "Testar grátis") — feito em 30/03/2026
-- [x] Adicionar scroll depth tracking (Intersection Observer) — feito em 30/03/2026
-- [ ] Criar páginas por setor (`/acoes/energia/`, `/acoes/bancos/`)
-- [ ] Escrever 10 artigos cornerstone (`/aprenda/` ou `/guias/`)
-- [ ] Implementar lead magnet "Alerta de Preço Justo" por email
-- [x] Mostrar dados reais na Nota Qualitativa (barras reais, números ocultos) — feito em 30/03/2026
-- [x] GitHub Actions para regeneração diária — feito em 30/03/2026
-- [x] Preço em tempo real nas ticker pages — feito em 30/03/2026
-- [x] Reduzir hero, mostrar valor imediato — feito em 30/03/2026
-- [ ] Implementar lastmod dinâmico no sitemap
+- [ ] 10 artigos cornerstone (`/aprenda/` ou `/guias/`)
+- [ ] Páginas de comparação (`/PETR4-vs-VALE3/`, top 50 pares)
+- [ ] Email nurturing sequence (5 emails via Brevo)
+- [ ] lastmod dinâmico no sitemap
+- [ ] Social proof quantitativo na landing
+- [ ] Tracking de interação com sliders
+- [ ] UTM tracking padronizado nos CTAs sociais
