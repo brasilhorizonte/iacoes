@@ -39,7 +39,10 @@ async function generatePage(ticker: string): Promise<boolean> {
       ...data._rawDividends.map(d => d.exDate),
     ].filter(Boolean).map(d => new Date(d).getTime()).filter(t => !isNaN(t));
     if (allDates.length > 0) {
-      tickerLastmod[ticker] = new Date(Math.max(...allDates)).toISOString().split('T')[0];
+      const maxDate = new Date(Math.max(...allDates));
+      const today = new Date();
+      const capped = maxDate > today ? today : maxDate;
+      tickerLastmod[ticker] = capped.toISOString().split('T')[0];
     }
 
     const peers: PeerTicker[] = getPeersBySector(allTickerData, ticker, 8);
