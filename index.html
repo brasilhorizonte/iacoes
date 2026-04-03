@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>iAções — A Primeira Plataforma de Stock Picking com IA do Brasil</title>
-    <meta name="description" content="Análise fundamentalista potencializada por Inteligência Artificial. Sem conflito de interesses. Metodologias Graham, Bazin, Gordon e DCF. Descubra as melhores ações da B3.">
+    <meta name="description" content="Sem conflito de interesses. Análise fundamentalista potencializada por Inteligência Artificial. Metodologias Graham, Bazin, Gordon e DCF para mais de 300 ações da B3. Descubra o preço justo de qualquer ação.">
     <meta name="keywords" content="iAções, análise fundamentalista, valuation, ações B3, preço justo, Graham, Bazin, Gordon, DCF, fluxo de caixa descontado, stock picking, inteligência artificial, investimentos, bolsa brasileira, IA, Brasil Horizonte">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
     <meta name="author" content="Brasil Horizonte">
@@ -55,7 +55,7 @@
             --red: #C44040;
             --text-primary: #1A1A18;
             --text-secondary: #5A5850;
-            --text-tertiary: #8A8880;
+            --text-tertiary: #737068;
             --text-light: #B0ACA4;
             --border: #E8E6E0;
             --border-strong: #D4D0C8;
@@ -303,19 +303,16 @@
             overflow: hidden;
             background: var(--nav-bg);
         }
-
         .ticker-track {
             display: flex;
             gap: 3rem;
             animation: tickerScroll 40s linear infinite;
             width: max-content;
         }
-
         @keyframes tickerScroll {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
         }
-
         .ticker-item {
             display: flex;
             align-items: center;
@@ -325,9 +322,266 @@
             white-space: nowrap;
             color: rgba(255,255,255,0.5);
         }
-
         .ticker-item .ticker-code { color: rgba(255,255,255,0.8); font-weight: 600; }
         .ticker-item .ticker-up { color: #5AC8E0; }
+
+        /* VALUATION WIDGET */
+        .val-widget {
+            padding: 3.5rem 2rem;
+            background: var(--nav-bg);
+            text-align: center;
+        }
+        .val-widget-inner {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+        .val-widget-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #FFFFFF;
+            margin-bottom: 0.3rem;
+            letter-spacing: -0.02em;
+        }
+        .val-widget-sub {
+            font-size: 0.88rem;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 1.8rem;
+        }
+        .val-search-wrap {
+            position: relative;
+            max-width: 380px;
+            margin: 0 auto 2rem;
+        }
+        .val-search-input {
+            width: 100%;
+            padding: 0.85rem 1.2rem 0.85rem 2.8rem;
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            font-weight: 600;
+            color: #FFFFFF;
+            background: rgba(255,255,255,0.08);
+            border: 1.5px solid var(--gold);
+            border-radius: 12px;
+            outline: none;
+            transition: all 0.2s;
+            letter-spacing: 0.04em;
+        }
+        .val-search-input::placeholder { color: rgba(255,255,255,0.3); font-weight: 400; }
+        .val-search-input:focus { background: rgba(255,255,255,0.12); box-shadow: 0 0 0 3px rgba(184,146,62,0.2); }
+        .val-search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 1rem;
+            pointer-events: none;
+        }
+        .val-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0; right: 0;
+            background: #062A36;
+            border: 1px solid rgba(184,146,62,0.3);
+            border-radius: 10px;
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 50;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+        }
+        .val-dropdown.show { display: block; }
+        .val-dropdown-item {
+            padding: 0.7rem 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-size: 0.88rem;
+        }
+        .val-dropdown-item:hover, .val-dropdown-item.active { background: rgba(184,146,62,0.12); }
+        .val-dropdown-item .dd-ticker {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+        .val-dropdown-item .dd-name {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.78rem;
+            text-align: right;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .val-results {
+            display: none;
+            animation: fadeUp 0.5s ease-out;
+        }
+        .val-results.show { display: block; }
+        .val-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        .val-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.3rem 1rem;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .val-card:hover { background: rgba(255,255,255,0.1); border-color: rgba(184,146,62,0.3); }
+        .val-card-method {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.3rem;
+        }
+        .val-card-sub {
+            font-size: 0.68rem;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 0.6rem;
+        }
+        .val-card-price {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--gold-light);
+            letter-spacing: -0.02em;
+            margin-bottom: 0.2rem;
+        }
+        .val-card-upside {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+        .val-card-upside.up { color: #5AC8E0; }
+        .val-card-upside.down { color: #ef4444; }
+        .val-card-upside.neutral { color: rgba(255,255,255,0.4); }
+        .val-premissa {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 0.7rem;
+            text-align: left;
+        }
+        .val-premissa-label {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.5rem;
+        }
+        .val-premissa-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.4rem;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.6);
+        }
+        .val-premissa-row label { flex: 1; }
+        .val-slider-group {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            flex: 1.2;
+        }
+        .val-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.15);
+            outline: none;
+        }
+        .val-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            background: var(--gold);
+            cursor: pointer;
+        }
+        .val-slider::-moz-range-thumb {
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            background: var(--gold);
+            cursor: pointer;
+            border: none;
+        }
+        .val-slider-val {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--gold-light);
+            min-width: 36px;
+            text-align: right;
+        }
+        .val-info-row {
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.4);
+            margin-top: 0.5rem;
+            padding-top: 0.4rem;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .val-info-row strong { color: rgba(255,255,255,0.7); }
+        .val-current {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 1rem;
+        }
+        .val-current strong { color: #FFFFFF; font-weight: 700; }
+        .val-actions {
+            display: flex;
+            gap: 0.6rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .val-actions .btn-cta { font-size: 0.85rem; padding: 0.6rem 1.3rem; }
+        .val-actions .btn-val-outline {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.6rem 1.3rem;
+            background: transparent;
+            color: #FFFFFF;
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.85rem;
+            border: 1.5px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .val-actions .btn-val-outline:hover { border-color: var(--gold); color: var(--gold); }
+        .val-dcf-tease {
+            margin-top: 1.5rem;
+            padding: 1.2rem;
+            background: rgba(184,146,62,0.08);
+            border: 1px dashed rgba(184,146,62,0.3);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .val-dcf-tease p {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 0.6rem;
+        }
+        .val-dcf-tease strong { color: var(--gold-light); }
+
+        @media (max-width: 768px) {
+            .val-cards { grid-template-columns: 1fr; }
+            .val-widget { padding: 2.5rem 1.5rem; }
+        }
 
 
 
@@ -1097,13 +1351,21 @@
         }
 
         @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .nav-links.show {
+            .nav-links {
                 display: flex; flex-direction: column;
                 position: absolute; top: 100%; left: 0; right: 0;
-                background: var(--nav-bg); padding: 1.5rem 2rem;
-                border-bottom: 1px solid rgba(255,255,255,0.1); gap: 1rem;
+                background: var(--nav-bg); padding: 0 2rem;
+                border-bottom: 1px solid rgba(255,255,255,0.1); gap: 0;
+                max-height: 0; overflow: hidden;
+                transition: max-height 0.3s ease, padding 0.3s ease;
             }
+            .nav-links.show {
+                max-height: 450px;
+                padding: 1rem 2rem 1.5rem;
+                gap: 0.3rem;
+            }
+            .nav-links li { list-style: none; }
+            .nav-links a { display: block; padding: 0.75rem 0; }
             .mobile-menu-btn { display: block; }
             .hero h1 { font-size: 2.3rem; }
             .hero-sub { font-size: 1.05rem; }
@@ -1330,6 +1592,71 @@
     }
     </script>
 
+    <!-- Schema.org JSON-LD: Product (Planos) -->
+    <script type="application/ld+json">
+    [
+        {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": "iAções IAnalista",
+            "description": "Análise fundamentalista com IA — valuation automatizado por Graham, Bazin, Gordon e DCF, score de qualidade e validação de teses de investimento.",
+            "brand": { "@type": "Brand", "name": "iAções" },
+            "offers": {
+                "@type": "Offer",
+                "price": "39.90",
+                "priceCurrency": "BRL",
+                "priceValidUntil": "2026-12-31",
+                "availability": "https://schema.org/InStock",
+                "url": "https://app.brasilhorizonte.com.br/authnew"
+            }
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": "iAções IAlocador",
+            "description": "Ferramentas completas de análise e alocação — dashboard, rankings, radar de oportunidades, gestão de carteira e otimização de portfólio por Markowitz.",
+            "brand": { "@type": "Brand", "name": "iAções" },
+            "offers": {
+                "@type": "Offer",
+                "price": "59.90",
+                "priceCurrency": "BRL",
+                "priceValidUntil": "2026-12-31",
+                "availability": "https://schema.org/InStock",
+                "url": "https://app.brasilhorizonte.com.br/authnew"
+            }
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": "iAções Fundamentalista",
+            "description": "Acesso completo — análise IA, alocação, relatórios exclusivos, planilhas Excel, conteúdos audiovisuais, lives mensais e comunidade fechada de investidores.",
+            "brand": { "@type": "Brand", "name": "iAções" },
+            "offers": {
+                "@type": "Offer",
+                "price": "79.90",
+                "priceCurrency": "BRL",
+                "priceValidUntil": "2026-12-31",
+                "availability": "https://schema.org/InStock",
+                "url": "https://app.brasilhorizonte.com.br/authnew"
+            }
+        }
+    ]
+    </script>
+
+    <!-- Schema.org JSON-LD: SpeakableSpecification -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "iAções — Stock Picking com Inteligência Artificial",
+        "speakable": {
+            "@type": "SpeakableSpecification",
+            "cssSelector": [".hero h1", ".hero-sub", ".val-widget-title", ".methodology-header .section-desc", ".diff-header .section-desc"]
+        },
+        "url": "https://iacoes.com.br/"
+    }
+    </script>
+
     <!-- Google Analytics (GA4) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-858T7GLTMJ"></script>
     <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
@@ -1363,7 +1690,7 @@
             <a href="https://brasilhorizonte.com.br" target="_blank" rel="noopener"><img src="assets/img/institucional_branco_amarelo_3x.png" alt="Brasil Horizonte" class="hero-brand-logo"></a>
         </div>
         <div class="hero-actions">
-            <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta" onclick="_iaClick(event)">Descobrir ações baratas →</a>
+            <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta" onclick="_iaClick(event)" style="background:var(--gold);color:var(--nav-bg-deep)">Descobrir ações baratas →</a>
             <a href="#modulos" class="btn-cta btn-outline">Conhecer a plataforma</a>
         </div>
         <div class="hero-proof">
@@ -1403,32 +1730,7 @@
     </div>
 </div>
 
-<!-- QUICK LINKS (SEO: crawlable links to top ticker pages) -->
-<section class="quick-links">
-    <div class="quick-links-inner">
-        <div class="quick-links-title">Análises em destaque</div>
-        <div class="quick-links-grid">
-            <a href="/PETR4/" class="quick-link">PETR4 <span class="quick-link-name">Petrobras</span></a>
-            <a href="/VALE3/" class="quick-link">VALE3 <span class="quick-link-name">Vale</span></a>
-            <a href="/ITUB4/" class="quick-link">ITUB4 <span class="quick-link-name">Itaú</span></a>
-            <a href="/BBAS3/" class="quick-link">BBAS3 <span class="quick-link-name">BB</span></a>
-            <a href="/WEGE3/" class="quick-link">WEGE3 <span class="quick-link-name">WEG</span></a>
-            <a href="/B3SA3/" class="quick-link">B3SA3 <span class="quick-link-name">B3</span></a>
-            <a href="/ABEV3/" class="quick-link">ABEV3 <span class="quick-link-name">Ambev</span></a>
-            <a href="/BBDC4/" class="quick-link">BBDC4 <span class="quick-link-name">Bradesco</span></a>
-            <a href="/RENT3/" class="quick-link">RENT3 <span class="quick-link-name">Localiza</span></a>
-            <a href="/SUZB3/" class="quick-link">SUZB3 <span class="quick-link-name">Suzano</span></a>
-            <a href="/JBSS3/" class="quick-link">JBSS3 <span class="quick-link-name">JBS</span></a>
-            <a href="/PRIO3/" class="quick-link">PRIO3 <span class="quick-link-name">PRIO</span></a>
-            <a href="/EGIE3/" class="quick-link">EGIE3 <span class="quick-link-name">Engie</span></a>
-            <a href="/TAEE11/" class="quick-link">TAEE11 <span class="quick-link-name">Taesa</span></a>
-            <a href="/EQTL3/" class="quick-link">EQTL3 <span class="quick-link-name">Equatorial</span></a>
-        </div>
-        <div class="quick-links-all">
-            <a href="/acoes/">Ver todas as 310+ ações analisadas →</a>
-        </div>
-    </div>
-</section>
+<!-- SEO: crawlable links to top ticker pages (merged into popular-tickers section below) -->
 
 <section class="modules" id="modulos">
     <div class="modules-header">
@@ -1473,16 +1775,16 @@
         <p class="section-desc">Ferramentas pensadas para quem quer investir com método, profundidade e independência.</p>
     </div>
     <div class="features-grid">
-        <div class="feature-card"><div class="feature-icon">📊</div><h3>Dashboard em Tempo Real</h3><p>Painel completo com indicadores fundamentalistas, preço justo, margem de segurança e score IA — tudo atualizado automaticamente.</p><span class="feature-tag gold">LIVE DATA</span></div>
-        <div class="feature-card"><div class="feature-icon">🎯</div><h3>Screening Inteligente</h3><p>Filtre ações da B3 por múltiplos critérios: P/L, P/VP, ROE, DY, margem de segurança, setor, liquidez e score IA.</p><span class="feature-tag">MULTI-FILTRO</span></div>
-        <div class="feature-card"><div class="feature-icon">🧠</div><h3>Relatórios IA</h3><p>Análises fundamentalistas completas escritas por IA, com base em dados reais e metodologias consagradas. Linguagem clara, sem jargão.</p><span class="feature-tag gold">IA GENERATIVA</span></div>
-        <div class="feature-card"><div class="feature-icon">⚖️</div><h3>Preço Justo Multi-Método</h3><p>Calcule o valor intrínseco por Graham, Bazin, Gordon e DCF. Compare os 4 métodos lado a lado para cada ação.</p><span class="feature-tag">4 METODOLOGIAS</span></div>
+        <div class="feature-card"><div class="feature-icon" role="img" aria-label="Dashboard">📊</div><h3>Dashboard em Tempo Real</h3><p>Painel completo com indicadores fundamentalistas, preço justo, margem de segurança e score IA — tudo atualizado automaticamente.</p><span class="feature-tag gold">LIVE DATA</span></div>
+        <div class="feature-card"><div class="feature-icon" role="img" aria-label="Screening">🎯</div><h3>Screening Inteligente</h3><p>Filtre ações da B3 por múltiplos critérios: P/L, P/VP, ROE, DY, margem de segurança, setor, liquidez e score IA.</p><span class="feature-tag">MULTI-FILTRO</span></div>
+        <div class="feature-card"><div class="feature-icon" role="img" aria-label="Relatórios IA">🧠</div><h3>Relatórios IA</h3><p>Análises fundamentalistas completas escritas por IA, com base em dados reais e metodologias consagradas. Linguagem clara, sem jargão.</p><span class="feature-tag gold">IA GENERATIVA</span></div>
+        <div class="feature-card"><div class="feature-icon" role="img" aria-label="Preço Justo">⚖️</div><h3>Preço Justo Multi-Método</h3><p>Calcule o valor intrínseco por Graham, Bazin, Gordon e DCF. Compare os 4 métodos lado a lado para cada ação.</p><span class="feature-tag">4 METODOLOGIAS</span></div>
 
-        <div class="feature-card"><div class="feature-icon">📈</div><h3>Backtesting de Estratégias</h3><p>Teste suas teses de investimento contra dados históricos. Veja como Graham, Bazin, Gordon e DCF performaram nos últimos anos.</p><span class="feature-tag">HISTÓRICO</span></div>
-        <div class="feature-card"><div class="feature-icon">🏢</div><h3>Análise Setorial</h3><p>Compare empresas do mesmo setor em um único painel. Identifique as mais eficientes, baratas e com melhores fundamentos.</p><span class="feature-tag">COMPARATIVO</span></div>
-        <div class="feature-card"><div class="feature-icon">🛡️</div><h3>Zero Conflito de Interesses</h3><p>Não somos corretora. Não vendemos produtos. Não temos carteira recomendada. Nosso único compromisso é com a análise.</p><span class="feature-tag gold">INDEPENDENTE</span></div>
-        <div class="feature-card"><div class="feature-icon">🤖</div><h3><span class="mono">AIrton</span> — Assistente IA</h3><p>Converse com o AIrton. Pergunte sobre ações, peça comparações, tire dúvidas sobre fundamentos. Ele sabe tudo da B3.</p><span class="feature-tag gold">CHAT IA</span></div>
-        <div class="feature-card"><div class="feature-icon">📄</div><h3>Feed de Documentos CVM</h3><p>Acompanhe em tempo real os documentos publicados na CVM: fatos relevantes, ITRs, DFPs, assembleias e mais. Filtrado por empresa e tipo.</p><span class="feature-tag">CVM FEED</span></div>
+        <div class="feature-card"><div class="feature-icon" role="img" aria-label="Backtesting">📈</div><h3>Backtesting de Estratégias</h3><p>Teste suas teses de investimento contra dados históricos. Veja como Graham, Bazin, Gordon e DCF performaram nos últimos anos.</p><span class="feature-tag">HISTÓRICO</span></div>
+        <div class="feature-card"><div class="feature-icon" role="img" aria-label="Análise Setorial">🏢</div><h3>Análise Setorial</h3><p>Compare empresas do mesmo setor em um único painel. Identifique as mais eficientes, baratas e com melhores fundamentos.</p><span class="feature-tag">COMPARATIVO</span></div>
+        <div class="feature-card"><div class="feature-icon" role="img" aria-label="Zero Conflito">🛡️</div><h3>Zero Conflito de Interesses</h3><p>Não somos corretora. Não vendemos produtos. Não temos carteira recomendada. Nosso único compromisso é com a análise.</p><span class="feature-tag gold">INDEPENDENTE</span></div>
+        <div class="feature-card"><div class="feature-icon" role="img" aria-label="Assistente IA">🤖</div><h3><span class="mono">AIrton</span> — Assistente IA</h3><p>Converse com o AIrton. Pergunte sobre ações, peça comparações, tire dúvidas sobre fundamentos. Ele sabe tudo da B3.</p><span class="feature-tag gold">CHAT IA</span></div>
+        <div class="feature-card"><div class="feature-icon" role="img" aria-label="Feed CVM">📄</div><h3>Feed de Documentos CVM</h3><p>Acompanhe em tempo real os documentos publicados na CVM: fatos relevantes, ITRs, DFPs, assembleias e mais. Filtrado por empresa e tipo.</p><span class="feature-tag">CVM FEED</span></div>
     </div>
 </section>
 
@@ -1515,6 +1817,104 @@
     </div>
 </section>
 
+<section class="val-widget" id="calculadora">
+    <div class="val-widget-inner">
+        <h2 class="val-widget-title">Calculadora de Preço Justo</h2>
+        <p class="val-widget-sub">Ajuste as premissas e veja o preço justo recalculado em tempo real</p>
+        <p class="val-widget-sub" id="vw-quote-date" style="font-family:var(--font-mono);font-size:0.72rem;margin-top:-0.8rem;margin-bottom:1.2rem;color:rgba(255,255,255,0.3)"></p>
+        <div class="val-search-wrap">
+            <span class="val-search-icon">&#x1F50D;</span>
+            <input type="text" class="val-search-input" id="val-input" placeholder="PETR4" autocomplete="off" spellcheck="false">
+            <div class="val-dropdown" id="val-dropdown"></div>
+        </div>
+        <div class="val-results" id="val-results">
+            <div class="val-current" id="vw-current"></div>
+            <div class="val-cards">
+                <!-- GRAHAM -->
+                <div class="val-card">
+                    <div class="val-card-method">Graham</div>
+                    <div class="val-card-sub">Value Investing</div>
+                    <div class="val-card-price" id="vw-graham">—</div>
+                    <div class="val-card-upside neutral" id="vw-graham-up">—</div>
+                    <div class="val-premissa">
+                        <div class="val-premissa-label">Premissas</div>
+                        <div class="val-premissa-row">
+                            <label>Margem Seg.</label>
+                            <div class="val-slider-group">
+                                <input type="range" id="vw-graham-margin" min="0" max="50" step="1" value="0" class="val-slider">
+                                <span class="val-slider-val" id="vw-graham-margin-val">0%</span>
+                            </div>
+                        </div>
+                        <div class="val-info-row" id="vw-graham-info"></div>
+                    </div>
+                </div>
+                <!-- BAZIN -->
+                <div class="val-card">
+                    <div class="val-card-method">Bazin</div>
+                    <div class="val-card-sub">Dividendos</div>
+                    <div class="val-card-price" id="vw-bazin">—</div>
+                    <div class="val-card-upside neutral" id="vw-bazin-up">—</div>
+                    <div class="val-premissa">
+                        <div class="val-premissa-label">Premissas</div>
+                        <div class="val-premissa-row">
+                            <label>DY Mínimo</label>
+                            <div class="val-slider-group">
+                                <input type="range" id="vw-bazin-dy" min="1" max="15" step="0.5" value="6" class="val-slider">
+                                <span class="val-slider-val" id="vw-bazin-dy-val">6.0%</span>
+                            </div>
+                        </div>
+                        <div class="val-info-row" id="vw-bazin-info"></div>
+                    </div>
+                </div>
+                <!-- GORDON -->
+                <div class="val-card">
+                    <div class="val-card-method">Gordon</div>
+                    <div class="val-card-sub">Dividend Discount</div>
+                    <div class="val-card-price" id="vw-gordon">—</div>
+                    <div class="val-card-upside neutral" id="vw-gordon-up">—</div>
+                    <div class="val-premissa">
+                        <div class="val-premissa-label">Premissas</div>
+                        <div class="val-premissa-row">
+                            <label>Desconto (r)</label>
+                            <div class="val-slider-group">
+                                <input type="range" id="vw-gordon-r" min="5" max="25" step="0.5" value="12" class="val-slider">
+                                <span class="val-slider-val" id="vw-gordon-r-val">12.0%</span>
+                            </div>
+                        </div>
+                        <div class="val-premissa-row">
+                            <label>Cresc. (g)</label>
+                            <div class="val-slider-group">
+                                <input type="range" id="vw-gordon-g" min="0" max="15" step="0.5" value="5" class="val-slider">
+                                <span class="val-slider-val" id="vw-gordon-g-val">5.0%</span>
+                            </div>
+                        </div>
+                        <div class="val-info-row" id="vw-gordon-info"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="val-dcf-tease">
+                <p>Quer montar seu próprio <strong style="color:var(--gold-light)">Valuation</strong>?</p>
+                <p>Na plataforma, você projeta receita, margens e crescimento — e a <strong>IA questiona suas premissas</strong>.</p>
+                <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta" onclick="_iaClick(event)" style="background:var(--gold);color:var(--nav-bg-deep);margin-top:0.8rem">Fazer meu Valuation &#x2192;</a>
+            </div>
+        </div>
+        <noscript>
+            <div style="display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;margin-top:1rem">
+                <a href="/PETR4/" style="color:var(--gold);font-weight:600;text-decoration:none">PETR4</a>
+                <a href="/VALE3/" style="color:var(--gold);font-weight:600;text-decoration:none">VALE3</a>
+                <a href="/ITUB4/" style="color:var(--gold);font-weight:600;text-decoration:none">ITUB4</a>
+                <a href="/WEGE3/" style="color:var(--gold);font-weight:600;text-decoration:none">WEGE3</a>
+                <a href="/BBAS3/" style="color:var(--gold);font-weight:600;text-decoration:none">BBAS3</a>
+                <a href="/ABEV3/" style="color:var(--gold);font-weight:600;text-decoration:none">ABEV3</a>
+                <a href="/BBDC4/" style="color:var(--gold);font-weight:600;text-decoration:none">BBDC4</a>
+                <a href="/RENT3/" style="color:var(--gold);font-weight:600;text-decoration:none">RENT3</a>
+                <a href="/SUZB3/" style="color:var(--gold);font-weight:600;text-decoration:none">SUZB3</a>
+                <a href="/JBSS3/" style="color:var(--gold);font-weight:600;text-decoration:none">JBSS3</a>
+            </div>
+        </noscript>
+    </div>
+</section>
+
 <section class="differentials">
     <div class="diff-inner">
         <div class="diff-header">
@@ -1523,12 +1923,12 @@
             <p class="section-desc">Não somos uma corretora. Não temos carteira recomendada. Somos a ferramenta do investidor que pensa por conta própria.</p>
         </div>
         <div class="diff-grid">
-            <div class="diff-item"><div class="diff-icon">🚫</div><div><h4>Sem conflito de interesses</h4><p>Não vendemos ativos, fundos ou produtos financeiros. Receita 100% por assinatura.</p></div></div>
-            <div class="diff-item"><div class="diff-icon">🧠</div><div><h4>IA + Análise Fundamentalista</h4><p>Inteligência artificial combinada com métodos consagrados de valuation.</p></div></div>
-            <div class="diff-item"><div class="diff-icon">⚡</div><div><h4>Análise em segundos</h4><p>O que levaria horas de estudo, a IA entrega em instantes com profundidade.</p></div></div>
-            <div class="diff-item"><div class="diff-icon">🎓</div><div><h4>CNPI e CGA por trás da IA</h4><p>Lógica analítica validada por profissionais certificados — CNPI (APIMEC) e CGA (ANBIMA).</p></div></div>
-            <div class="diff-item"><div class="diff-icon">🇧🇷</div><div><h4>100% focado no Brasil</h4><p>Feito para a B3. Dados em reais, normas brasileiras, particularidades locais.</p></div></div>
-            <div class="diff-item"><div class="diff-icon">🔄</div><div><h4>Atualização contínua</h4><p>Dados e análises sempre atualizados com os últimos balanços e cotações.</p></div></div>
+            <div class="diff-item"><div class="diff-icon" role="img" aria-label="Sem conflito">🚫</div><div><h4>Sem conflito de interesses</h4><p>Não vendemos ativos, fundos ou produtos financeiros. Receita 100% por assinatura.</p></div></div>
+            <div class="diff-item"><div class="diff-icon" role="img" aria-label="IA">🧠</div><div><h4>IA + Análise Fundamentalista</h4><p>Inteligência artificial combinada com métodos consagrados de valuation.</p></div></div>
+            <div class="diff-item"><div class="diff-icon" role="img" aria-label="Velocidade">⚡</div><div><h4>Análise em segundos</h4><p>O que levaria horas de estudo, a IA entrega em instantes com profundidade.</p></div></div>
+            <div class="diff-item"><div class="diff-icon" role="img" aria-label="Certificações">🎓</div><div><h4>CNPI e CGA por trás da IA</h4><p>Lógica analítica validada por profissionais certificados — CNPI (APIMEC) e CGA (ANBIMA).</p></div></div>
+            <div class="diff-item"><div class="diff-icon" role="img" aria-label="Brasil">🇧🇷</div><div><h4>100% focado no Brasil</h4><p>Feito para a B3. Dados em reais, normas brasileiras, particularidades locais.</p></div></div>
+            <div class="diff-item"><div class="diff-icon" role="img" aria-label="Atualização">🔄</div><div><h4>Atualização contínua</h4><p>Dados e análises sempre atualizados com os últimos balanços e cotações.</p></div></div>
         </div>
     </div>
 </section>
@@ -1542,7 +1942,7 @@
         </div>
         <div class="comp-table-wrap">
             <table class="comp-table">
-                <thead><tr><th></th><th>Corretoras</th><th>Casas de Research</th><th>iAções ✦</th></tr></thead>
+                <thead><tr><th scope="col"></th><th scope="col">Corretoras</th><th scope="col">Casas de Research</th><th scope="col">iAções ✦</th></tr></thead>
                 <tbody>
                     <tr><td>Sem conflito de interesses</td><td class="no">✗</td><td class="partial">~</td><td class="yes">✓</td></tr>
                     <tr><td>Análise por IA</td><td class="no">✗</td><td class="no">✗</td><td class="yes">✓</td></tr>
@@ -1578,9 +1978,9 @@
                     <li>Validador de Teses de investimento</li>
                     <li>Análise Qualitativa detalhada</li>
                 </ul>
-                <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta btn-outline" onclick="_iaClick(event)">Começar com IAnalista</a>
+                <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta" onclick="_iaClick(event)">Começar com IAnalista</a>
             </div>
-            <div class="pricing-card">
+            <div class="pricing-card featured">
                 <div class="pricing-plan">IALOCADOR</div>
                 <h3>Ferramentas completas de alocação e análise</h3>
                 <div class="pricing-price"><span class="currency">R$</span>59,90<span class="period">/mês</span></div>
@@ -1593,10 +1993,11 @@
                     <li>Radar de oportunidades</li>
                     <li>Gestão de Carteira</li>
                     <li>Otimização de portfólio (Markowitz)</li>
+                    <li>Painel Macro</li>
                 </ul>
-                <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta btn-outline" onclick="_iaClick(event)">Começar com IAlocador</a>
+                <a href="https://app.brasilhorizonte.com.br/authnew" class="btn-cta" onclick="_iaClick(event)">Começar com IAlocador</a>
             </div>
-            <div class="pricing-card featured">
+            <div class="pricing-card">
                 <div class="pricing-plan">FUNDAMENTALISTA</div>
                 <h3>Acesso completo com relatórios, Excel e IA</h3>
                 <div class="pricing-price"><span class="currency">R$</span>79,90<span class="period">/mês</span></div>
@@ -1627,21 +2028,22 @@
         </div>
         <div class="res-table-wrap">
             <table class="res-table">
-                <thead><tr><th>Recursos</th><th>IAnalista</th><th>IAlocador</th><th class="highlight-col">Fundamentalista</th></tr></thead>
+                <thead><tr><th scope="col">Recursos</th><th scope="col">Free</th><th scope="col">IAnalista</th><th scope="col">IAlocador</th><th scope="col" class="highlight-col">Fundamentalista</th></tr></thead>
                 <tbody>
-                    <tr><td>Score</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
-                    <tr><td>ValuAI</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
-                    <tr><td>Validador de Teses</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
-                    <tr><td>Análise Qualitativa</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
-                    <tr><td>Dashboard diário</td><td class="no">—</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
-                    <tr><td>Rankings de Screenings</td><td class="no">—</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
-                    <tr><td>Radar de Oportunidades</td><td class="no">—</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
-                    <tr><td>Gestão de Carteiras</td><td class="no">—</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
-                    <tr><td>Otimização de portfólio (Markowitz)</td><td class="no">—</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
-                    <tr><td>Relatórios exclusivos</td><td class="no">—</td><td class="no">—</td><td class="yes highlight-col">✓</td></tr>
-                    <tr><td>Conteúdo Audiovisual</td><td class="no">—</td><td class="no">—</td><td class="yes highlight-col">✓</td></tr>
-                    <tr><td>Acesso à comunidade</td><td class="no">—</td><td class="no">—</td><td class="yes highlight-col">✓</td></tr>
-                    <tr><td>Atualizações mensais de estratégia</td><td class="no">—</td><td class="no">—</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Dashboard diário</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Score</td><td class="no">✗</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>ValuAI</td><td class="partial">1/dia</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Validador de Teses</td><td class="partial">1/dia</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Análise Qualitativa</td><td class="partial">1/dia</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Rankings de Screenings</td><td class="no">✗</td><td class="no">—</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Radar de Oportunidades</td><td class="no">✗</td><td class="no">—</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Gestão de Carteiras</td><td class="partial">1/dia</td><td class="no">—</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Otimização de portfólio (Markowitz)</td><td class="partial">1/dia</td><td class="no">—</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Painel Macro</td><td class="no">✗</td><td class="no">—</td><td class="yes">✓</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Relatórios exclusivos</td><td class="no">✗</td><td class="no">—</td><td class="no">—</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Conteúdo Audiovisual</td><td class="no">✗</td><td class="no">—</td><td class="no">—</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Acesso à comunidade</td><td class="no">✗</td><td class="no">—</td><td class="no">—</td><td class="yes highlight-col">✓</td></tr>
+                    <tr><td>Atualizações mensais de estratégia</td><td class="no">✗</td><td class="no">—</td><td class="no">—</td><td class="yes highlight-col">✓</td></tr>
                 </tbody>
             </table>
         </div>
@@ -1708,20 +2110,20 @@
             <div class="section-label">Dúvidas</div>
             <h2 class="section-title">Perguntas Frequentes</h2>
         </div>
-        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">O iAções é uma casa de análise ou corretora?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Nenhum dos dois. O iAções é uma plataforma de tecnologia que oferece ferramentas de análise fundamentalista potencializadas por IA. Não fazemos recomendações de compra/venda, não vendemos ativos e não somos uma corretora.</p></div></div>
-        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Como funciona a análise por IA?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Nossa IA processa dados financeiros públicos das empresas listadas na B3 e aplica as metodologias de Graham, Bazin e Gordon de forma automatizada. No DCF, você monta seu próprio valuation e a IA analisa criticamente suas premissas. Tudo validado por analista CNPI certificado pela APIMEC.</p></div></div>
-        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Quem está por trás da plataforma?<span class="faq-icon">+</span></button><div class="faq-answer"><p>A plataforma foi desenvolvida por profissionais certificados — analista CNPI (APIMEC) e gestor CGA (ANBIMA). A IA executa as análises com base nos critérios técnicos definidos por eles, garantindo rigor metodológico em escala.</p></div></div>
-        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">O que significa "zero conflito de interesses"?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Nossa receita vem 100% das assinaturas. Não ganhamos comissão por operações, não vendemos fundos, não fazemos co-distribuição. Nosso compromisso é exclusivamente com a qualidade da análise.</p></div></div>
-        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Posso cancelar a qualquer momento?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Sim. Planos mensais podem ser cancelados a qualquer momento sem multa. O plano anual pode ser cancelado com reembolso proporcional nos primeiros 30 dias.</p></div></div>
-        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Quem é o AIrton?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Nosso assistente de IA conversacional. Pergunte sobre qualquer ação da B3, peça comparações, tire dúvidas sobre indicadores. Como ter um analista disponível 24/7.</p></div></div>
-        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">O iAções cobre todas as ações da B3?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Sim. Cobrimos mais de 300 ações listadas na B3, com análise fundamentalista e valuation automatizados para cada uma. A cobertura é atualizada continuamente conforme novas empresas entram no mercado.</p></div></div>
-        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">De onde vêm os dados utilizados nas análises?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Utilizamos dados financeiros públicos das empresas listadas na B3: demonstrações de resultado (DRE), balanços patrimoniais, fluxos de caixa, histórico de dividendos e cotações de mercado. Todos os dados são coletados de fontes oficiais e atualizados automaticamente.</p></div></div>
-        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Com que frequência os dados são atualizados?<span class="faq-icon">+</span></button><div class="faq-answer"><p>As cotações são atualizadas diariamente. Dados de balanço, DRE e fluxo de caixa são atualizados a cada divulgação trimestral. Os cálculos de valuation são reprocessados automaticamente sempre que novos dados ficam disponíveis.</p></div></div>
-        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">A IA pode errar? Como vocês lidam com isso?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Sim, como qualquer modelo de IA, pode haver erros de interpretação ou cálculo. Por isso, toda a lógica analítica é validada por profissionais certificados — analista CNPI (APIMEC) e gestor CGA (ANBIMA). As análises são ferramentas de apoio à decisão, não recomendações de investimento.</p></div></div>
-        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Preciso ter experiência com investimentos para usar o iAções?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Não. A plataforma foi projetada para ser acessível tanto para iniciantes quanto para investidores experientes. As análises são apresentadas de forma clara e objetiva, com explicações sobre cada indicador e metodologia utilizada.</p></div></div>
-        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Qual a diferença entre os planos IAnalista, IAlocador e Fundamentalista?<span class="faq-icon">+</span></button><div class="faq-answer"><p>O IAnalista oferece análise fundamentalista com IA — valuation, score de qualidade e validação de teses. O IAlocador adiciona ferramentas de alocação: dashboard, rankings, radar de oportunidades e otimização de portfólio. O Fundamentalista inclui tudo, mais relatórios exclusivos, planilhas Excel, conteúdos audiovisuais e acesso a grupo fechado.</p></div></div>
-        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">O iAções faz recomendação de compra ou venda de ações?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Não. O iAções é uma plataforma de ferramentas analíticas, não uma casa de análise. Fornecemos dados, cálculos de valuation e indicadores para que você tome suas próprias decisões de investimento com mais informação e autonomia.</p></div></div>
-        <div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('open')">Como funciona a otimização de portfólio por Markowitz?<span class="faq-icon">+</span></button><div class="faq-answer"><p>O IAlocador utiliza a Teoria Moderna de Portfólio de Harry Markowitz para calcular a distribuição ideal entre ativos. Com base na correlação histórica entre ações, o algoritmo encontra a fronteira eficiente — a combinação que maximiza retorno esperado para cada nível de risco aceito pelo investidor.</p></div></div>
+        <div class="faq-item"><button class="faq-question" aria-expanded="false" onclick="var o=this.parentElement.classList.toggle('open');this.setAttribute('aria-expanded',o)">O iAções é uma casa de análise ou corretora?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Nenhum dos dois. O iAções é uma plataforma de tecnologia que oferece ferramentas de análise fundamentalista potencializadas por IA. Não fazemos recomendações de compra/venda, não vendemos ativos e não somos uma corretora.</p></div></div>
+        <div class="faq-item"><button class="faq-question" aria-expanded="false" onclick="var o=this.parentElement.classList.toggle('open');this.setAttribute('aria-expanded',o)">Como funciona a análise por IA?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Nossa IA processa dados financeiros públicos das empresas listadas na B3 e aplica as metodologias de Graham, Bazin e Gordon de forma automatizada. No DCF, você monta seu próprio valuation e a IA analisa criticamente suas premissas. Tudo validado por analista CNPI certificado pela APIMEC.</p></div></div>
+        <div class="faq-item"><button class="faq-question" aria-expanded="false" onclick="var o=this.parentElement.classList.toggle('open');this.setAttribute('aria-expanded',o)">Quem está por trás da plataforma?<span class="faq-icon">+</span></button><div class="faq-answer"><p>A plataforma foi desenvolvida por profissionais certificados — analista CNPI (APIMEC) e gestor CGA (ANBIMA). A IA executa as análises com base nos critérios técnicos definidos por eles, garantindo rigor metodológico em escala.</p></div></div>
+        <div class="faq-item"><button class="faq-question" aria-expanded="false" onclick="var o=this.parentElement.classList.toggle('open');this.setAttribute('aria-expanded',o)">O que significa "zero conflito de interesses"?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Nossa receita vem 100% das assinaturas. Não ganhamos comissão por operações, não vendemos fundos, não fazemos co-distribuição. Nosso compromisso é exclusivamente com a qualidade da análise.</p></div></div>
+        <div class="faq-item"><button class="faq-question" aria-expanded="false" onclick="var o=this.parentElement.classList.toggle('open');this.setAttribute('aria-expanded',o)">Posso cancelar a qualquer momento?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Sim. Planos mensais podem ser cancelados a qualquer momento sem multa. O plano anual pode ser cancelado com reembolso proporcional nos primeiros 30 dias.</p></div></div>
+        <div class="faq-item"><button class="faq-question" aria-expanded="false" onclick="var o=this.parentElement.classList.toggle('open');this.setAttribute('aria-expanded',o)">Quem é o AIrton?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Nosso assistente de IA conversacional. Pergunte sobre qualquer ação da B3, peça comparações, tire dúvidas sobre indicadores. Como ter um analista disponível 24/7.</p></div></div>
+        <div class="faq-item"><button class="faq-question" aria-expanded="false" onclick="var o=this.parentElement.classList.toggle('open');this.setAttribute('aria-expanded',o)">O iAções cobre todas as ações da B3?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Sim. Cobrimos mais de 300 ações listadas na B3, com análise fundamentalista e valuation automatizados para cada uma. A cobertura é atualizada continuamente conforme novas empresas entram no mercado.</p></div></div>
+        <div class="faq-item"><button class="faq-question" aria-expanded="false" onclick="var o=this.parentElement.classList.toggle('open');this.setAttribute('aria-expanded',o)">De onde vêm os dados utilizados nas análises?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Utilizamos dados financeiros públicos das empresas listadas na B3: demonstrações de resultado (DRE), balanços patrimoniais, fluxos de caixa, histórico de dividendos e cotações de mercado. Todos os dados são coletados de fontes oficiais e atualizados automaticamente.</p></div></div>
+        <div class="faq-item"><button class="faq-question" aria-expanded="false" onclick="var o=this.parentElement.classList.toggle('open');this.setAttribute('aria-expanded',o)">Com que frequência os dados são atualizados?<span class="faq-icon">+</span></button><div class="faq-answer"><p>As cotações são atualizadas diariamente. Dados de balanço, DRE e fluxo de caixa são atualizados a cada divulgação trimestral. Os cálculos de valuation são reprocessados automaticamente sempre que novos dados ficam disponíveis.</p></div></div>
+        <div class="faq-item"><button class="faq-question" aria-expanded="false" onclick="var o=this.parentElement.classList.toggle('open');this.setAttribute('aria-expanded',o)">A IA pode errar? Como vocês lidam com isso?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Sim, como qualquer modelo de IA, pode haver erros de interpretação ou cálculo. Por isso, toda a lógica analítica é validada por profissionais certificados — analista CNPI (APIMEC) e gestor CGA (ANBIMA). As análises são ferramentas de apoio à decisão, não recomendações de investimento.</p></div></div>
+        <div class="faq-item"><button class="faq-question" aria-expanded="false" onclick="var o=this.parentElement.classList.toggle('open');this.setAttribute('aria-expanded',o)">Preciso ter experiência com investimentos para usar o iAções?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Não. A plataforma foi projetada para ser acessível tanto para iniciantes quanto para investidores experientes. As análises são apresentadas de forma clara e objetiva, com explicações sobre cada indicador e metodologia utilizada.</p></div></div>
+        <div class="faq-item"><button class="faq-question" aria-expanded="false" onclick="var o=this.parentElement.classList.toggle('open');this.setAttribute('aria-expanded',o)">Qual a diferença entre os planos IAnalista, IAlocador e Fundamentalista?<span class="faq-icon">+</span></button><div class="faq-answer"><p>O IAnalista oferece análise fundamentalista com IA — valuation, score de qualidade e validação de teses. O IAlocador adiciona ferramentas de alocação: dashboard, rankings, radar de oportunidades e otimização de portfólio. O Fundamentalista inclui tudo, mais relatórios exclusivos, planilhas Excel, conteúdos audiovisuais e acesso a grupo fechado.</p></div></div>
+        <div class="faq-item"><button class="faq-question" aria-expanded="false" onclick="var o=this.parentElement.classList.toggle('open');this.setAttribute('aria-expanded',o)">O iAções faz recomendação de compra ou venda de ações?<span class="faq-icon">+</span></button><div class="faq-answer"><p>Não. O iAções é uma plataforma de ferramentas analíticas, não uma casa de análise. Fornecemos dados, cálculos de valuation e indicadores para que você tome suas próprias decisões de investimento com mais informação e autonomia.</p></div></div>
+        <div class="faq-item"><button class="faq-question" aria-expanded="false" onclick="var o=this.parentElement.classList.toggle('open');this.setAttribute('aria-expanded',o)">Como funciona a otimização de portfólio por Markowitz?<span class="faq-icon">+</span></button><div class="faq-answer"><p>O IAlocador utiliza a Teoria Moderna de Portfólio de Harry Markowitz para calcular a distribuição ideal entre ativos. Com base na correlação histórica entre ações, o algoritmo encontra a fronteira eficiente — a combinação que maximiza retorno esperado para cada nível de risco aceito pelo investidor.</p></div></div>
     </div>
 </section>
 
@@ -1753,6 +2155,7 @@
             <a href="/PRIO3/" class="popular-card"><span class="popular-ticker">PRIO3</span><span class="popular-name">PRIO</span></a>
             <a href="/EGIE3/" class="popular-card"><span class="popular-ticker">EGIE3</span><span class="popular-name">Engie Brasil</span></a>
             <a href="/TAEE11/" class="popular-card"><span class="popular-ticker">TAEE11</span><span class="popular-name">Taesa</span></a>
+            <a href="/B3SA3/" class="popular-card"><span class="popular-ticker">B3SA3</span><span class="popular-name">B3</span></a>
         </div>
         <div class="popular-all">
             <a href="/acoes/">Ver todas as ações analisadas →</a>
@@ -1799,5 +2202,148 @@
 })();
 </script>
 
+<script>
+(function(){
+  var _vd = null, _cur = null, _curTicker = '';
+  var _vi = document.getElementById('val-input');
+  var _vdd = document.getElementById('val-dropdown');
+  var _vr = document.getElementById('val-results');
+  var _activeIdx = -1, _filtered = [];
+  var _placeholders = ['PETR4','VALE3','WEGE3','ITUB4','BBAS3'];
+  var _phIdx = 0, _phChar = 0, _phDir = 1, _phTimer;
+
+  function animatePlaceholder() {
+    if (document.activeElement === _vi || _vi.value) return;
+    var word = _placeholders[_phIdx];
+    if (_phDir === 1) {
+      _phChar++;
+      _vi.placeholder = word.substring(0, _phChar);
+      if (_phChar >= word.length) { _phDir = -1; _phTimer = setTimeout(animatePlaceholder, 1200); return; }
+    } else {
+      _phChar--;
+      _vi.placeholder = word.substring(0, _phChar) || '\u00A0';
+      if (_phChar <= 0) { _phDir = 1; _phIdx = (_phIdx + 1) % _placeholders.length; _phTimer = setTimeout(animatePlaceholder, 300); return; }
+    }
+    _phTimer = setTimeout(animatePlaceholder, _phDir === 1 ? 100 : 50);
+  }
+
+  fetch('/valuations.json').then(function(r){return r.json()}).then(function(d){
+    var qd = d._quoteDate; delete d._quoteDate;
+    _vd = d; animatePlaceholder();
+    if (qd) {
+      var parts = qd.split('-');
+      document.getElementById('vw-quote-date').textContent = 'Cotações de fechamento: ' + parts[2] + '/' + parts[1] + '/' + parts[0];
+    }
+  }).catch(function(){});
+
+  function fmt(v) { return v > 0 ? 'R$ ' + v.toFixed(2).replace('.', ',') : '—'; }
+  function upside(fv, p) {
+    if (!fv || fv <= 0) return { text: '—', cls: 'neutral' };
+    var u = (fv / p - 1) * 100;
+    return { text: (u >= 0 ? '+' : '') + u.toFixed(1) + '%', cls: u >= 0 ? 'up' : 'down' };
+  }
+  function setFV(priceId, upsideId, fv, price) {
+    document.getElementById(priceId).textContent = fmt(fv);
+    var u = upside(fv, price);
+    var el = document.getElementById(upsideId);
+    el.textContent = u.text; el.className = 'val-card-upside ' + u.cls;
+  }
+
+  function recalc() {
+    if (!_cur) return;
+    var d = _cur, p = d.price;
+    // Graham: sqrt(22.5 * LPA * VPA) * (1 - margin)
+    var margin = parseFloat(document.getElementById('vw-graham-margin').value) / 100;
+    document.getElementById('vw-graham-margin-val').textContent = (margin * 100).toFixed(0) + '%';
+    var gFV = (d.lpa > 0 && d.vpa > 0) ? Math.sqrt(22.5 * d.lpa * d.vpa) * (1 - margin) : 0;
+    setFV('vw-graham', 'vw-graham-up', gFV, p);
+    document.getElementById('vw-graham-info').innerHTML = 'LPA: <strong>' + fmt(d.lpa) + '</strong> &nbsp; VPA: <strong>' + fmt(d.vpa) + '</strong>';
+    // Bazin: avgDiv / minDY
+    var minDY = parseFloat(document.getElementById('vw-bazin-dy').value) / 100;
+    document.getElementById('vw-bazin-dy-val').textContent = (minDY * 100).toFixed(1) + '%';
+    var avgDiv = d.avgDiv ? (d.avgDiv['5'] || d.divTTM) : d.divTTM;
+    var bFV = avgDiv > 0 ? avgDiv / minDY : 0;
+    setFV('vw-bazin', 'vw-bazin-up', bFV, p);
+    document.getElementById('vw-bazin-info').innerHTML = 'Div. médio (5a): <strong>' + fmt(avgDiv) + '</strong>';
+    // Gordon: D1 / (r - g)
+    var r = parseFloat(document.getElementById('vw-gordon-r').value) / 100;
+    var g = parseFloat(document.getElementById('vw-gordon-g').value) / 100;
+    document.getElementById('vw-gordon-r-val').textContent = (r * 100).toFixed(1) + '%';
+    document.getElementById('vw-gordon-g-val').textContent = (g * 100).toFixed(1) + '%';
+    var dpa = d.divTTM || 0;
+    var d1 = dpa * (1 + g);
+    var kFV = (r > g && d1 > 0) ? d1 / (r - g) : 0;
+    setFV('vw-gordon', 'vw-gordon-up', kFV, p);
+    document.getElementById('vw-gordon-info').innerHTML = 'DPA (TTM): <strong>' + fmt(dpa) + '</strong>';
+  }
+
+  function showResult(ticker) {
+    var d = _vd[ticker]; if (!d) return;
+    _cur = d; _curTicker = ticker;
+    document.getElementById('vw-current').innerHTML = 'Cotação atual de <strong>' + ticker + '</strong> (' + d.name + '): <strong>R$ ' + d.price.toFixed(2).replace('.', ',') + '</strong>';
+    _vr.classList.add('show');
+    _vdd.classList.remove('show');
+    _vi.value = ticker;
+    recalc();
+    _iaTrack('widget_search');
+  }
+
+  // Slider listeners
+  ['vw-graham-margin', 'vw-bazin-dy', 'vw-gordon-r', 'vw-gordon-g'].forEach(function(id) {
+    document.getElementById(id).addEventListener('input', recalc);
+  });
+
+  function renderDropdown(items) {
+    _filtered = items; _activeIdx = -1;
+    if (!items.length) { _vdd.classList.remove('show'); return; }
+    _vdd.innerHTML = items.slice(0, 8).map(function(t) {
+      return '<div class="val-dropdown-item" data-ticker="' + t + '"><span class="dd-ticker">' + t + '</span><span class="dd-name">' + _vd[t].name + '</span></div>';
+    }).join('');
+    _vdd.classList.add('show');
+    _vdd.querySelectorAll('.val-dropdown-item').forEach(function(el) {
+      el.addEventListener('click', function() { showResult(el.dataset.ticker); });
+    });
+  }
+
+  _vi.addEventListener('input', function() {
+    if (!_vd) return;
+    var q = _vi.value.toUpperCase().trim();
+    if (q.length < 1) { _vdd.classList.remove('show'); return; }
+    var keys = Object.keys(_vd);
+    var matches = keys.filter(function(k) { return k.startsWith(q); });
+    if (!matches.length) matches = keys.filter(function(k) { return _vd[k].name.toUpperCase().indexOf(q) >= 0; });
+    matches.sort(function(a, b) { return a === q ? -1 : b === q ? 1 : a.localeCompare(b); });
+    renderDropdown(matches);
+  });
+
+  _vi.addEventListener('keydown', function(e) {
+    var items = _vdd.querySelectorAll('.val-dropdown-item');
+    if (e.key === 'ArrowDown') { e.preventDefault(); _activeIdx = Math.min(_activeIdx + 1, items.length - 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); _activeIdx = Math.max(_activeIdx - 1, 0); }
+    else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (_activeIdx >= 0 && items[_activeIdx]) showResult(items[_activeIdx].dataset.ticker);
+      else if (_filtered.length > 0) showResult(_filtered[0]);
+      return;
+    } else if (e.key === 'Escape') { _vdd.classList.remove('show'); return; }
+    else return;
+    items.forEach(function(el, i) { el.classList.toggle('active', i === _activeIdx); });
+    if (items[_activeIdx]) items[_activeIdx].scrollIntoView({ block: 'nearest' });
+  });
+
+  _vi.addEventListener('focus', function() {
+    clearTimeout(_phTimer);
+    if (_vi.value && _vd) {
+      var q = _vi.value.toUpperCase().trim();
+      var m = Object.keys(_vd).filter(function(k) { return k.startsWith(q); });
+      if (m.length) renderDropdown(m);
+    }
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.val-search-wrap')) _vdd.classList.remove('show');
+  });
+})();
+</script>
 </body>
 </html>

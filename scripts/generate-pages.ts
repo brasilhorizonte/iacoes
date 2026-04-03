@@ -16,6 +16,20 @@ const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 let allTickerData: TickerIndexEntry[] = [];
 const tickerLastmod: Record<string, string> = {};
 
+interface WidgetValuation {
+  name: string;
+  sector: string;
+  price: number;
+  graham: number;
+  bazin: number;
+  gordon: number;
+  lpa: number;
+  vpa: number;
+  divTTM: number;
+  avgDiv: Record<string, number>; // dividends by year-window: "1","3","5","10"
+}
+const widgetValuations: Record<string, WidgetValuation> = {};
+
 async function generatePage(ticker: string): Promise<boolean> {
   try {
     const data = await getFinancialData(ticker);
@@ -51,6 +65,41 @@ async function generatePage(ticker: string): Promise<boolean> {
     const dir = join(ROOT, ticker);
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, 'index.html'), html, 'utf-8');
+
+    // Widget valuation data (Graham, Bazin, Gordon)
+    const grahamFV = val.results.find(r => r.method === 'GRAHAM')?.fairValue || 0;
+    const gordonFV = val.results.find(r => r.method === 'GORDON')?.fairValue || 0;
+    const fiveYearsAgo = new Date(); fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
+    const oneYearAgo = new Date(); oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    const recentDivs = data._rawDividends.filter(d => new Date(d.exDate) >= oneYearAgo);
+    const divTTM = recentDivs.reduce((sum, d) => sum + d.amount, 0);
+    const fiveYearDivs = data._rawDividends.filter(d => new Date(d.exDate) >= fiveYearsAgo);
+    const avgDiv5y = fiveYearDivs.length > 0 ? fiveYearDivs.reduce((s, d) => s + d.amount, 0) / 5 : divTTM;
+    const bazinFV = avgDiv5y > 0 ? avgDiv5y / 0.06 : 0;
+
+    // Compute avg dividends for multiple year windows
+    const now = new Date();
+    const avgDivByWindow: Record<string, number> = {};
+    for (const y of [1, 3, 5, 10]) {
+      const cutoff = new Date(); cutoff.setFullYear(cutoff.getFullYear() - y);
+      const windowDivs = data._rawDividends.filter(d => new Date(d.exDate) >= cutoff);
+      avgDivByWindow[String(y)] = windowDivs.length > 0
+        ? Math.round((windowDivs.reduce((s, d) => s + d.amount, 0) / y) * 100) / 100
+        : 0;
+    }
+
+    widgetValuations[ticker] = {
+      name: data.fundamentals.name,
+      sector: data.fundamentals.sector,
+      price: data.price,
+      graham: Math.round(grahamFV * 100) / 100,
+      bazin: Math.round(bazinFV * 100) / 100,
+      gordon: Math.round(gordonFV * 100) / 100,
+      lpa: Math.round(data.fundamentals.lpa * 100) / 100,
+      vpa: Math.round(data.fundamentals.vpa * 100) / 100,
+      divTTM: Math.round(divTTM * 100) / 100,
+      avgDiv: avgDivByWindow,
+    };
 
     const upside = (val.totalUpside * 100).toFixed(1);
     console.log(`  ✓ ${ticker}: R$ ${data.price.toFixed(2)} → R$ ${val.weightedFairValue.toFixed(2)} (${upside}%)`);
@@ -154,6 +203,12 @@ async function main() {
     const tickersIndex = allTickers.filter(t => allTickerDirs.includes(t.ticker));
     writeFileSync(join(ROOT, 'tickers.json'), JSON.stringify(tickersIndex), 'utf-8');
     console.log(`🔍 tickers.json gerado (${tickersIndex.length} tickers)`);
+
+    // Generate valuations.json for landing page widget
+    const today = new Date().toISOString().split('T')[0];
+    const valuationsWithMeta = { _quoteDate: today, ...widgetValuations };
+    writeFileSync(join(ROOT, 'valuations.json'), JSON.stringify(valuationsWithMeta), 'utf-8');
+    console.log(`📊 valuations.json gerado (${Object.keys(widgetValuations).length} tickers, data: ${today})`);
   }
 
   // Ping search engines to re-crawl sitemap
