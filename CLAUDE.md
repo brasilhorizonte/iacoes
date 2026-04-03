@@ -43,11 +43,15 @@ iacoes/
 │   ├── supabase.ts          # Client Supabase + fetch + mappers de dados
 │   ├── types.ts             # Interfaces TypeScript (FinancialData, ValuationResult, etc.)
 │   └── constants.ts         # Constantes (taxas, pesos, cenarios)
+├── valuations.json          # Dados de valuation para o widget da landing page (gerado automaticamente)
 ├── robots.txt               # Gerado automaticamente
 ├── sitemap.xml              # Gerado automaticamente
 ├── tickers.json             # Lista de tickers gerada (usado pela busca)
 ├── CNAME                    # Dominio iacoes.com.br
 ├── .nojekyll                # Desabilita processamento Jekyll no GitHub Pages
+├── .github/
+│   └── workflows/
+│       └── generate-pages.yml  # Cron diario (seg-sex 20h BRT) para regenerar paginas
 ├── vercel.json              # Config Vercel (cleanUrls, headers)
 ├── package.json             # Scripts npm e dependencias
 ├── .env                     # Credenciais Supabase (NAO commitado)
@@ -160,27 +164,43 @@ Cada pagina gerada contem:
 ## Landing Page (index.html)
 
 A landing page institucional e escrita manualmente (nao gerada). Contem:
-- Hero section com proposta de valor
+- Hero section com proposta de valor (CTA primario dourado)
+- Ticker strip animada (dados estaticos, scroll infinito)
 - Secao de modulos (iAnalista, iAlocador)
-- Secao de features (14 cards)
+- Secao de features (9 cards com emojis + aria-label)
 - Secao de metodologias (Graham, Bazin, Gordon, DCF com layout 2 colunas)
+- **Widget Calculadora de Preco Justo** — calculadora interativa com autocomplete de tickers, sliders para premissas (margem de seguranca Graham, DY minimo Bazin, taxa de desconto/crescimento Gordon), recalculo em tempo real. Dados carregados de `/valuations.json` (gerado no build). Exibe data da cotacao. Tease para DCF na plataforma paga.
 - Secao de diferenciais (sem conflito de interesse, IA, etc.)
-- Secao comparativa de recursos (tabela IAnalista vs IAlocador vs Fundamentalista)
-- Secao de precos (3 planos: IAnalista, IAlocador, Fundamentalista)
+- Secao comparativa vs mercado (Corretoras vs Casas de Research vs iAcoes)
+- Secao de precos (3 planos: IAnalista, IAlocador, Fundamentalista) — badge "MAIS POPULAR" no IAlocador
+- Secao comparativa de recursos (tabela Free vs IAnalista vs IAlocador vs Fundamentalista) — Free com limitacoes (1/dia), inclui Painel Macro no IAlocador
 - Secao "Sobre Nos" (#sobre) — bios dos fundadores com credenciais CNPI (APIMEC) e CGA (ANBIMA), links sociais (LinkedIn, Twitter/X, Instagram, Telegram)
-- FAQ expandido (14 perguntas com Schema.org FAQPage)
-- Secao de acoes populares (20 tickers + link para /acoes/)
+- FAQ expandido (14 perguntas com Schema.org FAQPage, aria-expanded)
+- Secao de acoes populares (21 tickers + link para /acoes/)
 - Footer com links sociais (LinkedIn, Twitter/X, Instagram, Telegram)
 - Multiplos CTAs com tracking (`_iaClick`) apontando para `/authnew`
 - Design system: DM Sans + JetBrains Mono, paleta verde escuro (#093848) + dourado (#B8923E)
-- Schema.org: Organization (com `founder` Person + `hasCredential` + `sameAs` 6 links), WebSite (com SearchAction), FAQPage (14 Q&As)
+- Schema.org: Organization, WebSite (com SearchAction), FAQPage (14 Q&As), Product (3 planos com precos), SpeakableSpecification (AEO)
+
+### Widget Calculadora (`valuations.json`)
+
+O widget da landing page carrega `/valuations.json` via fetch. Este arquivo e gerado automaticamente pelo `generate-pages.ts` e contem para cada ticker:
+- `name`, `sector`, `price` (cotacao atual)
+- `graham`, `bazin`, `gordon` (precos justos pre-calculados)
+- `lpa`, `vpa` (lucro e valor patrimonial por acao)
+- `divTTM` (dividendos trailing twelve months)
+- `avgDiv` (media de dividendos por janela: 1, 3, 5 e 10 anos)
+- `_quoteDate` (campo global com data da geracao)
+
+O JavaScript inline na landing recalcula os precos justos em tempo real quando o usuario ajusta os sliders. Tracking via `_iaTrack('widget_search')`.
 
 ## Design System
 
 ### Landing page (index.html)
 - Fontes: DM Sans (display), JetBrains Mono (mono)
-- Cores: verde escuro `#2B3A2B`, dourado `#B8923E`, fundo `#FAFAF8`
-- Nav: fundo `#2B3A2B`
+- Cores: verde escuro `#093848`, dourado `#B8923E`, fundo `#FAFAF8`
+- Nav: fundo `#093848`
+- Texto terciario: `#737068` (ajustado para WCAG AA)
 
 ### Paginas de ticker
 - Fontes: Playfair Display (titulos), Montserrat (corpo), SFMono (numeros)
@@ -210,8 +230,18 @@ A landing page institucional e escrita manualmente (nao gerada). Contem:
 4. Processa em batches de 5 com 300ms de delay entre batches
 5. Para cada ticker: fetch dados → calcula valuation → gera HTML → salva em `/{TICKER}/index.html`
 6. Gera `sitemap.xml` (inclui TODAS as paginas de ticker existentes no disco, nao apenas as da execucao atual), `robots.txt` e `tickers.json`
-7. Gera `/acoes/index.html` (pagina indice com todos os tickers, inclui Twitter Card, og:image e keywords)
-8. Resultado: arquivos estaticos prontos para commit e push
+7. Gera `valuations.json` (dados de Graham, Bazin, Gordon, LPA, VPA, dividendos para o widget da landing page)
+8. Gera `/acoes/index.html` (pagina indice com todos os tickers, inclui Twitter Card, og:image e keywords)
+9. Resultado: arquivos estaticos prontos para commit e push
+
+### Cron Automatico (GitHub Actions)
+
+O workflow `.github/workflows/generate-pages.yml` roda automaticamente:
+- **Frequencia:** Seg-Sex as 23:00 UTC (20:00 BRT), apos fechamento da B3
+- **Trigger manual:** Disponivel via GitHub Actions UI (`workflow_dispatch`)
+- **Secrets necessarios:** `SUPABASE_URL` e `SUPABASE_ANON_KEY` (configurados no repositorio)
+- **Processo:** Gera todas as paginas, cria redirects lowercase (SEO), commita e faz push automaticamente
+- **Nota macOS:** Os redirects lowercase (`aalr3/index.html`) causam conflito no filesystem case-insensitive do macOS. Usar clone temporario em `/tmp` para push quando necessario
 
 ## Analytics
 
@@ -223,6 +253,7 @@ Todas as paginas (landing, ticker, indice) incluem:
 ### Eventos rastreados
 - `pageview` — dispara automaticamente ao carregar qualquer pagina
 - `cta_click` — dispara ao clicar em qualquer CTA que aponta para `app.brasilhorizonte.com.br`
+- `widget_search` — dispara quando o usuario seleciona um ticker no widget da calculadora (landing page)
 
 ### Implementacao tecnica
 - `_iaTrack(eventType)` — funcao base que faz POST na tabela com `keepalive:true`
@@ -240,8 +271,12 @@ Todas as paginas (landing, ticker, indice) incluem:
 
 ## TODO / Roadmap
 
-- [ ] Configurar GitHub Actions para regeneracao automatica (cron diario)
+- [x] Configurar GitHub Actions para regeneracao automatica (cron diario) — seg-sex 20h BRT
+- [x] Adicionar SpeakableSpecification para AEO
+- [x] Widget calculadora de preco justo na landing page
+- [x] Schema.org Product para os planos
 - [ ] Unificar design system entre landing page e paginas de ticker
-- [ ] Criar imagem OG 1200x630 (atual e 300x300)
+- [ ] Criar imagem OG 1200x628 (atual e 300x300)
 - [ ] Adicionar informacoes de contato visiveis (email/telefone)
-- [ ] Adicionar SpeakableSpecification para AEO
+- [ ] Social proof na landing page (depoimentos, numero de usuarios)
+- [ ] Lead magnet / captura de email (newsletter, analise semanal gratis)
