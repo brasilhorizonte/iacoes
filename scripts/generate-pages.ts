@@ -205,8 +205,15 @@ async function main() {
     console.log(`🔍 tickers.json gerado (${tickersIndex.length} tickers)`);
 
     // Generate valuations.json for landing page widget
-    const today = new Date().toISOString().split('T')[0];
-    const valuationsWithMeta = { _quoteDate: today, ...widgetValuations };
+    // Data de fechamento = dia útil anterior em BRT (o build roda após o fechamento)
+    const nowBRT = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+    nowBRT.setDate(nowBRT.getDate() - 1); // dia anterior (fechamento)
+    // Pular fim de semana: se caiu no domingo, volta para sexta; se sábado, volta para sexta
+    const dow = nowBRT.getDay();
+    if (dow === 0) nowBRT.setDate(nowBRT.getDate() - 2);
+    else if (dow === 6) nowBRT.setDate(nowBRT.getDate() - 1);
+    const quoteDate = nowBRT.toISOString().split('T')[0];
+    const valuationsWithMeta = { _quoteDate: quoteDate, ...widgetValuations };
     writeFileSync(join(ROOT, 'valuations.json'), JSON.stringify(valuationsWithMeta), 'utf-8');
     console.log(`📊 valuations.json gerado (${Object.keys(widgetValuations).length} tickers, data: ${today})`);
   }
