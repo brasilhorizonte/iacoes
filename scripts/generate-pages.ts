@@ -214,7 +214,7 @@ async function main() {
     const quoteDate = nowBRT.toISOString().split('T')[0];
     const valuationsWithMeta = { _quoteDate: quoteDate, ...widgetValuations };
     writeFileSync(join(ROOT, 'valuations.json'), JSON.stringify(valuationsWithMeta), 'utf-8');
-    console.log(`📊 valuations.json gerado (${Object.keys(widgetValuations).length} tickers, data: ${today})`);
+    console.log(`📊 valuations.json gerado (${Object.keys(widgetValuations).length} tickers, data: ${quoteDate})`);
   }
 
   // Ping search engines to re-crawl sitemap
