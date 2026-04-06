@@ -351,16 +351,16 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   <meta property="article:tag" content="${f.sector}">
 
   <!-- Open Graph Image -->
-  <meta property="og:image" content="https://iacoes.com.br/assets/img/og-brasilhorizonte.png">
-  <meta property="og:image:width" content="300">
-  <meta property="og:image:height" content="300">
+  <meta property="og:image" content="https://iacoes.com.br/assets/img/og-iacoes.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="628">
   <meta property="og:image:alt" content="${f.symbol} — Análise Fundamentalista | iAções">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${ogTitle}">
   <meta name="twitter:description" content="${desc}">
-  <meta name="twitter:image" content="https://iacoes.com.br/assets/img/og-brasilhorizonte.png">
+  <meta name="twitter:image" content="https://iacoes.com.br/assets/img/og-iacoes.png">
   <meta name="twitter:image:alt" content="${f.symbol} — Análise Fundamentalista | iAções">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1952,7 +1952,9 @@ export const generateIndexHTML = (tickers: TickerIndexEntry[]): string => {
   <meta property="og:url" content="https://iacoes.com.br/acoes/">
   <meta property="og:site_name" content="iAções — Análise de Ações | Brasil Horizonte">
   <meta property="og:locale" content="pt_BR">
-  <meta property="og:image" content="https://iacoes.com.br/assets/img/og-brasilhorizonte.png">
+  <meta property="og:image" content="https://iacoes.com.br/assets/img/og-iacoes.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="628">
   <meta property="og:image:alt" content="Todas as Ações da B3 — iAções">
   <meta name="keywords" content="ações B3, análise fundamentalista, preço justo, valuation, Graham, Bazin, Gordon, bolsa brasileira, investimentos, P/L, dividend yield, ROE, iAções, Brasil Horizonte">
 
@@ -1960,7 +1962,7 @@ export const generateIndexHTML = (tickers: TickerIndexEntry[]): string => {
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Todas as Ações da B3 — Análise Fundamentalista ${year} | iAções">
   <meta name="twitter:description" content="Lista completa de ${tickers.length} ações da B3 com indicadores fundamentalistas atualizados.">
-  <meta name="twitter:image" content="https://iacoes.com.br/assets/img/og-brasilhorizonte.png">
+  <meta name="twitter:image" content="https://iacoes.com.br/assets/img/og-iacoes.png">
   <meta name="twitter:image:alt" content="Todas as Ações da B3 — iAções">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
