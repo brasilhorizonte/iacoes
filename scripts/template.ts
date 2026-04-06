@@ -202,9 +202,9 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
 
   // SEO: meta description, title, FAQ
   const currentYear = new Date().getFullYear();
-  const desc = `${f.symbol} vale a pena? Preço justo de R$ ${fmt(grahamFV)} (Graham), R$ ${fmt(bazinFV)} (Bazin) e R$ ${fmt(gordonFV)} (Gordon). P/L ${fmtNum(f.pl)}, DY ${fmtPctShort(f.divYield)}, ROE ${fmtPctShort(f.roe)}. Histórico de dividendos e análise fundamentalista completa.`;
-  const titleTag = `${f.symbol} Preço Justo, Valuation e Dividendos ${currentYear} | Análise Fundamentalista | iAções`;
-  const ogTitle = `${f.symbol} vale a pena? Preço Justo R$ ${fmt(grahamFV)} (Graham) | iAções`;
+  const desc = `Calculadora de valor justo para ${f.name} (${f.symbol}) com Graham, Bazin e Gordon. Premissas ajustáveis — calcule o valor justo agora. Indicadores, balanço e dividendos atualizados.`;
+  const titleTag = `${f.symbol} Está Cara ou Barata? Calcule o Valor Justo | iAções`;
+  const ogTitle = `${f.symbol} Está Cara ou Barata? Calcule o Valor Justo | iAções`;
   const sectorSlugVal = sectorSlug(f.sector || '');
   const faqItems = [
     {
@@ -228,16 +228,24 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       a: `${divByYear.has(String(currentYear - 1)) ? `Em ${currentYear - 1}, ${f.symbol} distribuiu R$ ${fmt(divByYear.get(String(currentYear - 1))!.total)} por ação em ${divByYear.get(String(currentYear - 1))!.count} pagamentos entre dividendos e JCP.` : `${f.symbol} não possui registros de dividendos pagos em ${currentYear - 1}.`} Para baixar o histórico completo de proventos com datas e valores, insira seu e-mail na seção de dividendos acima.`
     },
     {
-      q: `Qual o preço justo de ${f.symbol} pelo método de Graham?`,
-      a: `Pelo método de Graham, o preço justo estimado de ${f.symbol} é de R$ ${fmt(grahamFV)}. Esse cálculo utiliza a fórmula de valor intrínseco de Benjamin Graham, baseada no lucro por ação (LPA = R$ ${fmt(f.lpa)}) e no valor patrimonial por ação (VPA = R$ ${fmt(f.vpa)}). A fórmula é: Valor Intrínseco = √(22,5 × LPA × VPA), com ajuste por margem de segurança. É um método mais adequado para empresas lucrativas com patrimônio sólido.`
+      q: `Como calcular o preço justo de ${f.symbol}?`,
+      a: `Use 3 métodos clássicos de valuation disponíveis nesta página: Graham (baseado em LPA e VPA), Bazin (baseado em dividendos) e Gordon (modelo de desconto de dividendos). Ajuste as premissas como margem de segurança, DY mínimo e taxa de desconto para encontrar o valor justo de ${f.name} segundo a sua análise. Para uma análise mais completa com DCF (Fluxo de Caixa Descontado), acesse a plataforma Brasil Horizonte.`
     },
     {
-      q: `Qual o preço justo de ${f.symbol} pelo método de Bazin?`,
-      a: `Pelo método de Bazin, o preço justo estimado de ${f.symbol} é de R$ ${fmt(bazinFV)}. A metodologia de Décio Bazin calcula o preço máximo que um investidor deveria pagar para obter um dividend yield mínimo de 6%. A fórmula é: Preço Justo = Dividendo Médio (5 anos) ÷ 0,06. ${avgDiv5y > 0 ? 'A média de dividendos dos últimos 5 anos foi de R$ ' + fmt(avgDiv5y) + ' por ação.' : 'A empresa não possui histórico suficiente de dividendos para este cálculo.'}`
+      q: `O que é a fórmula de Graham para ${f.symbol}?`,
+      a: `A fórmula de Benjamin Graham calcula o valor intrínseco de uma ação com base no lucro por ação (LPA) e no valor patrimonial por ação (VPA). A fórmula é: Valor Intrínseco = √(22,5 × LPA × VPA), com ajuste por margem de segurança. É um método mais adequado para empresas lucrativas com patrimônio sólido. Use a calculadora acima para calcular o valor justo de ${f.symbol} com suas próprias premissas.`
     },
     {
-      q: `Qual o preço justo de ${f.symbol} pelo modelo de Gordon?`,
-      a: `Pelo modelo de Gordon (DDM — Dividend Discount Model), o preço justo estimado de ${f.symbol} é de R$ ${fmt(gordonFV)}. O modelo calcula o valor presente de todos os dividendos futuros projetados, utilizando a fórmula: P = D1 ÷ (r − g), onde D1 é o dividendo projetado para o próximo ano, r é a taxa de desconto e g é a taxa de crescimento perpétuo dos dividendos. É um modelo mais adequado para empresas com dividendos estáveis e previsíveis.`
+      q: `Como funciona o modelo de Bazin para ${f.symbol}?`,
+      a: `A metodologia de Décio Bazin calcula o preço máximo que um investidor deveria pagar para obter um dividend yield mínimo desejado. A fórmula é: Preço Justo = Dividendo Médio (últimos anos) ÷ DY mínimo. É ideal para investidores focados em renda passiva. Ajuste o DY mínimo na calculadora acima para simular diferentes cenários para ${f.symbol}.`
+    },
+    {
+      q: `Como funciona o modelo de Gordon para ${f.symbol}?`,
+      a: `O modelo de Gordon (DDM — Dividend Discount Model) calcula o valor presente de todos os dividendos futuros projetados. A fórmula é: P = D1 ÷ (r − g), onde D1 é o dividendo projetado, r é a taxa de desconto e g é a taxa de crescimento perpétuo dos dividendos. Ajuste a taxa de desconto e crescimento na calculadora acima para simular o valor justo de ${f.symbol}.`
+    },
+    {
+      q: `O que é o DCF (Fluxo de Caixa Descontado) e como aplicar em ${f.symbol}?`,
+      a: `O DCF (Discounted Cash Flow) é o método mais completo de valuation, projetando os fluxos de caixa livres futuros da empresa e trazendo-os a valor presente usando o WACC como taxa de desconto. Diferente de Graham, Bazin e Gordon, o DCF considera a operação completa da empresa. Acesse a plataforma Brasil Horizonte para calcular o DCF de ${f.symbol} com projeções detalhadas de receita, margens e CAPEX.`
     },
     {
       q: `Qual o nível de endividamento de ${f.symbol}?`,
@@ -2376,20 +2384,6 @@ export const generateSitemap = (tickers: string[], sectors: string[] = [], lastm
 ${urls.join('\n')}
 </urlset>`;
 };
-
-export const generateLowercaseRedirect = (ticker: string): string => `<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>${ticker} — Análise Fundamentalista | iAções</title>
-  <link rel="canonical" href="https://iacoes.com.br/${ticker}/">
-  <meta http-equiv="refresh" content="0; url=https://iacoes.com.br/${ticker}/">
-  <meta name="robots" content="noindex, follow">
-</head>
-<body>
-  <p>Redirecionando para <a href="/${ticker}/">${ticker}</a>...</p>
-</body>
-</html>`;
 
 export const generateRobots = (): string => `User-agent: *
 Allow: /

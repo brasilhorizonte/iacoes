@@ -181,10 +181,9 @@ async function main() {
     }
 
     // Sitemap includes ALL existing ticker pages on disk, not just current run
-    // Excludes lowercase redirects (only uppercase canonical pages go in sitemap)
     const allTickerDirs = readdirSync(ROOT).filter(d => {
       if (d === 'acoes' || d === 'assets' || d === 'scripts' || d === 'node_modules' || d.startsWith('.')) return false;
-      if (d !== d.toUpperCase()) return false; // skip lowercase redirect dirs
+      if (d !== d.toUpperCase()) return false;
       const p = join(ROOT, d, 'index.html');
       try { return statSync(p).isFile(); } catch { return false; }
     });

@@ -240,8 +240,8 @@ O workflow `.github/workflows/generate-pages.yml` roda automaticamente:
 - **Frequencia:** Seg-Sex as 23:00 UTC (20:00 BRT), apos fechamento da B3
 - **Trigger manual:** Disponivel via GitHub Actions UI (`workflow_dispatch`)
 - **Secrets necessarios:** `SUPABASE_URL` e `SUPABASE_ANON_KEY` (configurados no repositorio)
-- **Processo:** Gera todas as paginas, cria redirects lowercase (SEO), commita e faz push automaticamente
-- **Nota macOS:** Os redirects lowercase (`aalr3/index.html`) causam conflito no filesystem case-insensitive do macOS. Usar clone temporario em `/tmp` para push quando necessario
+- **Processo:** Gera todas as paginas, commita e faz push automaticamente
+- **Nota:** Redirects case-insensitive sao tratados pelo `404.html` via JavaScript client-side (converte path para uppercase)
 
 ## Analytics
 
