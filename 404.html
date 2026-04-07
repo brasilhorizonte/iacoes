@@ -5,13 +5,33 @@
 <script>
 (function() {
     var path = window.location.pathname;
-    var upper = path.toUpperCase();
-    if (upper !== path) {
-        window.location.replace(window.location.origin + upper);
+    // Only redirect if path looks like a ticker: /XXXX3/ or /xxxx11/ etc.
+    var match = path.match(/^\/([A-Za-z]{4}\d{1,2})\/?$/);
+    if (match) {
+        var upper = '/' + match[1].toUpperCase() + '/';
+        if (upper !== path) {
+            window.location.replace(window.location.origin + upper);
+            return;
+        }
     }
+    // For non-ticker paths, show 404 content
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.style.display = 'block';
+    });
 })();
 </script>
-<title>Redirecionando...</title>
+<title>Página não encontrada | iAções</title>
+<style>
+body { display: none; font-family: system-ui, sans-serif; text-align: center; padding: 4rem 1rem; color: #0f172a; background: #f5f3ef; }
+h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+p { color: #64748b; margin-bottom: 2rem; }
+a { color: #B68F40; text-decoration: none; font-weight: 600; }
+a:hover { text-decoration: underline; }
+</style>
 </head>
-<body></body>
+<body>
+<h1>Página não encontrada</h1>
+<p>O endereço que você acessou não existe ou foi removido.</p>
+<a href="/">Voltar para o iAções</a> &middot; <a href="/acoes/">Ver todas as ações</a>
+</body>
 </html>

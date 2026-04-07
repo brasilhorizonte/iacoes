@@ -15,6 +15,21 @@ const supabaseAdmin = SUPABASE_SERVICE_KEY
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
   : null;
 
+// --- Sector normalization (dedup English/Portuguese variants) ---
+const SECTOR_NORMALIZE: Record<string, string> = {
+  'Consumer Cyclical': 'Consumo Cíclico',
+  'Industrials': 'Bens Industriais',
+  'Real Estate': 'Construção e Imobiliário',
+  'Utilities': 'Energia',
+  'Materiais': 'Materiais Básicos',
+  'Fundos Imobiliários': '',  // não é setor de ações
+};
+
+const normalizeSector = (s: string): string => {
+  const trimmed = s.trim();
+  return SECTOR_NORMALIZE[trimmed] ?? trimmed;
+};
+
 // --- Helpers ---
 
 const toNumber = (value: unknown): number => {
@@ -126,7 +141,7 @@ const mapBrapi = (row: Record<string, any>): RawBrapiQuote => {
     enterpriseValue: toNumber(pick(r, ['enterprise_value'])),
     priceToBook: toNumber(pick(r, ['price_to_book', 'pvp'])),
     priceToSalesTrailing12Months: toNumber(pick(r, ['price_to_sales_ttm'])),
-    sector: toStr(pick(r, ['sector'])),
+    sector: normalizeSector(toStr(pick(r, ['sector']))),
     industry: toStr(pick(r, ['industry', 'sub_sector'])),
     longBusinessSummary: toStr(pick(r, ['long_business_summary_ptbr', 'long_business_summary'])),
     pl: toNumber(pick(r, ['pl'])),
@@ -276,7 +291,7 @@ export const getAllTickersWithSector = async (): Promise<TickerIndexEntry[]> => 
   return data.map((r: any) => ({
     ticker: String(r.symbol).toUpperCase(),
     name: String(r.short_name || r.long_name || '').trim(),
-    sector: String(r.sector || '').trim(),
+    sector: normalizeSector(String(r.sector || '').trim()),
     price: toNumber(r.price) || toNumber(r.regular_market_price),
     pl: toNumber(r.pl),
     divYield: toNumber(r.dividend_yield),

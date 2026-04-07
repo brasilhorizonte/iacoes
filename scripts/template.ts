@@ -1277,7 +1277,7 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
   <ol>
     <li><a href="/">iAções</a></li>
     <li><a href="/acoes/">Ações</a></li>
-    ${f.sector ? `<li><a href="/acoes/#setor-${encodeURIComponent(f.sector.toLowerCase().replace(/[^a-z0-9]+/g, '-'))}">${f.sector}</a></li>` : ''}
+    ${f.sector && sectorSlugVal ? `<li><a href="/acoes/${sectorSlugVal}/">${f.sector}</a></li>` : ''}
     <li aria-current="page">${f.symbol}</li>
   </ol>
 </nav>
@@ -1712,7 +1712,7 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
         <span class="peer-price">R$ ${fmt(p.price)}</span>
       </a>`).join('')}
     </div>
-    <a href="/acoes/#setor-${sectorSlugVal}" class="peers-more">Ver todas as ações de ${f.sector} &rarr;</a>
+    ${sectorSlugVal ? `<a href="/acoes/${sectorSlugVal}/" class="peers-more">Ver todas as ações de ${f.sector} &rarr;</a>` : ''}
   </section>` : ''}
 
   <!-- FAQ SEO -->
@@ -1735,6 +1735,17 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
   </section>
 
   </article>
+
+  <!-- AÇÕES POPULARES (linking interno cross-sector) -->
+  <nav class="section-card popular-tickers" aria-label="Ações populares no iAções">
+    <h2 class="section-title font-playfair" style="font-size:1.1rem;margin-bottom:0.8rem;">Ações populares</h2>
+    <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">
+      ${['PETR4','VALE3','ITUB4','BBAS3','WEGE3','BBDC4','ABEV3','RENT3','SUZB3','GGBR4','CSNA3','HAPV3','CPLE6','TAEE11','ELET3','BPAC11','ITSA4','VIVT3','MGLU3','JBSS3'].filter(t => t !== f.symbol).slice(0, 15).map(t =>
+        `<a href="/${t}/" style="padding:0.3rem 0.6rem;background:#f8f6f1;border:1px solid #e2e8f0;border-radius:4px;font-size:0.75rem;font-weight:600;color:#0f172a;text-decoration:none;font-family:SFMono-Regular,monospace;">${t}</a>`
+      ).join('')}
+    </div>
+    <a href="/acoes/" style="display:inline-block;margin-top:0.6rem;font-size:0.8rem;color:#B68F40;text-decoration:none;font-weight:500;">Ver todas as ações &rarr;</a>
+  </nav>
 
   <!-- DISCLAIMER -->
   <footer class="disclaimer" role="contentinfo">
