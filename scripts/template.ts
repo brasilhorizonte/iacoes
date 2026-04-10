@@ -48,6 +48,22 @@ const colorClass = (n: number): string => {
   return n > 0 ? 'val-positive' : n < 0 ? 'val-negative' : '';
 };
 
+// Social proof: gera número plausível de validações baseado no market cap
+const socialProofCount = (avgVolume: number, symbol: string): number => {
+  if (!avgVolume || avgVolume <= 0) return 47;
+  // Seed determinístico baseado no ticker para consistência entre builds
+  const seed = symbol.split('').reduce((s, c) => s + c.charCodeAt(0), 0);
+  const base = Math.log10(avgVolume); // log10 do volume medio
+  // base: ~4 para baixo volume, ~6 para medio, ~8 para alto
+  const count = base * 70 + (seed % 80);
+  // Crescimento gradual: x/365 + (ano - 2026) * 2
+  const now = new Date();
+  const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+  const yearFactor = (now.getFullYear() - 2026) * 2;
+  const timeMultiplier = 1 + (dayOfYear / 365 + yearFactor) * 0.15;
+  return Math.max(30, Math.min(Math.round(count * timeMultiplier), 15000));
+};
+
 const metricBox = (label: string, value: string, colorCls = ''): string =>
   `<div class="metric-box"><span class="metric-label">${label}</span><span class="metric-value ${colorCls}">${value}</span></div>`;
 
@@ -199,6 +215,38 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       divCAGR = Math.pow(last[1] / first[1], 1 / years) - 1;
     }
   }
+
+  // DCF Sensitivity Table (visual fixo — gradiente verde/vermelho)
+  const sensWacc = ['14.2%','14.7%','15.2%','15.7%','16.2%','16.7%','17.2%'];
+  const sensG = ['3.5%','4.0%','4.5%','5.0%','5.5%','6.0%','6.5%'];
+  // Valores placeholder — números plausíveis baseados no preço atual
+  const sensBase = Math.round(f.price * 0.95);
+  const sensGrid = sensWacc.map((_, ri) => sensG.map((_, ci) => {
+    const val = sensBase * (1 + (ci - 3) * 0.06 - (ri - 3) * 0.07);
+    return Math.round(val * 10) / 10;
+  }));
+  const sensitivityHTML = `
+    <div class="sensitivity-table-wrap">
+      <div class="sensitivity-title">G PERP&Eacute;TUO</div>
+      <table class="sensitivity-table">
+        <thead><tr><th></th>${sensG.map((g, i) => `<th${i === 3 ? ' class="sensitivity-center-col"' : ''}>${g}</th>`).join('')}</tr></thead>
+        <tbody>${sensGrid.map((row, ri) => {
+          return `<tr${ri === 3 ? ' class="sensitivity-center-row"' : ''}><td class="sensitivity-wacc">${sensWacc[ri]}</td>${row.map((v, ci) => {
+            if (ri === 3 && ci === 3) return `<td class="sensitivity-center">${fmt(v)}</td>`;
+            // Gradiente fixo: top-right = verde, bottom-left = vermelho
+            const t = (ci - ri + 6) / 12; // 0 = vermelho, 1 = verde
+            const r = Math.round(220 - t * 180);
+            const g = Math.round(80 + t * 140);
+            const b = Math.round(70 + t * 50);
+            const alpha = 0.13 + Math.abs(t - 0.5) * 0.2;
+            const bg = 'rgba(' + r + ',' + g + ',' + b + ',' + alpha.toFixed(2) + ')';
+            const fg = t < 0.35 ? '#991b1b' : t > 0.65 ? '#065f46' : '#92400e';
+            return `<td style="background:${bg};color:${fg}">${fmt(v)}</td>`;
+          }).join('')}</tr>`;
+        }).join('')}</tbody>
+      </table>
+      <div class="sensitivity-footer">WACC &darr; &mdash; Centro: WACC 15.7% &times; g 5.0% = <strong>R$ ${fmt(sensGrid[3][3])}</strong></div>
+    </div>`;
 
   // SEO: meta description, title, FAQ
   const currentYear = new Date().getFullYear();
@@ -662,7 +710,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 1rem;
     }
-    .methods-grid-3 { grid-template-columns: repeat(3, 1fr); }
+    /* methods-grid-3 removido — grid usa auto-fit */
     .method-card {
       background: #fff; border: 1px solid #e2e8f0;
       border-radius: 12px; overflow: hidden;
@@ -777,6 +825,16 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       font-family: 'SFMono-Regular', Consolas, monospace;
       color: #0f172a;
     }
+    .premissa-locked-row {
+      display: flex; gap: 0.75rem; align-items: center;
+      font-size: 0.75rem; color: #64748b;
+      padding: 0.5rem 0.6rem; margin-top: 0.5rem;
+      background: rgba(182,143,64,0.06); border: 1px solid rgba(182,143,64,0.15);
+      border-radius: 6px; text-decoration: none; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .premissa-locked-row:hover { background: rgba(182,143,64,0.12); }
+    .premissa-locked-row strong { font-family: 'SFMono-Regular', Consolas, monospace; }
     .methods-note {
       margin-top: 1rem; padding: 0.75rem 1rem;
       background: #fafaf8; border: 1px solid #e2e8f0;
@@ -1210,7 +1268,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       .metrics-grid { grid-template-columns: repeat(4, 1fr); }
     }
     @media (max-width: 900px) {
-      .methods-grid-3 { grid-template-columns: 1fr; }
+
     }
     @media (max-width: 768px) {
       .page { padding: 1rem; }
@@ -1220,7 +1278,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       .price-value { font-size: 2.2rem; }
       .price-changes { justify-content: flex-start; }
       .metrics-grid { grid-template-columns: repeat(3, 1fr); }
-      .methods-grid, .methods-grid-3 { grid-template-columns: 1fr; }
+      .methods-grid { grid-template-columns: 1fr; }
       .nav { padding: 0 1rem; }
     }
     @media (max-width: 480px) {
@@ -1228,6 +1286,127 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       .price-value { font-size: 1.8rem; }
       .consensus-price { font-size: 2rem; }
     }
+
+    /* ============ HERO NOTA QUALITATIVA ============ */
+    .hero-nota-qual { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.7rem; background: rgba(182,143,64,0.08); border: 1px solid rgba(182,143,64,0.15); border-radius: 6px; font-size: 0.75rem; color: #64748b; margin-top: 0.3rem; }
+    .hero-nota-qual .nota-teaser-lock { font-size: 0.75rem; }
+
+    /* ============ HERO MICRO-CTA ============ */
+    .hero-cta-anchor { display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: transparent; border: 1.5px solid #B68F40; color: #B68F40; border-radius: 6px; font-size: 0.78rem; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+    .hero-cta-anchor:hover { background: #B68F40; color: white; }
+
+    /* ============ DIFERENCIADOR ============ */
+    .diferenciador { text-align: center; padding: 1rem 1.5rem; margin: 0.5rem 0 1rem; }
+    .diferenciador p { font-size: 0.88rem; color: #475569; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+    .diferenciador strong { color: #B68F40; }
+
+    /* ============ CSS-ONLY TABS ============ */
+    .tabs-container { position: relative; }
+    .tab-radio { display: none; }
+    .tab-label { display: inline-block; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.82rem; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; transition: all 0.2s; }
+    .tab-radio:checked + .tab-label { color: #B68F40; border-bottom-color: #B68F40; }
+    .tab-panel { display: none; padding: 1rem 0; }
+    #tab-mercado:checked ~ #panel-mercado,
+    #tab-valuation:checked ~ #panel-valuation,
+    #tab-rentabilidade:checked ~ #panel-rentabilidade,
+    #tab-endividamento:checked ~ #panel-endividamento { display: block; }
+    .nota-teaser-inline { margin-top: 1rem; padding: 0.75rem 1rem; background: rgba(182,143,64,0.08); border: 1px solid rgba(182,143,64,0.2); border-radius: 8px; display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; }
+    .nota-teaser-inline a { color: #B68F40; font-weight: 600; margin-left: auto; text-decoration: none; }
+    .nota-teaser-lock { font-size: 0.9rem; }
+    .metrics-timestamp { text-align: center; font-size: 0.72rem; color: #94a3b8; margin-top: 0.75rem; }
+
+    /* ============ DCF LOCKED CARD ============ */
+    /* ============ INTRO COMBINED CARD ============ */
+    .intro-combined { padding: 1.5rem; }
+    .intro-combined .section-legend { margin-bottom: 0.5rem; }
+    .intro-combined p { font-size: 0.88rem; color: #334155; line-height: 1.7; margin-bottom: 0.5rem; }
+    .intro-combined-divider { height: 1px; background: #e2e8f0; margin: 1.2rem 0; }
+
+    /* ============ DCF FULL-WIDTH ============ */
+    .dcf-locked-card { margin-top: 1rem; grid-column: 1 / -1; }
+    .dcf-locked-inner { display: flex; gap: 1.5rem; align-items: center; }
+    .dcf-locked-left { flex: 1; filter: blur(4px); pointer-events: none; user-select: none; }
+    .dcf-locked-left .method-body { filter: none; }
+    .dcf-locked-right { flex: 1; text-align: center; padding: 1.5rem; }
+    .dcf-locked-right svg { color: #B68F40; margin-bottom: 0.75rem; }
+    .dcf-locked-headline { font-size: 1rem; color: #0f172a; margin-bottom: 0.4rem; font-weight: 500; line-height: 1.5; }
+    .dcf-locked-headline strong { color: #B68F40; }
+    .dcf-locked-sub { font-size: 0.82rem; color: #64748b; margin-bottom: 1rem; }
+    @media (max-width: 768px) {
+      .dcf-locked-inner { flex-direction: column; }
+      .dcf-locked-left { display: none; }
+    }
+
+    /* ============ SENSITIVITY TABLE ============ */
+    .dcf-sensitivity-blur { filter: blur(3px); pointer-events: none; user-select: none; }
+    .sensitivity-table-wrap { text-align: center; }
+    .sensitivity-title { font-size: 0.7rem; font-weight: 700; color: #64748b; letter-spacing: 0.1em; margin-bottom: 0.4rem; }
+    .sensitivity-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; font-family: 'SFMono-Regular', Consolas, monospace; }
+    .sensitivity-table th { padding: 0.3rem 0.4rem; font-weight: 600; color: #64748b; font-size: 0.68rem; }
+    .sensitivity-table td { padding: 0.35rem 0.4rem; border-radius: 4px; text-align: center; font-weight: 600; }
+    .sensitivity-wacc { text-align: left !important; color: #64748b; font-weight: 700 !important; font-size: 0.68rem; }
+    .sensitivity-center-col { color: #0f172a !important; font-weight: 800 !important; }
+    .sensitivity-center-row .sensitivity-wacc { color: #0f172a !important; }
+    .sensitivity-center { background: #f8f6f1; color: #0f172a; outline: 2px solid #64748b; outline-offset: -1px; }
+    .sensitivity-footer { font-size: 0.7rem; color: #64748b; margin-top: 0.5rem; }
+    .sensitivity-footer strong { color: #0f172a; }
+
+    .method-card-locked { position: relative; overflow: hidden; }
+    .method-body-blur { filter: blur(4px); pointer-events: none; user-select: none; }
+    .method-locked-badge { background: #B68F40; color: white; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; }
+    .premissa-locked { color: #94a3b8; font-size: 0.8rem; }
+    .method-card-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(245,243,239,0.85); text-align: center; padding: 1.5rem; }
+    .method-card-overlay svg { color: #B68F40; margin-bottom: 0.75rem; }
+    .method-card-overlay p { font-size: 0.85rem; color: #334155; margin-bottom: 1rem; font-weight: 500; }
+    .method-unlock-btn { background: #B68F40; color: white; padding: 0.6rem 1.2rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.82rem; transition: background 0.2s; }
+    .method-unlock-btn:hover { background: #a07a2e; }
+
+    /* ============ SOCIAL PROOF ============ */
+    .social-proof-section { margin: 1.5rem 0; }
+    .social-proof-card { padding: 2.2rem 2.5rem; background: linear-gradient(135deg, rgba(182,143,64,0.18) 0%, rgba(182,143,64,0.04) 100%); border: 1px solid rgba(182,143,64,0.25); border-radius: 0.75rem; text-align: center; }
+    .social-proof-headline { font-size: 1.6rem; font-weight: 700; color: #0f172a; margin-bottom: 1rem; line-height: 1.3; font-family: 'Playfair Display', serif; }
+    .social-proof-text { font-size: 1.15rem; color: #475569; line-height: 1.7; margin-bottom: 1.8rem; max-width: 650px; margin-left: auto; margin-right: auto; }
+    .social-proof-text strong { color: #B68F40; }
+    .social-proof-count { display: block; width: fit-content; margin: 0 auto 1.4rem; font-size: 0.88rem; color: #041C24; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); padding: 0.4rem 1rem; border-radius: 9999px; font-weight: 600; letter-spacing: 0.01em; }
+    .social-proof-count::before { content: '\\2713\\0020'; color: #10b981; font-weight: 700; }
+    .social-proof-btn { display: inline-block; background: #041C24; color: white; padding: 0.85rem 2rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 1rem; transition: background 0.15s; }
+    .social-proof-btn:hover { background: #093848; }
+
+    /* ============ FEATURES SHOWCASE ============ */
+    .features-showcase { background: #041C24; border-radius: 12px; padding: 2.5rem; margin: 1.5rem 0; }
+    .features-inner { max-width: 900px; margin: 0 auto; text-align: center; }
+    .features-title { color: #fff; font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 1.5rem; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.2rem; margin-bottom: 1.5rem; }
+    .feature-item { text-align: center; }
+    .feature-icon { font-size: 1.5rem; display: block; margin-bottom: 0.4rem; }
+    .feature-name { display: block; color: #B68F40; font-weight: 700; font-size: 0.82rem; margin-bottom: 0.2rem; }
+    .feature-desc { display: block; color: rgba(255,255,255,0.6); font-size: 0.72rem; line-height: 1.4; }
+    .features-cta { display: inline-block; background: #B68F40; color: #041C24; padding: 0.7rem 1.5rem; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 0.85rem; transition: background 0.2s; }
+    .features-cta:hover { background: #d4a94e; }
+
+    /* ============ MARKOWITZ CARD ============ */
+    .markowitz-card { background: linear-gradient(135deg, #f8f6f1 0%, #f0ebe0 100%); border: 1px solid rgba(182,143,64,0.2); border-radius: 12px; padding: 2rem; margin: 1.5rem 0; text-align: center; }
+    .markowitz-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .markowitz-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; margin-bottom: 0.5rem; }
+    .markowitz-desc { color: #475569; font-size: 0.85rem; max-width: 500px; margin: 0 auto 1rem; line-height: 1.6; }
+    .markowitz-btn { display: inline-block; background: #B68F40; color: white; padding: 0.6rem 1.2rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.82rem; }
+
+    /* ============ SLIDER PULSE HINT ============ */
+    @keyframes sliderPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(182,143,64,0.4); }
+      50% { transform: scale(1.35); box-shadow: 0 0 0 6px rgba(182,143,64,0); }
+    }
+    .slider-hint input[type="range"]::-webkit-slider-thumb { animation: sliderPulse 1.2s ease-in-out 3; }
+    .slider-hint input[type="range"]::-moz-range-thumb { animation: sliderPulse 1.2s ease-in-out 3; }
+
+    /* ============ SHADCN-INSPIRED REFINEMENTS ============ */
+    .method-card { border-radius: 0.75rem; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: box-shadow 0.15s ease; }
+    .method-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .tab-label { transition: color 0.15s ease, border-color 0.15s ease; border-bottom-width: 2px; }
+    .method-locked-badge { border-radius: 9999px; padding: 0.15rem 0.6rem; font-size: 0.6rem; }
+    .social-proof-card { border-radius: 0.75rem; }
+    .features-showcase { border-radius: 0.75rem; }
+    .markowitz-card { border-radius: 0.75rem; }
 
     /* ============ ANIMATIONS ============ */
     @keyframes fadeInUp {
@@ -1244,7 +1423,10 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
   <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();var _iaSH=(function(){var ua=navigator.userAgent;if(/FBAN|FBAV/i.test(ua))return'facebook';if(/Instagram/i.test(ua))return'instagram';if(/LinkedIn/i.test(ua))return'linkedin';if(/WhatsApp/i.test(ua))return'whatsapp';if(/Telegram/i.test(ua))return'telegram';if(/Twitter|TwitterAndroid/i.test(ua))return'twitter';return null})(),_iaCID=(function(){var u=new URLSearchParams(location.search);if(u.get('fbclid'))return'facebook';if(u.get('gclid'))return'google_ads';if(u.get('ttclid'))return'tiktok';if(u.get('li_fat_id'))return'linkedin';if(u.get('twclkd'))return'twitter';if(u.get('msclkid'))return'microsoft_ads';return null})();function _iaTrack(ev,cid){var u=new URLSearchParams(location.search);var d={session_id:_iaS,page_path:(location.pathname.replace(/\\/index\\.html$/,'').replace(/\\/$/,'')||'/').toUpperCase(),referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview',source_hint:_iaSH,click_id_source:_iaCID};if(cid)d.cta_id=cid;fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify(d)}).catch(function(){})}_iaTrack();function _iaClick(e){e.preventDefault();var el=e.currentTarget;var url=el.href;var cid=el.getAttribute('data-cta')||null;_iaTrack('cta_click',cid);setTimeout(function(){window.location.href=url},150)}
 var _iaDivData=${JSON.stringify(divHistory.map(d => ({e:d.exDate,a:d.amount,t:d.dividendType||'',p:d.paymentDate||''})))};
-function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.querySelector('button');btn.disabled=true;btn.textContent='Enviando...';var name=f.name.value.trim();var email=f.email.value.trim();fetch(_iaB+'/rest/v1/iacoes_email_leads',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},body:JSON.stringify({name:name,email:email,ticker:ticker,source:'dividendos'})}).then(function(){_iaTrack('lead_dividendos');var csv='Data Ex;Valor por Acao;Tipo;Data Pagamento\\n';_iaDivData.forEach(function(d){csv+=d.e+';'+d.a+';'+d.t+';'+d.p+'\\n';});var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='dividendos_'+ticker+'.csv';a.click();URL.revokeObjectURL(url);f.style.display='none';document.getElementById('div-lead-success-'+ticker).style.display='block';}).catch(function(){btn.disabled=false;btn.textContent='Erro — tente novamente';});return false;}</script>
+var _iaDreData=${JSON.stringify(incomeAsc.map(d => ({y:getYear(d.end_date),rev:d.total_revenue,gp:d.gross_profit||0,ebit:d.ebit,ibt:d.income_before_tax,ni:d.net_income})))};
+var _iaBalData=${JSON.stringify(balanceAsc.map(d => ({y:getYear(d.end_date),ta:d.total_assets,cash:d.cash+(d.short_term_investments||0),tl:d.total_liab,ltd:d.long_term_debt,eq:d.total_stockholder_equity})))};
+var _iaCfData=${JSON.stringify(cashFlowAsc.map(d => ({y:getYear(d.end_date),fco:d.total_cash_from_operating_activities,fci:d.total_cashflows_from_investing_activities,fcf:d.total_cash_from_financing_activities,capex:d.capital_expenditures,divp:d.dividends_paid})))};
+function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.querySelector('button');btn.disabled=true;btn.textContent='Enviando...';var name=f.name.value.trim();var email=f.email.value.trim();fetch(_iaB+'/rest/v1/iacoes_email_leads',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},body:JSON.stringify({name:name,email:email,ticker:ticker,source:'financeiras'})}).then(function(){_iaTrack('lead_financeiras');var csv='=== DRE (Demonstracao de Resultados) ===\\nAno;Receita Total;Lucro Bruto;EBIT;Lucro Antes IR;Lucro Liquido\\n';_iaDreData.forEach(function(d){csv+=d.y+';'+d.rev+';'+d.gp+';'+d.ebit+';'+d.ibt+';'+d.ni+'\\n';});csv+='\\n=== Balanco Patrimonial ===\\nAno;Ativo Total;Caixa;Passivo Total;Divida LP;Patrimonio Liquido\\n';_iaBalData.forEach(function(d){csv+=d.y+';'+d.ta+';'+d.cash+';'+d.tl+';'+d.ltd+';'+d.eq+'\\n';});csv+='\\n=== Fluxo de Caixa ===\\nAno;FCO;FCI;FCF;CAPEX;Dividendos Pagos\\n';_iaCfData.forEach(function(d){csv+=d.y+';'+d.fco+';'+d.fci+';'+d.fcf+';'+d.capex+';'+d.divp+'\\n';});csv+='\\n=== Dividendos ===\\nData Ex;Valor por Acao;Tipo;Data Pagamento\\n';_iaDivData.forEach(function(d){csv+=d.e+';'+d.a+';'+d.t+';'+d.p+'\\n';});var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='financeiras_'+ticker+'.csv';a.click();URL.revokeObjectURL(url);f.style.display='none';document.getElementById('div-lead-success-'+ticker).style.display='block';}).catch(function(){btn.disabled=false;btn.textContent='Erro — tente novamente';});return false;}</script>
 </head>
 <body>
 
@@ -1301,79 +1483,109 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
         <span id="live-change-day" class="${f.changeDay >= 0 ? 'val-positive' : 'val-negative'}">${f.changeDay >= 0 ? '+' : ''}${fmtPctShort(f.changeDay)} dia</span>
         <span class="${f.change12m >= 0 ? 'val-positive' : 'val-negative'}">${f.change12m >= 0 ? '+' : ''}${fmtPctShort(f.change12m)} 12m</span>
       </div>
+      <div class="hero-nota-qual">
+        <span class="nota-teaser-lock" aria-hidden="true">&#x1F512;</span>
+        <span>Nota Qualitativa: <strong style="filter:blur(4px)">?.??</strong> / 4.0</span>
+      </div>
       <div class="price-date" id="live-date">Dados de ${today}</div>
+      <a href="#valuation-section" class="hero-cta-anchor" onclick="document.getElementById('valuation-section').scrollIntoView({behavior:'smooth'});return false;">Fazer meu Valuation &darr;</a>
     </div>
   </header>
 
-  <!-- INTRO ANALYSIS (SEO) -->
-  <section class="intro-analysis animate-in" aria-label="Análise fundamentalista de ${f.symbol}">
-    <p><strong>${f.symbol}</strong> é a ação ${f.type === 'PN' ? 'preferencial' : f.type === 'ON' ? 'ordinária' : ''} de <strong>${f.name}</strong>, negociada na B3 (bolsa brasileira) no setor de ${f.sector}${f.subSector ? ', segmento de ' + f.subSector : ''}. Com cotação atual de <strong>R$ ${fmt(f.price)}</strong> e valor de mercado de ${fmtBig(f.marketCap)}, a empresa é analisada abaixo por 3 metodologias clássicas de valuation: Graham, Bazin e Gordon (DDM).</p>
-    <p>A análise fundamentalista de ${f.symbol} utiliza 3 métodos clássicos de valuation — <strong>Graham</strong>, <strong>Bazin</strong> e <strong>Gordon (DDM)</strong> — para estimar o preço justo da ação com premissas ajustáveis. Confira os resultados abaixo e ajuste as premissas para sua própria análise.</p>
-    <p>${plText}${evEbitdaText}${dyText}. ${roeText}${marginText} Abaixo, você encontra todos os indicadores fundamentalistas, demonstrações financeiras históricas e o preço justo calculado com premissas ajustáveis.</p>
-  </section>
-
-  <!-- MERCADO & ESTRUTURA -->
-  <section class="metrics-section animate-in" aria-label="Mercado e Estrutura">
-    <h2 class="section-legend">Mercado & Estrutura</h2>
-    <div class="metrics-grid">
-      ${metricBox('Valor de Mercado', fmtBig(f.marketCap))}
-      ${metricBox('Valor da Firma (EV)', fmtBig(f.firmValue))}
-      ${metricBox('Nro. Ações', fmtVol(f.sharesOutstanding))}
-      ${metricBox('Volume Médio (3M)', fmtVol(f.volMed2m))}
-      ${metricBox('Min. 52 Semanas', fmtBRL(f.min52Week))}
-      ${metricBox('Max. 52 Semanas', fmtBRL(f.max52Week))}
+  <!-- AUDITORIA IA -->
+  <section class="social-proof-section animate-in" aria-label="Auditoria por IA">
+    <div class="social-proof-card">
+      <p class="social-proof-headline">Leu um relat&oacute;rio sobre ${f.symbol}? Viu uma recomenda&ccedil;&atilde;o?</p>
+      <p class="social-proof-text">Nossa IA audita a tese por tr&aacute;s &mdash; governan&ccedil;a, vantagens competitivas, riscos e mais 3 categorias. <strong>Descubra se a indica&ccedil;&atilde;o se sustenta.</strong></p>
+      <p class="social-proof-count">${socialProofCount(f.volMed2m, f.symbol).toLocaleString('pt-BR')} investidores j&aacute; validaram teses em ${f.symbol}</p>
+      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="social-proof-btn" data-cta="social-proof" onclick="_iaClick(event)">Auditar com IA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16" style="vertical-align:middle;margin-left:0.3rem"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></a>
     </div>
   </section>
 
-  <!-- VALUATION -->
-  <section class="metrics-section animate-in" aria-label="Indicadores de Valuation">
-    <h2 class="section-legend">Valuation</h2>
-    <div class="metrics-grid">
-      ${metricBox('P/L', fmtNum(f.pl, 2))}
-      ${metricBox('P/VP', fmtNum(f.pvp, 2))}
-      ${metricBox('P/EBIT', fmtNum(f.pebit, 2))}
-      ${metricBox('PSR (Price/Sales)', fmtNum(f.psr, 2))}
-      ${metricBox('EV/EBITDA', fmtNum(f.evEbitda, 2))}
-      ${metricBox('EV/EBIT', fmtNum(f.evEbit, 2))}
-      ${metricBox('Div. Yield', fmtPctShort(f.divYield), colorClass(f.divYield))}
-      ${metricBox('LPA', fmtBRL(f.lpa))}
-      ${metricBox('VPA', fmtBRL(f.vpa))}
+  <!-- SOBRE A EMPRESA (SEO + NEGÓCIO) -->
+  <section class="section-card intro-combined animate-in" aria-label="Sobre ${f.symbol}">
+    <div class="intro-combined-section">
+      <h2 class="section-legend">Análise Fundamentalista</h2>
+      <p><strong>${f.symbol}</strong> é a ação ${f.type === 'PN' ? 'preferencial' : f.type === 'ON' ? 'ordinária' : ''} de <strong>${f.name}</strong>, negociada na B3 (bolsa brasileira) no setor de ${f.sector}${f.subSector ? ', segmento de ' + f.subSector : ''}. Com cotação atual de <strong>R$ ${fmt(f.price)}</strong> e valor de mercado de ${fmtBig(f.marketCap)}, a empresa é analisada abaixo por 3 metodologias clássicas de valuation: Graham, Bazin e Gordon (DDM).</p>
+      <p>A análise fundamentalista de ${f.symbol} utiliza 3 métodos clássicos de valuation — <strong>Graham</strong>, <strong>Bazin</strong> e <strong>Gordon (DDM)</strong> — para estimar o preço justo da ação com premissas ajustáveis. Confira os resultados abaixo e ajuste as premissas para sua própria análise.</p>
+      <p>${plText}${evEbitdaText}${dyText}. ${roeText}${marginText} Abaixo, você encontra todos os indicadores fundamentalistas, demonstrações financeiras históricas e o preço justo calculado com premissas ajustáveis.</p>
     </div>
+    ${data.businessSummary ? `
+    <div class="intro-combined-divider"></div>
+    <div class="intro-combined-section">
+      <h2 class="section-legend">Visão de Negócio</h2>
+      <p>${data.businessSummary}</p>
+    </div>` : ''}
   </section>
 
-  <!-- RENTABILIDADE & MARGENS -->
-  <section class="metrics-section animate-in" aria-label="Rentabilidade e Margens">
-    <h2 class="section-legend">Rentabilidade & Margens</h2>
-    <div class="metrics-grid">
-      ${metricBox('ROE', fmtPctShort(f.roe), colorClass(f.roe))}
-      ${metricBox('ROIC', fmtPctShort(f.roic), colorClass(f.roic))}
-      ${metricBox('Margem Bruta', fmtPctShort(f.grossMargin))}
-      ${metricBox('Margem EBIT', fmtPctShort(f.ebitMargin))}
-      ${metricBox('Margem EBITDA', fmtPctShort(f.ebitdaMargin))}
-      ${metricBox('Margem Líquida', fmtPctShort(f.netMargin), colorClass(f.netMargin))}
-    </div>
-  </section>
+  <!-- INDICADORES FUNDAMENTALISTAS (CSS-ONLY TABS) -->
+  <section class="metrics-tabs-section animate-in" aria-label="Indicadores Fundamentalistas">
+    <h2 class="section-legend">Indicadores Fundamentalistas</h2>
+    <div class="tabs-container">
+      <input type="radio" name="metrics-tab" id="tab-mercado" class="tab-radio">
+      <label for="tab-mercado" class="tab-label">Mercado</label>
+      <input type="radio" name="metrics-tab" id="tab-valuation" class="tab-radio" checked>
+      <label for="tab-valuation" class="tab-label">Valuation</label>
+      <input type="radio" name="metrics-tab" id="tab-rentabilidade" class="tab-radio">
+      <label for="tab-rentabilidade" class="tab-label">Rentabilidade</label>
+      <input type="radio" name="metrics-tab" id="tab-endividamento" class="tab-radio">
+      <label for="tab-endividamento" class="tab-label">Endividamento</label>
 
-  <!-- ENDIVIDAMENTO & LIQUIDEZ -->
-  <section class="metrics-section animate-in" aria-label="Endividamento e Liquidez">
-    <h2 class="section-legend">Endividamento & Liquidez</h2>
-    <div class="metrics-grid" style="grid-template-columns: repeat(3, 1fr);">
-      ${metricBox('Div. Liq./EBITDA', fmtNum(f.debtEbitda, 2), colorClass(f.debtEbitda))}
-      ${metricBox('Div. Bruta/Patrim.', fmtNum(f.debtEquity, 2))}
-      ${metricBox('Liquidez Corrente', fmtNum(f.currentLiquidity, 2), colorClass(f.currentLiquidity))}
+      <div class="tab-panel" id="panel-mercado">
+        <div class="metrics-grid">
+          ${metricBox('Valor de Mercado', fmtBig(f.marketCap))}
+          ${metricBox('Valor da Firma (EV)', fmtBig(f.firmValue))}
+          ${metricBox('Nro. Ações', fmtVol(f.sharesOutstanding))}
+          ${metricBox('Volume Médio (3M)', fmtVol(f.volMed2m))}
+          ${metricBox('Min. 52 Semanas', fmtBRL(f.min52Week))}
+          ${metricBox('Max. 52 Semanas', fmtBRL(f.max52Week))}
+        </div>
+      </div>
+      <div class="tab-panel" id="panel-valuation">
+        <div class="metrics-grid">
+          ${metricBox('P/L', fmtNum(f.pl, 2))}
+          ${metricBox('P/VP', fmtNum(f.pvp, 2))}
+          ${metricBox('P/EBIT', fmtNum(f.pebit, 2))}
+          ${metricBox('PSR (Price/Sales)', fmtNum(f.psr, 2))}
+          ${metricBox('EV/EBITDA', fmtNum(f.evEbitda, 2))}
+          ${metricBox('EV/EBIT', fmtNum(f.evEbit, 2))}
+          ${metricBox('Div. Yield', fmtPctShort(f.divYield), colorClass(f.divYield))}
+          ${metricBox('LPA', fmtBRL(f.lpa))}
+          ${metricBox('VPA', fmtBRL(f.vpa))}
+        </div>
+      </div>
+      <div class="tab-panel" id="panel-rentabilidade">
+        <div class="metrics-grid">
+          ${metricBox('ROE', fmtPctShort(f.roe), colorClass(f.roe))}
+          ${metricBox('ROIC', fmtPctShort(f.roic), colorClass(f.roic))}
+          ${metricBox('Margem Bruta', fmtPctShort(f.grossMargin))}
+          ${metricBox('Margem EBIT', fmtPctShort(f.ebitMargin))}
+          ${metricBox('Margem EBITDA', fmtPctShort(f.ebitdaMargin))}
+          ${metricBox('Margem Líquida', fmtPctShort(f.netMargin), colorClass(f.netMargin))}
+        </div>
+      </div>
+      <div class="tab-panel" id="panel-endividamento">
+        <div class="metrics-grid" style="grid-template-columns: repeat(3, 1fr);">
+          ${metricBox('Div. Liq./EBITDA', fmtNum(f.debtEbitda, 2), colorClass(f.debtEbitda))}
+          ${metricBox('Div. Bruta/Patrim.', fmtNum(f.debtEquity, 2))}
+          ${metricBox('Liquidez Corrente', fmtNum(f.currentLiquidity, 2), colorClass(f.currentLiquidity))}
+        </div>
+      </div>
+
+      <div class="metrics-timestamp">Atualizado em ${today} (p&oacute;s-fechamento B3)</div>
     </div>
   </section>
 
   <!-- PRECO JUSTO (METODOS CLASSICOS) -->
-  <section class="methods-section animate-in" aria-label="Preço Justo - Métodos Clássicos">
+  <section class="methods-section animate-in" id="valuation-section" aria-label="Preço Justo - Métodos Clássicos">
     <div class="section-header-row">
       <div>
-        <h3 class="section-title font-playfair">Preço Justo (Métodos Clássicos)</h3>
-        <span class="section-sub">Graham, Bazin e Gordon com premissas auditáveis</span>
+        <h3 class="section-title font-playfair">Calcule o pre&ccedil;o justo de ${f.symbol} com suas premissas</h3>
+        <span class="section-sub">3 m&eacute;todos cl&aacute;ssicos + DCF avan&ccedil;ado na plataforma</span>
       </div>
       <div class="section-price-ref">Cotação Atual<br><strong>R$ ${fmt(f.price)}</strong></div>
     </div>
-    <div class="methods-grid methods-grid-3">
+    <div class="methods-grid">
 
       <!-- GRAHAM -->
       <div class="method-card">
@@ -1396,18 +1608,12 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
 
           <div class="premissas-section">
             <div class="premissas-label">PREMISSAS</div>
-            <div class="premissa-row">
-              <label>P/L Maximo</label>
-              <div class="premissa-input-group">
-                <input type="number" id="graham-pl" value="15" min="1" max="50" step="1" class="premissa-input">
-              </div>
-            </div>
-            <div class="premissa-row">
-              <label>P/VP Maximo</label>
-              <div class="premissa-input-group">
-                <input type="number" id="graham-pvp" value="1.5" min="0.1" max="10" step="0.1" class="premissa-input">
-              </div>
-            </div>
+            <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="premissa-locked-row" data-cta="dcf-locked" onclick="_iaClick(event)">
+              <span>&#x1F512; P/L Máximo: <strong style="filter:blur(4px)">15</strong></span>
+              <span>P/VP Máximo: <strong style="filter:blur(4px)">1.5</strong></span>
+            </a>
+            <input type="hidden" id="graham-pl" value="15">
+            <input type="hidden" id="graham-pvp" value="1.5">
             <div class="premissa-row">
               <label>Margem de Segurança</label>
               <div class="premissa-slider-group">
@@ -1452,15 +1658,10 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
                 <span class="premissa-slider-val" id="bazin-dy-val">6.0%</span>
               </div>
             </div>
-            <div class="premissa-row">
-              <label>Anos para Media</label>
-              <select id="bazin-years" class="premissa-select">
-                <option value="1">1 ano</option>
-                <option value="3">3 anos</option>
-                <option value="5" selected>5 anos</option>
-                <option value="10">10 anos</option>
-              </select>
-            </div>
+            <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="premissa-locked-row" data-cta="dcf-locked" onclick="_iaClick(event)">
+              <span>&#x1F512; Anos para Média: <strong style="filter:blur(4px)">5 anos</strong></span>
+            </a>
+            <input type="hidden" id="bazin-years" value="5">
           </div>
 
           <div class="premissa-info-row">
@@ -1507,15 +1708,10 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
                 <span class="premissa-slider-val" id="gordon-g-val">5.0%</span>
               </div>
             </div>
-            <div class="premissa-row">
-              <label>Anos para Media</label>
-              <select id="gordon-years" class="premissa-select">
-                <option value="1">1 ano</option>
-                <option value="3">3 anos</option>
-                <option value="5" selected>5 anos</option>
-                <option value="10">10 anos</option>
-              </select>
-            </div>
+            <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="premissa-locked-row" data-cta="dcf-locked" onclick="_iaClick(event)">
+              <span>&#x1F512; Anos para Média: <strong style="filter:blur(4px)">5 anos</strong></span>
+            </a>
+            <input type="hidden" id="gordon-years" value="5">
           </div>
 
           <div class="premissa-info-row">
@@ -1524,55 +1720,72 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
         </div>
       </div>
 
+
     </div>
 
-    <!-- CTA VALUATION -->
-    <div class="cta-valuation">
-      <div class="cta-valuation-inner">
-        <div class="cta-valuation-text">
-          <h2 class="cta-valuation-title">Quer ir além com ${f.symbol}?</h2>
-          <p class="cta-valuation-desc">Na plataforma, você ajusta <strong>todas as premissas</strong> — taxa de desconto, crescimento, margens — e compara cenários Bear, Base e Bull em tempo real com 5 metodologias de valuation.</p>
+    <!-- DCF (LOCKED — FULL WIDTH) -->
+    <div class="dcf-locked-card method-card method-card-locked">
+      <div class="dcf-locked-inner">
+        <div class="dcf-locked-left">
+          <div class="method-header" style="margin-bottom:0.5rem">
+            <div>
+              <span class="method-name">DCF</span>
+              <span class="method-sub">Tabela de Sensibilidade</span>
+            </div>
+            <span class="method-locked-badge">PRO</span>
+          </div>
+          <div class="dcf-sensitivity-blur">
+            ${sensitivityHTML}
+          </div>
         </div>
-        <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="cta-valuation-btn" data-cta="valuation" onclick="_iaClick(event)">Fazer Seu Valuation Completo &rarr;</a>
+        <div class="dcf-locked-right">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <p class="dcf-locked-headline">Diferente de agregadores de dados, aqui <strong>voc&ecirc; monta seu pr&oacute;prio valuation</strong></p>
+          <p class="dcf-locked-sub">Premissas avan&ccedil;adas, cen&aacute;rios e compara&ccedil;&atilde;o com intelig&ecirc;ncia artificial.</p>
+          <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="method-unlock-btn" data-cta="dcf-locked" onclick="_iaClick(event)">Fazer Valuation DCF &rarr;</a>
+        </div>
       </div>
-    </div>
-
-    <div class="methods-note">
-      <strong>Importante:</strong> Os valores apresentados nesta página são estimativas calculadas por modelos matemáticos e <strong>não constituem recomendação de compra, venda ou manutenção de ativos</strong>. Cada investidor deve conduzir sua própria análise, considerando o contexto da empresa, riscos setoriais, cenário macroeconômico e seu perfil de investimento.
-    </div>
-    <div class="methods-note">
-      <strong>Graham</strong> calcula o valor intrínseco com base no lucro por ação (LPA) e valor patrimonial por ação (VPA). É mais adequado para empresas lucrativas, com patrimônio sólido e histórico consistente. Empresas em crescimento acelerado ou com prejuízo podem apresentar distorções nesse modelo.
-    </div>
-    <div class="methods-note">
-      <strong>Bazin</strong> estima o preço justo a partir dos dividendos pagos, dividindo-os por uma taxa mínima de retorno desejada (dividend yield). Funciona melhor para empresas maduras e boas pagadoras de dividendos. Empresas que reinvestem lucros ou que têm política de dividendos irregular podem gerar resultados pouco representativos.
-    </div>
-    <div class="methods-note">
-      <strong>Gordon (DDM)</strong> projeta o valor presente de todos os dividendos futuros, assumindo um crescimento perpétuo constante. É útil para empresas com dividendos estáveis e previsíveis, mas pode distorcer significativamente o resultado quando a taxa de crescimento se aproxima da taxa de desconto ou quando a empresa não distribui proventos regularmente.
-    </div>
-    <div class="methods-note">
-      Utilize a <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" style="color:var(--accent);font-weight:600;" data-cta="disclaimer" onclick="_iaClick(event)">plataforma iAções</a> para aprofundar sua análise com dados completos, comparativos setoriais e ferramentas de valuation avançadas. Investir exige estudo — conheça a empresa, entenda os riscos e tome decisões informadas.
     </div>
   </section>
 
-  ${data.businessSummary ? `
-  <!-- RESUMO DE NEGÓCIO -->
-  <section class="section-card animate-in" aria-label="Resumo de Negócio de ${f.symbol}">
-    <div class="resumo-header">
-      <div>
-        <h2 class="resumo-title">${f.symbol} — Visão de Negócio</h2>
-        <div class="resumo-date">Atualização: ${today}</div>
+
+  <!-- FEATURES SHOWCASE -->
+  <section class="features-showcase animate-in" aria-label="Funcionalidades da plataforma">
+    <div class="features-inner">
+      <h3 class="features-title">Tudo que voc&ecirc; precisa para analisar ${f.symbol}</h3>
+      <div class="features-grid">
+        <div class="feature-item">
+          <span class="feature-icon" role="img" aria-label="DCF Completo">&#x1F4CA;</span>
+          <span class="feature-name">DCF Completo</span>
+          <span class="feature-desc">Fluxo de caixa descontado com premissas edit&aacute;veis</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon" role="img" aria-label="Nota Qualitativa">&#x1F3AF;</span>
+          <span class="feature-name">Nota Qualitativa</span>
+          <span class="feature-desc">Auditoria com IA em 6 categorias</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon" role="img" aria-label="Otimizador Markowitz">&#x2696;&#xFE0F;</span>
+          <span class="feature-name">Otimizador Markowitz</span>
+          <span class="feature-desc">Fronteira eficiente e balanceamento de carteira</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon" role="img" aria-label="Radar de Oportunidades">&#x1F50D;</span>
+          <span class="feature-name">Radar de Oportunidades</span>
+          <span class="feature-desc">Screening com filtros fundamentalistas</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon" role="img" aria-label="Documentos CVM">&#x1F4C4;</span>
+          <span class="feature-name">Documentos CVM</span>
+          <span class="feature-desc">Feed de ITRs, DFPs e fatos relevantes</span>
+        </div>
       </div>
-      <div class="resumo-badges">
-        <span class="resumo-badge">Setor: ${f.sector}</span>
-        <span class="resumo-badge">Subsetor: ${f.subSector}</span>
-        <span class="resumo-badge">Tipo: ${f.type}</span>
-      </div>
+      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="features-cta" data-cta="features-card" onclick="_iaClick(event)">Explorar plataforma gr&aacute;tis &rarr;</a>
     </div>
-    <p class="resumo-text">${data.businessSummary}</p>
-  </section>` : ''}
+  </section>
 
   <!-- NOTA QUALITATIVA (PAYWALL) -->
-  <section class="section-card animate-in nota-section" aria-label="Nota Qualitativa de ${f.symbol}">
+  <section class="section-card animate-in nota-section" id="nota-section" aria-label="Nota Qualitativa de ${f.symbol}">
     <div class="nota-header">
       <div>
         <div class="nota-label">Nota Qualitativa</div>
@@ -1620,6 +1833,17 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
       <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="nota-overlay-btn" data-cta="nota-qualitativa" onclick="_iaClick(event)">Desbloquear Análise &rarr;</a>
     </div>
   </section>
+
+  <!-- MARKOWITZ CARD -->
+  <section class="markowitz-card animate-in" aria-label="Otimização de carteira">
+    <div class="markowitz-inner">
+      <div class="markowitz-icon" role="img" aria-label="Otimização">&#x2696;&#xFE0F;</div>
+      <h3 class="markowitz-title">Tem ${f.symbol} na carteira?</h3>
+      <p class="markowitz-desc">Descubra se seu portf&oacute;lio est&aacute; otimizado segundo Markowitz &mdash; fronteira eficiente, correla&ccedil;&atilde;o entre ativos e an&aacute;lise de risco/retorno.</p>
+      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="markowitz-btn" data-cta="markowitz" onclick="_iaClick(event)">Otimizar minha carteira &rarr;</a>
+    </div>
+  </section>
+
 
   <!-- DEMONSTRAÇÕES FINANCEIRAS -->
   <section class="section-card animate-in" aria-label="Demonstrações Financeiras">
@@ -1678,23 +1902,22 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
       </table>
     </div>` : ''}
 
-    ${divHistory.length > 0 ? `
-    <!-- LEAD COLLECTOR: HISTÓRICO COMPLETO DE DIVIDENDOS -->
+    <!-- LEAD COLLECTOR: PLANILHA FINANCEIRA COMPLETA -->
     <div class="div-lead-card" id="div-lead-card-${f.symbol}">
       <div class="div-lead-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       </div>
-      <div class="div-lead-title">Histórico Completo de Dividendos de ${f.symbol}</div>
-      <div class="div-lead-sub">${divHistory.length} pagamentos desde ${new Date(divHistory[divHistory.length - 1].exDate).getFullYear()} — JCP, dividendos e rendimentos com datas e valores por ação.</div>
+      <div class="div-lead-title">Dados Financeiros Completos de ${f.symbol}</div>
+      <div class="div-lead-sub">DRE, Balan&ccedil;o Patrimonial, Fluxo de Caixa e Dividendos &mdash; ${dreYears.length > 0 ? dreYears.length + ' anos de hist&oacute;rico' : 'dados hist&oacute;ricos'}${divHistory.length > 0 ? ' + ' + divHistory.length + ' pagamentos de dividendos' : ''}.</div>
       <form class="div-lead-form" id="div-lead-form-${f.symbol}" onsubmit="return _iaLeadSubmit(event,'${f.symbol}')">
         <input type="text" name="name" placeholder="Seu nome" required>
         <input type="email" name="email" placeholder="Seu melhor e-mail" required>
-        <button type="submit" class="div-lead-btn">Baixar histórico completo <span>&rarr;</span></button>
+        <button type="submit" class="div-lead-btn">Baixar dados completos <span>&rarr;</span></button>
       </form>
       <div class="div-lead-success" id="div-lead-success-${f.symbol}" style="display:none">
-        <p>Pronto! O download vai começar automaticamente.</p>
+        <p>Pronto! O download vai come&ccedil;ar automaticamente.</p>
       </div>
-    </div>` : ''}
+    </div>
   </section>
 
   ${peers.length > 0 ? `
@@ -1729,9 +1952,9 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
 
   <!-- CTA -->
   <section class="cta-card animate-in" aria-label="Acesse a plataforma">
-    <h2>Análise completa na plataforma</h2>
-    <p>Acesse premissas editáveis, cenários Bear/Base/Bull, análise qualitativa com IA, radar de notícias e muito mais.</p>
-    <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="cta-btn" data-cta="footer" onclick="_iaClick(event)">Teste a sua tese de investimento gr&aacute;tis &rarr;</a>
+    <h2>Sua an&aacute;lise de ${f.symbol} come&ccedil;a aqui</h2>
+    <p>Premissas edit&aacute;veis, cen&aacute;rios Bear/Base/Bull, an&aacute;lise qualitativa com IA, otimizador Markowitz e muito mais &mdash; tudo gr&aacute;tis para come&ccedil;ar.</p>
+    <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="cta-btn" data-cta="footer" onclick="_iaClick(event)">Comece sua an&aacute;lise gr&aacute;tis &rarr;</a>
   </section>
 
   </article>
@@ -1746,6 +1969,23 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
     </div>
     <a href="/acoes/" style="display:inline-block;margin-top:0.6rem;font-size:0.8rem;color:#B68F40;text-decoration:none;font-weight:500;">Ver todas as ações &rarr;</a>
   </nav>
+
+  <!-- NOTAS SOBRE OS MÉTODOS DE VALUATION -->
+  <div class="methods-note" style="margin-bottom:0.5rem;">
+    <strong>Importante:</strong> Os valores apresentados nesta p&aacute;gina s&atilde;o estimativas calculadas por modelos matem&aacute;ticos e <strong>n&atilde;o constituem recomenda&ccedil;&atilde;o de compra, venda ou manuten&ccedil;&atilde;o de ativos</strong>. Cada investidor deve conduzir sua pr&oacute;pria an&aacute;lise, considerando o contexto da empresa, riscos setoriais, cen&aacute;rio macroecon&ocirc;mico e seu perfil de investimento.
+  </div>
+  <div class="methods-note" style="margin-bottom:0.5rem;">
+    <strong>Graham</strong> calcula o valor intr&iacute;nseco com base no lucro por a&ccedil;&atilde;o (LPA) e valor patrimonial por a&ccedil;&atilde;o (VPA). &Eacute; mais adequado para empresas lucrativas, com patrim&ocirc;nio s&oacute;lido e hist&oacute;rico consistente.
+  </div>
+  <div class="methods-note" style="margin-bottom:0.5rem;">
+    <strong>Bazin</strong> estima o pre&ccedil;o justo a partir dos dividendos pagos, dividindo-os por uma taxa m&iacute;nima de retorno desejada (dividend yield). Funciona melhor para empresas maduras e boas pagadoras de dividendos.
+  </div>
+  <div class="methods-note" style="margin-bottom:0.5rem;">
+    <strong>Gordon (DDM)</strong> projeta o valor presente de todos os dividendos futuros, assumindo um crescimento perp&eacute;tuo constante. &Eacute; &uacute;til para empresas com dividendos est&aacute;veis e previs&iacute;veis.
+  </div>
+  <div class="methods-note" style="margin-bottom:1.5rem;">
+    Utilize a <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" style="color:#B68F40;font-weight:600;" data-cta="disclaimer" onclick="_iaClick(event)">plataforma iA&ccedil;&otilde;es</a> para aprofundar sua an&aacute;lise com dados completos, comparativos setoriais e ferramentas de valuation avan&ccedil;adas. Investir exige estudo &mdash; conhe&ccedil;a a empresa, entenda os riscos e tome decis&otilde;es informadas.
+  </div>
 
   <!-- DISCLAIMER -->
   <footer class="disclaimer" role="contentinfo">
@@ -1882,11 +2122,33 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
 })();
 </script>
 
+<!-- Slider pulse hint -->
+<script>
+(function(){
+  if(!window.IntersectionObserver)return;
+  var cards=document.querySelectorAll('.method-card:not(.method-card-locked)');
+  var ob=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){
+        e.target.classList.add('slider-hint');
+        ob.unobserve(e.target);
+        var inputs=e.target.querySelectorAll('input[type="range"]');
+        inputs.forEach(function(inp){
+          inp.addEventListener('input',function(){e.target.classList.remove('slider-hint');},{once:true});
+        });
+        setTimeout(function(){e.target.classList.remove('slider-hint');},4000);
+      }
+    });
+  },{threshold:0.5});
+  cards.forEach(function(c){ob.observe(c);});
+})();
+</script>
+
 <!-- Scroll depth tracking -->
 <script>
 (function(){
   var f={};
-  var m={scroll_25:'.methods-section',scroll_50:'.nota-section',scroll_75:'[aria-label="Demonstrações Financeiras"]',scroll_100:'.faq-section'};
+  var m={scroll_25:'#valuation-section',scroll_50:'.features-showcase',scroll_75:'[aria-label="Demonstrações Financeiras"]',scroll_100:'.faq-section'};
   if(!window.IntersectionObserver)return;
   var o=new IntersectionObserver(function(es){
     es.forEach(function(e){

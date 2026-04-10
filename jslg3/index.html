@@ -386,7 +386,7 @@
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 1rem;
     }
-    .methods-grid-3 { grid-template-columns: repeat(3, 1fr); }
+    /* methods-grid-3 removido — grid usa auto-fit */
     .method-card {
       background: #fff; border: 1px solid #e2e8f0;
       border-radius: 12px; overflow: hidden;
@@ -501,6 +501,16 @@
       font-family: 'SFMono-Regular', Consolas, monospace;
       color: #0f172a;
     }
+    .premissa-locked-row {
+      display: flex; gap: 0.75rem; align-items: center;
+      font-size: 0.75rem; color: #64748b;
+      padding: 0.5rem 0.6rem; margin-top: 0.5rem;
+      background: rgba(182,143,64,0.06); border: 1px solid rgba(182,143,64,0.15);
+      border-radius: 6px; text-decoration: none; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .premissa-locked-row:hover { background: rgba(182,143,64,0.12); }
+    .premissa-locked-row strong { font-family: 'SFMono-Regular', Consolas, monospace; }
     .methods-note {
       margin-top: 1rem; padding: 0.75rem 1rem;
       background: #fafaf8; border: 1px solid #e2e8f0;
@@ -934,7 +944,7 @@
       .metrics-grid { grid-template-columns: repeat(4, 1fr); }
     }
     @media (max-width: 900px) {
-      .methods-grid-3 { grid-template-columns: 1fr; }
+
     }
     @media (max-width: 768px) {
       .page { padding: 1rem; }
@@ -944,7 +954,7 @@
       .price-value { font-size: 2.2rem; }
       .price-changes { justify-content: flex-start; }
       .metrics-grid { grid-template-columns: repeat(3, 1fr); }
-      .methods-grid, .methods-grid-3 { grid-template-columns: 1fr; }
+      .methods-grid { grid-template-columns: 1fr; }
       .nav { padding: 0 1rem; }
     }
     @media (max-width: 480px) {
@@ -952,6 +962,127 @@
       .price-value { font-size: 1.8rem; }
       .consensus-price { font-size: 2rem; }
     }
+
+    /* ============ HERO NOTA QUALITATIVA ============ */
+    .hero-nota-qual { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.7rem; background: rgba(182,143,64,0.08); border: 1px solid rgba(182,143,64,0.15); border-radius: 6px; font-size: 0.75rem; color: #64748b; margin-top: 0.3rem; }
+    .hero-nota-qual .nota-teaser-lock { font-size: 0.75rem; }
+
+    /* ============ HERO MICRO-CTA ============ */
+    .hero-cta-anchor { display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: transparent; border: 1.5px solid #B68F40; color: #B68F40; border-radius: 6px; font-size: 0.78rem; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+    .hero-cta-anchor:hover { background: #B68F40; color: white; }
+
+    /* ============ DIFERENCIADOR ============ */
+    .diferenciador { text-align: center; padding: 1rem 1.5rem; margin: 0.5rem 0 1rem; }
+    .diferenciador p { font-size: 0.88rem; color: #475569; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+    .diferenciador strong { color: #B68F40; }
+
+    /* ============ CSS-ONLY TABS ============ */
+    .tabs-container { position: relative; }
+    .tab-radio { display: none; }
+    .tab-label { display: inline-block; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.82rem; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; transition: all 0.2s; }
+    .tab-radio:checked + .tab-label { color: #B68F40; border-bottom-color: #B68F40; }
+    .tab-panel { display: none; padding: 1rem 0; }
+    #tab-mercado:checked ~ #panel-mercado,
+    #tab-valuation:checked ~ #panel-valuation,
+    #tab-rentabilidade:checked ~ #panel-rentabilidade,
+    #tab-endividamento:checked ~ #panel-endividamento { display: block; }
+    .nota-teaser-inline { margin-top: 1rem; padding: 0.75rem 1rem; background: rgba(182,143,64,0.08); border: 1px solid rgba(182,143,64,0.2); border-radius: 8px; display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; }
+    .nota-teaser-inline a { color: #B68F40; font-weight: 600; margin-left: auto; text-decoration: none; }
+    .nota-teaser-lock { font-size: 0.9rem; }
+    .metrics-timestamp { text-align: center; font-size: 0.72rem; color: #94a3b8; margin-top: 0.75rem; }
+
+    /* ============ DCF LOCKED CARD ============ */
+    /* ============ INTRO COMBINED CARD ============ */
+    .intro-combined { padding: 1.5rem; }
+    .intro-combined .section-legend { margin-bottom: 0.5rem; }
+    .intro-combined p { font-size: 0.88rem; color: #334155; line-height: 1.7; margin-bottom: 0.5rem; }
+    .intro-combined-divider { height: 1px; background: #e2e8f0; margin: 1.2rem 0; }
+
+    /* ============ DCF FULL-WIDTH ============ */
+    .dcf-locked-card { margin-top: 1rem; grid-column: 1 / -1; }
+    .dcf-locked-inner { display: flex; gap: 1.5rem; align-items: center; }
+    .dcf-locked-left { flex: 1; filter: blur(4px); pointer-events: none; user-select: none; }
+    .dcf-locked-left .method-body { filter: none; }
+    .dcf-locked-right { flex: 1; text-align: center; padding: 1.5rem; }
+    .dcf-locked-right svg { color: #B68F40; margin-bottom: 0.75rem; }
+    .dcf-locked-headline { font-size: 1rem; color: #0f172a; margin-bottom: 0.4rem; font-weight: 500; line-height: 1.5; }
+    .dcf-locked-headline strong { color: #B68F40; }
+    .dcf-locked-sub { font-size: 0.82rem; color: #64748b; margin-bottom: 1rem; }
+    @media (max-width: 768px) {
+      .dcf-locked-inner { flex-direction: column; }
+      .dcf-locked-left { display: none; }
+    }
+
+    /* ============ SENSITIVITY TABLE ============ */
+    .dcf-sensitivity-blur { filter: blur(3px); pointer-events: none; user-select: none; }
+    .sensitivity-table-wrap { text-align: center; }
+    .sensitivity-title { font-size: 0.7rem; font-weight: 700; color: #64748b; letter-spacing: 0.1em; margin-bottom: 0.4rem; }
+    .sensitivity-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; font-family: 'SFMono-Regular', Consolas, monospace; }
+    .sensitivity-table th { padding: 0.3rem 0.4rem; font-weight: 600; color: #64748b; font-size: 0.68rem; }
+    .sensitivity-table td { padding: 0.35rem 0.4rem; border-radius: 4px; text-align: center; font-weight: 600; }
+    .sensitivity-wacc { text-align: left !important; color: #64748b; font-weight: 700 !important; font-size: 0.68rem; }
+    .sensitivity-center-col { color: #0f172a !important; font-weight: 800 !important; }
+    .sensitivity-center-row .sensitivity-wacc { color: #0f172a !important; }
+    .sensitivity-center { background: #f8f6f1; color: #0f172a; outline: 2px solid #64748b; outline-offset: -1px; }
+    .sensitivity-footer { font-size: 0.7rem; color: #64748b; margin-top: 0.5rem; }
+    .sensitivity-footer strong { color: #0f172a; }
+
+    .method-card-locked { position: relative; overflow: hidden; }
+    .method-body-blur { filter: blur(4px); pointer-events: none; user-select: none; }
+    .method-locked-badge { background: #B68F40; color: white; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; }
+    .premissa-locked { color: #94a3b8; font-size: 0.8rem; }
+    .method-card-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(245,243,239,0.85); text-align: center; padding: 1.5rem; }
+    .method-card-overlay svg { color: #B68F40; margin-bottom: 0.75rem; }
+    .method-card-overlay p { font-size: 0.85rem; color: #334155; margin-bottom: 1rem; font-weight: 500; }
+    .method-unlock-btn { background: #B68F40; color: white; padding: 0.6rem 1.2rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.82rem; transition: background 0.2s; }
+    .method-unlock-btn:hover { background: #a07a2e; }
+
+    /* ============ SOCIAL PROOF ============ */
+    .social-proof-section { margin: 1.5rem 0; }
+    .social-proof-card { padding: 2.2rem 2.5rem; background: linear-gradient(135deg, rgba(182,143,64,0.18) 0%, rgba(182,143,64,0.04) 100%); border: 1px solid rgba(182,143,64,0.25); border-radius: 0.75rem; text-align: center; }
+    .social-proof-headline { font-size: 1.6rem; font-weight: 700; color: #0f172a; margin-bottom: 1rem; line-height: 1.3; font-family: 'Playfair Display', serif; }
+    .social-proof-text { font-size: 1.15rem; color: #475569; line-height: 1.7; margin-bottom: 1.8rem; max-width: 650px; margin-left: auto; margin-right: auto; }
+    .social-proof-text strong { color: #B68F40; }
+    .social-proof-count { display: block; width: fit-content; margin: 0 auto 1.4rem; font-size: 0.88rem; color: #041C24; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); padding: 0.4rem 1rem; border-radius: 9999px; font-weight: 600; letter-spacing: 0.01em; }
+    .social-proof-count::before { content: '\2713\0020'; color: #10b981; font-weight: 700; }
+    .social-proof-btn { display: inline-block; background: #041C24; color: white; padding: 0.85rem 2rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 1rem; transition: background 0.15s; }
+    .social-proof-btn:hover { background: #093848; }
+
+    /* ============ FEATURES SHOWCASE ============ */
+    .features-showcase { background: #041C24; border-radius: 12px; padding: 2.5rem; margin: 1.5rem 0; }
+    .features-inner { max-width: 900px; margin: 0 auto; text-align: center; }
+    .features-title { color: #fff; font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 1.5rem; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.2rem; margin-bottom: 1.5rem; }
+    .feature-item { text-align: center; }
+    .feature-icon { font-size: 1.5rem; display: block; margin-bottom: 0.4rem; }
+    .feature-name { display: block; color: #B68F40; font-weight: 700; font-size: 0.82rem; margin-bottom: 0.2rem; }
+    .feature-desc { display: block; color: rgba(255,255,255,0.6); font-size: 0.72rem; line-height: 1.4; }
+    .features-cta { display: inline-block; background: #B68F40; color: #041C24; padding: 0.7rem 1.5rem; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 0.85rem; transition: background 0.2s; }
+    .features-cta:hover { background: #d4a94e; }
+
+    /* ============ MARKOWITZ CARD ============ */
+    .markowitz-card { background: linear-gradient(135deg, #f8f6f1 0%, #f0ebe0 100%); border: 1px solid rgba(182,143,64,0.2); border-radius: 12px; padding: 2rem; margin: 1.5rem 0; text-align: center; }
+    .markowitz-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .markowitz-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; margin-bottom: 0.5rem; }
+    .markowitz-desc { color: #475569; font-size: 0.85rem; max-width: 500px; margin: 0 auto 1rem; line-height: 1.6; }
+    .markowitz-btn { display: inline-block; background: #B68F40; color: white; padding: 0.6rem 1.2rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.82rem; }
+
+    /* ============ SLIDER PULSE HINT ============ */
+    @keyframes sliderPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(182,143,64,0.4); }
+      50% { transform: scale(1.35); box-shadow: 0 0 0 6px rgba(182,143,64,0); }
+    }
+    .slider-hint input[type="range"]::-webkit-slider-thumb { animation: sliderPulse 1.2s ease-in-out 3; }
+    .slider-hint input[type="range"]::-moz-range-thumb { animation: sliderPulse 1.2s ease-in-out 3; }
+
+    /* ============ SHADCN-INSPIRED REFINEMENTS ============ */
+    .method-card { border-radius: 0.75rem; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: box-shadow 0.15s ease; }
+    .method-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .tab-label { transition: color 0.15s ease, border-color 0.15s ease; border-bottom-width: 2px; }
+    .method-locked-badge { border-radius: 9999px; padding: 0.15rem 0.6rem; font-size: 0.6rem; }
+    .social-proof-card { border-radius: 0.75rem; }
+    .features-showcase { border-radius: 0.75rem; }
+    .markowitz-card { border-radius: 0.75rem; }
 
     /* ============ ANIMATIONS ============ */
     @keyframes fadeInUp {
@@ -968,7 +1099,10 @@
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
   <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();var _iaSH=(function(){var ua=navigator.userAgent;if(/FBAN|FBAV/i.test(ua))return'facebook';if(/Instagram/i.test(ua))return'instagram';if(/LinkedIn/i.test(ua))return'linkedin';if(/WhatsApp/i.test(ua))return'whatsapp';if(/Telegram/i.test(ua))return'telegram';if(/Twitter|TwitterAndroid/i.test(ua))return'twitter';return null})(),_iaCID=(function(){var u=new URLSearchParams(location.search);if(u.get('fbclid'))return'facebook';if(u.get('gclid'))return'google_ads';if(u.get('ttclid'))return'tiktok';if(u.get('li_fat_id'))return'linkedin';if(u.get('twclkd'))return'twitter';if(u.get('msclkid'))return'microsoft_ads';return null})();function _iaTrack(ev,cid){var u=new URLSearchParams(location.search);var d={session_id:_iaS,page_path:(location.pathname.replace(/\/index\.html$/,'').replace(/\/$/,'')||'/').toUpperCase(),referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview',source_hint:_iaSH,click_id_source:_iaCID};if(cid)d.cta_id=cid;fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify(d)}).catch(function(){})}_iaTrack();function _iaClick(e){e.preventDefault();var el=e.currentTarget;var url=el.href;var cid=el.getAttribute('data-cta')||null;_iaTrack('cta_click',cid);setTimeout(function(){window.location.href=url},150)}
 var _iaDivData=[{"e":"2025-12-29","a":1.4803,"t":"DIVIDENDO","p":"2026-12-31"},{"e":"2025-12-29","a":0.43122706,"t":"JCP","p":"2026-02-02"},{"e":"2024-12-26","a":0.32159132,"t":"JCP","p":"2025-01-31"},{"e":"2024-12-26","a":0.09892037,"t":"DIVIDENDO","p":"2025-01-31"},{"e":"2024-12-20","a":0.09892,"t":"DIVIDENDO","p":"2025-01-31"},{"e":"2024-12-20","a":0.321591,"t":"JCP","p":"2025-01-31"},{"e":"2023-12-06","a":0.3168678,"t":"JCP","p":"2023-12-26"},{"e":"2022-12-27","a":0.236108,"t":"DIVIDENDO","p":"2023-01-06"},{"e":"2022-12-27","a":0.23610765,"t":"JCP","p":"2023-01-06"},{"e":"2022-05-05","a":0.21612994,"t":"DIVIDENDO","p":"2022-05-16"},{"e":"2021-12-23","a":0.1591001,"t":"JCP","p":"2022-01-31"},{"e":"2021-04-29","a":0.07927929,"t":"DIVIDENDO","p":"2021-05-21"},{"e":"2021-01-06","a":0.05544619,"t":"JCP","p":"2021-01-29"},{"e":"2020-04-30","a":0.05586395,"t":"DIVIDENDO","p":"2020-04-30"},{"e":"2020-01-03","a":0.18859816,"t":"JCP","p":"2020-02-09"},{"e":"2018-12-28","a":0.15497614,"t":"JCP","p":"2019-05-12"},{"e":"2016-01-20","a":0.9704129,"t":"DIVIDENDO","p":"2016-01-29"},{"e":"2015-12-21","a":0.04846746,"t":"JCP","p":"2016-01-10"},{"e":"2015-04-29","a":0.002211515,"t":"DIVIDENDO","p":"2015-04-29"},{"e":"2014-12-23","a":0.09016091,"t":"JCP","p":"2015-01-09"},{"e":"2014-04-25","a":0.01465975,"t":"DIVIDENDO","p":"2014-05-07"},{"e":"2013-12-13","a":0.10189146,"t":"JCP","p":"2014-01-13"},{"e":"2013-04-26","a":0.01717193,"t":"DIVIDENDO","p":"2013-04-26"},{"e":"2012-12-17","a":0.0793715,"t":"JCP","p":"2013-01-17"},{"e":"2012-04-27","a":0.011447417,"t":"DIVIDENDO","p":"2012-04-27"},{"e":"2011-12-09","a":0.06672924,"t":"JCP","p":"2012-01-09"},{"e":"2011-04-29","a":0.11215797,"t":"DIVIDENDO","p":"2011-05-27"}];
-function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.querySelector('button');btn.disabled=true;btn.textContent='Enviando...';var name=f.name.value.trim();var email=f.email.value.trim();fetch(_iaB+'/rest/v1/iacoes_email_leads',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},body:JSON.stringify({name:name,email:email,ticker:ticker,source:'dividendos'})}).then(function(){_iaTrack('lead_dividendos');var csv='Data Ex;Valor por Acao;Tipo;Data Pagamento\n';_iaDivData.forEach(function(d){csv+=d.e+';'+d.a+';'+d.t+';'+d.p+'\n';});var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='dividendos_'+ticker+'.csv';a.click();URL.revokeObjectURL(url);f.style.display='none';document.getElementById('div-lead-success-'+ticker).style.display='block';}).catch(function(){btn.disabled=false;btn.textContent='Erro — tente novamente';});return false;}</script>
+var _iaDreData=[{"y":"2016","rev":6739417000,"gp":1297360000,"ebit":498783000,"ibt":-249470000,"ni":-183174000},{"y":"2017","rev":7255804000,"gp":1486115000,"ebit":704470000,"ibt":33929000,"ni":16718000},{"y":"2018","rev":8075389000,"gp":1766302000,"ebit":960717000,"ibt":279497980,"ni":189170000},{"y":"2019","rev":9686209000,"gp":2059383000,"ebit":1199165000,"ibt":431126020,"ni":318625000},{"y":"2020","rev":2826797000,"gp":301655000,"ebit":195388990,"ibt":10650000,"ni":131317000},{"y":"2021","rev":4295978000,"gp":660666000,"ebit":523933000,"ibt":322526020,"ni":272548000},{"y":"2022","rev":6022405000,"gp":1041048000,"ebit":768825000,"ibt":166396990,"ni":194182000},{"y":"2023","rev":7574644000,"gp":1392042000,"ebit":1281404000,"ibt":377750020,"ni":351783000},{"y":"2024","rev":9056258000,"gp":1553871000,"ebit":1210459000,"ibt":268359010,"ni":207312000},{"y":"2025","rev":9640608000,"gp":1522033000,"ebit":1141757000,"ibt":-2741000,"ni":81704000}];
+var _iaBalData=[{"y":"2016","ta":8868383000,"cash":1043220000,"tl":8259394000,"ltd":0,"eq":608989000},{"y":"2017","ta":11500924000,"cash":2433254100,"tl":10311604000,"ltd":0,"eq":1189319900},{"y":"2018","ta":15873954000,"cash":4849245970,"tl":14625455000,"ltd":0,"eq":1248499000},{"y":"2019","ta":20268235000,"cash":5806058000,"tl":17888270000,"ltd":0,"eq":2379963000},{"y":"2020","ta":4838756000,"cash":652609000,"tl":3773610000,"ltd":0,"eq":1065146000},{"y":"2021","ta":7122247000,"cash":954573010,"tl":5792396000,"ltd":0,"eq":1329851000},{"y":"2022","ta":8242132000,"cash":873297000,"tl":6829519000,"ltd":0,"eq":1412613000},{"y":"2023","ta":11888867000,"cash":1880548000,"tl":10225424000,"ltd":0,"eq":1663443000},{"y":"2024","ta":12480182000,"cash":2025390900,"tl":10709822000,"ltd":0,"eq":1770360100},{"y":"2025","ta":12133203000,"cash":1480955000,"tl":10808647000,"ltd":0,"eq":1324556000}];
+var _iaCfData=[{"y":"2016","fco":756453000,"fci":-93188000,"fcf":-1028511000,"capex":0,"divp":0},{"y":"2017","fco":-1873071000,"fci":-80322000,"fcf":2082207000,"capex":0,"divp":0},{"y":"2018","fco":-2388058000,"fci":-143056990,"fcf":2506705000,"capex":0,"divp":0},{"y":"2019","fco":-1999548000,"fci":-217052990,"fcf":2118092000,"capex":0,"divp":0},{"y":"2020","fco":-1331683000,"fci":-229588990,"fcf":1034032000,"capex":0,"divp":0},{"y":"2021","fco":-264368990,"fci":-415084000,"fcf":767829000,"capex":0,"divp":0},{"y":"2022","fco":755264000,"fci":-87614000,"fcf":-344976000,"capex":0,"divp":0},{"y":"2023","fco":-1315218000,"fci":-150076000,"fcf":1600538000,"capex":0,"divp":0},{"y":"2024","fco":-296008000,"fci":-107868000,"fcf":235830000,"capex":0,"divp":0},{"y":"2025","fco":1210204000,"fci":-144080000,"fcf":-1267523000,"capex":0,"divp":0}];
+function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.querySelector('button');btn.disabled=true;btn.textContent='Enviando...';var name=f.name.value.trim();var email=f.email.value.trim();fetch(_iaB+'/rest/v1/iacoes_email_leads',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},body:JSON.stringify({name:name,email:email,ticker:ticker,source:'financeiras'})}).then(function(){_iaTrack('lead_financeiras');var csv='=== DRE (Demonstracao de Resultados) ===\nAno;Receita Total;Lucro Bruto;EBIT;Lucro Antes IR;Lucro Liquido\n';_iaDreData.forEach(function(d){csv+=d.y+';'+d.rev+';'+d.gp+';'+d.ebit+';'+d.ibt+';'+d.ni+'\n';});csv+='\n=== Balanco Patrimonial ===\nAno;Ativo Total;Caixa;Passivo Total;Divida LP;Patrimonio Liquido\n';_iaBalData.forEach(function(d){csv+=d.y+';'+d.ta+';'+d.cash+';'+d.tl+';'+d.ltd+';'+d.eq+'\n';});csv+='\n=== Fluxo de Caixa ===\nAno;FCO;FCI;FCF;CAPEX;Dividendos Pagos\n';_iaCfData.forEach(function(d){csv+=d.y+';'+d.fco+';'+d.fci+';'+d.fcf+';'+d.capex+';'+d.divp+'\n';});csv+='\n=== Dividendos ===\nData Ex;Valor por Acao;Tipo;Data Pagamento\n';_iaDivData.forEach(function(d){csv+=d.e+';'+d.a+';'+d.t+';'+d.p+'\n';});var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='financeiras_'+ticker+'.csv';a.click();URL.revokeObjectURL(url);f.style.display='none';document.getElementById('div-lead-success-'+ticker).style.display='block';}).catch(function(){btn.disabled=false;btn.textContent='Erro — tente novamente';});return false;}</script>
 </head>
 <body>
 
@@ -1025,79 +1159,109 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
         <span id="live-change-day" class="val-positive">+1.3% dia</span>
         <span class="val-positive">+0.6% 12m</span>
       </div>
+      <div class="hero-nota-qual">
+        <span class="nota-teaser-lock" aria-hidden="true">&#x1F512;</span>
+        <span>Nota Qualitativa: <strong style="filter:blur(4px)">?.??</strong> / 4.0</span>
+      </div>
       <div class="price-date" id="live-date">Dados de 10/04/2026</div>
+      <a href="#valuation-section" class="hero-cta-anchor" onclick="document.getElementById('valuation-section').scrollIntoView({behavior:'smooth'});return false;">Fazer meu Valuation &darr;</a>
     </div>
   </header>
 
-  <!-- INTRO ANALYSIS (SEO) -->
-  <section class="intro-analysis animate-in" aria-label="Análise fundamentalista de JSLG3">
-    <p><strong>JSLG3</strong> é a ação ordinária de <strong>JSL S.A.</strong>, negociada na B3 (bolsa brasileira) no setor de Bens Industriais, segmento de Transporte Rodoviário. Com cotação atual de <strong>R$ 8,57</strong> e valor de mercado de R$ 2,41 B, a empresa é analisada abaixo por 3 metodologias clássicas de valuation: Graham, Bazin e Gordon (DDM).</p>
-    <p>A análise fundamentalista de JSLG3 utiliza 3 métodos clássicos de valuation — <strong>Graham</strong>, <strong>Bazin</strong> e <strong>Gordon (DDM)</strong> — para estimar o preço justo da ação com premissas ajustáveis. Confira os resultados abaixo e ajuste as premissas para sua própria análise.</p>
-    <p>Negocia a um P/L de 29,8x e EV/EBITDA de 5,0x, com dividend yield de 22.3% nos últimos 12 meses. O retorno sobre patrimônio (ROE) é de 6.2%, e a margem líquida de 0.8%. Abaixo, você encontra todos os indicadores fundamentalistas, demonstrações financeiras históricas e o preço justo calculado com premissas ajustáveis.</p>
-  </section>
-
-  <!-- MERCADO & ESTRUTURA -->
-  <section class="metrics-section animate-in" aria-label="Mercado e Estrutura">
-    <h2 class="section-legend">Mercado & Estrutura</h2>
-    <div class="metrics-grid">
-      <div class="metric-box"><span class="metric-label">Valor de Mercado</span><span class="metric-value ">R$ 2,41 B</span></div>
-      <div class="metric-box"><span class="metric-label">Valor da Firma (EV)</span><span class="metric-value ">R$ 9,84 B</span></div>
-      <div class="metric-box"><span class="metric-label">Nro. Ações</span><span class="metric-value ">281,07 M</span></div>
-      <div class="metric-box"><span class="metric-label">Volume Médio (3M)</span><span class="metric-value ">940,30 K</span></div>
-      <div class="metric-box"><span class="metric-label">Min. 52 Semanas</span><span class="metric-value ">R$ 5,03</span></div>
-      <div class="metric-box"><span class="metric-label">Max. 52 Semanas</span><span class="metric-value ">R$ 8,82</span></div>
+  <!-- AUDITORIA IA -->
+  <section class="social-proof-section animate-in" aria-label="Auditoria por IA">
+    <div class="social-proof-card">
+      <p class="social-proof-headline">Leu um relat&oacute;rio sobre JSLG3? Viu uma recomenda&ccedil;&atilde;o?</p>
+      <p class="social-proof-text">Nossa IA audita a tese por tr&aacute;s &mdash; governan&ccedil;a, vantagens competitivas, riscos e mais 3 categorias. <strong>Descubra se a indica&ccedil;&atilde;o se sustenta.</strong></p>
+      <p class="social-proof-count">472 investidores j&aacute; validaram teses em JSLG3</p>
+      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=JSLG3" class="social-proof-btn" data-cta="social-proof" onclick="_iaClick(event)">Auditar com IA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16" style="vertical-align:middle;margin-left:0.3rem"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></a>
     </div>
   </section>
 
-  <!-- VALUATION -->
-  <section class="metrics-section animate-in" aria-label="Indicadores de Valuation">
-    <h2 class="section-legend">Valuation</h2>
-    <div class="metrics-grid">
-      <div class="metric-box"><span class="metric-label">P/L</span><span class="metric-value ">29,84</span></div>
-      <div class="metric-box"><span class="metric-label">P/VP</span><span class="metric-value ">1,72</span></div>
-      <div class="metric-box"><span class="metric-label">P/EBIT</span><span class="metric-value ">2,11</span></div>
-      <div class="metric-box"><span class="metric-label">PSR (Price/Sales)</span><span class="metric-value ">0,25</span></div>
-      <div class="metric-box"><span class="metric-label">EV/EBITDA</span><span class="metric-value ">5,02</span></div>
-      <div class="metric-box"><span class="metric-label">EV/EBIT</span><span class="metric-value ">7,84</span></div>
-      <div class="metric-box"><span class="metric-label">Div. Yield</span><span class="metric-value val-positive">22.3%</span></div>
-      <div class="metric-box"><span class="metric-label">LPA</span><span class="metric-value ">R$ 0,29</span></div>
-      <div class="metric-box"><span class="metric-label">VPA</span><span class="metric-value ">R$ 4,64</span></div>
+  <!-- SOBRE A EMPRESA (SEO + NEGÓCIO) -->
+  <section class="section-card intro-combined animate-in" aria-label="Sobre JSLG3">
+    <div class="intro-combined-section">
+      <h2 class="section-legend">Análise Fundamentalista</h2>
+      <p><strong>JSLG3</strong> é a ação ordinária de <strong>JSL S.A.</strong>, negociada na B3 (bolsa brasileira) no setor de Bens Industriais, segmento de Transporte Rodoviário. Com cotação atual de <strong>R$ 8,57</strong> e valor de mercado de R$ 2,41 B, a empresa é analisada abaixo por 3 metodologias clássicas de valuation: Graham, Bazin e Gordon (DDM).</p>
+      <p>A análise fundamentalista de JSLG3 utiliza 3 métodos clássicos de valuation — <strong>Graham</strong>, <strong>Bazin</strong> e <strong>Gordon (DDM)</strong> — para estimar o preço justo da ação com premissas ajustáveis. Confira os resultados abaixo e ajuste as premissas para sua própria análise.</p>
+      <p>Negocia a um P/L de 29,8x e EV/EBITDA de 5,0x, com dividend yield de 22.3% nos últimos 12 meses. O retorno sobre patrimônio (ROE) é de 6.2%, e a margem líquida de 0.8%. Abaixo, você encontra todos os indicadores fundamentalistas, demonstrações financeiras históricas e o preço justo calculado com premissas ajustáveis.</p>
+    </div>
+    
+    <div class="intro-combined-divider"></div>
+    <div class="intro-combined-section">
+      <h2 class="section-legend">Visão de Negócio</h2>
+      <p>JSL S.A., together with its subsidiaries, provides logistics services in Brazil. The company operates vehicle fleets that handle road freight transport operations in consumer goods, petrochemical, and other segments. It also offers warehousing services; and manages receipt, storage, inventory control, and shipment activities within the clients' premises. In addition, the company provides urban distribution services; and raw material supply, loading, and internal handling services for various sectors, such as sugar and ethanol, mining, and forestry. Further, it transports company employees to strategic locations using a mix of vehicles, such as buses, minibuses, or vans; provides rental of vehicles with driver services for the transportation of people and cargo; and offers a digital platform for freight transport. The company was founded in 1956 and is headquartered in São Paulo, Brazil. JSL S.A. is a subsidiary of Simpar S.A.</p>
     </div>
   </section>
 
-  <!-- RENTABILIDADE & MARGENS -->
-  <section class="metrics-section animate-in" aria-label="Rentabilidade e Margens">
-    <h2 class="section-legend">Rentabilidade & Margens</h2>
-    <div class="metrics-grid">
-      <div class="metric-box"><span class="metric-label">ROE</span><span class="metric-value val-positive">6.2%</span></div>
-      <div class="metric-box"><span class="metric-label">ROIC</span><span class="metric-value val-positive">0.7%</span></div>
-      <div class="metric-box"><span class="metric-label">Margem Bruta</span><span class="metric-value ">15.8%</span></div>
-      <div class="metric-box"><span class="metric-label">Margem EBIT</span><span class="metric-value ">11.8%</span></div>
-      <div class="metric-box"><span class="metric-label">Margem EBITDA</span><span class="metric-value ">20.3%</span></div>
-      <div class="metric-box"><span class="metric-label">Margem Líquida</span><span class="metric-value val-positive">0.8%</span></div>
-    </div>
-  </section>
+  <!-- INDICADORES FUNDAMENTALISTAS (CSS-ONLY TABS) -->
+  <section class="metrics-tabs-section animate-in" aria-label="Indicadores Fundamentalistas">
+    <h2 class="section-legend">Indicadores Fundamentalistas</h2>
+    <div class="tabs-container">
+      <input type="radio" name="metrics-tab" id="tab-mercado" class="tab-radio">
+      <label for="tab-mercado" class="tab-label">Mercado</label>
+      <input type="radio" name="metrics-tab" id="tab-valuation" class="tab-radio" checked>
+      <label for="tab-valuation" class="tab-label">Valuation</label>
+      <input type="radio" name="metrics-tab" id="tab-rentabilidade" class="tab-radio">
+      <label for="tab-rentabilidade" class="tab-label">Rentabilidade</label>
+      <input type="radio" name="metrics-tab" id="tab-endividamento" class="tab-radio">
+      <label for="tab-endividamento" class="tab-label">Endividamento</label>
 
-  <!-- ENDIVIDAMENTO & LIQUIDEZ -->
-  <section class="metrics-section animate-in" aria-label="Endividamento e Liquidez">
-    <h2 class="section-legend">Endividamento & Liquidez</h2>
-    <div class="metrics-grid" style="grid-template-columns: repeat(3, 1fr);">
-      <div class="metric-box"><span class="metric-label">Div. Liq./EBITDA</span><span class="metric-value val-positive">3,86</span></div>
-      <div class="metric-box"><span class="metric-label">Div. Bruta/Patrim.</span><span class="metric-value ">0,00</span></div>
-      <div class="metric-box"><span class="metric-label">Liquidez Corrente</span><span class="metric-value ">0,00</span></div>
+      <div class="tab-panel" id="panel-mercado">
+        <div class="metrics-grid">
+          <div class="metric-box"><span class="metric-label">Valor de Mercado</span><span class="metric-value ">R$ 2,41 B</span></div>
+          <div class="metric-box"><span class="metric-label">Valor da Firma (EV)</span><span class="metric-value ">R$ 9,84 B</span></div>
+          <div class="metric-box"><span class="metric-label">Nro. Ações</span><span class="metric-value ">281,07 M</span></div>
+          <div class="metric-box"><span class="metric-label">Volume Médio (3M)</span><span class="metric-value ">940,30 K</span></div>
+          <div class="metric-box"><span class="metric-label">Min. 52 Semanas</span><span class="metric-value ">R$ 5,03</span></div>
+          <div class="metric-box"><span class="metric-label">Max. 52 Semanas</span><span class="metric-value ">R$ 8,82</span></div>
+        </div>
+      </div>
+      <div class="tab-panel" id="panel-valuation">
+        <div class="metrics-grid">
+          <div class="metric-box"><span class="metric-label">P/L</span><span class="metric-value ">29,84</span></div>
+          <div class="metric-box"><span class="metric-label">P/VP</span><span class="metric-value ">1,72</span></div>
+          <div class="metric-box"><span class="metric-label">P/EBIT</span><span class="metric-value ">2,11</span></div>
+          <div class="metric-box"><span class="metric-label">PSR (Price/Sales)</span><span class="metric-value ">0,25</span></div>
+          <div class="metric-box"><span class="metric-label">EV/EBITDA</span><span class="metric-value ">5,02</span></div>
+          <div class="metric-box"><span class="metric-label">EV/EBIT</span><span class="metric-value ">7,84</span></div>
+          <div class="metric-box"><span class="metric-label">Div. Yield</span><span class="metric-value val-positive">22.3%</span></div>
+          <div class="metric-box"><span class="metric-label">LPA</span><span class="metric-value ">R$ 0,29</span></div>
+          <div class="metric-box"><span class="metric-label">VPA</span><span class="metric-value ">R$ 4,64</span></div>
+        </div>
+      </div>
+      <div class="tab-panel" id="panel-rentabilidade">
+        <div class="metrics-grid">
+          <div class="metric-box"><span class="metric-label">ROE</span><span class="metric-value val-positive">6.2%</span></div>
+          <div class="metric-box"><span class="metric-label">ROIC</span><span class="metric-value val-positive">0.7%</span></div>
+          <div class="metric-box"><span class="metric-label">Margem Bruta</span><span class="metric-value ">15.8%</span></div>
+          <div class="metric-box"><span class="metric-label">Margem EBIT</span><span class="metric-value ">11.8%</span></div>
+          <div class="metric-box"><span class="metric-label">Margem EBITDA</span><span class="metric-value ">20.3%</span></div>
+          <div class="metric-box"><span class="metric-label">Margem Líquida</span><span class="metric-value val-positive">0.8%</span></div>
+        </div>
+      </div>
+      <div class="tab-panel" id="panel-endividamento">
+        <div class="metrics-grid" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="metric-box"><span class="metric-label">Div. Liq./EBITDA</span><span class="metric-value val-positive">3,86</span></div>
+          <div class="metric-box"><span class="metric-label">Div. Bruta/Patrim.</span><span class="metric-value ">0,00</span></div>
+          <div class="metric-box"><span class="metric-label">Liquidez Corrente</span><span class="metric-value ">0,00</span></div>
+        </div>
+      </div>
+
+      <div class="metrics-timestamp">Atualizado em 10/04/2026 (p&oacute;s-fechamento B3)</div>
     </div>
   </section>
 
   <!-- PRECO JUSTO (METODOS CLASSICOS) -->
-  <section class="methods-section animate-in" aria-label="Preço Justo - Métodos Clássicos">
+  <section class="methods-section animate-in" id="valuation-section" aria-label="Preço Justo - Métodos Clássicos">
     <div class="section-header-row">
       <div>
-        <h3 class="section-title font-playfair">Preço Justo (Métodos Clássicos)</h3>
-        <span class="section-sub">Graham, Bazin e Gordon com premissas auditáveis</span>
+        <h3 class="section-title font-playfair">Calcule o pre&ccedil;o justo de JSLG3 com suas premissas</h3>
+        <span class="section-sub">3 m&eacute;todos cl&aacute;ssicos + DCF avan&ccedil;ado na plataforma</span>
       </div>
       <div class="section-price-ref">Cotação Atual<br><strong>R$ 8,57</strong></div>
     </div>
-    <div class="methods-grid methods-grid-3">
+    <div class="methods-grid">
 
       <!-- GRAHAM -->
       <div class="method-card">
@@ -1120,18 +1284,12 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
 
           <div class="premissas-section">
             <div class="premissas-label">PREMISSAS</div>
-            <div class="premissa-row">
-              <label>P/L Maximo</label>
-              <div class="premissa-input-group">
-                <input type="number" id="graham-pl" value="15" min="1" max="50" step="1" class="premissa-input">
-              </div>
-            </div>
-            <div class="premissa-row">
-              <label>P/VP Maximo</label>
-              <div class="premissa-input-group">
-                <input type="number" id="graham-pvp" value="1.5" min="0.1" max="10" step="0.1" class="premissa-input">
-              </div>
-            </div>
+            <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=JSLG3" class="premissa-locked-row" data-cta="dcf-locked" onclick="_iaClick(event)">
+              <span>&#x1F512; P/L Máximo: <strong style="filter:blur(4px)">15</strong></span>
+              <span>P/VP Máximo: <strong style="filter:blur(4px)">1.5</strong></span>
+            </a>
+            <input type="hidden" id="graham-pl" value="15">
+            <input type="hidden" id="graham-pvp" value="1.5">
             <div class="premissa-row">
               <label>Margem de Segurança</label>
               <div class="premissa-slider-group">
@@ -1176,15 +1334,10 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
                 <span class="premissa-slider-val" id="bazin-dy-val">6.0%</span>
               </div>
             </div>
-            <div class="premissa-row">
-              <label>Anos para Media</label>
-              <select id="bazin-years" class="premissa-select">
-                <option value="1">1 ano</option>
-                <option value="3">3 anos</option>
-                <option value="5" selected>5 anos</option>
-                <option value="10">10 anos</option>
-              </select>
-            </div>
+            <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=JSLG3" class="premissa-locked-row" data-cta="dcf-locked" onclick="_iaClick(event)">
+              <span>&#x1F512; Anos para Média: <strong style="filter:blur(4px)">5 anos</strong></span>
+            </a>
+            <input type="hidden" id="bazin-years" value="5">
           </div>
 
           <div class="premissa-info-row">
@@ -1231,15 +1384,10 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
                 <span class="premissa-slider-val" id="gordon-g-val">5.0%</span>
               </div>
             </div>
-            <div class="premissa-row">
-              <label>Anos para Media</label>
-              <select id="gordon-years" class="premissa-select">
-                <option value="1">1 ano</option>
-                <option value="3">3 anos</option>
-                <option value="5" selected>5 anos</option>
-                <option value="10">10 anos</option>
-              </select>
-            </div>
+            <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=JSLG3" class="premissa-locked-row" data-cta="dcf-locked" onclick="_iaClick(event)">
+              <span>&#x1F512; Anos para Média: <strong style="filter:blur(4px)">5 anos</strong></span>
+            </a>
+            <input type="hidden" id="gordon-years" value="5">
           </div>
 
           <div class="premissa-info-row">
@@ -1248,55 +1396,80 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
         </div>
       </div>
 
+
     </div>
 
-    <!-- CTA VALUATION -->
-    <div class="cta-valuation">
-      <div class="cta-valuation-inner">
-        <div class="cta-valuation-text">
-          <h2 class="cta-valuation-title">Quer ir além com JSLG3?</h2>
-          <p class="cta-valuation-desc">Na plataforma, você ajusta <strong>todas as premissas</strong> — taxa de desconto, crescimento, margens — e compara cenários Bear, Base e Bull em tempo real com 5 metodologias de valuation.</p>
+    <!-- DCF (LOCKED — FULL WIDTH) -->
+    <div class="dcf-locked-card method-card method-card-locked">
+      <div class="dcf-locked-inner">
+        <div class="dcf-locked-left">
+          <div class="method-header" style="margin-bottom:0.5rem">
+            <div>
+              <span class="method-name">DCF</span>
+              <span class="method-sub">Tabela de Sensibilidade</span>
+            </div>
+            <span class="method-locked-badge">PRO</span>
+          </div>
+          <div class="dcf-sensitivity-blur">
+            
+    <div class="sensitivity-table-wrap">
+      <div class="sensitivity-title">G PERP&Eacute;TUO</div>
+      <table class="sensitivity-table">
+        <thead><tr><th></th><th>3.5%</th><th>4.0%</th><th>4.5%</th><th class="sensitivity-center-col">5.0%</th><th>5.5%</th><th>6.0%</th><th>6.5%</th></tr></thead>
+        <tbody><tr><td class="sensitivity-wacc">14.2%</td><td style="background:rgba(130,150,95,0.13);color:#92400e">8,20</td><td style="background:rgba(115,162,99,0.15);color:#92400e">8,70</td><td style="background:rgba(100,173,103,0.16);color:#065f46">9,20</td><td style="background:rgba(85,185,108,0.18);color:#065f46">9,70</td><td style="background:rgba(70,197,112,0.20);color:#065f46">10,20</td><td style="background:rgba(55,208,116,0.21);color:#065f46">10,60</td><td style="background:rgba(40,220,120,0.23);color:#065f46">11,10</td></tr><tr><td class="sensitivity-wacc">14.7%</td><td style="background:rgba(145,138,91,0.15);color:#92400e">7,70</td><td style="background:rgba(130,150,95,0.13);color:#92400e">8,20</td><td style="background:rgba(115,162,99,0.15);color:#92400e">8,60</td><td style="background:rgba(100,173,103,0.16);color:#065f46">9,10</td><td style="background:rgba(85,185,108,0.18);color:#065f46">9,60</td><td style="background:rgba(70,197,112,0.20);color:#065f46">10,10</td><td style="background:rgba(55,208,116,0.21);color:#065f46">10,60</td></tr><tr><td class="sensitivity-wacc">15.2%</td><td style="background:rgba(160,127,87,0.16);color:#991b1b">7,10</td><td style="background:rgba(145,138,91,0.15);color:#92400e">7,60</td><td style="background:rgba(130,150,95,0.13);color:#92400e">8,10</td><td style="background:rgba(115,162,99,0.15);color:#92400e">8,60</td><td style="background:rgba(100,173,103,0.16);color:#065f46">9,00</td><td style="background:rgba(85,185,108,0.18);color:#065f46">9,50</td><td style="background:rgba(70,197,112,0.20);color:#065f46">10,00</td></tr><tr class="sensitivity-center-row"><td class="sensitivity-wacc">15.7%</td><td style="background:rgba(175,115,83,0.18);color:#991b1b">6,60</td><td style="background:rgba(160,127,87,0.16);color:#991b1b">7,00</td><td style="background:rgba(145,138,91,0.15);color:#92400e">7,50</td><td class="sensitivity-center">8,00</td><td style="background:rgba(115,162,99,0.15);color:#92400e">8,50</td><td style="background:rgba(100,173,103,0.16);color:#065f46">9,00</td><td style="background:rgba(85,185,108,0.18);color:#065f46">9,40</td></tr><tr><td class="sensitivity-wacc">16.2%</td><td style="background:rgba(190,103,78,0.20);color:#991b1b">6,00</td><td style="background:rgba(175,115,83,0.18);color:#991b1b">6,50</td><td style="background:rgba(160,127,87,0.16);color:#991b1b">7,00</td><td style="background:rgba(145,138,91,0.15);color:#92400e">7,40</td><td style="background:rgba(130,150,95,0.13);color:#92400e">7,90</td><td style="background:rgba(115,162,99,0.15);color:#92400e">8,40</td><td style="background:rgba(100,173,103,0.16);color:#065f46">8,90</td></tr><tr><td class="sensitivity-wacc">16.7%</td><td style="background:rgba(205,92,74,0.21);color:#991b1b">5,40</td><td style="background:rgba(190,103,78,0.20);color:#991b1b">5,90</td><td style="background:rgba(175,115,83,0.18);color:#991b1b">6,40</td><td style="background:rgba(160,127,87,0.16);color:#991b1b">6,90</td><td style="background:rgba(145,138,91,0.15);color:#92400e">7,40</td><td style="background:rgba(130,150,95,0.13);color:#92400e">7,80</td><td style="background:rgba(115,162,99,0.15);color:#92400e">8,30</td></tr><tr><td class="sensitivity-wacc">17.2%</td><td style="background:rgba(220,80,70,0.23);color:#991b1b">4,90</td><td style="background:rgba(205,92,74,0.21);color:#991b1b">5,40</td><td style="background:rgba(190,103,78,0.20);color:#991b1b">5,80</td><td style="background:rgba(175,115,83,0.18);color:#991b1b">6,30</td><td style="background:rgba(160,127,87,0.16);color:#991b1b">6,80</td><td style="background:rgba(145,138,91,0.15);color:#92400e">7,30</td><td style="background:rgba(130,150,95,0.13);color:#92400e">7,80</td></tr></tbody>
+      </table>
+      <div class="sensitivity-footer">WACC &darr; &mdash; Centro: WACC 15.7% &times; g 5.0% = <strong>R$ 8,00</strong></div>
+    </div>
+          </div>
         </div>
-        <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=JSLG3" class="cta-valuation-btn" data-cta="valuation" onclick="_iaClick(event)">Fazer Seu Valuation Completo &rarr;</a>
+        <div class="dcf-locked-right">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <p class="dcf-locked-headline">Diferente de agregadores de dados, aqui <strong>voc&ecirc; monta seu pr&oacute;prio valuation</strong></p>
+          <p class="dcf-locked-sub">Premissas avan&ccedil;adas, cen&aacute;rios e compara&ccedil;&atilde;o com intelig&ecirc;ncia artificial.</p>
+          <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=JSLG3" class="method-unlock-btn" data-cta="dcf-locked" onclick="_iaClick(event)">Fazer Valuation DCF &rarr;</a>
+        </div>
       </div>
-    </div>
-
-    <div class="methods-note">
-      <strong>Importante:</strong> Os valores apresentados nesta página são estimativas calculadas por modelos matemáticos e <strong>não constituem recomendação de compra, venda ou manutenção de ativos</strong>. Cada investidor deve conduzir sua própria análise, considerando o contexto da empresa, riscos setoriais, cenário macroeconômico e seu perfil de investimento.
-    </div>
-    <div class="methods-note">
-      <strong>Graham</strong> calcula o valor intrínseco com base no lucro por ação (LPA) e valor patrimonial por ação (VPA). É mais adequado para empresas lucrativas, com patrimônio sólido e histórico consistente. Empresas em crescimento acelerado ou com prejuízo podem apresentar distorções nesse modelo.
-    </div>
-    <div class="methods-note">
-      <strong>Bazin</strong> estima o preço justo a partir dos dividendos pagos, dividindo-os por uma taxa mínima de retorno desejada (dividend yield). Funciona melhor para empresas maduras e boas pagadoras de dividendos. Empresas que reinvestem lucros ou que têm política de dividendos irregular podem gerar resultados pouco representativos.
-    </div>
-    <div class="methods-note">
-      <strong>Gordon (DDM)</strong> projeta o valor presente de todos os dividendos futuros, assumindo um crescimento perpétuo constante. É útil para empresas com dividendos estáveis e previsíveis, mas pode distorcer significativamente o resultado quando a taxa de crescimento se aproxima da taxa de desconto ou quando a empresa não distribui proventos regularmente.
-    </div>
-    <div class="methods-note">
-      Utilize a <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" style="color:var(--accent);font-weight:600;" data-cta="disclaimer" onclick="_iaClick(event)">plataforma iAções</a> para aprofundar sua análise com dados completos, comparativos setoriais e ferramentas de valuation avançadas. Investir exige estudo — conheça a empresa, entenda os riscos e tome decisões informadas.
     </div>
   </section>
 
-  
-  <!-- RESUMO DE NEGÓCIO -->
-  <section class="section-card animate-in" aria-label="Resumo de Negócio de JSLG3">
-    <div class="resumo-header">
-      <div>
-        <h2 class="resumo-title">JSLG3 — Visão de Negócio</h2>
-        <div class="resumo-date">Atualização: 10/04/2026</div>
+
+  <!-- FEATURES SHOWCASE -->
+  <section class="features-showcase animate-in" aria-label="Funcionalidades da plataforma">
+    <div class="features-inner">
+      <h3 class="features-title">Tudo que voc&ecirc; precisa para analisar JSLG3</h3>
+      <div class="features-grid">
+        <div class="feature-item">
+          <span class="feature-icon" role="img" aria-label="DCF Completo">&#x1F4CA;</span>
+          <span class="feature-name">DCF Completo</span>
+          <span class="feature-desc">Fluxo de caixa descontado com premissas edit&aacute;veis</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon" role="img" aria-label="Nota Qualitativa">&#x1F3AF;</span>
+          <span class="feature-name">Nota Qualitativa</span>
+          <span class="feature-desc">Auditoria com IA em 6 categorias</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon" role="img" aria-label="Otimizador Markowitz">&#x2696;&#xFE0F;</span>
+          <span class="feature-name">Otimizador Markowitz</span>
+          <span class="feature-desc">Fronteira eficiente e balanceamento de carteira</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon" role="img" aria-label="Radar de Oportunidades">&#x1F50D;</span>
+          <span class="feature-name">Radar de Oportunidades</span>
+          <span class="feature-desc">Screening com filtros fundamentalistas</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon" role="img" aria-label="Documentos CVM">&#x1F4C4;</span>
+          <span class="feature-name">Documentos CVM</span>
+          <span class="feature-desc">Feed de ITRs, DFPs e fatos relevantes</span>
+        </div>
       </div>
-      <div class="resumo-badges">
-        <span class="resumo-badge">Setor: Bens Industriais</span>
-        <span class="resumo-badge">Subsetor: Transporte Rodoviário</span>
-        <span class="resumo-badge">Tipo: ON</span>
-      </div>
+      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="features-cta" data-cta="features-card" onclick="_iaClick(event)">Explorar plataforma gr&aacute;tis &rarr;</a>
     </div>
-    <p class="resumo-text">JSL S.A., together with its subsidiaries, provides logistics services in Brazil. The company operates vehicle fleets that handle road freight transport operations in consumer goods, petrochemical, and other segments. It also offers warehousing services; and manages receipt, storage, inventory control, and shipment activities within the clients' premises. In addition, the company provides urban distribution services; and raw material supply, loading, and internal handling services for various sectors, such as sugar and ethanol, mining, and forestry. Further, it transports company employees to strategic locations using a mix of vehicles, such as buses, minibuses, or vans; provides rental of vehicles with driver services for the transportation of people and cargo; and offers a digital platform for freight transport. The company was founded in 1956 and is headquartered in São Paulo, Brazil. JSL S.A. is a subsidiary of Simpar S.A.</p>
   </section>
 
   <!-- NOTA QUALITATIVA (PAYWALL) -->
-  <section class="section-card animate-in nota-section" aria-label="Nota Qualitativa de JSLG3">
+  <section class="section-card animate-in nota-section" id="nota-section" aria-label="Nota Qualitativa de JSLG3">
     <div class="nota-header">
       <div>
         <div class="nota-label">Nota Qualitativa</div>
@@ -1353,6 +1526,17 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
       <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="nota-overlay-btn" data-cta="nota-qualitativa" onclick="_iaClick(event)">Desbloquear Análise &rarr;</a>
     </div>
   </section>
+
+  <!-- MARKOWITZ CARD -->
+  <section class="markowitz-card animate-in" aria-label="Otimização de carteira">
+    <div class="markowitz-inner">
+      <div class="markowitz-icon" role="img" aria-label="Otimização">&#x2696;&#xFE0F;</div>
+      <h3 class="markowitz-title">Tem JSLG3 na carteira?</h3>
+      <p class="markowitz-desc">Descubra se seu portf&oacute;lio est&aacute; otimizado segundo Markowitz &mdash; fronteira eficiente, correla&ccedil;&atilde;o entre ativos e an&aacute;lise de risco/retorno.</p>
+      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="markowitz-btn" data-cta="markowitz" onclick="_iaClick(event)">Otimizar minha carteira &rarr;</a>
+    </div>
+  </section>
+
 
   <!-- DEMONSTRAÇÕES FINANCEIRAS -->
   <section class="section-card animate-in" aria-label="Demonstrações Financeiras">
@@ -1411,21 +1595,20 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
       </table>
     </div>
 
-    
-    <!-- LEAD COLLECTOR: HISTÓRICO COMPLETO DE DIVIDENDOS -->
+    <!-- LEAD COLLECTOR: PLANILHA FINANCEIRA COMPLETA -->
     <div class="div-lead-card" id="div-lead-card-JSLG3">
       <div class="div-lead-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       </div>
-      <div class="div-lead-title">Histórico Completo de Dividendos de JSLG3</div>
-      <div class="div-lead-sub">27 pagamentos desde 2011 — JCP, dividendos e rendimentos com datas e valores por ação.</div>
+      <div class="div-lead-title">Dados Financeiros Completos de JSLG3</div>
+      <div class="div-lead-sub">DRE, Balan&ccedil;o Patrimonial, Fluxo de Caixa e Dividendos &mdash; 10 anos de hist&oacute;rico + 27 pagamentos de dividendos.</div>
       <form class="div-lead-form" id="div-lead-form-JSLG3" onsubmit="return _iaLeadSubmit(event,'JSLG3')">
         <input type="text" name="name" placeholder="Seu nome" required>
         <input type="email" name="email" placeholder="Seu melhor e-mail" required>
-        <button type="submit" class="div-lead-btn">Baixar histórico completo <span>&rarr;</span></button>
+        <button type="submit" class="div-lead-btn">Baixar dados completos <span>&rarr;</span></button>
       </form>
       <div class="div-lead-success" id="div-lead-success-JSLG3" style="display:none">
-        <p>Pronto! O download vai começar automaticamente.</p>
+        <p>Pronto! O download vai come&ccedil;ar automaticamente.</p>
       </div>
     </div>
   </section>
@@ -1537,9 +1720,9 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
 
   <!-- CTA -->
   <section class="cta-card animate-in" aria-label="Acesse a plataforma">
-    <h2>Análise completa na plataforma</h2>
-    <p>Acesse premissas editáveis, cenários Bear/Base/Bull, análise qualitativa com IA, radar de notícias e muito mais.</p>
-    <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="cta-btn" data-cta="footer" onclick="_iaClick(event)">Teste a sua tese de investimento gr&aacute;tis &rarr;</a>
+    <h2>Sua an&aacute;lise de JSLG3 come&ccedil;a aqui</h2>
+    <p>Premissas edit&aacute;veis, cen&aacute;rios Bear/Base/Bull, an&aacute;lise qualitativa com IA, otimizador Markowitz e muito mais &mdash; tudo gr&aacute;tis para come&ccedil;ar.</p>
+    <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=JSLG3" class="cta-btn" data-cta="footer" onclick="_iaClick(event)">Comece sua an&aacute;lise gr&aacute;tis &rarr;</a>
   </section>
 
   </article>
@@ -1552,6 +1735,23 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
     </div>
     <a href="/acoes/" style="display:inline-block;margin-top:0.6rem;font-size:0.8rem;color:#B68F40;text-decoration:none;font-weight:500;">Ver todas as ações &rarr;</a>
   </nav>
+
+  <!-- NOTAS SOBRE OS MÉTODOS DE VALUATION -->
+  <div class="methods-note" style="margin-bottom:0.5rem;">
+    <strong>Importante:</strong> Os valores apresentados nesta p&aacute;gina s&atilde;o estimativas calculadas por modelos matem&aacute;ticos e <strong>n&atilde;o constituem recomenda&ccedil;&atilde;o de compra, venda ou manuten&ccedil;&atilde;o de ativos</strong>. Cada investidor deve conduzir sua pr&oacute;pria an&aacute;lise, considerando o contexto da empresa, riscos setoriais, cen&aacute;rio macroecon&ocirc;mico e seu perfil de investimento.
+  </div>
+  <div class="methods-note" style="margin-bottom:0.5rem;">
+    <strong>Graham</strong> calcula o valor intr&iacute;nseco com base no lucro por a&ccedil;&atilde;o (LPA) e valor patrimonial por a&ccedil;&atilde;o (VPA). &Eacute; mais adequado para empresas lucrativas, com patrim&ocirc;nio s&oacute;lido e hist&oacute;rico consistente.
+  </div>
+  <div class="methods-note" style="margin-bottom:0.5rem;">
+    <strong>Bazin</strong> estima o pre&ccedil;o justo a partir dos dividendos pagos, dividindo-os por uma taxa m&iacute;nima de retorno desejada (dividend yield). Funciona melhor para empresas maduras e boas pagadoras de dividendos.
+  </div>
+  <div class="methods-note" style="margin-bottom:0.5rem;">
+    <strong>Gordon (DDM)</strong> projeta o valor presente de todos os dividendos futuros, assumindo um crescimento perp&eacute;tuo constante. &Eacute; &uacute;til para empresas com dividendos est&aacute;veis e previs&iacute;veis.
+  </div>
+  <div class="methods-note" style="margin-bottom:1.5rem;">
+    Utilize a <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" style="color:#B68F40;font-weight:600;" data-cta="disclaimer" onclick="_iaClick(event)">plataforma iA&ccedil;&otilde;es</a> para aprofundar sua an&aacute;lise com dados completos, comparativos setoriais e ferramentas de valuation avan&ccedil;adas. Investir exige estudo &mdash; conhe&ccedil;a a empresa, entenda os riscos e tome decis&otilde;es informadas.
+  </div>
 
   <!-- DISCLAIMER -->
   <footer class="disclaimer" role="contentinfo">
@@ -1688,11 +1888,33 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
 })();
 </script>
 
+<!-- Slider pulse hint -->
+<script>
+(function(){
+  if(!window.IntersectionObserver)return;
+  var cards=document.querySelectorAll('.method-card:not(.method-card-locked)');
+  var ob=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){
+        e.target.classList.add('slider-hint');
+        ob.unobserve(e.target);
+        var inputs=e.target.querySelectorAll('input[type="range"]');
+        inputs.forEach(function(inp){
+          inp.addEventListener('input',function(){e.target.classList.remove('slider-hint');},{once:true});
+        });
+        setTimeout(function(){e.target.classList.remove('slider-hint');},4000);
+      }
+    });
+  },{threshold:0.5});
+  cards.forEach(function(c){ob.observe(c);});
+})();
+</script>
+
 <!-- Scroll depth tracking -->
 <script>
 (function(){
   var f={};
-  var m={scroll_25:'.methods-section',scroll_50:'.nota-section',scroll_75:'[aria-label="Demonstrações Financeiras"]',scroll_100:'.faq-section'};
+  var m={scroll_25:'#valuation-section',scroll_50:'.features-showcase',scroll_75:'[aria-label="Demonstrações Financeiras"]',scroll_100:'.faq-section'};
   if(!window.IntersectionObserver)return;
   var o=new IntersectionObserver(function(es){
     es.forEach(function(e){
