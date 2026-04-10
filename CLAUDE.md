@@ -39,10 +39,13 @@ iacoes/
 ├── scripts/                 # Gerador de paginas estaticas (TypeScript)
 │   ├── generate-pages.ts    # Orquestrador principal
 │   ├── template.ts          # Template HTML + geradores de sitemap/robots
+│   ├── validate-html.ts     # Validacao pos-geracao (7 regras, roda via postgenerate)
 │   ├── valuation.ts         # Calculos de valuation (DCF, Graham, Gordon, EVA, Multiplos)
 │   ├── supabase.ts          # Client Supabase + fetch + mappers de dados
 │   ├── types.ts             # Interfaces TypeScript (FinancialData, ValuationResult, etc.)
 │   └── constants.ts         # Constantes (taxas, pesos, cenarios)
+├── _bmad/                   # BMAD framework (agentes, workflows, skills)
+├── _bmad-output/            # Outputs de sessoes BMAD (brainstorming, etc.)
 ├── valuations.json          # Dados de valuation para o widget da landing page (gerado automaticamente)
 ├── robots.txt               # Gerado automaticamente
 ├── sitemap.xml              # Gerado automaticamente
@@ -64,8 +67,11 @@ iacoes/
 npm run generate              # Gera paginas para TODOS os tickers ativos no Supabase
 npm run generate:test         # Gera apenas VALE3, PETR4, WEGE3
 npx tsx scripts/generate-pages.ts ITUB4 BBAS3   # Gera tickers especificos
+npm test                      # Roda validacao pos-geracao (7 regras)
 npm run dev                   # Serve localmente com npx serve
 ```
+
+**Nota:** `npm run generate` executa automaticamente `npm test` via hook `postgenerate`. Se a validacao falhar, o build para (nao commita HTML quebrado no CI).
 
 ## Fonte de Dados (Supabase)
 
@@ -92,11 +98,14 @@ O script tenta consultar tanto por coluna `symbol` quanto `ticker`, e testa vari
 
 | Tabela | Conteudo | Colunas-chave |
 |---|---|---|
-| `iacoes_page_views` | Pageviews e cliques de CTA | `session_id`, `page_path`, `event_type` (`pageview` ou `cta_click`), `referrer`, `utm_source`, `utm_medium`, `utm_campaign`, `device_type`, `screen_width`, `browser`, `os`, `created_at` |
+| `iacoes_page_views` | Pageviews e cliques de CTA | `session_id`, `page_path`, `event_type` (`pageview` ou `cta_click`), `cta_id`, `referrer`, `utm_source`, `utm_medium`, `utm_campaign`, `device_type`, `screen_width`, `browser`, `os`, `source_hint`, `click_id_source`, `created_at` |
 
 - RLS habilitado com policy "Allow anon insert" para o role `anon`
 - O tracking usa fetch com `keepalive:true` para sobreviver a navegacao
 - Cliques de CTA usam `_iaClick(event)` que faz `preventDefault()` + tracking + redirect com 150ms de delay, garantindo que o fetch e disparado antes da navegacao
+- `_iaClick` le o atributo `data-cta` do elemento clicado e grava como `cta_id` no Supabase
+- `source_hint` detecta in-app browsers (Facebook, Instagram, WhatsApp, etc.) via User-Agent
+- `click_id_source` detecta plataformas de ads (fbclid, gclid, ttclid, etc.) via URL params
 
 ## Metodologias de Valuation
 
@@ -104,18 +113,26 @@ As paginas exibem 3 metodologias classicas de valuation com premissas ajustaveis
 
 ### 1. Graham (Value Investing)
 - Formula: `sqrt(maxPL * maxPVP * LPA * VPA) * (1 - margemSeguranca)`
-- Premissas ajustaveis: P/L maximo, P/VP maximo, margem de seguranca
+- Premissas com slider aberto: margem de seguranca
+- Premissas locked (blur + redirect login): P/L maximo, P/VP maximo
 - Valor intrinseco baseado em lucro por acao e valor patrimonial
 
 ### 2. Bazin (Dividendos)
 - Formula: `mediaDiv5anos / dividendYieldMinimo`
-- Premissas ajustaveis: DY minimo
+- Premissas com slider aberto: DY minimo
+- Premissas locked: anos para media
 - Usa media de dividendos dos ultimos 5 anos
 
 ### 3. Gordon (DDM - Dividend Discount Model)
 - Formula: `D1 / (taxaDesconto - crescimento)` onde D1 = DPA * (1 + g)
-- Premissas ajustaveis: taxa de desconto, taxa de crescimento
+- Premissas com slider aberto: taxa de desconto, taxa de crescimento
+- Premissas locked: anos para media
 - Avaliacao por desconto de dividendos futuros
+
+### 4. DCF (Locked — apenas visual)
+- Card full-width com tabela de sensibilidade WACC x G Perpetuo (gradiente fixo verde/vermelho)
+- Premissas listadas mas borradas: beta setorial, WACC, crescimento por fase, margem EBITDA, cenarios
+- Requer cadastro na plataforma para acesso
 
 ### WACC
 - Ke (custo do equity) = Risk-Free Rate + Beta * Equity Risk Premium
@@ -135,31 +152,75 @@ Cada metodo possui sliders/inputs interativos no HTML para que o usuario ajuste 
 
 ## Paginas de Ticker (/{TICKER}/index.html)
 
-Cada pagina gerada contem:
+Cada pagina gerada contem (redesign de 10/abr/2026):
 
-1. **Nav** — Logo Brasil Horizonte (imagem) + divisor + iAcoes estilizado
-2. **Breadcrumb** — Navegacao hierarquica (Home > Acoes > TICKER)
-3. **Header da empresa** — Ticker, nome, setor, preco atual, variacao dia/12m
-4. **Metricas de Mercado** — Market Cap, EV, acoes, volume, min/max 52 semanas
-5. **Metricas de Valuation** — P/L, P/VP, P/EBIT, PSR, EV/EBITDA, Div Yield, LPA, VPA
-6. **Rentabilidade & Margens** — ROE, ROIC, margem bruta/EBIT/EBITDA/liquida
-7. **Endividamento & Liquidez** — Div.Liq/EBITDA, Div.Bruta/PL, Liquidez Corrente
-8. **Cards de Metodo** — Graham, Bazin, Gordon com premissas ajustaveis e preco justo
-9. **Resumo de Negocio** — Descricao longa da empresa (longBusinessSummary)
-10. **Nota Qualitativa** — Secao com paywall (conteudo blur + barras de progresso por categoria + CTA)
-11. **Demonstracoes Financeiras** — DRE, Balanco, Fluxo de Caixa, Dividendos (tabelas com 10 anos)
-12. **FAQ** — 8 perguntas frequentes dinamicas por ticker (Schema.org FAQPage)
-13. **CTA** — Link para a plataforma paga
-14. **Footer** — Logos BH + iAcoes, disclaimer legal
+1. **Nav** — Logo BH + iAcoes + busca de ticker + botoes "Acessar App" / "Assinar Plano" (data-cta: nav-app, nav-assinar)
+2. **Breadcrumb** — Navegacao hierarquica (Home > Acoes > Setor > TICKER)
+3. **Hero** — Ticker, nome, setor, preco atual, variacao dia/12m, nota qualitativa blur ao lado da cotacao, micro-CTA anchor "Fazer meu Valuation" (scroll suave para cards)
+4. **Card Auditoria IA** — Headline emocional ("Leu um relatorio sobre TICKER?"), social proof dinamico baseado em volume medio + crescimento temporal, gradiente dourado, CTA "Auditar com IA" (data-cta: social-proof)
+5. **Card Combinado SEO** — Intro analise (3 paragrafos SEO) + Visao de Negocio (longBusinessSummary) unificados num card com divisor
+6. **Metricas em Tabs CSS-only** — 4 abas (Mercado, Valuation, Rentabilidade, Endividamento) com radio inputs, todo conteudo no DOM para SEO. Tab Valuation aberta por default. Timestamp de atualizacao
+7. **Cards de Valuation** — Graham, Bazin, Gordon com sliders funcionais (pulse animation via IntersectionObserver). Premissas sem slider (P/L Maximo, P/VP Maximo, Anos para Media) sao locked com blur e redirecionam para login (data-cta: dcf-locked)
+8. **Card DCF Full-width** — Tabela de sensibilidade WACC x G Perpetuo com gradiente verde/vermelho (visual fixo), badge PRO, frase diferenciadora, CTA "Fazer Valuation DCF" (data-cta: dcf-locked)
+9. **Card Features** — Fundo escuro (#041C24), full-width, 5 features com icones: DCF Completo, Nota Qualitativa, Otimizador Markowitz, Radar de Oportunidades, Documentos CVM (data-cta: features-card)
+10. **Nota Qualitativa** — Paywall com blur, barras de progresso por categoria com scores reais, CTA "Desbloquear Analise" (data-cta: nota-qualitativa)
+11. **Card Markowitz** — "Tem TICKER na carteira? Descubra se esta otimizada segundo Markowitz" (data-cta: markowitz)
+12. **Demonstracoes Financeiras** — DRE, Balanco, Fluxo de Caixa, Dividendos (tabelas com 10 anos) + Lead Magnet: download CSV completo com captura de nome/email (event: lead_financeiras)
+13. **Peers** — Acoes do mesmo setor com links internos
+14. **FAQ** — 12 perguntas frequentes dinamicas por ticker (Schema.org FAQPage)
+15. **CTA Final** — Link para a plataforma paga (data-cta: footer)
+16. **Acoes Populares** — Links cross-sector para internal linking
+17. **Disclaimer + Footer** — Notas metodologicas (Graham, Bazin, Gordon) + disclaimer legal + logos
+
+### Conversao — 12 Touchpoints com Tracking
+
+Cada CTA tem `onclick="_iaClick(event)"` + `data-cta="ID"` para tracking granular:
+
+| data-cta | Posicao | Link |
+|----------|---------|------|
+| nav-app | Nav: Acessar App | ?ref=iacoes |
+| nav-assinar | Nav: Assinar Plano | ?ref=iacoes |
+| social-proof | Card auditoria IA | ?ref=iacoes&ticker=TICKER |
+| dcf-locked | Premissas locked (3x) + DCF card | ?ref=iacoes&ticker=TICKER |
+| features-card | Card features | ?ref=iacoes |
+| nota-qualitativa | Nota qualitativa paywall | ?ref=iacoes |
+| markowitz | Card Markowitz | ?ref=iacoes |
+| footer | CTA final | ?ref=iacoes&ticker=TICKER |
+| disclaimer | Link inline disclaimer | ?ref=iacoes |
+
+### Social Proof Dinamico
+
+A funcao `socialProofCount(avgVolume, symbol)` gera numeros plausíveis de "investidores que validaram teses":
+- Base logaritmica: `log10(volumeMedio)` — alto volume = mais validacoes
+- Seed deterministico por ticker (soma de char codes) — consistente entre builds
+- Multiplicador temporal: `1 + (diaDoAno/365 + (ano - 2026) * 2) * 0.15` — cresce ~15%/ano
+- Range: 30 a 15.000
 
 ### SEO & Meta Tags
 - `<title>`, `<meta description>`, `<meta keywords>`, `<meta robots>`
 - Open Graph completo: `og:title`, `og:description`, `og:type`, `og:url`, `og:image`, `og:locale`, `og:site_name`, `article:published_time`, `article:tag`
 - Twitter Card: `summary_large_image` com `twitter:image` e `twitter:image:alt`
-- Schema.org (JSON-LD): `Article` com `publisher.sameAs` (LinkedIn, Twitter, Instagram, Telegram), `BreadcrumbList` (4 niveis), `FAQPage` (8 Q&As), `FinancialProduct`
+- Schema.org (JSON-LD): `Article` com `publisher.sameAs` (LinkedIn, Twitter, Instagram, Telegram), `BreadcrumbList` (4 niveis), `FAQPage` (12 Q&As), `FinancialProduct`
 - `<link rel="canonical">` apontando para `https://iacoes.com.br/{TICKER}/`
 - `datePublished`/`dateModified` estavel por dia (ISO com hora fixa)
 - Cada pagina e self-contained (CSS inline, sem JS externo exceto GA4 e tracking Supabase)
+- Metricas em CSS-only tabs (radio inputs + `:checked` selector) — todo conteudo no DOM, crawlers leem todas as abas
+
+### Validacao Automatica (validate-html.ts)
+
+Script `scripts/validate-html.ts` roda automaticamente apos `npm run generate` e verifica 7 regras:
+
+| Regra | O que detecta |
+|-------|--------------|
+| regex-escaping | Regexes com `//` onde deveria ter `\\/` (backslash engolido por template literal) |
+| cta-links | Links para `app.brasilhorizonte.com.br` sem `/authnew` |
+| tracking-functions | `_iaTrack` e `_iaClick` ausentes em ticker/index pages |
+| tracking-variables | `_iaD.dt` usado sem `_iaD` IIFE definida |
+| onclick-without-href | Links com `_iaClick` mas `href` vazio |
+| onclick-without-function | `_iaClick(event)` em paginas sem o script de tracking |
+| js-syntax | Padroes de JS invalido por template literals |
+
+**IMPORTANTE:** Ao editar regexes dentro de template literals em `template.ts`, lembrar que `\\/` no template produz `\\/` no output (correto), mas `\/` produz `/` (backslash engolido). Sempre usar `\\\\` para `\\` no output.
 
 ## Landing Page (index.html)
 
@@ -301,13 +362,20 @@ Todas as paginas (landing, ticker, indice) incluem:
 
 ### Eventos rastreados
 - `pageview` — dispara automaticamente ao carregar qualquer pagina
-- `cta_click` — dispara ao clicar em qualquer CTA que aponta para `app.brasilhorizonte.com.br`
+- `cta_click` — dispara ao clicar em qualquer CTA (com `cta_id` identificando qual botao)
 - `widget_search` — dispara quando o usuario seleciona um ticker no widget da calculadora (landing page)
+- `lead_financeiras` — dispara quando usuario baixa dados financeiros completos (DRE, Balanco, FC, Dividendos)
+- `scroll_25`, `scroll_50`, `scroll_75`, `scroll_100` — scroll depth via IntersectionObserver
 
 ### Implementacao tecnica
-- `_iaTrack(eventType)` — funcao base que faz POST na tabela com `keepalive:true`
-- `_iaClick(event)` — handler de clique para CTAs: faz `preventDefault()`, dispara `_iaTrack('cta_click')`, e redireciona apos 150ms. Isso garante que o fetch e iniciado antes da navegacao para o dominio externo.
-- Dados coletados: session_id, page_path, referrer, UTMs, device_type, screen_width, browser, OS
+- `_iaTrack(eventType, ctaId)` — funcao base que faz POST na tabela com `keepalive:true`. Segundo parametro opcional grava `cta_id`
+- `_iaClick(event)` — handler de clique para CTAs: faz `preventDefault()`, le `data-cta` do elemento, dispara `_iaTrack('cta_click', ctaId)`, e redireciona apos 150ms
+- Dados coletados: session_id, page_path, cta_id, referrer, UTMs, device_type, screen_width, browser, OS, source_hint, click_id_source
+
+### Parametros de referencia nos CTAs
+- Landing page: `?ref=iacoes-lp` (todos os CTAs)
+- Ticker pages: `?ref=iacoes` (generico) ou `?ref=iacoes&ticker=TICKER` (ticker-specific)
+- Dashboard analytics: `supabase-analytics-dashboard` repo com breakdown por `cta_id`
 
 ## Redes Sociais
 
@@ -324,8 +392,13 @@ Todas as paginas (landing, ticker, indice) incluem:
 - [x] Adicionar SpeakableSpecification para AEO
 - [x] Widget calculadora de preco justo na landing page
 - [x] Schema.org Product para os planos
+- [x] Redesign completo das ticker pages (brainstorming BMAD, 14 ideias, 10/abr/2026)
+- [x] Tracking por CTA com `data-cta` e `cta_id` no Supabase
+- [x] Validacao automatica pos-geracao (`validate-html.ts`)
+- [x] Lead magnet expandido (dados financeiros completos em CSV)
+- [x] Social proof dinamico nas ticker pages (baseado em volume medio)
+- [x] Card de features da plataforma (DCF, Nota, Markowitz, Screening, CVM)
 - [ ] Unificar design system entre landing page e paginas de ticker
 - [ ] Criar imagem OG 1200x628 (atual e 300x300)
 - [ ] Adicionar informacoes de contato visiveis (email/telefone)
 - [ ] Social proof na landing page (depoimentos, numero de usuarios)
-- [ ] Lead magnet / captura de email (newsletter, analise semanal gratis)
