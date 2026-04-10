@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "npx serve .",
     "generate": "npx tsx scripts/generate-pages.ts",
-    "generate:test": "npx tsx scripts/generate-pages.ts VALE3 PETR4 WEGE3"
+    "generate:test": "npx tsx scripts/generate-pages.ts VALE3 PETR4 WEGE3",
+    "test": "npx tsx scripts/validate-html.ts",
+    "postgenerate": "npx tsx scripts/validate-html.ts"
   },
   "private": true,
   "dependencies": {
