@@ -386,6 +386,10 @@ Todas as paginas (landing, ticker, indice) incluem:
 - **LinkedIn (Gabriel, CNPI):** https://www.linkedin.com/in/gabriel-dantas-a-melo-cnpi-8796b4158/
 - **LinkedIn (Lucas, CGA):** https://www.linkedin.com/in/lucastnm/
 
+## Campanhas ativas
+
+- **Promo 50% (Temporada de Balanços)** — ate 2026-05-03 23:59 BRT. Toda a logica em `index.html` (CSS, HTML, JS inline). Auto-revert via JS quando deadline passa. Documentacao completa em [`CAMPAIGN-PROMO-50.md`](./CAMPAIGN-PROMO-50.md): como estender prazo, como fazer hard revert do codigo, inventario de mudancas, queries de analise.
+
 ## TODO / Roadmap
 
 - [x] Configurar GitHub Actions para regeneracao automatica (cron diario) — seg-sex 20h BRT
