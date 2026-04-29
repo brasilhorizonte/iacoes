@@ -1498,7 +1498,7 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
       <p class="social-proof-headline">Leu um relat&oacute;rio sobre ${f.symbol}? Viu uma recomenda&ccedil;&atilde;o?</p>
       <p class="social-proof-text">Nossa IA audita a tese por tr&aacute;s &mdash; governan&ccedil;a, vantagens competitivas, riscos e mais 3 categorias. <strong>Descubra se a indica&ccedil;&atilde;o se sustenta.</strong></p>
       <p class="social-proof-count">${socialProofCount(f.volMed2m, f.symbol).toLocaleString('pt-BR')} investidores j&aacute; validaram teses em ${f.symbol}</p>
-      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="social-proof-btn" data-cta="social-proof" onclick="_iaClick(event)">Auditar com IA <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16" style="vertical-align:middle;margin-left:0.3rem"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></a>
+      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="social-proof-btn" data-cta="social-proof" onclick="_iaClick(event)">Auditar com IA grátis <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16" style="vertical-align:middle;margin-left:0.3rem"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></a>
     </div>
   </section>
 
