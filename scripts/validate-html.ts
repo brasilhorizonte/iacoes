@@ -158,6 +158,23 @@ function checkOnclickWithoutFunction(file: string, html: string) {
 }
 
 /**
+ * RULE: utm-injection
+ * _iaClick deve injetar utm_source/utm_medium/utm_campaign/utm_content na URL
+ * de destino. Sem isso, GA4 e usage_events classificam o trafego do iacoes
+ * como "direct"/"referral" e perdemos atribuicao da campanha.
+ * Sector pages nao tem _iaClick — so ticker pages, /acoes/index.html e landing.
+ */
+function checkUTMInjection(file: string, html: string) {
+  const isSectorPage = /^acoes\/[^/]+\/index\.html$/.test(file) && file !== 'acoes/index.html';
+  if (isSectorPage) return;
+  if (!html.includes('function _iaClick(')) return; // outra regra ja reclama
+
+  if (!html.includes("set('utm_source'") || !html.includes("set('utm_campaign'")) {
+    addIssue(file, 'utm-injection', '_iaClick nao injeta utm_source/utm_campaign — CTAs sem atribuicao');
+  }
+}
+
+/**
  * RULE: js-syntax-basic
  * Detecta padroes de JavaScript invalido comuns em output de template literals.
  */
@@ -199,6 +216,7 @@ function main() {
     checkTrackingVariables(relPath, html);
     checkOnclickHref(relPath, html);
     checkOnclickWithoutFunction(relPath, html);
+    checkUTMInjection(relPath, html);
     checkJSSyntax(relPath, html);
 
     checked++;
