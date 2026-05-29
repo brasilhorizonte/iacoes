@@ -41,6 +41,10 @@ function collectHTMLFiles(): string[] {
     }
   }
 
+  // Landing page (root index.html — editada à mão, precisa de validação)
+  const landing = join(ROOT, 'index.html');
+  try { statSync(landing); files.push(landing); } catch {}
+
   // Index page
   const indexHtml = join(ROOT, 'acoes', 'index.html');
   try { statSync(indexHtml); files.push(indexHtml); } catch {}
