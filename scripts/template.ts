@@ -251,8 +251,8 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   // SEO: meta description, title, FAQ
   const currentYear = new Date().getFullYear();
   const desc = `Calculadora de valor justo para ${f.name} (${f.symbol}) com Graham, Bazin e Gordon. Premissas ajustáveis — calcule o valor justo agora. Indicadores, balanço e dividendos atualizados.`;
-  const titleTag = `${f.symbol} Está Cara ou Barata? Calcule o Valor Justo | iAções`;
-  const ogTitle = `${f.symbol} Está Cara ou Barata? Calcule o Valor Justo | iAções`;
+  const titleTag = `${f.symbol} Está Cara ou Barata? Calcule o Valor Justo | IAções`;
+  const ogTitle = `${f.symbol} Está Cara ou Barata? Calcule o Valor Justo | IAções`;
   const sectorSlugVal = sectorSlug(f.sector || '');
   const faqItems = [
     {
@@ -389,7 +389,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   <meta property="og:description" content="${desc}">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://iacoes.com.br/${f.symbol}/">
-  <meta property="og:site_name" content="iAções — Análise de Ações | Brasil Horizonte">
+  <meta property="og:site_name" content="IAções — Análise de Ações | Brasil Horizonte">
   <meta property="og:locale" content="pt_BR">
   <meta property="article:published_time" content="${todayISO}">
   <meta property="article:modified_time" content="${todayISO}">
@@ -402,14 +402,14 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   <meta property="og:image" content="https://iacoes.com.br/assets/img/og-iacoes.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="628">
-  <meta property="og:image:alt" content="${f.symbol} — Análise Fundamentalista | iAções">
+  <meta property="og:image:alt" content="${f.symbol} — Análise Fundamentalista | IAções">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${ogTitle}">
   <meta name="twitter:description" content="${desc}">
   <meta name="twitter:image" content="https://iacoes.com.br/assets/img/og-iacoes.png">
-  <meta name="twitter:image:alt" content="${f.symbol} — Análise Fundamentalista | iAções">
+  <meta name="twitter:image:alt" content="${f.symbol} — Análise Fundamentalista | IAções">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -427,7 +427,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     "author": { "@type": "Organization", "name": "Brasil Horizonte", "url": "https://brasilhorizonte.com.br" },
     "publisher": {
       "@type": "Organization",
-      "name": "iAções by Brasil Horizonte",
+      "name": "IAções by Brasil Horizonte",
       "url": "https://iacoes.com.br",
       "logo": { "@type": "ImageObject", "url": "https://iacoes.com.br/assets/img/institucional_branco_amarelo_3x.png" },
       "sameAs": [
@@ -452,7 +452,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "iAções", "item": "https://iacoes.com.br/" },
+      { "@type": "ListItem", "position": 1, "name": "IAções", "item": "https://iacoes.com.br/" },
       { "@type": "ListItem", "position": 2, "name": "Ações", "item": "https://iacoes.com.br/acoes/" },
       { "@type": "ListItem", "position": 3, "name": "${f.sector || 'Setor'}", "item": "https://iacoes.com.br/acoes/#setor-${encodeURIComponent((f.sector || '').toLowerCase().replace(/[^a-z0-9]+/g, '-'))}" },
       { "@type": "ListItem", "position": 4, "name": "${f.symbol}", "item": "https://iacoes.com.br/${f.symbol}/" }
@@ -1435,12 +1435,12 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
 <!-- NAV -->
 <nav class="nav" aria-label="Navegação principal">
   <div class="nav-left">
-    <a href="/" class="nav-brand" aria-label="iAções - Página inicial">
+    <a href="/" class="nav-brand" aria-label="IAções - Página inicial">
       <img src="/assets/img/institucional_branco_amarelo_3x.png" alt="Brasil Horizonte" class="nav-logo-bh">
     </a>
     <span class="nav-divider"></span>
-    <a href="/" class="nav-iacoes" aria-label="iAções">
-      <span class="nav-iacoes-i">iA</span><span class="nav-iacoes-acoes">ções</span><span class="nav-cursor"></span>
+    <a href="/" class="nav-iacoes" aria-label="IAções">
+      <span class="nav-iacoes-i">IA</span><span class="nav-iacoes-acoes">ções</span><span class="nav-cursor"></span>
     </a>
   </div>
   <div class="nav-search">
@@ -1459,7 +1459,7 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
 <!-- Breadcrumb -->
 <nav class="breadcrumb" aria-label="Breadcrumb">
   <ol>
-    <li><a href="/">iAções</a></li>
+    <li><a href="/">IAções</a></li>
     <li><a href="/acoes/">Ações</a></li>
     ${f.sector && sectorSlugVal ? `<li><a href="/acoes/${sectorSlugVal}/">${f.sector}</a></li>` : ''}
     <li aria-current="page">${f.symbol}</li>
@@ -1962,7 +1962,7 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
   </article>
 
   <!-- AÇÕES POPULARES (linking interno cross-sector) -->
-  <nav class="section-card popular-tickers" aria-label="Ações populares no iAções">
+  <nav class="section-card popular-tickers" aria-label="Ações populares no IAções">
     <h2 class="section-title font-playfair" style="font-size:1.1rem;margin-bottom:0.8rem;">Ações populares</h2>
     <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">
       ${['PETR4','VALE3','ITUB4','BBAS3','WEGE3','BBDC4','ABEV3','RENT3','SUZB3','GGBR4','CSNA3','HAPV3','CPLE6','TAEE11','ELET3','BPAC11','ITSA4','VIVT3','MGLU3','JBSS3'].filter(t => t !== f.symbol).slice(0, 15).map(t =>
@@ -1986,7 +1986,7 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
     <strong>Gordon (DDM)</strong> projeta o valor presente de todos os dividendos futuros, assumindo um crescimento perp&eacute;tuo constante. &Eacute; &uacute;til para empresas com dividendos est&aacute;veis e previs&iacute;veis.
   </div>
   <div class="methods-note" style="margin-bottom:1.5rem;">
-    Utilize a <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" style="color:#B68F40;font-weight:600;" data-cta="disclaimer" onclick="_iaClick(event)">plataforma iA&ccedil;&otilde;es</a> para aprofundar sua an&aacute;lise com dados completos, comparativos setoriais e ferramentas de valuation avan&ccedil;adas. Investir exige estudo &mdash; conhe&ccedil;a a empresa, entenda os riscos e tome decis&otilde;es informadas.
+    Utilize a <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" style="color:#B68F40;font-weight:600;" data-cta="disclaimer" onclick="_iaClick(event)">plataforma IA&ccedil;&otilde;es</a> para aprofundar sua an&aacute;lise com dados completos, comparativos setoriais e ferramentas de valuation avan&ccedil;adas. Investir exige estudo &mdash; conhe&ccedil;a a empresa, entenda os riscos e tome decis&otilde;es informadas.
   </div>
 
   <!-- DISCLAIMER -->
@@ -2218,29 +2218,29 @@ export const generateIndexHTML = (tickers: TickerIndexEntry[]): string => {
   <script>var _fbPixelId='__META_PIXEL_ID__';if(_fbPixelId&&_fbPixelId.indexOf('_')<0){!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init',_fbPixelId);fbq('track','PageView');}</script>
   <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();var _iaSH=(function(){var ua=navigator.userAgent;if(/FBAN|FBAV/i.test(ua))return'facebook';if(/Instagram/i.test(ua))return'instagram';if(/LinkedIn/i.test(ua))return'linkedin';if(/WhatsApp/i.test(ua))return'whatsapp';if(/Telegram/i.test(ua))return'telegram';if(/Twitter|TwitterAndroid/i.test(ua))return'twitter';return null})(),_iaCID=(function(){var u=new URLSearchParams(location.search);if(u.get('fbclid'))return'facebook';if(u.get('gclid'))return'google_ads';if(u.get('ttclid'))return'tiktok';if(u.get('li_fat_id'))return'linkedin';if(u.get('twclkd'))return'twitter';if(u.get('msclkid'))return'microsoft_ads';return null})();function _iaTrack(ev,cid){var u=new URLSearchParams(location.search);var d={session_id:_iaS,page_path:(location.pathname.replace(/\\/index\\.html$/,'').replace(/\\/$/,'')||'/').toUpperCase(),referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview',source_hint:_iaSH,click_id_source:_iaCID};if(cid)d.cta_id=cid;fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify(d)}).catch(function(){})}_iaTrack();function _iaClick(e){var el=e.currentTarget;try{var _lh=new URL(el.href).host;if(typeof fbq==='function'&&_lh.indexOf('brasilhorizonte.com')>-1)fbq('track','Lead')}catch(_le){}if(e.metaKey||e.ctrlKey||e.shiftKey||e.button===1)return;e.preventDefault();var cid=el.getAttribute('data-cta')||'unknown';var u;try{u=new URL(el.href)}catch(_){u=null}if(u){var inUtm=new URLSearchParams(location.search);var src=inUtm.get('utm_source')||'iacoes';var med=inUtm.get('utm_medium')||'acoes-index';var camp=inUtm.get('utm_campaign')||'seo-organico';if(!u.searchParams.has('utm_source'))u.searchParams.set('utm_source',src);if(!u.searchParams.has('utm_medium'))u.searchParams.set('utm_medium',med);if(!u.searchParams.has('utm_campaign'))u.searchParams.set('utm_campaign',camp);if(!u.searchParams.has('utm_content'))u.searchParams.set('utm_content',cid)}_iaTrack('cta_click',cid);var dest=u?u.toString():el.href;setTimeout(function(){window.location.href=dest},150)}document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchParams(location.search).get('fbclid');if(!_fb)return;document.querySelectorAll('a[href*="brasilhorizonte.com"]').forEach(function(l){try{var _u=new URL(l.href);_u.searchParams.set('fbclid',_fb);l.href=_u.toString()}catch(e){}})});</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Todas as Ações da B3 — Análise Fundamentalista e Preço Justo ${year} | iAções</title>
+  <title>Todas as Ações da B3 — Análise Fundamentalista e Preço Justo ${year} | IAções</title>
   <meta name="description" content="Lista completa de ${tickers.length} ações da B3 com indicadores fundamentalistas: P/L, Dividend Yield, preço justo por Graham, Bazin e Gordon. Análise fundamentalista atualizada em ${today}.">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
   <meta name="author" content="Brasil Horizonte">
   <link rel="canonical" href="https://iacoes.com.br/acoes/">
-  <meta property="og:title" content="Todas as Ações da B3 — Análise Fundamentalista ${year} | iAções">
+  <meta property="og:title" content="Todas as Ações da B3 — Análise Fundamentalista ${year} | IAções">
   <meta property="og:description" content="Lista completa de ${tickers.length} ações da B3 com indicadores fundamentalistas atualizados.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://iacoes.com.br/acoes/">
-  <meta property="og:site_name" content="iAções — Análise de Ações | Brasil Horizonte">
+  <meta property="og:site_name" content="IAções — Análise de Ações | Brasil Horizonte">
   <meta property="og:locale" content="pt_BR">
   <meta property="og:image" content="https://iacoes.com.br/assets/img/og-iacoes.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="628">
-  <meta property="og:image:alt" content="Todas as Ações da B3 — iAções">
-  <meta name="keywords" content="ações B3, análise fundamentalista, preço justo, valuation, Graham, Bazin, Gordon, bolsa brasileira, investimentos, P/L, dividend yield, ROE, iAções, Brasil Horizonte">
+  <meta property="og:image:alt" content="Todas as Ações da B3 — IAções">
+  <meta name="keywords" content="ações B3, análise fundamentalista, preço justo, valuation, Graham, Bazin, Gordon, bolsa brasileira, investimentos, P/L, dividend yield, ROE, IAções, Brasil Horizonte">
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Todas as Ações da B3 — Análise Fundamentalista ${year} | iAções">
+  <meta name="twitter:title" content="Todas as Ações da B3 — Análise Fundamentalista ${year} | IAções">
   <meta name="twitter:description" content="Lista completa de ${tickers.length} ações da B3 com indicadores fundamentalistas atualizados.">
   <meta name="twitter:image" content="https://iacoes.com.br/assets/img/og-iacoes.png">
-  <meta name="twitter:image:alt" content="Todas as Ações da B3 — iAções">
+  <meta name="twitter:image:alt" content="Todas as Ações da B3 — IAções">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2268,7 +2268,7 @@ export const generateIndexHTML = (tickers: TickerIndexEntry[]): string => {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "iAções", "item": "https://iacoes.com.br/" },
+      { "@type": "ListItem", "position": 1, "name": "IAções", "item": "https://iacoes.com.br/" },
       { "@type": "ListItem", "position": 2, "name": "Ações", "item": "https://iacoes.com.br/acoes/" }
     ]
   }
@@ -2392,7 +2392,7 @@ export const generateIndexHTML = (tickers: TickerIndexEntry[]): string => {
   <div class="nav-left">
     <a href="/" class="nav-brand"><img src="/assets/img/institucional_branco_amarelo_3x.png" alt="Brasil Horizonte" class="nav-logo-bh"></a>
     <span class="nav-divider"></span>
-    <a href="/" class="nav-iacoes"><span class="nav-iacoes-i">iA</span><span class="nav-iacoes-acoes">ções</span><span class="nav-cursor"></span></a>
+    <a href="/" class="nav-iacoes"><span class="nav-iacoes-i">IA</span><span class="nav-iacoes-acoes">ções</span><span class="nav-cursor"></span></a>
   </div>
   <div class="nav-links">
     <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="nav-btn nav-btn-outline" data-cta="nav-app" onclick="_iaClick(event)">Acessar App</a>
@@ -2402,7 +2402,7 @@ export const generateIndexHTML = (tickers: TickerIndexEntry[]): string => {
 
 <nav class="breadcrumb" aria-label="Breadcrumb">
   <ol>
-    <li><a href="/">iAções</a></li>
+    <li><a href="/">IAções</a></li>
     <li aria-current="page">Ações</li>
   </ol>
 </nav>
@@ -2507,7 +2507,7 @@ export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[]):
   const desc = `${count} ações do setor de ${sector} na B3 com análise fundamentalista, preço justo e dividendos. P/L médio: ${fmtNum(avgPL)}, DY médio: ${fmtPctShort(avgDY)}. Dados ${year}.`;
 
   const faqItems = [
-    { q: `Quantas ações do setor de ${sector} existem na B3?`, a: `Atualmente existem ${count} ações do setor de ${sector} listadas na B3 com análise fundamentalista disponível no iAções. O valor de mercado combinado do setor é de ${fmtBig(totalMC)}.` },
+    { q: `Quantas ações do setor de ${sector} existem na B3?`, a: `Atualmente existem ${count} ações do setor de ${sector} listadas na B3 com análise fundamentalista disponível no IAções. O valor de mercado combinado do setor é de ${fmtBig(totalMC)}.` },
     { q: `Qual o P/L médio do setor de ${sector}?`, a: `O P/L (Preço/Lucro) médio das ${count} ações do setor de ${sector} é de ${fmtNum(avgPL)}. O P/L indica quantos anos de lucro seriam necessários para recuperar o investimento no preço atual.` },
     { q: `Quais ações do setor de ${sector} pagam mais dividendos?`, a: `O Dividend Yield médio do setor de ${sector} é de ${fmtPctShort(avgDY)}. As ações com maior DY são: ${tickers.filter(t => t.divYield > 0).sort((a, b) => b.divYield - a.divYield).slice(0, 3).map(t => t.ticker + ' (' + fmtPctShort(t.divYield) + ')').join(', ') || 'dados não disponíveis'}.` },
   ];
@@ -2526,17 +2526,17 @@ export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[]):
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ações do Setor de ${sector} ${year} | Análise Fundamentalista | iAções</title>
+  <title>Ações do Setor de ${sector} ${year} | Análise Fundamentalista | IAções</title>
   <meta name="description" content="${desc}">
   <meta name="keywords" content="ações ${sector}, setor ${sector} B3, dividendos ${sector}, análise fundamentalista ${sector}, preço justo ${sector}">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://iacoes.com.br/acoes/${slug}/">
-  <meta property="og:title" content="Ações do Setor de ${sector} — Análise e Dividendos | iAções">
+  <meta property="og:title" content="Ações do Setor de ${sector} — Análise e Dividendos | IAções">
   <meta property="og:description" content="${desc}">
   <meta property="og:url" content="https://iacoes.com.br/acoes/${slug}/">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="pt_BR">
-  <meta property="og:site_name" content="iAções">
+  <meta property="og:site_name" content="IAções">
   <script type="application/ld+json">${faqSchema}</script>
   <script type="application/ld+json">${JSON.stringify({
     "@context": "https://schema.org",
@@ -2596,7 +2596,7 @@ export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[]):
   <a href="/" class="nav-logo">
     <img src="/assets/img/institucional_branco_amarelo_3x.png" alt="Brasil Horizonte" loading="lazy">
     <span style="color:rgba(255,255,255,0.3);margin:0 0.3rem">|</span>
-    <span class="nav-brand"><span>iA</span>ções</span>
+    <span class="nav-brand"><span>IA</span>ções</span>
   </a>
   <div class="nav-links">
     <a href="/acoes/">Todas as Ações</a>
