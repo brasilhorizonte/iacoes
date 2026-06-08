@@ -2051,13 +2051,16 @@
     }
     </script>
 
+    <!-- Verificação de domínio Meta (Business Settings → Brand Safety → Domínios) -->
+    <meta name="facebook-domain-verification" content="0941qt8c38dvdna2jnm6fgek6931de">
+
     <!-- Google Analytics (GA4) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-858T7GLTMJ"></script>
     <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
 
-    <!-- Meta Pixel — SUBSTITUIR __META_PIXEL_ID__ pelo MESMO Pixel ID do app (brasilhorizonte.com). Enquanto houver "_" no valor, nada dispara (guard). Ver follow-up no plano. -->
+    <!-- Meta Pixel — Pixel ID 927250313694701 (mesmo do app brasilhorizonte.com). Guard "_" mantido por segurança. -->
     <script>
-    var _fbPixelId='__META_PIXEL_ID__';
+    var _fbPixelId='927250313694701';
     if(_fbPixelId&&_fbPixelId.indexOf('_')<0){
     !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
     fbq('init',_fbPixelId);fbq('track','PageView');
