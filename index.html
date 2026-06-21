@@ -1997,7 +1997,7 @@
             "brand": { "@type": "Brand", "name": "IAções" },
             "offers": {
                 "@type": "Offer",
-                "price": "39.90",
+                "price": "19.90",
                 "priceCurrency": "BRL",
                 "priceValidUntil": "2026-12-31",
                 "availability": "https://schema.org/InStock",
@@ -2012,7 +2012,7 @@
             "brand": { "@type": "Brand", "name": "IAções" },
             "offers": {
                 "@type": "Offer",
-                "price": "59.90",
+                "price": "39.90",
                 "priceCurrency": "BRL",
                 "priceValidUntil": "2026-12-31",
                 "availability": "https://schema.org/InStock",
@@ -2079,24 +2079,17 @@
 </head>
 <body>
 
-<div id="promo-banner" class="promo-banner" style="display:none">
-    <div class="promo-banner-inner">
-        <span class="promo-banner-emoji">🔥</span>
-        <span class="promo-banner-text"><strong>Temporada de balanços</strong> · 50% off em todos os planos · Termina em <span id="promo-countdown" class="promo-countdown">--</span></span>
-        <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp" class="promo-banner-cta" data-cta="promo-banner" data-promo="1" onclick="_iaClick(event)">Assinar agora →</a>
-    </div>
-</div>
 
 <nav>
     <a href="/" class="nav-logo"><span class="ia">IA</span>ções<span class="terminal-cursor"></span></a>
     <ul class="nav-links">
         <li><a href="#modulos">Módulos</a></li>
         <li><a href="#plataforma">Plataforma</a></li>
-        <li><a href="#airton">AIrton</a></li>
+        <li><a href="/airton/">AIrton</a></li>
         <li><a href="#alertas">Alertas</a></li>
         <li><a href="#precos">Preços</a></li>
         <li><a href="#faq">FAQ</a></li>
-        <li><a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp" class="btn-cta btn-cta-nav" data-cta="nav-comecar" data-promo="1" onclick="_iaClick(event)">Começar grátis</a></li>
+        <li><a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp" class="btn-cta btn-cta-nav" data-cta="nav-comecar" onclick="_iaClick(event)">Começar grátis</a></li>
     </ul>
     <button class="mobile-menu-btn" aria-label="Abrir menu" aria-expanded="false" onclick="var n=document.querySelector('.nav-links');var s=n.classList.toggle('show');this.setAttribute('aria-expanded',s)">
         <span></span><span></span><span></span>
@@ -2114,11 +2107,10 @@
                 <a href="https://brasilhorizonte.com.br" target="_blank" rel="noopener"><img src="assets/img/institucional_branco_amarelo_3x.png" alt="Brasil Horizonte" class="hero-brand-logo" width="123" height="60"></a>
             </div>
             <div class="hero-actions">
-                <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp" class="btn-cta" data-cta="hero" data-promo="1" onclick="_iaClick(event)" style="background:var(--gold);color:var(--nav-bg-deep)">Testar grátis agora →</a>
+                <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp" class="btn-cta" data-cta="hero" onclick="_iaClick(event)" style="background:var(--gold);color:var(--nav-bg-deep)">Testar grátis agora →</a>
                 <a href="#plataforma" class="btn-cta btn-outline">Ver a plataforma</a>
             </div>
             <p class="hero-free-note">Comece <strong>grátis</strong>: 1 análise por dia, sem cartão de crédito.</p>
-            <p id="hero-promo-line" class="hero-promo-line" style="display:none">📊 Empresas da B3 divulgando o 1T26. <strong>50% off em todos os planos</strong> até domingo, 23:59.</p>
             <div class="hero-proof">
                 <span><span class="check">✓</span> Sem carteira recomendada</span>
                 <span><span class="check">✓</span> 100% livre de conflito</span>
@@ -2324,25 +2316,14 @@
             <h2 class="section-title">Invista em análise de verdade</h2>
             <p class="section-desc">Escolha o plano ideal para o seu momento como investidor.</p>
         </div>
-        <div id="pricing-promo-box" class="pricing-promo-box" style="display:none">
-            <div class="pricing-promo-box-flag">🔥 Oferta Temporada de Balanços</div>
-            <div class="pricing-promo-box-headline"><strong>50% OFF</strong> em todos os planos</div>
-            <div class="pricing-promo-box-countdown">
-                <span class="pricing-promo-box-label">Termina em</span>
-                <span id="pricing-promo-countdown" class="pricing-promo-box-timer">--</span>
-            </div>
-            <div class="pricing-promo-box-sub">Domingo, 23:59 — depois disso o preço volta ao normal</div>
-        </div>
         <div class="pricing-grid">
             <div class="pricing-card">
                 <div class="pricing-plan">IANALISTA</div>
                 <h3>Seu analista pessoal com Inteligência Artificial</h3>
-                <div class="pricing-promo-badge promo-only" style="display:none">−50% até domingo</div>
                 <div class="pricing-price">
-                    <span class="price-original"><span class="currency">R$</span>39,90<span class="period">/mês</span></span>
-                    <span class="price-promo" style="display:none"><span class="price-strike"><span class="currency">R$</span>39,90</span><span class="currency">R$</span>19,95<span class="period">/mês</span></span>
+                    <span class="price-original"><span class="currency">R$</span>19,90<span class="period">/mês</span></span>
                 </div>
-                <p class="pricing-annual"><span class="annual-original">ou R$ 399/ano</span><span class="annual-promo" style="display:none"><s>R$ 399</s> ou <strong>R$ 199,50/ano</strong></span></p>
+                <p class="pricing-annual"><span class="annual-original">ou R$ 199/ano</span></p>
                 <p class="pricing-desc">Para quem quer análise fundamentalista com IA.</p>
                 <ul class="pricing-features">
                     <li>SCORE — Análise qualitativa de empresas</li>
@@ -2354,17 +2335,15 @@
                     <li>Alertas proativos — CVM, dividendos, preço justo</li>
                     <li>Notificações via Telegram em tempo real</li>
                 </ul>
-                <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp" class="btn-cta" data-cta="preco-ianalista" data-promo="1" onclick="_iaClick(event)"><span class="cta-label-original">Começar com IAnalista</span><span class="cta-label-promo" style="display:none">Testar grátis</span></a>
+                <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp" class="btn-cta" data-cta="preco-ianalista" onclick="_iaClick(event)">Começar com IAnalista</a>
             </div>
             <div class="pricing-card featured">
                 <div class="pricing-plan">IALOCADOR</div>
                 <h3>Ferramentas completas de alocação e análise</h3>
-                <div class="pricing-promo-badge promo-only" style="display:none">−50% até domingo</div>
                 <div class="pricing-price">
-                    <span class="price-original"><span class="currency">R$</span>59,90<span class="period">/mês</span></span>
-                    <span class="price-promo" style="display:none"><span class="price-strike"><span class="currency">R$</span>59,90</span><span class="currency">R$</span>29,95<span class="period">/mês</span></span>
+                    <span class="price-original"><span class="currency">R$</span>39,90<span class="period">/mês</span></span>
                 </div>
-                <p class="pricing-annual"><span class="annual-original">ou R$ 599/ano</span><span class="annual-promo" style="display:none"><s>R$ 599</s> ou <strong>R$ 299,50/ano</strong></span></p>
+                <p class="pricing-annual"><span class="annual-original">ou R$ 399/ano</span></p>
                 <p class="pricing-desc">Para quem quer picking + alocação inteligente.</p>
                 <ul class="pricing-features">
                     <li>Tudo do plano IAnalista</li>
@@ -2375,17 +2354,15 @@
                     <li>Otimização de portfólio (Markowitz)</li>
                     <li>Painel Macro (SELIC, IPCA, câmbio, curva DI)</li>
                 </ul>
-                <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp" class="btn-cta" data-cta="preco-ialocador" data-promo="1" onclick="_iaClick(event)"><span class="cta-label-original">Começar com IAlocador</span><span class="cta-label-promo" style="display:none">Testar grátis</span></a>
+                <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp" class="btn-cta" data-cta="preco-ialocador" onclick="_iaClick(event)">Começar com IAlocador</a>
             </div>
             <div class="pricing-card">
                 <div class="pricing-plan">FUNDAMENTALISTA</div>
                 <h3>Acesso completo com relatórios e conteúdo exclusivo</h3>
-                <div class="pricing-promo-badge promo-only" style="display:none">−50% até domingo</div>
                 <div class="pricing-price">
                     <span class="price-original"><span class="currency">R$</span>79,90<span class="period">/mês</span></span>
-                    <span class="price-promo" style="display:none"><span class="price-strike"><span class="currency">R$</span>79,90</span><span class="currency">R$</span>39,95<span class="period">/mês</span></span>
                 </div>
-                <p class="pricing-annual"><span class="annual-original">ou R$ 799/ano</span><span class="annual-promo" style="display:none"><s>R$ 799</s> ou <strong>R$ 399,50/ano</strong></span></p>
+                <p class="pricing-annual"><span class="annual-original">ou R$ 799/ano</span></p>
                 <p class="pricing-desc">Para o investidor que quer tudo, sem limitações.</p>
                 <ul class="pricing-features">
                     <li>Tudo do plano IAlocador</li>
@@ -2394,7 +2371,7 @@
                     <li>Acesso a grupo fechado de membros</li>
                     <li>Prioridade em respostas e suporte</li>
                 </ul>
-                <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp" class="btn-cta" data-cta="preco-fundamentalista" data-promo="1" onclick="_iaClick(event)"><span class="cta-label-original">Acesso completo →</span><span class="cta-label-promo" style="display:none">Testar grátis →</span></a>
+                <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp" class="btn-cta" data-cta="preco-fundamentalista" onclick="_iaClick(event)">Acesso completo →</a>
             </div>
         </div>
     </div>
@@ -3052,143 +3029,6 @@ document.addEventListener('DOMContentLoaded',function(){var f=new URLSearchParam
 })();
 </script>
 
-<!-- Campanha Temporada de Balanços: 50% off até 2026-05-03 23:59 BRT -->
-<script>
-(function(){
-  var DEADLINE = new Date('2026-05-03T23:59:59-03:00').getTime();
-  var CAMPAIGN_ID = 'balancos-1t26';
-  var CTA_SUFFIX = '-promo50';
-  var banner = document.getElementById('promo-banner');
-  var countdownEl = document.getElementById('promo-countdown');
-  var pricingCountdownEl = document.getElementById('pricing-promo-countdown');
-  var heroLine = document.getElementById('hero-promo-line');
-  var pricingBox = document.getElementById('pricing-promo-box');
-  var navEl = document.querySelector('nav');
-  var heroEl = document.querySelector('.hero');
-  var promoActive = false;
-  var interval = null;
-
-  function offsetForBanner(){
-    if (!banner) return;
-    var bh = banner.offsetHeight;
-    if (navEl) navEl.style.top = bh + 'px';
-    if (heroEl) heroEl.style.paddingTop = (7 * 16 + bh) + 'px';
-  }
-  function clearOffset(){
-    if (navEl) navEl.style.top = '';
-    if (heroEl) heroEl.style.paddingTop = '';
-  }
-
-  function pad(n){ return n < 10 ? '0' + n : '' + n; }
-
-  function fmt(ms){
-    var s = Math.max(0, Math.floor(ms / 1000));
-    var d = Math.floor(s / 86400); s -= d * 86400;
-    var h = Math.floor(s / 3600);  s -= h * 3600;
-    var m = Math.floor(s / 60);    s -= m * 60;
-    return d + 'd ' + pad(h) + 'h ' + pad(m) + 'm ' + pad(s) + 's';
-  }
-
-  function showAll(sel, show){
-    var nodes = document.querySelectorAll(sel);
-    for (var i = 0; i < nodes.length; i++){
-      nodes[i].style.display = show ? '' : 'none';
-    }
-  }
-
-  function appendUtm(href){
-    if (!href) return href;
-    if (href.indexOf('utm_campaign=') !== -1) return href;
-    if (href.indexOf('app.brasilhorizonte.com.br') === -1) return href;
-    var sep = href.indexOf('?') !== -1 ? '&' : '?';
-    return href + sep + 'utm_campaign=' + CAMPAIGN_ID + '&utm_medium=promo-balancos';
-  }
-
-  function activatePromo(){
-    if (promoActive) return;
-    promoActive = true;
-    if (banner) banner.style.display = '';
-    if (heroLine) heroLine.style.display = '';
-    if (pricingBox) pricingBox.style.display = '';
-    offsetForBanner();
-    showAll('.price-original', false);
-    showAll('.price-promo', true);
-    showAll('.annual-original', false);
-    showAll('.annual-promo', true);
-    showAll('.cta-label-original', false);
-    showAll('.cta-label-promo', true);
-    showAll('.pricing-promo-badge.promo-only', true);
-    var ctas = document.querySelectorAll('[data-promo="1"]');
-    for (var i = 0; i < ctas.length; i++){
-      var el = ctas[i];
-      var orig = el.getAttribute('data-cta') || '';
-      if (orig && orig.indexOf(CTA_SUFFIX) === -1){
-        el.setAttribute('data-cta-original', orig);
-        el.setAttribute('data-cta', orig + CTA_SUFFIX);
-      }
-      var href = el.getAttribute('href');
-      if (href){
-        el.setAttribute('href', appendUtm(href));
-      }
-    }
-  }
-
-  function stripPromoUtm(href){
-    if (!href) return href;
-    return href
-      .replace(/[?&]utm_campaign=balancos-1t26/g, '')
-      .replace(/[?&]utm_medium=promo-balancos/g, '')
-      .replace(/\?&/, '?')
-      .replace(/\?$/, '');
-  }
-
-  function deactivatePromo(){
-    if (banner) banner.style.display = 'none';
-    if (heroLine) heroLine.style.display = 'none';
-    if (pricingBox) pricingBox.style.display = 'none';
-    clearOffset();
-    showAll('.price-original', true);
-    showAll('.price-promo', false);
-    showAll('.annual-original', true);
-    showAll('.annual-promo', false);
-    showAll('.cta-label-original', true);
-    showAll('.cta-label-promo', false);
-    showAll('.pricing-promo-badge.promo-only', false);
-    var ctas = document.querySelectorAll('[data-promo="1"]');
-    for (var i = 0; i < ctas.length; i++){
-      var el = ctas[i];
-      el.removeAttribute('data-promo');
-      var origCta = el.getAttribute('data-cta-original');
-      if (origCta){
-        el.setAttribute('data-cta', origCta);
-        el.removeAttribute('data-cta-original');
-      }
-      var href = el.getAttribute('href');
-      if (href){
-        el.setAttribute('href', stripPromoUtm(href));
-      }
-    }
-    promoActive = false;
-    if (interval){ clearInterval(interval); interval = null; }
-  }
-
-  function tick(){
-    var remaining = DEADLINE - Date.now();
-    if (remaining <= 0){
-      deactivatePromo();
-      return;
-    }
-    if (!promoActive) activatePromo();
-    var formatted = fmt(remaining);
-    if (countdownEl) countdownEl.textContent = formatted;
-    if (pricingCountdownEl) pricingCountdownEl.textContent = formatted;
-  }
-
-  tick();
-  interval = setInterval(tick, 1000);
-  window.addEventListener('resize', function(){ if (promoActive) offsetForBanner(); });
-})();
-</script>
 <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp" class="mobile-sticky-cta" data-cta="sticky-mobile" onclick="_iaClick(event)">Testar grátis →</a>
 </body>
 </html>
