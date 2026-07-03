@@ -96,9 +96,11 @@ O script tenta consultar tanto por coluna `symbol` quanto `ticker`, e testa vari
 
 ### Tabela de analytics
 
-| Tabela | Conteudo | Colunas-chave |
+| Tabela / View | Conteudo | Colunas-chave |
 |---|---|---|
-| `iacoes_page_views` | Pageviews e cliques de CTA | `session_id`, `page_path`, `event_type` (`pageview` ou `cta_click`), `cta_id`, `referrer`, `utm_source`, `utm_medium`, `utm_campaign`, `device_type`, `screen_width`, `browser`, `os`, `source_hint`, `click_id_source`, `created_at` |
+| `iacoes_page_views` (tabela) | Pageviews e cliques de CTA (bruto, incluindo bots) | `session_id`, `page_path`, `event_type` (`pageview` ou `cta_click`), `cta_id`, `referrer`, `utm_source`, `utm_medium`, `utm_campaign`, `device_type`, `screen_width`, `browser`, `os`, `source_hint`, `click_id_source`, `created_at` |
+| `iacoes_page_views_human` (view) | Mesmas colunas, exclui sessoes flaggeadas como bot | Consumida pelo dashboard via RPC `get_analytics_data()` |
+| `iacoes_sessions_enriched` (view) | 1 linha por session com flag `is_bot` e metricas agregadas | Usada para debug/auditoria do filtro |
 
 - RLS habilitado com policy "Allow anon insert" para o role `anon`
 - O tracking usa fetch com `keepalive:true` para sobreviver a navegacao
@@ -106,6 +108,15 @@ O script tenta consultar tanto por coluna `symbol` quanto `ticker`, e testa vari
 - `_iaClick` le o atributo `data-cta` do elemento clicado e grava como `cta_id` no Supabase
 - `source_hint` detecta in-app browsers (Facebook, Instagram, WhatsApp, etc.) via User-Agent
 - `click_id_source` detecta plataformas de ads (fbclid, gclid, ttclid, etc.) via URL params
+
+### Filtro de crawlers (views `iacoes_page_views_human` e `iacoes_sessions_enriched`)
+
+Desde 2026-04-22 o dashboard consome a view `iacoes_page_views_human` ao inves da tabela bruta. A view exclui sessoes flaggeadas como bot pela regra: 1 pageview + 0 cta_clicks + sem referrer/utm_source/click_id_source/source_hint + `screen_width = 412` + `device_type = 'mobile'` + `os = 'Android'` (9 sinais simultaneos por `session_id`).
+
+Historicamente, ~33% das sessoes eram bots (crawler disfarcado de Chrome Android mobile). Spike de 2026-04-21 (412 pageviews vs baseline ~50) tinha 80% de origem crawler. Filtro foi validado contra dados de 10 dias (dias normais filtram 8-20%, dias com crawler ativo filtram 40-80%).
+
+Migracoes relacionadas no repo `supabase-analytics-dashboard`:
+- `supabase/migrations/20260422_filter_iacoes_bots.sql` (cria views + versao atualizada da RPC `get_analytics_data()`)
 
 ## Metodologias de Valuation
 
