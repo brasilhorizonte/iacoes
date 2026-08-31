@@ -502,7 +502,7 @@ ${airtonQuestions.map(q => `        <li><a href="${airtonAuditHref}&prompt=${enc
   <meta property="article:tag" content="${f.sector}">
 
   <!-- Open Graph Image -->
-  <meta property="og:image" content="https://iacoes.com.br/assets/img/og-iacoes-v2.png">
+  <meta property="og:image" content="https://iacoes.com.br/assets/img/og-iacoes-v3.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="${f.symbol} — Análise Fundamentalista | IAções">
@@ -511,7 +511,7 @@ ${airtonQuestions.map(q => `        <li><a href="${airtonAuditHref}&prompt=${enc
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${ogTitle}">
   <meta name="twitter:description" content="${desc}">
-  <meta name="twitter:image" content="https://iacoes.com.br/assets/img/og-iacoes-v2.png">
+  <meta name="twitter:image" content="https://iacoes.com.br/assets/img/og-iacoes-v3.png">
   <meta name="twitter:image:alt" content="${f.symbol} — Análise Fundamentalista | IAções">
 
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
@@ -2434,7 +2434,7 @@ export const generateIndexHTML = (tickers: TickerIndexEntry[]): string => {
   <meta property="og:url" content="https://iacoes.com.br/acoes/">
   <meta property="og:site_name" content="IAções — Análise de Ações | Brasil Horizonte">
   <meta property="og:locale" content="pt_BR">
-  <meta property="og:image" content="https://iacoes.com.br/assets/img/og-iacoes-v2.png">
+  <meta property="og:image" content="https://iacoes.com.br/assets/img/og-iacoes-v3.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Todas as Ações da B3 — IAções">
@@ -2444,7 +2444,7 @@ export const generateIndexHTML = (tickers: TickerIndexEntry[]): string => {
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Todas as Ações da B3 — Análise Fundamentalista ${year} | IAções">
   <meta name="twitter:description" content="Lista completa de ${tickers.length} ações da B3 com indicadores fundamentalistas atualizados.">
-  <meta name="twitter:image" content="https://iacoes.com.br/assets/img/og-iacoes-v2.png">
+  <meta name="twitter:image" content="https://iacoes.com.br/assets/img/og-iacoes-v3.png">
   <meta name="twitter:image:alt" content="Todas as Ações da B3 — IAções">
 
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
@@ -2745,14 +2745,14 @@ export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[]):
   <meta property="og:type" content="website">
   <meta property="og:locale" content="pt_BR">
   <meta property="og:site_name" content="IAções">
-  <meta property="og:image" content="https://iacoes.com.br/assets/img/og-iacoes-v2.png">
+  <meta property="og:image" content="https://iacoes.com.br/assets/img/og-iacoes-v3.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Ações do setor de ${sector} — IAções">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Ações do Setor de ${sector} — Análise e Dividendos | IAções">
   <meta name="twitter:description" content="${desc}">
-  <meta name="twitter:image" content="https://iacoes.com.br/assets/img/og-iacoes-v2.png">
+  <meta name="twitter:image" content="https://iacoes.com.br/assets/img/og-iacoes-v3.png">
   <meta name="twitter:image:alt" content="Ações do setor de ${sector} — IAções">
   <link rel="icon" type="image/png" href="/assets/img/favicon.png">
   <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
