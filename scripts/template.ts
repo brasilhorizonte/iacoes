@@ -1,4 +1,7 @@
-import type { FinancialData, ComprehensiveValuation, RawIncomeStatement, RawBalanceSheet, RawCashFlow, RawDividend, PeerTicker, TickerIndexEntry, QualitativeScore } from './types';
+import type { FinancialData, ComprehensiveValuation, RawIncomeStatement, RawBalanceSheet, RawCashFlow, RawDividend, PeerTicker, TickerIndexEntry, QualitativeScore, CvmDocument } from './types';
+// Cache de documentos da CVM preenchido por `fetchFinancials` durante o build.
+// Leitura síncrona: o template não faz I/O. Sem ciclo (supabase.ts não importa este arquivo).
+import { getCvmDocuments } from './supabase';
 
 // --- Slug helper (normalizes accented chars to ASCII) ---
 export const sectorSlug = (s: string): string =>
@@ -41,6 +44,30 @@ const fmtVol = (n: number): string => {
 const fmtNum = (n: number, dec = 2): string => {
   if (!Number.isFinite(n)) return '-';
   return fmt(n, dec);
+};
+
+// Escapa TODO texto vindo do banco antes de entrar no HTML (aspas, <, >, &).
+const escHtml = (raw: string): string =>
+  String(raw ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+// "2026-08-27" -> "27/08/2026" (sem passar por Date, que aplicaria fuso)
+const fmtDateISOtoBR = (iso: string): string => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : iso;
+};
+
+// Corta no limite de palavra e fecha com reticências.
+const truncate = (raw: string, max: number): string => {
+  const t = raw.trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max);
+  const sp = cut.lastIndexOf(' ');
+  return (sp > max * 0.6 ? cut.slice(0, sp) : cut).replace(/[\s.,;:-]+$/, '') + '…';
 };
 
 const colorClass = (n: number): string => {
@@ -371,6 +398,82 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   const evEbitdaText = Number.isFinite(f.evEbitda) && f.evEbitda > 0
     ? ` e EV/EBITDA de ${fmtNum(f.evEbitda, 1)}x`
     : '';
+
+  // --- AIrton (assistente IA) — hrefs canônicos e copy ---
+  const airtonAuditHref = `https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}&intent=auditoria`;
+  const airtonIntroHref = `https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}&intent=airton`;
+  const alertaCvmHref = `https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}&intent=alerta`;
+  const airtonQuestions = [
+    `Minha tese em ${f.symbol} se sustenta?`,
+    `Resume o último Fato Relevante de ${f.symbol}`,
+    `Compara ${f.symbol} com os pares do setor`
+  ];
+
+  // --- Documentos reais da CVM (bloco de topo) ---
+  // Só entra o que veio do banco. Sem documentos, o bloco não é renderizado e o card
+  // de auditoria do AIrton assume a posição — a página nunca fica com buraco.
+  const cvmDocs: CvmDocument[] = getCvmDocuments(f.symbol);
+  const cvmDocsPlural = cvmDocs.length > 1;
+  const socialProofLine = `${socialProofCount(f.volMed2m, f.symbol).toLocaleString('pt-BR')} investidores j&aacute; validaram teses em ${f.symbol}`;
+
+  // Bloco 1 (topo) — DEMONSTRAÇÃO: os documentos que a companhia realmente publicou.
+  // Distinto do bloco `alerta-cvm` do fim da página (chamada direta, fundo escuro):
+  // copy e visual diferentes de propósito.
+  const cvmDocsBlock = `
+  <!-- ÚLTIMOS DOCUMENTOS DA CVM -->
+  <section class="cvm-docs-section animate-in" aria-label="&Uacute;ltimos documentos de ${f.symbol} publicados na CVM">
+    <div class="cvm-docs-card">
+      <p class="cvm-docs-eyebrow">Direto da CVM</p>
+      <h2 class="cvm-docs-title">O que ${f.symbol} publicou na CVM</h2>
+      <p class="cvm-docs-sub">${cvmDocsPlural ? `Os ${cvmDocs.length} documentos mais recentes` : 'O documento mais recente'} que a companhia enviou &agrave; CVM. &Eacute; exatamente ${cvmDocsPlural ? 'isto' : 'isso'} que o alerta entrega no seu WhatsApp &mdash; com o resumo do AIrton pronto &mdash; no instante em que sai.</p>
+      <ol class="cvm-docs-list">
+${cvmDocs.map(d => `        <li><a class="cvm-doc-link" href="${escHtml(d.link)}" target="_blank" rel="noopener nofollow">
+          <span class="cvm-doc-meta"><span class="cvm-doc-type">${escHtml(d.docTypeLabel)}</span><time class="cvm-doc-date" datetime="${escHtml(d.date)}">${fmtDateISOtoBR(d.date)}</time><span class="cvm-doc-out" aria-hidden="true">ver na CVM &nearr;</span></span>
+${d.title ? `          <span class="cvm-doc-title">${escHtml(truncate(d.title, 120))}</span>\n` : ''}${d.excerpt ? `          <span class="cvm-doc-excerpt">${escHtml(truncate(d.excerpt, 240))}</span>\n` : ''}        </a></li>`).join('\n')}
+      </ol>
+      <div class="cvm-docs-cta">
+        <a href="${alertaCvmHref}" class="cvm-docs-btn" data-cta="alerta-cvm-topo" onclick="_iaClick(event)">Receba os pr&oacute;ximos no WhatsApp &rarr;</a>
+        <p class="cvm-docs-foot">Gr&aacute;tis, sem cart&atilde;o.</p>
+        <p class="social-proof-count" style="margin-top:1.1rem">${socialProofLine}</p>
+        <a href="${airtonIntroHref}" class="cvm-docs-secondary" data-cta="airton-audit" onclick="_iaClick(event)">Ou pe&ccedil;a ao AIrton para auditar sua tese em ${f.symbol} &rarr;</a>
+      </div>
+    </div>
+  </section>`;
+
+  // Fallback — ticker sem cobertura em `cvm_documents`. Mantém a posição, o CTA de topo
+  // e a linha de prova social; nada é inventado.
+  const airtonAuditBlock = `
+  <!-- AUDITORIA DE TESE PELO AIRTON (fallback: sem documentos da CVM para este ticker) -->
+  <section class="social-proof-section animate-in" aria-label="Auditoria de tese pelo AIrton">
+    <div class="social-proof-card">
+      <p class="social-proof-headline">Leu um relat&oacute;rio sobre ${f.symbol}? Pergunte ao AIrton.</p>
+      <p class="social-proof-text">O AIrton cruza a tese com os n&uacute;meros reais de ${f.symbol} &mdash; governan&ccedil;a, vantagem competitiva, endividamento e riscos &mdash; e diz onde ela <strong>n&atilde;o se sustenta</strong>.</p>
+      <p class="social-proof-count">${socialProofLine}</p>
+      <ul class="airton-q-list" aria-label="Perguntas prontas para o AIrton sobre ${f.symbol}">
+${airtonQuestions.map(q => `        <li><a href="${airtonAuditHref}&prompt=${encodeURIComponent(q)}" class="airton-q" data-cta="airton-audit" onclick="_iaClick(event)"><span class="airton-q-mark" aria-hidden="true">&#x201C;</span>${q}<span class="airton-q-arrow" aria-hidden="true">&rarr;</span></a></li>`).join('\n')}
+      </ul>
+      <a href="${airtonAuditHref}" class="social-proof-btn" data-cta="airton-audit" onclick="_iaClick(event)">Auditar ${f.symbol} gr&aacute;tis <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16" style="vertical-align:middle;margin-left:0.3rem"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></a>
+    </div>
+  </section>`;
+
+  const cvmOrAuditBlock = cvmDocs.length ? cvmDocsBlock : airtonAuditBlock;
+
+  // Bolha de demonstração do AIrton — REGRA DURA: nunca inventar número.
+  // Cada frase só entra se o dado existir de fato para este ticker.
+  const airtonDemoSentences: string[] = [];
+  if (Number.isFinite(wfv) && wfv > 0 && Number.isFinite(data.price) && data.price > 0) {
+    airtonDemoSentences.push(`O preço justo ponderado de ${f.symbol} pelos 3 métodos clássicos é R$ ${fmt(wfv)}, contra R$ ${fmt(data.price)} de cotação (${upsideFmt}).`);
+  }
+  if (Number.isFinite(grahamFV) && grahamFV > 0) {
+    airtonDemoSentences.push(`Por Graham, com 25% de margem de segurança, o valor intrínseco fica em R$ ${fmt(grahamFV)}.`);
+  }
+  if (Number.isFinite(f.roe) && f.roe > 0) {
+    airtonDemoSentences.push(`O ROE de ${fmtPctShort(f.roe)} é o número que sustenta (ou derruba) a premissa de rentabilidade da sua tese.`);
+  }
+  const airtonDemoAnswer = airtonDemoSentences.length > 0
+    ? airtonDemoSentences.join(' ') + ' Quer que eu cruze isso com o endividamento e os riscos do último ITR?'
+    : `Vou cruzar sua tese em ${f.symbol} com os fundamentos e os documentos que a empresa publicou na CVM, e apontar onde ela não se sustenta. Me conta qual é a sua tese.`;
+
 
   return `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -916,45 +1019,28 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       color: #475569; text-align: left; min-width: 120px;
     }
     .fin-transposed thead th.sticky-col { background: #fff; }
-    .div-lead-card {
+    .alerta-cvm-card {
       margin-top: 1.5rem; padding: 2rem; border-radius: 12px;
       background: linear-gradient(135deg, #041C24 0%, #0a2e3a 100%);
       text-align: center; color: #fff;
     }
-    .div-lead-icon { margin-bottom: 0.75rem; color: #B68F40; }
-    .div-lead-title {
-      font-family: 'Playfair Display', serif; font-size: 1.15rem;
-      font-weight: 700; margin-bottom: 0.4rem;
+    .alerta-cvm-icon { margin-bottom: 0.75rem; color: #B68F40; }
+    .alerta-cvm-title {
+      font-family: 'Playfair Display', serif; font-size: 1.25rem;
+      font-weight: 700; margin-bottom: 0.5rem; color: #fff;
     }
-    .div-lead-sub {
-      font-size: 0.82rem; color: rgba(255,255,255,0.7);
-      margin-bottom: 1.25rem; max-width: 420px; margin-left: auto; margin-right: auto;
+    .alerta-cvm-sub {
+      font-size: 0.88rem; color: rgba(255,255,255,0.78); line-height: 1.65;
+      margin-bottom: 1.4rem; max-width: 520px; margin-left: auto; margin-right: auto;
     }
-    .div-lead-form {
-      display: flex; flex-wrap: wrap; gap: 0.5rem;
-      justify-content: center; max-width: 500px; margin: 0 auto;
-    }
-    .div-lead-form input {
-      flex: 1; min-width: 160px; padding: 0.65rem 0.9rem;
-      border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
-      background: rgba(255,255,255,0.08); color: #fff;
-      font-size: 0.85rem; font-family: 'Montserrat', sans-serif;
-    }
-    .div-lead-form input::placeholder { color: rgba(255,255,255,0.4); }
-    .div-lead-form input:focus { outline: none; border-color: #B68F40; background: rgba(255,255,255,0.12); }
-    .div-lead-btn {
-      width: 100%; padding: 0.7rem; border: none; border-radius: 8px;
+    .alerta-cvm-btn {
+      display: inline-block; padding: 0.8rem 1.6rem; border-radius: 8px;
       background: #B68F40; color: #041C24; font-weight: 700;
-      font-size: 0.88rem; cursor: pointer; transition: all 0.2s;
+      font-size: 0.92rem; text-decoration: none; transition: background 0.15s;
       font-family: 'Montserrat', sans-serif;
     }
-    .div-lead-btn:hover { background: #c9a44e; }
-    .div-lead-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .div-lead-success { margin-top: 1rem; }
-    .div-lead-success p { color: #10b981; font-weight: 600; font-size: 0.9rem; }
-    @media (max-width: 640px) {
-      .div-lead-form input { min-width: 100%; }
-    }
+    .alerta-cvm-btn:hover { background: #c9a44e; }
+    .alerta-cvm-foot { margin-top: 0.9rem; font-size: 0.75rem; color: rgba(255,255,255,0.55); }
 
     /* ============ SANITY CHECK ============ */
     .sanity-table {
@@ -1372,6 +1458,110 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     .social-proof-btn { display: inline-block; background: #041C24; color: white; padding: 0.85rem 2rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 1rem; transition: background 0.15s; }
     .social-proof-btn:hover { background: #093848; }
 
+    /* ============ AIRTON — PERGUNTAS PRONTAS (card de auditoria) ============ */
+    .airton-q-list { list-style: none; padding: 0; margin: 0 auto 1.6rem; max-width: 560px; display: flex; flex-direction: column; gap: 0.5rem; }
+    .airton-q { display: flex; align-items: center; gap: 0.5rem; text-align: left; background: #fff; border: 1px solid rgba(4,28,36,0.12); border-radius: 9999px; padding: 0.6rem 1rem; color: #0f172a; text-decoration: none; font-size: 0.88rem; line-height: 1.4; transition: border-color 0.15s, box-shadow 0.15s; }
+    .airton-q:hover, .airton-q:focus-visible { border-color: #B68F40; box-shadow: 0 2px 8px rgba(182,143,64,0.18); }
+    .airton-q-mark { color: #B68F40; font-family: 'Playfair Display', serif; font-size: 1.3rem; line-height: 1; }
+    .airton-q-arrow { margin-left: auto; color: #B68F40; font-weight: 700; }
+
+    /* ============ DOCUMENTOS DA CVM (bloco de topo) ============ */
+    /* Deliberadamente claro e em lista: é demonstração. O bloco alerta-cvm
+       do fim da página é escuro e centrado — chamada direta. Não podem parecer o mesmo. */
+    .cvm-docs-section { margin: 1.5rem 0; }
+    .cvm-docs-card {
+      background: #fff; border: 1px solid rgba(4,28,36,0.10);
+      border-left: 4px solid #B68F40; border-radius: 0.75rem;
+      padding: 2rem 2.25rem;
+    }
+    .cvm-docs-eyebrow {
+      text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.7rem;
+      font-weight: 700; color: #B68F40; margin-bottom: 0.45rem;
+    }
+    .cvm-docs-title {
+      font-family: 'Playfair Display', serif; font-size: 1.55rem; line-height: 1.25;
+      color: #0f172a; margin-bottom: 0.55rem;
+    }
+    .cvm-docs-sub { font-size: 0.95rem; color: #475569; line-height: 1.65; margin-bottom: 1.4rem; }
+    .cvm-docs-list { list-style: none; padding: 0; margin: 0 0 1.5rem; display: flex; flex-direction: column; gap: 0.55rem; }
+    .cvm-doc-link {
+      display: block; text-decoration: none; color: inherit;
+      background: #f5f3ef; border: 1px solid rgba(4,28,36,0.08); border-radius: 8px;
+      padding: 0.85rem 1rem; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+    .cvm-doc-link:hover, .cvm-doc-link:focus-visible { background: #fff; border-color: #B68F40; box-shadow: 0 2px 10px rgba(182,143,64,0.16); }
+    .cvm-doc-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.3rem; }
+    .cvm-doc-type {
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+      color: #041C24; background: rgba(182,143,64,0.18); border-radius: 9999px; padding: 0.2rem 0.6rem;
+    }
+    .cvm-doc-date { font-size: 0.75rem; color: #64748b; font-weight: 600; }
+    .cvm-doc-title { display: block; font-size: 0.95rem; font-weight: 600; color: #0f172a; line-height: 1.4; }
+    .cvm-doc-excerpt { display: block; font-size: 0.85rem; color: #475569; line-height: 1.6; margin-top: 0.3rem; }
+    .cvm-doc-out { font-size: 0.72rem; color: #B68F40; font-weight: 700; margin-left: auto; white-space: nowrap; }
+    .cvm-docs-cta { border-top: 1px solid rgba(4,28,36,0.08); padding-top: 1.3rem; text-align: center; }
+    .cvm-docs-btn {
+      display: inline-block; background: #041C24; color: #fff;
+      padding: 0.85rem 1.9rem; border-radius: 8px; text-decoration: none;
+      font-weight: 700; font-size: 0.98rem; transition: background 0.15s;
+      font-family: 'Montserrat', sans-serif;
+    }
+    .cvm-docs-btn:hover { background: #093848; }
+    .cvm-docs-foot { margin-top: 0.7rem; font-size: 0.75rem; color: #64748b; }
+    .cvm-docs-secondary {
+      display: inline-block; margin-top: 1rem; font-size: 0.83rem;
+      color: #475569; text-decoration: underline; text-underline-offset: 3px;
+    }
+    .cvm-docs-secondary:hover { color: #B68F40; }
+    @media (max-width: 768px) {
+      .cvm-docs-card { padding: 1.5rem 1.1rem; }
+      .cvm-docs-title { font-size: 1.28rem; }
+      .cvm-doc-out { display: none; }
+    }
+
+    /* ============ AIRTON — BLOCO DE APRESENTAÇÃO ============ */
+    .airton-intro { background: #041C24; border-radius: 12px; padding: 2.5rem; margin: 1.5rem 0; }
+    .airton-intro-inner { max-width: 760px; margin: 0 auto; text-align: center; }
+    .airton-eyebrow { text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.7rem; font-weight: 700; color: #B68F40; margin-bottom: 0.6rem; }
+    .airton-intro-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: #fff; margin-bottom: 0.7rem; line-height: 1.25; }
+    .airton-intro-sub { font-size: 0.95rem; color: rgba(255,255,255,0.78); line-height: 1.7; margin-bottom: 1.8rem; }
+    .airton-chat { background: rgba(255,255,255,0.05); border: 1px solid rgba(182,143,64,0.28); border-radius: 12px; padding: 1.2rem; text-align: left; margin-bottom: 1.6rem; }
+    .airton-chat-tag { display: inline-block; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; color: #041C24; background: #B68F40; padding: 0.2rem 0.6rem; border-radius: 9999px; margin-bottom: 0.9rem; }
+    .airton-bubble { border-radius: 10px; padding: 0.75rem 0.95rem; font-size: 0.87rem; line-height: 1.6; margin-bottom: 0.6rem; }
+    .airton-bubble:last-child { margin-bottom: 0; }
+    .airton-bubble-who { display: block; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 0.25rem; opacity: 0.75; }
+    .airton-bubble-user { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.92); margin-left: auto; max-width: 88%; }
+    .airton-bubble-ai { background: #f5f3ef; color: #0f172a; max-width: 96%; }
+    .airton-caps { list-style: none; padding: 0; margin: 0 0 1.6rem; display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; justify-content: center; }
+    .airton-caps li { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; color: rgba(255,255,255,0.85); }
+    .airton-cap-ico { font-size: 0.95rem; }
+    .airton-intro-btn { display: inline-block; background: #B68F40; color: #041C24; padding: 0.85rem 1.8rem; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.95rem; transition: background 0.15s; }
+    .airton-intro-btn:hover { background: #c9a44e; }
+    @media (max-width: 640px) {
+      .airton-intro { padding: 1.6rem 1.1rem; }
+      .airton-intro-title { font-size: 1.3rem; }
+      .airton-caps { flex-direction: column; align-items: center; }
+    }
+
+    /* ============ CTA FIXO MOBILE ============ */
+    .sticky-m { display: none; }
+    @media (max-width: 768px) {
+      .sticky-m {
+        display: block; position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
+        padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+        background: rgba(4,28,36,0.94); backdrop-filter: blur(12px);
+        border-top: 1px solid rgba(182,143,64,0.35);
+      }
+      .sticky-m-btn {
+        display: block; width: 100%; text-align: center; box-sizing: border-box;
+        background: #B68F40; color: #041C24; font-weight: 700; font-size: 0.92rem;
+        padding: 0.8rem 1rem; border-radius: 8px; text-decoration: none;
+        font-family: 'Montserrat', sans-serif;
+      }
+      /* espaço para o CTA fixo não cobrir conteúdo nem o scroll horizontal das tabelas */
+      body { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+    }
+
     /* ============ FEATURES SHOWCASE ============ */
     .features-showcase { background: #041C24; border-radius: 12px; padding: 2.5rem; margin: 1.5rem 0; }
     .features-inner { max-width: 900px; margin: 0 auto; text-align: center; }
@@ -1383,13 +1573,6 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     .feature-desc { display: block; color: rgba(255,255,255,0.6); font-size: 0.72rem; line-height: 1.4; }
     .features-cta { display: inline-block; background: #B68F40; color: #041C24; padding: 0.7rem 1.5rem; border-radius: 6px; font-weight: 700; text-decoration: none; font-size: 0.85rem; transition: background 0.2s; }
     .features-cta:hover { background: #d4a94e; }
-
-    /* ============ MARKOWITZ CARD ============ */
-    .markowitz-card { background: linear-gradient(135deg, #f8f6f1 0%, #f0ebe0 100%); border: 1px solid rgba(182,143,64,0.2); border-radius: 12px; padding: 2rem; margin: 1.5rem 0; text-align: center; }
-    .markowitz-icon { font-size: 2rem; margin-bottom: 0.5rem; }
-    .markowitz-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; margin-bottom: 0.5rem; }
-    .markowitz-desc { color: #475569; font-size: 0.85rem; max-width: 500px; margin: 0 auto 1rem; line-height: 1.6; }
-    .markowitz-btn { display: inline-block; background: #B68F40; color: white; padding: 0.6rem 1.2rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.82rem; }
 
     /* ============ SLIDER PULSE HINT ============ */
     @keyframes sliderPulse {
@@ -1406,7 +1589,6 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     .method-locked-badge { border-radius: 9999px; padding: 0.15rem 0.6rem; font-size: 0.6rem; }
     .social-proof-card { border-radius: 0.75rem; }
     .features-showcase { border-radius: 0.75rem; }
-    .markowitz-card { border-radius: 0.75rem; }
 
     /* ============ ANIMATIONS ============ */
     @keyframes fadeInUp {
@@ -1421,14 +1603,18 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   <!-- Google Analytics (GA4) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-858T7GLTMJ"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
-  <!-- Verificação de domínio Meta (Pixel fica só na landing, não nas páginas de ticker) -->
+  <!-- Verificação de domínio Meta (Business Settings → Brand Safety → Domínios) -->
   <meta name="facebook-domain-verification" content="0941qt8c38dvdna2jnm6fgek6931de">
-  <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();var _iaSH=(function(){var ua=navigator.userAgent;if(/FBAN|FBAV/i.test(ua))return'facebook';if(/Instagram/i.test(ua))return'instagram';if(/LinkedIn/i.test(ua))return'linkedin';if(/WhatsApp/i.test(ua))return'whatsapp';if(/Telegram/i.test(ua))return'telegram';if(/Twitter|TwitterAndroid/i.test(ua))return'twitter';return null})(),_iaCID=(function(){var u=new URLSearchParams(location.search);if(u.get('fbclid'))return'facebook';if(u.get('gclid'))return'google_ads';if(u.get('ttclid'))return'tiktok';if(u.get('li_fat_id'))return'linkedin';if(u.get('twclkd'))return'twitter';if(u.get('msclkid'))return'microsoft_ads';return null})();function _iaTrack(ev,cid){var u=new URLSearchParams(location.search);var d={session_id:_iaS,page_path:(location.pathname.replace(/\\/index\\.html$/,'').replace(/\\/$/,'')||'/').toUpperCase(),referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview',source_hint:_iaSH,click_id_source:_iaCID};if(cid)d.cta_id=cid;fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify(d)}).catch(function(){})}_iaTrack();function _iaClick(e){var el=e.currentTarget;try{var _lh=new URL(el.href).host;if(typeof fbq==='function'&&_lh.indexOf('brasilhorizonte.com')>-1)fbq('trackCustom','CTAIAcoes')}catch(_le){}if(e.metaKey||e.ctrlKey||e.shiftKey||e.button===1)return;e.preventDefault();var cid=el.getAttribute('data-cta')||'unknown';var u;try{u=new URL(el.href)}catch(_){u=null}if(u){var inUtm=new URLSearchParams(location.search);var src=inUtm.get('utm_source')||'iacoes';var med=inUtm.get('utm_medium')||'ticker';var camp=inUtm.get('utm_campaign')||'seo-organico';if(!u.searchParams.has('utm_source'))u.searchParams.set('utm_source',src);if(!u.searchParams.has('utm_medium'))u.searchParams.set('utm_medium',med);if(!u.searchParams.has('utm_campaign'))u.searchParams.set('utm_campaign',camp);if(!u.searchParams.has('utm_content'))u.searchParams.set('utm_content',cid)}_iaTrack('cta_click',cid);var dest=u?u.toString():el.href;setTimeout(function(){window.location.href=dest},150)}
-var _iaDivData=${JSON.stringify(divHistory.map(d => ({e:d.exDate,a:d.amount,t:d.dividendType||'',p:d.paymentDate||''})))};
-var _iaDreData=${JSON.stringify(incomeAsc.map(d => ({y:getYear(d.end_date),rev:d.total_revenue,gp:d.gross_profit||0,ebit:d.ebit,ibt:d.income_before_tax,ni:d.net_income})))};
-var _iaBalData=${JSON.stringify(balanceAsc.map(d => ({y:getYear(d.end_date),ta:d.total_assets,cash:d.cash+(d.short_term_investments||0),tl:d.total_liab,ltd:d.long_term_debt,eq:d.total_stockholder_equity})))};
-var _iaCfData=${JSON.stringify(cashFlowAsc.map(d => ({y:getYear(d.end_date),fco:d.total_cash_from_operating_activities,fci:d.total_cashflows_from_investing_activities,fcf:d.total_cash_from_financing_activities,capex:d.capital_expenditures,divp:d.dividends_paid})))};
-function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.querySelector('button');btn.disabled=true;btn.textContent='Enviando...';var name=f.name.value.trim();var email=f.email.value.trim();fetch(_iaB+'/rest/v1/iacoes_email_leads',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},body:JSON.stringify({name:name,email:email,ticker:ticker,source:'financeiras'})}).then(function(){_iaTrack('lead_financeiras');var csv='=== DRE (Demonstracao de Resultados) ===\\nAno;Receita Total;Lucro Bruto;EBIT;Lucro Antes IR;Lucro Liquido\\n';_iaDreData.forEach(function(d){csv+=d.y+';'+d.rev+';'+d.gp+';'+d.ebit+';'+d.ibt+';'+d.ni+'\\n';});csv+='\\n=== Balanco Patrimonial ===\\nAno;Ativo Total;Caixa;Passivo Total;Divida LP;Patrimonio Liquido\\n';_iaBalData.forEach(function(d){csv+=d.y+';'+d.ta+';'+d.cash+';'+d.tl+';'+d.ltd+';'+d.eq+'\\n';});csv+='\\n=== Fluxo de Caixa ===\\nAno;FCO;FCI;FCF;CAPEX;Dividendos Pagos\\n';_iaCfData.forEach(function(d){csv+=d.y+';'+d.fco+';'+d.fci+';'+d.fcf+';'+d.capex+';'+d.divp+'\\n';});csv+='\\n=== Dividendos ===\\nData Ex;Valor por Acao;Tipo;Data Pagamento\\n';_iaDivData.forEach(function(d){csv+=d.e+';'+d.a+';'+d.t+';'+d.p+'\\n';});var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='financeiras_'+ticker+'.csv';a.click();URL.revokeObjectURL(url);f.style.display='none';document.getElementById('div-lead-success-'+ticker).style.display='block';}).catch(function(){btn.disabled=false;btn.textContent='Erro — tente novamente';});return false;}document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchParams(location.search).get('fbclid');if(!_fb)return;document.querySelectorAll('a[href*="brasilhorizonte.com"]').forEach(function(l){try{var _u=new URL(l.href);_u.searchParams.set('fbclid',_fb);l.href=_u.toString()}catch(e){}})});</script>
+  <!-- Meta Pixel — Pixel ID 927250313694701 (mesmo do app brasilhorizonte.com). Guard "_" mantido por segurança. -->
+  <script>
+  var _fbPixelId='927250313694701';
+  if(_fbPixelId&&_fbPixelId.indexOf('_')<0){
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init',_fbPixelId);fbq('track','PageView');
+  }
+  </script>
+  <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();var _iaSH=(function(){var ua=navigator.userAgent;if(/FBAN|FBAV/i.test(ua))return'facebook';if(/Instagram/i.test(ua))return'instagram';if(/LinkedIn/i.test(ua))return'linkedin';if(/WhatsApp/i.test(ua))return'whatsapp';if(/Telegram/i.test(ua))return'telegram';if(/Twitter|TwitterAndroid/i.test(ua))return'twitter';return null})(),_iaCID=(function(){var u=new URLSearchParams(location.search);if(u.get('fbclid'))return'facebook';if(u.get('gclid'))return'google_ads';if(u.get('ttclid'))return'tiktok';if(u.get('li_fat_id'))return'linkedin';if(u.get('twclkd'))return'twitter';if(u.get('msclkid'))return'microsoft_ads';return null})();var _iaBOT=(function(){try{if(navigator.webdriver===true)return true;if(/bot|crawl|spider|headless|preview|lighthouse|gptbot|claudebot|perplexity|bingpreview/i.test(navigator.userAgent||''))return true;var l=navigator.languages;if(!l||!l.length)return true;return false}catch(_be){return false}})(),_iaINT=false;(function(){try{var _if=function(){_iaINT=true};['pointerdown','keydown','touchstart','wheel'].forEach(function(t){window.addEventListener(t,_if,{passive:true,once:true})})}catch(_ie){}})();function _iaTrack(ev,cid){var u=new URLSearchParams(location.search);var d={session_id:_iaS,page_path:(location.pathname.replace(/\\/index\\.html$/,'').replace(/\\/$/,'')||'/').toUpperCase(),referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview',source_hint:_iaSH,click_id_source:_iaCID,is_bot:_iaBOT,interacted:_iaINT};if(cid)d.cta_id=cid;fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify(d)}).catch(function(){})}_iaTrack();function _iaClick(e){var el=e.currentTarget;try{var _lh=new URL(el.href).host;if(typeof fbq==='function'&&_lh.indexOf('brasilhorizonte.com')>-1)fbq('trackCustom','CTAIAcoes')}catch(_le){try{console.warn('[iAcoes] fbq CTA tracking falhou:',_le)}catch(_we){}}if(e.metaKey||e.ctrlKey||e.shiftKey||e.button===1)return;e.preventDefault();var cid=el.getAttribute('data-cta')||'unknown';var u;try{u=new URL(el.href)}catch(_){u=null}if(u){var inUtm=new URLSearchParams(location.search);var src=inUtm.get('utm_source')||'iacoes';var med=inUtm.get('utm_medium')||'ticker';var camp=inUtm.get('utm_campaign')||'seo-organico';if(!u.searchParams.has('utm_source'))u.searchParams.set('utm_source',src);if(!u.searchParams.has('utm_medium'))u.searchParams.set('utm_medium',med);if(!u.searchParams.has('utm_campaign'))u.searchParams.set('utm_campaign',camp);if(!u.searchParams.has('utm_content'))u.searchParams.set('utm_content',cid)}_iaTrack('cta_click',cid);var dest=u?u.toString():el.href;setTimeout(function(){window.location.href=dest},150)}
+document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchParams(location.search).get('fbclid');if(!_fb)return;document.querySelectorAll('a[href*="brasilhorizonte.com"]').forEach(function(l){try{var _u=new URL(l.href);_u.searchParams.set('fbclid',_fb);l.href=_u.toString()}catch(e){}})});</script>
 </head>
 <body>
 
@@ -1494,15 +1680,7 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
     </div>
   </header>
 
-  <!-- AUDITORIA IA -->
-  <section class="social-proof-section animate-in" aria-label="Auditoria por IA">
-    <div class="social-proof-card">
-      <p class="social-proof-headline">Leu um relat&oacute;rio sobre ${f.symbol}? Viu uma recomenda&ccedil;&atilde;o?</p>
-      <p class="social-proof-text">Nossa IA audita a tese por tr&aacute;s &mdash; governan&ccedil;a, vantagens competitivas, riscos e mais 3 categorias. <strong>Descubra se a indica&ccedil;&atilde;o se sustenta.</strong></p>
-      <p class="social-proof-count">${socialProofCount(f.volMed2m, f.symbol).toLocaleString('pt-BR')} investidores j&aacute; validaram teses em ${f.symbol}</p>
-      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="social-proof-btn" data-cta="social-proof" onclick="_iaClick(event)">Auditar com IA grátis <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16" style="vertical-align:middle;margin-left:0.3rem"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></a>
-    </div>
-  </section>
+${cvmOrAuditBlock}
 
   <!-- SOBRE A EMPRESA (SEO + NEGÓCIO) -->
   <section class="section-card intro-combined animate-in" aria-label="Sobre ${f.symbol}">
@@ -1751,6 +1929,29 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
   </section>
 
 
+  <!-- APRESENTAÇÃO DO AIRTON -->
+  <section class="airton-intro animate-in" aria-label="Conhe&ccedil;a o AIrton, assistente de IA">
+    <div class="airton-intro-inner">
+      <p class="airton-eyebrow">Assistente IA</p>
+      <h2 class="airton-intro-title">Conhe&ccedil;a o AIrton, seu copiloto para ${f.symbol}</h2>
+      <p class="airton-intro-sub">Ele conhece sua carteira, valida suas teses contra os fundamentos reais e resume os documentos da CVM &mdash; no app e no seu WhatsApp.</p>
+
+      <div class="airton-chat" role="img" aria-label="Exemplo ilustrativo de conversa com o AIrton sobre ${f.symbol}">
+        <span class="airton-chat-tag">Exemplo ilustrativo &mdash; n&atilde;o &eacute; recomenda&ccedil;&atilde;o de investimento</span>
+        <div class="airton-bubble airton-bubble-user"><span class="airton-bubble-who">Voc&ecirc;</span>${airtonQuestions[0]}</div>
+        <div class="airton-bubble airton-bubble-ai"><span class="airton-bubble-who">AIrton</span>${airtonDemoAnswer}</div>
+      </div>
+
+      <ul class="airton-caps" aria-label="O que o AIrton faz">
+        <li><span class="airton-cap-ico" aria-hidden="true">&#x1F4BC;</span>Acessa sua carteira</li>
+        <li><span class="airton-cap-ico" aria-hidden="true">&#x2705;</span>Valida suas teses</li>
+        <li><span class="airton-cap-ico" aria-hidden="true">&#x26A1;</span>Resume a CVM em segundos</li>
+      </ul>
+
+      <a href="${airtonIntroHref}" class="airton-intro-btn" data-cta="airton-intro" onclick="_iaClick(event)">Conversar com o AIrton sobre ${f.symbol} &rarr;</a>
+    </div>
+  </section>
+
   <!-- FEATURES SHOWCASE -->
   <section class="features-showcase animate-in" aria-label="Funcionalidades da plataforma">
     <div class="features-inner">
@@ -1767,14 +1968,19 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
           <span class="feature-desc">Auditoria com IA em 6 categorias</span>
         </div>
         <div class="feature-item">
-          <span class="feature-icon" role="img" aria-label="Otimizador Markowitz">&#x2696;&#xFE0F;</span>
-          <span class="feature-name">Otimizador Markowitz</span>
-          <span class="feature-desc">Fronteira eficiente e balanceamento de carteira</span>
+          <span class="feature-icon" role="img" aria-label="AIrton">&#x1F916;</span>
+          <span class="feature-name">AIrton</span>
+          <span class="feature-desc">Assistente de IA que audita teses no app e no WhatsApp</span>
         </div>
         <div class="feature-item">
-          <span class="feature-icon" role="img" aria-label="Radar de Oportunidades">&#x1F50D;</span>
-          <span class="feature-name">Radar de Oportunidades</span>
-          <span class="feature-desc">Screening com filtros fundamentalistas</span>
+          <span class="feature-icon" role="img" aria-label="Alertas CVM em tempo real">&#x1F514;</span>
+          <span class="feature-name">Alertas CVM em tempo real</span>
+          <span class="feature-desc">Fato Relevante, ITR, DFP e proventos no instante da publica&ccedil;&atilde;o</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon" role="img" aria-label="Minhas Teses">&#x1F4DD;</span>
+          <span class="feature-name">Minhas Teses</span>
+          <span class="feature-desc">Registre sua tese e acompanhe se ela segue de p&eacute;</span>
         </div>
         <div class="feature-item">
           <span class="feature-icon" role="img" aria-label="Documentos CVM">&#x1F4C4;</span>
@@ -1836,17 +2042,6 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
     </div>
   </section>
 
-  <!-- MARKOWITZ CARD -->
-  <section class="markowitz-card animate-in" aria-label="Otimização de carteira">
-    <div class="markowitz-inner">
-      <div class="markowitz-icon" role="img" aria-label="Otimização">&#x2696;&#xFE0F;</div>
-      <h3 class="markowitz-title">Tem ${f.symbol} na carteira?</h3>
-      <p class="markowitz-desc">Descubra se seu portf&oacute;lio est&aacute; otimizado segundo Markowitz &mdash; fronteira eficiente, correla&ccedil;&atilde;o entre ativos e an&aacute;lise de risco/retorno.</p>
-      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="markowitz-btn" data-cta="markowitz" onclick="_iaClick(event)">Otimizar minha carteira &rarr;</a>
-    </div>
-  </section>
-
-
   <!-- DEMONSTRAÇÕES FINANCEIRAS -->
   <section class="section-card animate-in" aria-label="Demonstrações Financeiras">
     <div class="section-header-row">
@@ -1904,21 +2099,15 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
       </table>
     </div>` : ''}
 
-    <!-- LEAD COLLECTOR: PLANILHA FINANCEIRA COMPLETA -->
-    <div class="div-lead-card" id="div-lead-card-${f.symbol}">
-      <div class="div-lead-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <!-- ALERTA CVM -->
+    <div class="alerta-cvm-card" role="complementary" aria-label="Alertas da CVM sobre ${f.symbol}">
+      <div class="alerta-cvm-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       </div>
-      <div class="div-lead-title">Dados Financeiros Completos de ${f.symbol}</div>
-      <div class="div-lead-sub">DRE, Balan&ccedil;o Patrimonial, Fluxo de Caixa e Dividendos &mdash; ${dreYears.length > 0 ? dreYears.length + ' anos de hist&oacute;rico' : 'dados hist&oacute;ricos'}${divHistory.length > 0 ? ' + ' + divHistory.length + ' pagamentos de dividendos' : ''}.</div>
-      <form class="div-lead-form" id="div-lead-form-${f.symbol}" onsubmit="return _iaLeadSubmit(event,'${f.symbol}')">
-        <input type="text" name="name" placeholder="Seu nome" required>
-        <input type="email" name="email" placeholder="Seu melhor e-mail" required>
-        <button type="submit" class="div-lead-btn">Baixar dados completos <span>&rarr;</span></button>
-      </form>
-      <div class="div-lead-success" id="div-lead-success-${f.symbol}" style="display:none">
-        <p>Pronto! O download vai come&ccedil;ar automaticamente.</p>
-      </div>
+      <div class="alerta-cvm-title">Fique sabendo antes do mercado</div>
+      <p class="alerta-cvm-sub">Receba no WhatsApp cada Fato Relevante, ITR, DFP e an&uacute;ncio de proventos de ${f.symbol} no instante em que sai na CVM &mdash; com o resumo do AIrton pronto.</p>
+      <a href="${alertaCvmHref}" class="alerta-cvm-btn" data-cta="alerta-cvm" onclick="_iaClick(event)">Ativar alertas de ${f.symbol} &rarr;</a>
+      <p class="alerta-cvm-foot">Gr&aacute;tis, sem cart&atilde;o. Tamb&eacute;m dispon&iacute;vel no Telegram.</p>
     </div>
   </section>
 
@@ -1955,7 +2144,7 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
   <!-- CTA -->
   <section class="cta-card animate-in" aria-label="Acesse a plataforma">
     <h2>Sua an&aacute;lise de ${f.symbol} come&ccedil;a aqui</h2>
-    <p>Premissas edit&aacute;veis, cen&aacute;rios Bear/Base/Bull, an&aacute;lise qualitativa com IA, otimizador Markowitz e muito mais &mdash; tudo gr&aacute;tis para come&ccedil;ar.</p>
+    <p>Premissas edit&aacute;veis, cen&aacute;rios Bear/Base/Bull, an&aacute;lise qualitativa com IA, alertas da CVM e o AIrton &mdash; tudo gr&aacute;tis para come&ccedil;ar.</p>
     <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="cta-btn" data-cta="footer" onclick="_iaClick(event)">Comece sua an&aacute;lise gr&aacute;tis &rarr;</a>
   </section>
 
@@ -2183,6 +2372,11 @@ function _iaLeadSubmit(e,ticker){e.preventDefault();var f=e.target;var btn=f.que
 })();
 </script>
 
+<!-- CTA FIXO MOBILE -->
+<div class="sticky-m" role="complementary" aria-label="Analisar ${f.symbol} na plataforma">
+  <a href="${airtonAuditHref}" class="sticky-m-btn" data-cta="sticky-mobile" onclick="_iaClick(event)">Auditar ${f.symbol} gr&aacute;tis &rarr;</a>
+</div>
+
 </body>
 </html>`;
 };
@@ -2214,9 +2408,17 @@ export const generateIndexHTML = (tickers: TickerIndexEntry[]): string => {
   <meta charset="UTF-8">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-858T7GLTMJ"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858T7GLTMJ');</script>
-  <!-- Verificação de domínio Meta (Pixel fica só na landing, não nas páginas de ticker) -->
+  <!-- Verificação de domínio Meta (Business Settings → Brand Safety → Domínios) -->
   <meta name="facebook-domain-verification" content="0941qt8c38dvdna2jnm6fgek6931de">
-  <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();var _iaSH=(function(){var ua=navigator.userAgent;if(/FBAN|FBAV/i.test(ua))return'facebook';if(/Instagram/i.test(ua))return'instagram';if(/LinkedIn/i.test(ua))return'linkedin';if(/WhatsApp/i.test(ua))return'whatsapp';if(/Telegram/i.test(ua))return'telegram';if(/Twitter|TwitterAndroid/i.test(ua))return'twitter';return null})(),_iaCID=(function(){var u=new URLSearchParams(location.search);if(u.get('fbclid'))return'facebook';if(u.get('gclid'))return'google_ads';if(u.get('ttclid'))return'tiktok';if(u.get('li_fat_id'))return'linkedin';if(u.get('twclkd'))return'twitter';if(u.get('msclkid'))return'microsoft_ads';return null})();function _iaTrack(ev,cid){var u=new URLSearchParams(location.search);var d={session_id:_iaS,page_path:(location.pathname.replace(/\\/index\\.html$/,'').replace(/\\/$/,'')||'/').toUpperCase(),referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview',source_hint:_iaSH,click_id_source:_iaCID};if(cid)d.cta_id=cid;fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify(d)}).catch(function(){})}_iaTrack();function _iaClick(e){var el=e.currentTarget;try{var _lh=new URL(el.href).host;if(typeof fbq==='function'&&_lh.indexOf('brasilhorizonte.com')>-1)fbq('trackCustom','CTAIAcoes')}catch(_le){}if(e.metaKey||e.ctrlKey||e.shiftKey||e.button===1)return;e.preventDefault();var cid=el.getAttribute('data-cta')||'unknown';var u;try{u=new URL(el.href)}catch(_){u=null}if(u){var inUtm=new URLSearchParams(location.search);var src=inUtm.get('utm_source')||'iacoes';var med=inUtm.get('utm_medium')||'acoes-index';var camp=inUtm.get('utm_campaign')||'seo-organico';if(!u.searchParams.has('utm_source'))u.searchParams.set('utm_source',src);if(!u.searchParams.has('utm_medium'))u.searchParams.set('utm_medium',med);if(!u.searchParams.has('utm_campaign'))u.searchParams.set('utm_campaign',camp);if(!u.searchParams.has('utm_content'))u.searchParams.set('utm_content',cid)}_iaTrack('cta_click',cid);var dest=u?u.toString():el.href;setTimeout(function(){window.location.href=dest},150)}document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchParams(location.search).get('fbclid');if(!_fb)return;document.querySelectorAll('a[href*="brasilhorizonte.com"]').forEach(function(l){try{var _u=new URL(l.href);_u.searchParams.set('fbclid',_fb);l.href=_u.toString()}catch(e){}})});</script>
+  <!-- Meta Pixel — Pixel ID 927250313694701 (mesmo do app brasilhorizonte.com). Guard "_" mantido por segurança. -->
+  <script>
+  var _fbPixelId='927250313694701';
+  if(_fbPixelId&&_fbPixelId.indexOf('_')<0){
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init',_fbPixelId);fbq('track','PageView');
+  }
+  </script>
+  <script>var _iaB='https://dawvgbopyemcayavcatd.supabase.co',_iaK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRhd3ZnYm9weWVtY2F5YXZjYXRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU3MzAwOTEsImV4cCI6MjA3MTMwNjA5MX0.TuQV1G_JsJQRjLr76f8xX2HUjCig5FQa8R-YpsPyJiw',_iaS=(function(){var s=sessionStorage.getItem('_ia_sid');if(!s){s=crypto.randomUUID();sessionStorage.setItem('_ia_sid',s)}return s})(),_iaD=(function(){var ua=navigator.userAgent;var m=/Mobi|Android/i.test(ua);var t=/Tablet|iPad/i.test(ua);var dt=t?'tablet':m?'mobile':'desktop';var br='Outro';if(/Edg\\//i.test(ua))br='Edge';else if(/Chrome/i.test(ua))br='Chrome';else if(/Firefox/i.test(ua))br='Firefox';else if(/Safari/i.test(ua))br='Safari';var os='Outro';if(/Windows/i.test(ua))os='Windows';else if(/Mac/i.test(ua))os='macOS';else if(/Android/i.test(ua))os='Android';else if(/iPhone|iPad|iPod/i.test(ua))os='iOS';else if(/Linux/i.test(ua))os='Linux';return{dt:dt,br:br,os:os}})();var _iaSH=(function(){var ua=navigator.userAgent;if(/FBAN|FBAV/i.test(ua))return'facebook';if(/Instagram/i.test(ua))return'instagram';if(/LinkedIn/i.test(ua))return'linkedin';if(/WhatsApp/i.test(ua))return'whatsapp';if(/Telegram/i.test(ua))return'telegram';if(/Twitter|TwitterAndroid/i.test(ua))return'twitter';return null})(),_iaCID=(function(){var u=new URLSearchParams(location.search);if(u.get('fbclid'))return'facebook';if(u.get('gclid'))return'google_ads';if(u.get('ttclid'))return'tiktok';if(u.get('li_fat_id'))return'linkedin';if(u.get('twclkd'))return'twitter';if(u.get('msclkid'))return'microsoft_ads';return null})();var _iaBOT=(function(){try{if(navigator.webdriver===true)return true;if(/bot|crawl|spider|headless|preview|lighthouse|gptbot|claudebot|perplexity|bingpreview/i.test(navigator.userAgent||''))return true;var l=navigator.languages;if(!l||!l.length)return true;return false}catch(_be){return false}})(),_iaINT=false;(function(){try{var _if=function(){_iaINT=true};['pointerdown','keydown','touchstart','wheel'].forEach(function(t){window.addEventListener(t,_if,{passive:true,once:true})})}catch(_ie){}})();function _iaTrack(ev,cid){var u=new URLSearchParams(location.search);var d={session_id:_iaS,page_path:(location.pathname.replace(/\\/index\\.html$/,'').replace(/\\/$/,'')||'/').toUpperCase(),referrer:document.referrer||null,utm_source:u.get('utm_source')||null,utm_medium:u.get('utm_medium')||null,utm_campaign:u.get('utm_campaign')||null,device_type:_iaD.dt,screen_width:screen.width,browser:_iaD.br,os:_iaD.os,event_type:ev||'pageview',source_hint:_iaSH,click_id_source:_iaCID,is_bot:_iaBOT,interacted:_iaINT};if(cid)d.cta_id=cid;fetch(_iaB+'/rest/v1/iacoes_page_views',{method:'POST',headers:{'Content-Type':'application/json','apikey':_iaK,'Authorization':'Bearer '+_iaK,'Prefer':'return=minimal'},keepalive:true,body:JSON.stringify(d)}).catch(function(){})}_iaTrack();function _iaClick(e){var el=e.currentTarget;try{var _lh=new URL(el.href).host;if(typeof fbq==='function'&&_lh.indexOf('brasilhorizonte.com')>-1)fbq('trackCustom','CTAIAcoes')}catch(_le){try{console.warn('[iAcoes] fbq CTA tracking falhou:',_le)}catch(_we){}}if(e.metaKey||e.ctrlKey||e.shiftKey||e.button===1)return;e.preventDefault();var cid=el.getAttribute('data-cta')||'unknown';var u;try{u=new URL(el.href)}catch(_){u=null}if(u){var inUtm=new URLSearchParams(location.search);var src=inUtm.get('utm_source')||'iacoes';var med=inUtm.get('utm_medium')||'acoes-index';var camp=inUtm.get('utm_campaign')||'seo-organico';if(!u.searchParams.has('utm_source'))u.searchParams.set('utm_source',src);if(!u.searchParams.has('utm_medium'))u.searchParams.set('utm_medium',med);if(!u.searchParams.has('utm_campaign'))u.searchParams.set('utm_campaign',camp);if(!u.searchParams.has('utm_content'))u.searchParams.set('utm_content',cid)}_iaTrack('cta_click',cid);var dest=u?u.toString():el.href;setTimeout(function(){window.location.href=dest},150)}document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchParams(location.search).get('fbclid');if(!_fb)return;document.querySelectorAll('a[href*="brasilhorizonte.com"]').forEach(function(l){try{var _u=new URL(l.href);_u.searchParams.set('fbclid',_fb);l.href=_u.toString()}catch(e){}})});</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Todas as Ações da B3 — Análise Fundamentalista e Preço Justo ${year} | IAções</title>
   <meta name="description" content="Lista completa de ${tickers.length} ações da B3 com indicadores fundamentalistas: P/L, Dividend Yield, preço justo por Graham, Bazin e Gordon. Análise fundamentalista atualizada em ${today}.">

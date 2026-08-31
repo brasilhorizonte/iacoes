@@ -232,12 +232,25 @@ export interface ValuationWeights {
   GRAHAM: number;
 }
 
+// Documento publicado pela companhia na CVM (tabela `public.cvm_documents`).
+// Já normalizado: `docTypeLabel` é a sigla traduzida (a sigla crua nunca vai para o HTML)
+// e `title`/`excerpt` vêm limpos de markdown. O escape de HTML é responsabilidade do template.
+export interface CvmDocument {
+  docType: string;       // sigla original (FR, CM, ITR, DFP, ...) — uso interno/debug
+  docTypeLabel: string;  // rótulo legível em português
+  title: string;         // título extraído de `summary` (pode ser vazio)
+  date: string;          // ISO yyyy-mm-dd, sempre <= hoje
+  excerpt: string;       // `ai_summary` limpo (fallback: vazio)
+  link: string;          // URL do documento oficial na CVM
+}
+
 export interface SupabaseFinancials {
   income: RawIncomeStatement[];
   balance: RawBalanceSheet[];
   cashFlow: RawCashFlow[];
   brapi: RawBrapiQuote[];
   dividends: RawDividend[];
+  cvmDocs: CvmDocument[];
 }
 
 export interface PeerTicker {

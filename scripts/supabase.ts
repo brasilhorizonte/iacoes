@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import type {
   RawIncomeStatement, RawBalanceSheet, RawCashFlow,
   RawBrapiQuote, RawDividend, SupabaseFinancials,
-  PeerTicker, TickerIndexEntry, QualitativeScore
+  PeerTicker, TickerIndexEntry, QualitativeScore, CvmDocument
 } from './types';
 
 const SUPABASE_URL = process.env.SUPABASE_URL!;
@@ -172,6 +172,131 @@ const mapDividend = (row: Record<string, any>): RawDividend => {
   };
 };
 
+// --- Documentos da CVM (tabela public.cvm_documents) ---
+
+// Siglas da CVM/RAD -> rótulo em português. Documento com sigla fora deste mapa é
+// descartado: a regra é nunca exibir a sigla crua na página.
+const CVM_DOC_LABELS: Record<string, string> = {
+  FR: 'Fato Relevante',
+  CM: 'Comunicado ao Mercado',
+  ITR: 'Informações Trimestrais',
+  DFP: 'Demonstrações Financeiras Padronizadas',
+  FRE: 'Formulário de Referência',
+  VLMO: 'Negociação de Valores Mobiliários',
+  PR: 'Divulgação de Resultados',
+};
+
+// Quantos documentos entram no bloco da página de ticker.
+export const CVM_DOC_LIMIT = 4;
+
+// Linhas lidas por consulta antes de deduplicar (o feed repete o mesmo `link`
+// com títulos diferentes; 40 dá folga para sobrar CVM_DOC_LIMIT depois).
+const CVM_FETCH_ROWS = 40;
+
+// `summary` vem no formato "<Tipo> - <título> - Date YYYY-MM-DD"
+// (algumas linhas usam "Data" em vez de "Date", e o título pode ser vazio: "- - -").
+const CVM_DATE_SUFFIX = /\s*-\s*Dat[ae]\s*\d{4}-\d{2}-\d{2}\s*$/i;
+
+// `ai_summary` é texto gerado com markdown leve (**negrito**, ##, quebras de linha).
+const cleanCvmText = (raw: string): string =>
+  raw
+    .replace(/\*\*/g, '')
+    .replace(/^\s{0,3}#{1,6}\s*/gm, '')
+    .replace(/[`_]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const cvmTitleFromSummary = (summary: string): string => {
+  let s = summary.replace(CVM_DATE_SUFFIX, '').trim();
+  const sep = s.indexOf(' - ');
+  if (sep >= 0) s = s.slice(sep + 3);
+  s = s.replace(/^[\s-]+/, '').replace(/[\s-]+$/, '');
+  return cleanCvmText(s);
+};
+
+const mapCvmDocument = (row: Record<string, any>): CvmDocument | null => {
+  const r = norm(row);
+
+  const docType = toStr(pick(r, ['doc_type', 'doctype'])).trim().toUpperCase();
+  const docTypeLabel = CVM_DOC_LABELS[docType];
+  if (!docTypeLabel) return null;
+
+  const link = toStr(pick(r, ['link'])).trim();
+  if (!/^https?:\/\//i.test(link)) return null;
+
+  const date = toStr(pick(r, ['date'])).slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+
+  let title = cvmTitleFromSummary(toStr(pick(r, ['summary'])));
+  // Algumas linhas trazem a própria sigla como título ("ITR - ITR - Date ..."):
+  // não vale como informação e a sigla crua não pode aparecer na página.
+  if (title.toUpperCase() === docType || title.toLowerCase() === docTypeLabel.toLowerCase()) title = '';
+
+  const excerpt = cleanCvmText(toStr(pick(r, ['ai_summary'])));
+  if (!title && !excerpt) return null;
+
+  return { docType, docTypeLabel, title, date, excerpt, link };
+};
+
+/**
+ * Últimos documentos que a companhia publicou na CVM, mais recentes primeiro.
+ *
+ * Tolerante a falha por contrato: qualquer erro (tabela ausente, RLS, rede) devolve
+ * `[]` e a geração da página segue — o bloco simplesmente não é renderizado.
+ *
+ * Cobertura: `cvm_documents` guarda um ticker por emissor (ex.: PETR4, não PETR3).
+ * Se o ticker exato não tiver linhas, cai para a raiz de 4 letras do código B3, que
+ * identifica o mesmo emissor — documento da CVM é da companhia, não da classe de ação.
+ */
+export const fetchCvmDocuments = async (ticker: string, limit = CVM_DOC_LIMIT): Promise<CvmDocument[]> => {
+  const t = normSym(ticker);
+  if (!t) return [];
+  const today = new Date().toISOString().slice(0, 10);
+
+  const run = async (apply: (q: any) => any): Promise<Record<string, any>[]> => {
+    try {
+      const { data, error } = await apply(
+        supabase
+          .from('cvm_documents')
+          .select('ticker,doc_type,date,summary,ai_summary,link')
+          .lte('date', today)          // há linhas com data no futuro no feed
+          .not('date', 'is', null)
+          .order('date', { ascending: false })
+          .limit(CVM_FETCH_ROWS)
+      );
+      if (error) { console.warn(`  ⚠ ${t}: cvm_documents — ${error.message}`); return []; }
+      return data || [];
+    } catch (e: any) {
+      console.warn(`  ⚠ ${t}: cvm_documents — ${e?.message || e}`);
+      return [];
+    }
+  };
+
+  let rows = await run(q => q.eq('ticker', t));
+  if (!rows.length) {
+    const root = /^[A-Z]{4}/.exec(t)?.[0];
+    if (root) rows = await run(q => q.like('ticker', `${root}%`));
+  }
+
+  const seen = new Set<string>();
+  const docs: CvmDocument[] = [];
+  for (const row of rows) {
+    const doc = mapCvmDocument(row);
+    if (!doc) continue;
+    if (seen.has(doc.link)) continue;   // o feed repete o mesmo link com títulos diferentes
+    seen.add(doc.link);
+    docs.push(doc);
+    if (docs.length >= limit) break;
+  }
+  return docs;
+};
+
+// Cache preenchido por `fetchFinancials` (uma chamada por ticker no pipeline) e lido
+// de forma síncrona pelo template, que não pode fazer I/O.
+const cvmDocsCache = new Map<string, CvmDocument[]>();
+
+export const getCvmDocuments = (ticker: string): CvmDocument[] => cvmDocsCache.get(normSym(ticker)) || [];
+
 // --- Ticker candidates ---
 
 const buildCandidates = (ticker: string): string[] => {
@@ -236,12 +361,16 @@ export const fetchFinancials = async (ticker: string): Promise<SupabaseFinancial
     return [];
   };
 
-  const [incomeRows, balanceRows, cashFlowRows, dividendRows] = await Promise.all([
+  const [incomeRows, balanceRows, cashFlowRows, dividendRows, cvmDocs] = await Promise.all([
     fetchTable('brapi_income_statements'),
     fetchTable('brapi_balance_sheets'),
     fetchTable('brapi_cashflows'),
-    fetchTable('brapi_dividends')
+    fetchTable('brapi_dividends'),
+    fetchCvmDocuments(sym)
   ]);
+
+  cvmDocsCache.set(normSym(sym), cvmDocs);
+  if (normSym(t) !== normSym(sym)) cvmDocsCache.set(normSym(t), cvmDocs);
 
   const income = incomeRows.map(mapIncome).filter(r => r.symbol);
   const balance = balanceRows.map(mapBalance).filter(r => r.symbol);
@@ -250,7 +379,7 @@ export const fetchFinancials = async (ticker: string): Promise<SupabaseFinancial
 
   if (!income.length && !balance.length && !cashFlow.length) return null;
 
-  return { income, balance, cashFlow, brapi, dividends };
+  return { income, balance, cashFlow, brapi, dividends, cvmDocs };
 };
 
 // --- Get all active tickers ---

@@ -1,0 +1,59 @@
+diff --git a/package.json b/package.json
+index 3d744640..bf02df14 100644
+--- a/package.json
++++ b/package.json
+@@ -6,8 +6,9 @@
+     "dev": "npx serve .",
+     "generate": "npx tsx scripts/generate-pages.ts",
+     "generate:test": "npx tsx scripts/generate-pages.ts VALE3 PETR4 WEGE3",
+-    "test": "npx tsx scripts/validate-html.ts",
+-    "postgenerate": "npx tsx scripts/validate-html.ts"
++    "generate:calculadoras": "npx tsx scripts/generate-calculators.ts",
++    "test": "npx tsx scripts/validate-planning.ts && npx tsx scripts/validate-html.ts",
++    "postgenerate": "npx tsx scripts/validate-planning.ts && npx tsx scripts/validate-html.ts"
+   },
+   "private": true,
+   "dependencies": {
+diff --git a/scripts/validate-html.ts b/scripts/validate-html.ts
+index 735f6390..8ef75578 100644
+--- a/scripts/validate-html.ts
++++ b/scripts/validate-html.ts
+@@ -59,6 +59,20 @@ function collectHTMLFiles(): string[] {
+     }
+   } catch {}
+ 
++  // Páginas de calculadora (/calculadoras/ e /calculadoras/{slug}/).
++  // ⚠️ Sem esta varredura o validador diria "tudo ok" sem nunca ter aberto as
++  // páginas novas — um gate só enxerga o que você ensina a ele a procurar.
++  const calcDir = join(ROOT, 'calculadoras');
++  try {
++    const calcIndex = join(calcDir, 'index.html');
++    try { statSync(calcIndex); files.push(calcIndex); } catch {}
++    for (const entry of readdirSync(calcDir)) {
++      if (entry === 'index.html') continue;
++      const html = join(calcDir, entry, 'index.html');
++      try { statSync(html); files.push(html); } catch {}
++    }
++  } catch {}
++
+   return files;
+ }
+ 
+@@ -128,8 +142,15 @@ function checkTrackingFunctions(file: string, html: string) {
+  * Se _iaD for undefined, _iaTrack crasha em _iaD.dt e o redirect nunca roda.
+  */
+ function checkTrackingVariables(file: string, html: string) {
+-  // _iaD deve ser uma IIFE que retorna um objeto com .dt, .br, .os
+-  if (html.includes('_iaD.dt') && !html.includes('_iaD=(function()')) {
++  // _iaD deve ser uma IIFE que retorna um objeto com .dt, .br, .os.
++  //
++  // Casamento por REGEX tolerante a espaços, não por string literal: as páginas
++  // de ticker embutem o script minificado (`_iaD=(function(){`) e as de
++  // calculadora injetam um arquivo .js formatado (`_iaD = (function () {`).
++  // As duas formas são igualmente válidas — o que a regra precisa detectar é
++  // `_iaD` sendo USADO sem ter sido DEFINIDO, não um estilo de formatação.
++  const definesIaD = /_iaD\s*=\s*\(\s*function\s*\(/.test(html);
++  if (html.includes('_iaD.dt') && !definesIaD) {
+     addIssue(file, 'tracking-variables', '_iaD.dt usado mas _iaD IIFE nao encontrada');
+   }
+ }
