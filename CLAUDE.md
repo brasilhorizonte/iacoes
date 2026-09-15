@@ -236,7 +236,7 @@ Estrutura atual (redesign de 10/abr/2026, reforma de oferta em ago/2026):
 
 1. **Nav** — Logo BH + iAcoes + busca de ticker + botoes "Acessar App" / "Assinar Plano" (data-cta: nav-app, nav-assinar)
 2. **Breadcrumb** — Navegacao hierarquica (Home > Acoes > Setor > TICKER)
-3. **Hero** — Ticker, nome, setor, preco atual, variacao dia/12m, nota qualitativa blur ao lado da cotacao, micro-CTA anchor "Fazer meu Valuation" (scroll suave para cards)
+3. **Hero** — Ticker, nome, setor, preco atual, variacao dia/12m, nota qualitativa blur ao lado da cotacao, micro-CTA anchor "Fazer meu Valuation" (scroll suave para cards) e, ao lado, "Ver TICKER na plataforma" (data-cta: asset-page) — leva a pagina completa do ativo no app (`/ativo/TICKER`) via `next`
 4. **Bloco de Documentos da CVM** — "O que TICKER publicou na CVM": lista `<ol>` dos 4 documentos
    reais mais recentes (tipo traduzido, `<time datetime>`, titulo, resumo do AIrton), cada um linkando
    o documento oficial (`target="_blank" rel="noopener nofollow"`, sem `_iaClick` — e link externo,
@@ -298,6 +298,13 @@ Cada CTA tem `onclick="_iaClick(event)"` + `data-cta="ID"` para tracking granula
 | `footer` | CTA final | `ref=iacoes&ticker=T` |
 | `disclaimer` | Link inline no disclaimer | `ref=iacoes` |
 | `sticky-mobile` | Barra fixa (so mobile) | `ref=iacoes&ticker=T&intent=auditoria` |
+| `asset-page` | Hero: "Ver TICKER na plataforma" | `ref=iacoes&ticker=T&next=/ativo/T` (encoded) |
+
+**`next` (15/09/2026):** o unico CTA que leva a uma tela especifica do app. O `Auth.tsx` do app
+redireciona para o `next` depois do login/cadastro, e na hora se a pessoa ja esta logada; os demais
+parametros (`ref`, `ticker`, `utm_*` injetados pelo `_iaClick`) seguem junto na URL de destino. A
+pagina do ativo no app EXIGE login — a versao publica de cada acao e esta pagina do iacoes. Cadastro
+por e-mail passa pela confirmacao e pode perder o `next`; pelo Google ele e preservado.
 
 **IMPORTANTE para dashboards:** `airton-audit` e o **sucessor historico de `social-proof`** — o card
 foi reescrito e o id renomeado em 31/ago/2026. Quem agrega por `cta_id` precisa unir as duas series,
