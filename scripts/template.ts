@@ -478,6 +478,10 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       <p class="verdict-foot">Gr&aacute;tis, sem cart&atilde;o. Premissas suas, cen&aacute;rios e WACC.</p>
     </div>
   </section>`;
+  // Página completa do ativo no app (15/09/2026). `next` devolve à /ativo/TICKER depois
+  // do cadastro/login; quem já está logado é mandado direto (o Auth.tsx do app honra o
+  // `next` nos dois casos). Continua em /authnew por causa da regra `cta-links`.
+  const assetPageHref = `https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}&next=${encodeURIComponent(`/ativo/${f.symbol}`)}`;
   const airtonQuestions = [
     `Minha tese em ${f.symbol} se sustenta?`,
     `Resume o último Fato Relevante de ${f.symbol}`,
@@ -1510,6 +1514,8 @@ ${airtonQuestions.map(q => `        <li><a href="${airtonAuditHref}&prompt=${enc
       .verdict-value { font-size: 1.7rem; }
       .verdict-btn { display: block; }
     }
+    .hero-cta-app { display: inline-block; margin-top: 0.75rem; margin-left: 0.5rem; padding: 0.4rem 1rem; background: #B68F40; border: 1.5px solid #B68F40; color: white; border-radius: 6px; font-size: 0.78rem; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+    .hero-cta-app:hover { background: #9c7a35; border-color: #9c7a35; }
 
     /* ============ DIFERENCIADOR ============ */
     .diferenciador { text-align: center; padding: 1rem 1.5rem; margin: 0.5rem 0 1rem; }
@@ -1806,6 +1812,7 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
         <span>Nota Qualitativa: <strong style="filter:blur(4px)">?.??</strong> / 4.0</span>
       </div>
       <div class="price-date" id="live-date">Dados de ${today}</div>
+      <a href="${assetPageHref}" class="hero-cta-app" data-cta="asset-page" onclick="_iaClick(event)">Ver ${f.symbol} na plataforma &rarr;</a>
     </div>
   </header>
 

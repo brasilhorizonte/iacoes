@@ -236,7 +236,7 @@ Estrutura atual (redesign de 10/abr/2026, reforma de oferta em ago/2026):
 
 1. **Nav** — Logo BH + iAcoes + busca de ticker + botoes "Acessar App" / "Assinar Plano" (data-cta: nav-app, nav-assinar)
 2. **Breadcrumb** — Navegacao hierarquica (Home > Acoes > Setor > TICKER)
-3. **Hero** — Ticker, nome, setor, preco atual, variacao dia/12m, nota qualitativa blur ao lado da cotacao
+3. **Hero** — Ticker, nome, setor, preco atual, variacao dia/12m, nota qualitativa blur ao lado da cotacao e link "Ver TICKER na plataforma" (data-cta: asset-page) — pagina completa do ativo no app (`/ativo/TICKER`) via `next`. A ancora "Fazer meu Valuation" saiu em set/2026 (a faixa de veredito assumiu o papel)
 3b. **Faixa de veredito** (set/2026) — fundo escuro, logo abaixo do hero: preco justo estimado
    (**media ponderada dos 5 metodos** — DCF, Gordon, EVA, Multiplos, Graham; nao so os classicos)
    + badge de upside/downside + nota "estimativa, nao recomendacao" + CTA "Ver o DCF completo de
@@ -308,6 +308,13 @@ Cada CTA tem `onclick="_iaClick(event)"` + `data-cta="ID"` para tracking granula
 | `footer` | CTA final | `ref=iacoes&ticker=T` |
 | `disclaimer` | Link inline no disclaimer | `ref=iacoes` |
 | `sticky-mobile` | Barra fixa (so mobile) | `ref=iacoes&ticker=T&intent=auditoria` |
+| `asset-page` | Hero: "Ver TICKER na plataforma" | `ref=iacoes&ticker=T&next=/ativo/T` (encoded) |
+
+**`next` (15/09/2026):** o unico CTA que leva a uma tela especifica do app. O `Auth.tsx` do app
+redireciona para o `next` depois do login/cadastro, e na hora se a pessoa ja esta logada; os demais
+parametros (`ref`, `ticker`, `utm_*` injetados pelo `_iaClick`) seguem junto na URL de destino. A
+pagina do ativo no app EXIGE login — a versao publica de cada acao e esta pagina do iacoes. Cadastro
+por e-mail passa pela confirmacao e pode perder o `next`; pelo Google ele e preservado.
 
 **IMPORTANTE para dashboards:** `airton-audit` e o **sucessor historico de `social-proof`** — o card
 foi reescrito e o id renomeado em 31/ago/2026. Quem agrega por `cta_id` precisa unir as duas series,
