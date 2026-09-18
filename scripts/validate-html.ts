@@ -30,34 +30,35 @@ function addIssue(file: string, rule: string, detail: string) {
 
 // ── Coleta de arquivos HTML gerados ──────────────────────────────
 
+/**
+ * Pastas que nunca contêm página publicada. Tudo o mais é varrido.
+ *
+ * ⚠️ A versão anterior ENUMERAVA o que validar: pasta de ticker casando
+ * `^[A-Z]{4}\d{1,2}$`, a landing, /acoes/ e os setores. Com isso, 7 das 359 páginas
+ * nunca eram validadas — `airton/`, as 4 calculadoras e, silenciosamente, `B3SA3/`,
+ * cujo radical tem um dígito no meio e não casa o regex. Justamente a página do AIrton
+ * era a mais desatualizada do site (prometia um trial de 14 dias que não existe mais).
+ * Lista de EXCLUSÃO em vez de lista de inclusão: página nova entra no gate sozinha.
+ */
+const SKIP_DIRS = new Set(['node_modules', '.git', '.github', 'scripts', 'assets', '_bmad', '_bmad-output']);
+
 function collectHTMLFiles(): string[] {
   const files: string[] = [];
 
-  // Ticker pages (UPPERCASE dirs like PETR4/, VALE3/)
-  for (const entry of readdirSync(ROOT)) {
-    if (/^[A-Z]{4}\d{1,2}$/.test(entry)) {
-      const html = join(ROOT, entry, 'index.html');
-      try { statSync(html); files.push(html); } catch {}
+  const walk = (dir: string) => {
+    for (const entry of readdirSync(dir)) {
+      if (entry.startsWith('.') || SKIP_DIRS.has(entry)) continue;
+      const full = join(dir, entry);
+      let st;
+      try { st = statSync(full); } catch { continue; }
+      if (st.isDirectory()) walk(full);
+      else if (entry === 'index.html') files.push(full);
     }
-  }
+  };
 
-  // Landing page (root index.html — editada à mão, precisa de validação)
   const landing = join(ROOT, 'index.html');
   try { statSync(landing); files.push(landing); } catch {}
-
-  // Index page
-  const indexHtml = join(ROOT, 'acoes', 'index.html');
-  try { statSync(indexHtml); files.push(indexHtml); } catch {}
-
-  // Sector pages
-  const acoesDir = join(ROOT, 'acoes');
-  try {
-    for (const entry of readdirSync(acoesDir)) {
-      if (entry === 'index.html') continue;
-      const html = join(acoesDir, entry, 'index.html');
-      try { statSync(html); files.push(html); } catch {}
-    }
-  } catch {}
+  walk(ROOT);
 
   return files;
 }
@@ -195,6 +196,34 @@ function checkJSSyntax(file: string, html: string) {
   }
 }
 
+/**
+ * RULE: marca-aposentada
+ *
+ * Os planos IAnalista e IAlocador fundiram-se em IAções, e o teste grátis passou de 14
+ * para 7 dias. O site é a porta de entrada: uma página que ainda venda o plano antigo
+ * manda a pessoa para um checkout com outro nome, e uma que prometa 14 dias entrega 7.
+ *
+ * ⚠️ Vale para o TEXTO VISÍVEL e para o `application/ld+json`. O FAQPage e o Product do
+ * schema.org são o que o Google exibe como rich result — a página do AIrton dizia
+ * "14 dias" 18 vezes, METADE delas dentro do JSON-LD. Corrigir só o que se lê deixaria
+ * o buscador anunciando um trial que não existe.
+ *
+ * ⚠️ NÃO procure preço aqui. Nas páginas de ticker, "19,90" e "39,90" são cotação e
+ * receita ("R$ 19,90 B"), não plano — uma regra por número acusaria demonstrativo.
+ */
+const MARCA_APOSENTADA: Array<[RegExp, string]> = [
+  [/IAnalista/g, 'o plano IAnalista virou IAções'],
+  [/IAlocador/g, 'o plano IAlocador virou IAções'],
+  [/14 dias/g, 'o teste grátis é de 7 dias, não 14'],
+];
+
+function checkMarcaAposentada(file: string, texto: string) {
+  for (const [re, porque] of MARCA_APOSENTADA) {
+    const n = (texto.match(re) || []).length;
+    if (n > 0) addIssue(file, 'marca-aposentada', `${n}× — ${porque}`);
+  }
+}
+
 // ── Runner ───────────────────────────────────────────────────────
 
 function main() {
@@ -222,8 +251,21 @@ function main() {
     checkOnclickWithoutFunction(relPath, html);
     checkUTMInjection(relPath, html);
     checkJSSyntax(relPath, html);
+    checkMarcaAposentada(relPath, html);
 
     checked++;
+  }
+
+  // ⚠️ O template é a CAUSA: 352 das 359 páginas saem dele, e o cron
+  // `generate-pages.yml` as reescreve todo dia útil às 20:00 BRT. Acusar só o HTML
+  // gerado daria o alarme um dia DEPOIS de alguém reintroduzir a marca velha — e a
+  // correção no HTML seria desfeita pelo robô na madrugada seguinte.
+  const template = join(ROOT, 'scripts', 'template.ts');
+  try {
+    checkMarcaAposentada('scripts/template.ts', readFileSync(template, 'utf-8'));
+    checked++;
+  } catch {
+    addIssue('scripts/template.ts', 'marca-aposentada', 'template não encontrado — o gate da causa não rodou');
   }
 
   // ── Resultado ──
