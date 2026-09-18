@@ -31,16 +31,13 @@ const issues: Issue[] = [];
  * ⚠️ Entrada aqui é dívida datada, não exceção permanente. Some da lista quando a tarefa
  * fechar — e, se a tarefa morrer, o defeito volta a reprovar, que é o comportamento certo.
  */
-const KNOWN_BROKEN: Array<{ file: RegExp; rule: string; motivo: string }> = [
-  {
-    file: /^calculadoras\//,
-    rule: 'tracking-variables',
-    motivo:
-      'GL-SITE-05 — as 4 calculadoras usam _iaD.dt/.br/.os sem nunca definir _iaD (a página ' +
-      'de ticker define com _iaD=(function(). É ReferenceError em runtime. São untracked no ' +
-      'git: NUNCA foram publicadas, então não há incidente aberto. Consertar antes de publicar.',
-  },
-];
+// ⚠️ Vazio de propósito. A única entrada que existiu aqui suprimia `tracking-variables`
+// nas calculadoras com o diagnóstico ERRADO: elas nunca tiveram ReferenceError — `_iaD`
+// é declarado com `var`, no mesmo <script> e antes do uso. Quem estava quebrado era o
+// GATE, que comparava a grafia minificada da IIFE. Suprimir um alarme sem confirmar a
+// causa custou um item de bloqueio no runbook e escondeu o defeito real por semanas:
+// antes de acrescentar linha aqui, prove o problema no arquivo, não no relatório.
+const KNOWN_BROKEN: Array<{ file: RegExp; rule: string; motivo: string }> = [];
 
 const suprimidos: Issue[] = [];
 
@@ -152,10 +149,33 @@ function checkTrackingFunctions(file: string, html: string) {
  * Se _iaD for undefined, _iaTrack crasha em _iaD.dt e o redirect nunca roda.
  */
 function checkTrackingVariables(file: string, html: string) {
-  // _iaD deve ser uma IIFE que retorna um objeto com .dt, .br, .os
-  if (html.includes('_iaD.dt') && !html.includes('_iaD=(function()')) {
+  const uso = html.indexOf('_iaD.dt');
+  if (uso === -1) return;
+
+  // ⚠️ A versão anterior comparava a STRING LITERAL `_iaD=(function()` e acusava as 4
+  // calculadoras, que são formatadas (`_iaD = (function () {`) em vez de minificadas
+  // como as páginas de ticker. O `_iaD` delas sempre esteve definido, com `var`, no
+  // mesmo <script> e antes do uso — era falso positivo, e ficou meses suprimido em
+  // KNOWN_BROKEN com o diagnóstico errado ("ReferenceError em runtime"). Detectar por
+  // FORMA, não por grafia: o minificador é livre para pôr ou tirar espaço.
+  const iife = /_iaD\s*=\s*\(\s*function\s*\(/;
+  const def = html.search(iife);
+  if (def === -1) {
     addIssue(file, 'tracking-variables', '_iaD.dt usado mas _iaD IIFE nao encontrada');
+    return;
   }
+  if (def > uso) {
+    addIssue(file, 'tracking-variables', '_iaD definido DEPOIS do primeiro uso em _iaD.dt');
+  }
+
+  // ⚠️ NÃO checar aqui se `_iaD` é declarado com var/let/const. Foi tentado em
+  // 18/09/2026 e acusou 336 páginas de produção que estão CORRETAS: no HTML de ticker
+  // o tracking é minificado numa linha só, e a IIFE do `_iaS`, logo antes, contém `;`
+  // e `}` dentro dela. Qualquer heurística de "corta no último delimitador" cai no
+  // meio dessa função aninhada e conclui que falta `var` onde existe
+  // `var _iaB=…,_iaS=…,_iaD=…`. Descobrir o escopo de uma atribuição exige parser de
+  // JavaScript, não casamento de string — e um gate que grita em 336 arquivos bons é
+  // pior que gate nenhum, porque ensina a ignorar a saída.
 }
 
 /**
