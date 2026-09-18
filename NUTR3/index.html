@@ -17,8 +17,8 @@
   <meta property="og:url" content="https://iacoes.com.br/NUTR3/">
   <meta property="og:site_name" content="IAções — Análise de Ações | Brasil Horizonte">
   <meta property="og:locale" content="pt_BR">
-  <meta property="article:published_time" content="2026-08-31T03:00:00.000Z">
-  <meta property="article:modified_time" content="2026-08-31T03:00:00.000Z">
+  <meta property="article:published_time" content="2026-09-18T03:00:00.000Z">
+  <meta property="article:modified_time" content="2026-09-18T03:00:00.000Z">
   <meta property="article:section" content="Análise Fundamentalista">
   <meta property="article:tag" content="NUTR3">
   <meta property="article:tag" content="Valuation">
@@ -51,8 +51,8 @@
     "@type": "Article",
     "headline": "NUTR3 — Preço Justo e Análise Fundamentalista 2026",
     "description": "Calculadora de valor justo para Nutriplant Industria E Comercio S.A. (NUTR3) com Graham, Bazin e Gordon. Premissas ajustáveis — calcule o valor justo agora. Indicadores, balanço e dividendos atualizados.",
-    "datePublished": "2026-08-31T03:00:00.000Z",
-    "dateModified": "2026-08-31T03:00:00.000Z",
+    "datePublished": "2026-09-18T03:00:00.000Z",
+    "dateModified": "2026-09-18T03:00:00.000Z",
     "author": { "@type": "Organization", "name": "Brasil Horizonte", "url": "https://brasilhorizonte.com.br" },
     "publisher": {
       "@type": "Organization",
@@ -98,7 +98,7 @@
       {
         "@type": "Question",
         "name": "Quais os principais indicadores fundamentalistas de NUTR3?",
-        "acceptedAnswer": { "@type": "Answer", "text": "NUTR3 apresenta P/L de 3,18, P/VP de 0,58, ROE de 15.3%, ROIC de 6.4%, Margem Líquida de 4.4%, EV/EBITDA de 5,38 e Div. Liq./EBITDA de 2,98. Esses indicadores ajudam a avaliar a saúde financeira, rentabilidade e eficiência operacional da empresa." }
+        "acceptedAnswer": { "@type": "Answer", "text": "NUTR3 apresenta P/L de 3,83, P/VP de 0,59, ROE de 15.3%, ROIC de 6.4%, Margem Líquida de 4.4%, EV/EBITDA de 3,80 e Div. Liq./EBITDA de 1,35. Esses indicadores ajudam a avaliar a saúde financeira, rentabilidade e eficiência operacional da empresa." }
       },
       {
         "@type": "Question",
@@ -148,7 +148,7 @@
       {
         "@type": "Question",
         "name": "Qual o nível de endividamento de NUTR3?",
-        "acceptedAnswer": { "@type": "Answer", "text": "NUTR3 possui Dívida Líquida/EBITDA de 2,98x, Dívida Bruta/Patrimônio de 0,00x e Liquidez Corrente de 0,00x. A Dívida Líquida/EBITDA indica quantos anos de geração operacional seriam necessários para quitar a dívida líquida. A Liquidez Corrente mostra a capacidade de honrar obrigações de curto prazo com ativos circulantes." }
+        "acceptedAnswer": { "@type": "Answer", "text": "NUTR3 possui Dívida Líquida/EBITDA de 1,35x, Dívida Bruta/Patrimônio de 0,43x e Liquidez Corrente de 1,59x. A Dívida Líquida/EBITDA indica quantos anos de geração operacional seriam necessários para quitar a dívida líquida. A Liquidez Corrente mostra a capacidade de honrar obrigações de curto prazo com ativos circulantes." }
       }
     ]
   }
@@ -953,9 +953,61 @@
     .hero-nota-qual { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.7rem; background: rgba(182,143,64,0.08); border: 1px solid rgba(182,143,64,0.15); border-radius: 6px; font-size: 0.75rem; color: #64748b; margin-top: 0.3rem; }
     .hero-nota-qual .nota-teaser-lock { font-size: 0.75rem; }
 
-    /* ============ HERO MICRO-CTA ============ */
-    .hero-cta-anchor { display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: transparent; border: 1.5px solid #B68F40; color: #B68F40; border-radius: 6px; font-size: 0.78rem; font-weight: 600; text-decoration: none; transition: all 0.2s; }
-    .hero-cta-anchor:hover { background: #B68F40; color: white; }
+    /* ============ FEATURES POR TICKER ============ */
+    .tk-features { background: #041C24; border-radius: 12px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; }
+    .tk-features-title { color: #fff; font-family: 'Playfair Display', serif; font-size: 1.15rem; margin: 0 0 1rem; }
+    .tk-features-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+    .tk-features-list a { display: flex; align-items: center; gap: 0.9rem; padding: 0.8rem 1rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; text-decoration: none; color: #fff; transition: border-color 0.15s, background 0.15s; }
+    .tk-features-list a:hover { border-color: #B68F40; background: rgba(182,143,64,0.1); }
+    .tkf-ico { font-size: 1.2rem; flex-shrink: 0; }
+    .tkf-body { display: flex; flex-direction: column; gap: 0.1rem; flex: 1; min-width: 0; }
+    .tkf-body strong { font-size: 0.92rem; color: #fff; }
+    .tkf-body span { font-size: 0.78rem; color: rgba(255,255,255,0.65); line-height: 1.45; }
+    .tkf-blur { filter: blur(4px); color: #B68F40; }
+    .tkf-arrow { color: #B68F40; font-weight: 700; flex-shrink: 0; }
+    /* demonstrações colapsadas */
+    .fin-details > summary { list-style: none; cursor: pointer; }
+    .fin-details > summary::-webkit-details-marker { display: none; }
+    .fin-toggle { color: #B68F40; font-weight: 700; }
+    .fin-details[open] .fin-toggle::after { content: ' ↑'; }
+    .fin-details:not([open]) .fin-toggle::after { content: ' ↓'; }
+    .fin-details[open] > summary { margin-bottom: 1rem; }
+
+    /* ============ GRÁFICO POR MÉTODO ============ */
+    .methods-chart { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.25rem 1.5rem; margin: 0 0 1.5rem; }
+    .mc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+    .mc-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: #0f172a; margin: 0 0 0.2rem; }
+    .mc-sub { font-size: 0.78rem; color: #64748b; margin: 0; }
+    .mc-unlock { flex-shrink: 0; font-size: 0.8rem; font-weight: 700; color: #B68F40; text-decoration: none; border: 1.5px solid #B68F40; border-radius: 6px; padding: 0.4rem 0.8rem; }
+    .mc-unlock:hover { background: #B68F40; color: #fff; }
+    .mc-wrap { position: relative; }
+    .mc-svg { width: 100%; height: auto; display: block; font-family: 'Montserrat', sans-serif; }
+    .mc-label { font-size: 12px; font-weight: 600; fill: #334155; }
+    .mc-val { font-size: 11.5px; font-weight: 700; font-family: 'SFMono-Regular', Consolas, monospace; }
+    .mc-up { fill: #059669; } .mc-down { fill: #dc2626; }
+    .mc-price { font-size: 10.5px; font-weight: 600; fill: #0f172a; }
+    .mc-locked-bar { filter: blur(3px); opacity: 0.55; }
+    .mc-pill rect { fill: rgba(255,255,255,0.94); stroke: rgba(182,143,64,0.5); }
+    .mc-pill text { font-size: 10.5px; font-weight: 700; fill: #0f172a; }
+
+    /* ============ FAIXA DE VEREDITO (acima da dobra) ============ */
+    .verdict-strip { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; background: #041C24; color: #fff; border-radius: 12px; padding: 1.25rem 1.75rem; margin: -0.5rem 0 1.5rem; border: 1px solid rgba(182,143,64,0.35); }
+    .verdict-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: #B68F40; font-weight: 700; margin-bottom: 0.3rem; }
+    .verdict-methods { color: rgba(255,255,255,0.55); font-weight: 500; text-transform: none; letter-spacing: 0; margin-left: 0.4rem; }
+    .verdict-value { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 2rem; font-weight: 700; line-height: 1.1; display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+    .verdict-value sup { font-size: 0.9rem; font-weight: 600; vertical-align: super; margin-right: 0.15rem; color: rgba(255,255,255,0.7); }
+    .verdict-upside { font-family: 'Montserrat', sans-serif; font-size: 0.85rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px; background: rgba(255,255,255,0.08); }
+    .verdict-upside.val-positive { color: #34d399; } .verdict-upside.val-negative { color: #f87171; } .verdict-upside.val-neutral { color: #cbd5e1; }
+    .verdict-note { font-size: 0.72rem; color: rgba(255,255,255,0.6); margin-top: 0.4rem; line-height: 1.5; }
+    .verdict-right { flex-shrink: 0; text-align: center; }
+    .verdict-btn { display: inline-block; background: #B68F40; color: #041C24; font-weight: 700; font-size: 0.92rem; padding: 0.8rem 1.4rem; border-radius: 8px; text-decoration: none; font-family: 'Montserrat', sans-serif; transition: transform 0.15s, box-shadow 0.15s; }
+    .verdict-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(182,143,64,0.35); }
+    .verdict-foot { font-size: 0.7rem; color: rgba(255,255,255,0.55); margin-top: 0.45rem; }
+    @media (max-width: 768px) {
+      .verdict-strip { flex-direction: column; align-items: stretch; padding: 1.1rem 1.2rem; }
+      .verdict-value { font-size: 1.7rem; }
+      .verdict-btn { display: block; }
+    }
 
     /* ============ DIFERENCIADOR ============ */
     .diferenciador { text-align: center; padding: 1rem 1.5rem; margin: 0.5rem 0 1rem; }
@@ -1242,7 +1294,7 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
     </div>
     <div class="company-right">
       <div class="price-label">Cotação Atual</div>
-      <div class="price-value" id="live-price"><sup>R$</sup>2,22</div>
+      <div class="price-value" id="live-price"><sup>R$</sup>2,26</div>
       <div class="price-changes">
         <span id="live-change-day" class="val-positive">+0.0% dia</span>
         <span class="val-negative">-0.2% 12m</span>
@@ -1251,43 +1303,54 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
         <span class="nota-teaser-lock" aria-hidden="true">&#x1F512;</span>
         <span>Nota Qualitativa: <strong style="filter:blur(4px)">?.??</strong> / 4.0</span>
       </div>
-      <div class="price-date" id="live-date">Dados de 31/08/2026</div>
-      <a href="#valuation-section" class="hero-cta-anchor" onclick="document.getElementById('valuation-section').scrollIntoView({behavior:'smooth'});return false;">Fazer meu Valuation &darr;</a>
+      <div class="price-date" id="live-date">Dados de 18/09/2026</div>
     </div>
   </header>
 
 
-  <!-- ÚLTIMOS DOCUMENTOS DA CVM -->
-  <section class="cvm-docs-section animate-in" aria-label="&Uacute;ltimos documentos de NUTR3 publicados na CVM">
-    <div class="cvm-docs-card">
-      <p class="cvm-docs-eyebrow">Direto da CVM</p>
-      <h2 class="cvm-docs-title">O que NUTR3 publicou na CVM</h2>
-      <p class="cvm-docs-sub">Os 4 documentos mais recentes que a companhia enviou &agrave; CVM. &Eacute; exatamente isto que o alerta entrega no seu WhatsApp &mdash; com o resumo do AIrton pronto &mdash; no instante em que sai.</p>
-      <ol class="cvm-docs-list">
-        <li><a class="cvm-doc-link" href="https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&amp;descTipo=IPE&amp;CodigoInstituicao=1&amp;numProtocolo=1558422&amp;numSequencia=1083128&amp;numVersao=1" target="_blank" rel="noopener nofollow">
-          <span class="cvm-doc-meta"><span class="cvm-doc-type">Fato Relevante</span><time class="cvm-doc-date" datetime="2026-08-17">17/08/2026</time><span class="cvm-doc-out" aria-hidden="true">ver na CVM &nearr;</span></span>
-          <span class="cvm-doc-title">Migração e concomitante adesão ao Regime FÁCIL da B3 S.A. e classificação como companhia de menor porte (CMP) perante a…</span>
-        </a></li>
-        <li><a class="cvm-doc-link" href="https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&amp;descTipo=IPE&amp;CodigoInstituicao=1&amp;numProtocolo=1555536&amp;numSequencia=1080242&amp;numVersao=1" target="_blank" rel="noopener nofollow">
-          <span class="cvm-doc-meta"><span class="cvm-doc-type">Divulgação de Resultados</span><time class="cvm-doc-date" datetime="2026-08-11">11/08/2026</time><span class="cvm-doc-out" aria-hidden="true">ver na CVM &nearr;</span></span>
-          <span class="cvm-doc-title">COMENTÁRIOS DO DESEMPENHO DO SEMESTRE ENCERRADO EM 30/06/26</span>
-        </a></li>
-        <li><a class="cvm-doc-link" href="https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&amp;descTipo=IPE&amp;CodigoInstituicao=1&amp;numProtocolo=1546308&amp;numSequencia=1071014&amp;numVersao=1" target="_blank" rel="noopener nofollow">
-          <span class="cvm-doc-meta"><span class="cvm-doc-type">Fato Relevante</span><time class="cvm-doc-date" datetime="2026-07-20">20/07/2026</time><span class="cvm-doc-out" aria-hidden="true">ver na CVM &nearr;</span></span>
-          <span class="cvm-doc-title">Agenda de divulgação de resultados do segundo trimestre de 2026</span>
-        </a></li>
-        <li><a class="cvm-doc-link" href="https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&amp;descTipo=IPE&amp;CodigoInstituicao=1&amp;numProtocolo=1507130&amp;numSequencia=1031836&amp;numVersao=1" target="_blank" rel="noopener nofollow">
-          <span class="cvm-doc-meta"><span class="cvm-doc-type">Fato Relevante</span><time class="cvm-doc-date" datetime="2026-04-22">22/04/2026</time><span class="cvm-doc-out" aria-hidden="true">ver na CVM &nearr;</span></span>
-          <span class="cvm-doc-title">Agenda de divulgação de resultados do primeiro trimestre de 2026</span>
-          <span class="cvm-doc-excerpt">A Nutriplant Indústria e Comércio S.A., listada na bolsa de valores sob o ticker NUTR3 (CNPJ/MF N° 51.128.999/0001-90 e NIRE 35.300.320.930), comunicou ao mercado o cronograma para a divulgação de seus resultados financeiros referentes ao…</span>
-        </a></li>
-      </ol>
-      <div class="cvm-docs-cta">
-        <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=NUTR3&intent=alerta" class="cvm-docs-btn" data-cta="alerta-cvm-topo" onclick="_iaClick(event)">Receba os pr&oacute;ximos no WhatsApp &rarr;</a>
-        <p class="cvm-docs-foot">Gr&aacute;tis, sem cart&atilde;o.</p>
-        <p class="social-proof-count" style="margin-top:1.1rem">342 investidores j&aacute; validaram teses em NUTR3</p>
-        <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=NUTR3&intent=airton" class="cvm-docs-secondary" data-cta="airton-audit" onclick="_iaClick(event)">Ou pe&ccedil;a ao AIrton para auditar sua tese em NUTR3 &rarr;</a>
+  <section class="verdict-strip animate-in" aria-label="Pre&ccedil;o justo estimado de NUTR3">
+    <div class="verdict-left">
+      <p class="verdict-label">Pre&ccedil;o justo estimado <span class="verdict-methods">m&eacute;dia ponderada de 5 m&eacute;todos</span></p>
+      <p class="verdict-value"><sup>R$</sup>2,42 <span class="verdict-upside val-neutral">Neutro (+6.9%)</span></p>
+      <p class="verdict-note">vs. cota&ccedil;&atilde;o de R$ 2,26. Estimativa por modelos com premissas p&uacute;blicas &mdash; n&atilde;o &eacute; recomenda&ccedil;&atilde;o.</p>
+    </div>
+    <div class="verdict-right">
+      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=NUTR3&intent=dcf" class="verdict-btn" data-cta="hero-dcf" onclick="_iaClick(event)">Ver o DCF completo de NUTR3 &rarr;</a>
+      <p class="verdict-foot">Gr&aacute;tis, sem cart&atilde;o. Premissas suas, cen&aacute;rios e WACC.</p>
+    </div>
+  </section>
+
+  <section class="methods-chart animate-in" aria-label="Pre&ccedil;o justo de NUTR3 por m&eacute;todo de valuation">
+    <div class="mc-head">
+      <div>
+        <h2 class="mc-title">Pre&ccedil;o justo por m&eacute;todo</h2>
+        <p class="mc-sub">2 m&eacute;todos abertos &middot; 2 exclusivos da plataforma &middot; linha = cota&ccedil;&atilde;o atual</p>
       </div>
+      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=NUTR3&intent=dcf" class="mc-unlock" data-cta="chart-locked" onclick="_iaClick(event)">Desbloquear os 2 m&eacute;todos &rarr;</a>
+    </div>
+    <div class="mc-wrap">
+      <svg viewBox="0 0 640 156" class="mc-svg" role="img" aria-label="Barras com o pre&ccedil;o justo de NUTR3 por m&eacute;todo, comparadas &agrave; cota&ccedil;&atilde;o de R$ 2,26">
+        <text x="84" y="31" text-anchor="end" class="mc-label">Graham</text><rect x="92" y="19" width="414.3" height="16" rx="3" fill="#10b981" /><text x="512.3" y="31" class="mc-val mc-up">R$ 7,09</text><text x="84" y="61" text-anchor="end" class="mc-label">Gordon</text><rect x="92" y="49" width="241.5" height="16" rx="3" fill="#10b981" /><text x="339.5" y="61" class="mc-val mc-up">R$ 4,13</text><text x="84" y="91" text-anchor="end" class="mc-label">EVA &#x1F512;</text><rect x="92" y="79" width="72.8" height="16" rx="3" fill="#94a3b8" class="mc-locked-bar"/><text x="84" y="121" text-anchor="end" class="mc-label">M&uacute;ltiplos &#x1F512;</text><rect x="92" y="109" width="155.7" height="16" rx="3" fill="#94a3b8" class="mc-locked-bar"/>
+        <g class="mc-pill"><rect x="204" y="90" width="240" height="24" rx="12"/><text x="324" y="106" text-anchor="middle">&#x1F512; Exclusivo da plataforma: DCF, EVA e M&uacute;ltiplos</text></g>
+        <line x1="224.1" y1="8" x2="224.1" y2="134" stroke="#0f172a" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="224.1" y="148" text-anchor="middle" class="mc-price">Cota&ccedil;&atilde;o R$ 2,26</text>
+      </svg>
+    </div>
+  </section>
+
+
+  <!-- AUDITORIA DE TESE PELO AIRTON (sempre, logo abaixo da faixa de veredito) -->
+  <section class="social-proof-section animate-in" aria-label="Auditoria de tese pelo AIrton">
+    <div class="social-proof-card">
+      <p class="social-proof-headline">Leu um relat&oacute;rio sobre NUTR3? Pergunte ao AIrton.</p>
+      <p class="social-proof-text">O AIrton cruza a tese com os n&uacute;meros reais de NUTR3 &mdash; governan&ccedil;a, vantagem competitiva, endividamento e riscos &mdash; e diz onde ela <strong>n&atilde;o se sustenta</strong>.</p>
+      <p class="social-proof-count">258 investidores j&aacute; validaram teses em NUTR3</p>
+      <ul class="airton-q-list" aria-label="Perguntas prontas para o AIrton sobre NUTR3">
+        <li><a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=NUTR3&intent=auditoria&prompt=Minha%20tese%20em%20NUTR3%20se%20sustenta%3F" class="airton-q" data-cta="airton-audit" onclick="_iaClick(event)"><span class="airton-q-mark" aria-hidden="true">&#x201C;</span>Minha tese em NUTR3 se sustenta?<span class="airton-q-arrow" aria-hidden="true">&rarr;</span></a></li>
+        <li><a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=NUTR3&intent=auditoria&prompt=Resume%20o%20%C3%BAltimo%20Fato%20Relevante%20de%20NUTR3" class="airton-q" data-cta="airton-audit" onclick="_iaClick(event)"><span class="airton-q-mark" aria-hidden="true">&#x201C;</span>Resume o último Fato Relevante de NUTR3<span class="airton-q-arrow" aria-hidden="true">&rarr;</span></a></li>
+        <li><a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=NUTR3&intent=auditoria&prompt=Compara%20NUTR3%20com%20os%20pares%20do%20setor" class="airton-q" data-cta="airton-audit" onclick="_iaClick(event)"><span class="airton-q-mark" aria-hidden="true">&#x201C;</span>Compara NUTR3 com os pares do setor<span class="airton-q-arrow" aria-hidden="true">&rarr;</span></a></li>
+      </ul>
+      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=NUTR3&intent=auditoria" class="social-proof-btn" data-cta="airton-audit" onclick="_iaClick(event)">Auditar NUTR3 gr&aacute;tis <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16" style="vertical-align:middle;margin-left:0.3rem"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></a>
     </div>
   </section>
 
@@ -1295,9 +1358,9 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
   <section class="section-card intro-combined animate-in" aria-label="Sobre NUTR3">
     <div class="intro-combined-section">
       <h2 class="section-legend">Análise Fundamentalista</h2>
-      <p><strong>NUTR3</strong> é a ação ordinária de <strong>Nutriplant Industria E Comercio S.A.</strong>, negociada na B3 (bolsa brasileira) no setor de Materiais Básicos, segmento de Fertilizantes e Defensivos. Com cotação atual de <strong>R$ 2,22</strong> e valor de mercado de R$ 29,27 M, a empresa é analisada abaixo por 3 metodologias clássicas de valuation: Graham, Bazin e Gordon (DDM).</p>
+      <p><strong>NUTR3</strong> é a ação ordinária de <strong>Nutriplant Industria E Comercio S.A.</strong>, negociada na B3 (bolsa brasileira) no setor de Materiais Básicos, segmento de Fertilizantes e Defensivos. Com cotação atual de <strong>R$ 2,26</strong> e valor de mercado de R$ 30,20 M, a empresa é analisada abaixo por 3 metodologias clássicas de valuation: Graham, Bazin e Gordon (DDM).</p>
       <p>A análise fundamentalista de NUTR3 utiliza 3 métodos clássicos de valuation — <strong>Graham</strong>, <strong>Bazin</strong> e <strong>Gordon (DDM)</strong> — para estimar o preço justo da ação com premissas ajustáveis. Confira os resultados abaixo e ajuste as premissas para sua própria análise.</p>
-      <p>Negocia a um P/L de 3,2x e EV/EBITDA de 5,4x. O retorno sobre patrimônio (ROE) é de 15.3%, e a margem líquida de 4.4%. Abaixo, você encontra todos os indicadores fundamentalistas, demonstrações financeiras históricas e o preço justo calculado com premissas ajustáveis.</p>
+      <p>Negocia a um P/L de 3,8x e EV/EBITDA de 3,8x. O retorno sobre patrimônio (ROE) é de 15.3%, e a margem líquida de 4.4%. Abaixo, você encontra todos os indicadores fundamentalistas, demonstrações financeiras históricas e o preço justo calculado com premissas ajustáveis.</p>
     </div>
     
     <div class="intro-combined-divider"></div>
@@ -1322,24 +1385,24 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
 
       <div class="tab-panel" id="panel-mercado">
         <div class="metrics-grid">
-          <div class="metric-box"><span class="metric-label">Valor de Mercado</span><span class="metric-value ">R$ 29,27 M</span></div>
-          <div class="metric-box"><span class="metric-label">Valor da Firma (EV)</span><span class="metric-value ">R$ 65,91 M</span></div>
-          <div class="metric-box"><span class="metric-label">Nro. Ações</span><span class="metric-value ">13,18 M</span></div>
-          <div class="metric-box"><span class="metric-label">Volume Médio (3M)</span><span class="metric-value ">3,90 K</span></div>
+          <div class="metric-box"><span class="metric-label">Valor de Mercado</span><span class="metric-value ">R$ 30,20 M</span></div>
+          <div class="metric-box"><span class="metric-label">Valor da Firma (EV)</span><span class="metric-value ">R$ 46,54 M</span></div>
+          <div class="metric-box"><span class="metric-label">Nro. Ações</span><span class="metric-value ">13,36 M</span></div>
+          <div class="metric-box"><span class="metric-label">Volume Médio (3M)</span><span class="metric-value ">300</span></div>
           <div class="metric-box"><span class="metric-label">Min. 52 Semanas</span><span class="metric-value ">R$ 1,98</span></div>
           <div class="metric-box"><span class="metric-label">Max. 52 Semanas</span><span class="metric-value ">R$ 3,20</span></div>
         </div>
       </div>
       <div class="tab-panel" id="panel-valuation">
         <div class="metrics-grid">
-          <div class="metric-box"><span class="metric-label">P/L</span><span class="metric-value ">3,18</span></div>
-          <div class="metric-box"><span class="metric-label">P/VP</span><span class="metric-value ">0,58</span></div>
-          <div class="metric-box"><span class="metric-label">P/EBIT</span><span class="metric-value ">3,74</span></div>
+          <div class="metric-box"><span class="metric-label">P/L</span><span class="metric-value ">3,83</span></div>
+          <div class="metric-box"><span class="metric-label">P/VP</span><span class="metric-value ">0,59</span></div>
+          <div class="metric-box"><span class="metric-label">P/EBIT</span><span class="metric-value ">3,86</span></div>
           <div class="metric-box"><span class="metric-label">PSR (Price/Sales)</span><span class="metric-value ">0,14</span></div>
-          <div class="metric-box"><span class="metric-label">EV/EBITDA</span><span class="metric-value ">5,38</span></div>
-          <div class="metric-box"><span class="metric-label">EV/EBIT</span><span class="metric-value ">3,60</span></div>
+          <div class="metric-box"><span class="metric-label">EV/EBITDA</span><span class="metric-value ">3,80</span></div>
+          <div class="metric-box"><span class="metric-label">EV/EBIT</span><span class="metric-value ">4,11</span></div>
           <div class="metric-box"><span class="metric-label">Div. Yield</span><span class="metric-value ">0.0%</span></div>
-          <div class="metric-box"><span class="metric-label">LPA</span><span class="metric-value ">R$ 0,70</span></div>
+          <div class="metric-box"><span class="metric-label">LPA</span><span class="metric-value ">R$ 0,59</span></div>
           <div class="metric-box"><span class="metric-label">VPA</span><span class="metric-value ">R$ 3,86</span></div>
         </div>
       </div>
@@ -1355,13 +1418,13 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
       </div>
       <div class="tab-panel" id="panel-endividamento">
         <div class="metrics-grid" style="grid-template-columns: repeat(3, 1fr);">
-          <div class="metric-box"><span class="metric-label">Div. Liq./EBITDA</span><span class="metric-value val-positive">2,98</span></div>
-          <div class="metric-box"><span class="metric-label">Div. Bruta/Patrim.</span><span class="metric-value ">0,00</span></div>
-          <div class="metric-box"><span class="metric-label">Liquidez Corrente</span><span class="metric-value ">0,00</span></div>
+          <div class="metric-box"><span class="metric-label">Div. Liq./EBITDA</span><span class="metric-value val-positive">1,35</span></div>
+          <div class="metric-box"><span class="metric-label">Div. Bruta/Patrim.</span><span class="metric-value ">0,43</span></div>
+          <div class="metric-box"><span class="metric-label">Liquidez Corrente</span><span class="metric-value val-positive">1,59</span></div>
         </div>
       </div>
 
-      <div class="metrics-timestamp">Atualizado em 31/08/2026 (p&oacute;s-fechamento B3)</div>
+      <div class="metrics-timestamp">Atualizado em 18/09/2026 (p&oacute;s-fechamento B3)</div>
     </div>
   </section>
 
@@ -1372,7 +1435,7 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
         <h3 class="section-title font-playfair">Calcule o pre&ccedil;o justo de NUTR3 com suas premissas</h3>
         <span class="section-sub">3 m&eacute;todos cl&aacute;ssicos + DCF avan&ccedil;ado na plataforma</span>
       </div>
-      <div class="section-price-ref">Cotação Atual<br><strong>R$ 2,22</strong></div>
+      <div class="section-price-ref">Cotação Atual<br><strong>R$ 2,26</strong></div>
     </div>
     <div class="methods-grid">
 
@@ -1388,11 +1451,11 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
         <div class="method-body">
           <div class="method-fv-row">
             <span class="method-fv-label">PRECO JUSTO</span>
-            <span class="method-fv val-positive" id="graham-fv">R$ 7,76</span>
+            <span class="method-fv val-positive" id="graham-fv">R$ 7,09</span>
           </div>
           <div class="method-upside-row">
             <span class="method-fv-label">Upside</span>
-            <span class="method-upside val-positive" id="graham-upside">+249.7%</span>
+            <span class="method-upside val-positive" id="graham-upside">+213.5%</span>
           </div>
 
           <div class="premissas-section">
@@ -1413,7 +1476,7 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
           </div>
 
           <div class="premissa-info-row">
-            <span>LPA:</span> <strong>R$ 0,70</strong>
+            <span>LPA:</span> <strong>R$ 0,59</strong>
             <span style="margin-left:0.75rem">VPA:</span> <strong>R$ 3,86</strong>
           </div>
         </div>
@@ -1474,11 +1537,11 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
         <div class="method-body">
           <div class="method-fv-row">
             <span class="method-fv-label">PRECO JUSTO</span>
-            <span class="method-fv val-positive" id="gordon-fv">R$ 4,89</span>
+            <span class="method-fv val-positive" id="gordon-fv">R$ 4,13</span>
           </div>
           <div class="method-upside-row">
             <span class="method-fv-label">Upside</span>
-            <span class="method-upside val-positive" id="gordon-upside">+120.3%</span>
+            <span class="method-upside val-positive" id="gordon-upside">+82.7%</span>
           </div>
 
           <div class="premissas-section">
@@ -1545,135 +1608,55 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
     </div>
   </section>
 
-
-  <!-- APRESENTAÇÃO DO AIRTON -->
-  <section class="airton-intro animate-in" aria-label="Conhe&ccedil;a o AIrton, assistente de IA">
-    <div class="airton-intro-inner">
-      <p class="airton-eyebrow">Assistente IA</p>
-      <h2 class="airton-intro-title">Conhe&ccedil;a o AIrton, seu copiloto para NUTR3</h2>
-      <p class="airton-intro-sub">Ele conhece sua carteira, valida suas teses contra os fundamentos reais e resume os documentos da CVM &mdash; no app e no seu WhatsApp.</p>
-
-      <div class="airton-chat" role="img" aria-label="Exemplo ilustrativo de conversa com o AIrton sobre NUTR3">
-        <span class="airton-chat-tag">Exemplo ilustrativo &mdash; n&atilde;o &eacute; recomenda&ccedil;&atilde;o de investimento</span>
-        <div class="airton-bubble airton-bubble-user"><span class="airton-bubble-who">Voc&ecirc;</span>Minha tese em NUTR3 se sustenta?</div>
-        <div class="airton-bubble airton-bubble-ai"><span class="airton-bubble-who">AIrton</span>O preço justo ponderado de NUTR3 pelos 3 métodos clássicos é R$ 2,93, contra R$ 2,22 de cotação (+31.9%). Por Graham, com 25% de margem de segurança, o valor intrínseco fica em R$ 7,76. O ROE de 15.3% é o número que sustenta (ou derruba) a premissa de rentabilidade da sua tese. Quer que eu cruze isso com o endividamento e os riscos do último ITR?</div>
+  <!-- ÚLTIMOS DOCUMENTOS DA CVM -->
+  <section class="cvm-docs-section animate-in" aria-label="&Uacute;ltimos documentos de NUTR3 publicados na CVM">
+    <div class="cvm-docs-card">
+      <p class="cvm-docs-eyebrow">Direto da CVM</p>
+      <h2 class="cvm-docs-title">O que NUTR3 publicou na CVM</h2>
+      <p class="cvm-docs-sub">Os 4 documentos mais recentes que a companhia enviou &agrave; CVM. &Eacute; exatamente isto que o alerta entrega no seu WhatsApp &mdash; com o resumo do AIrton pronto &mdash; no instante em que sai.</p>
+      <ol class="cvm-docs-list">
+        <li><a class="cvm-doc-link" href="https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&amp;descTipo=IPE&amp;CodigoInstituicao=1&amp;numProtocolo=1558422&amp;numSequencia=1083128&amp;numVersao=1" target="_blank" rel="noopener nofollow">
+          <span class="cvm-doc-meta"><span class="cvm-doc-type">Fato Relevante</span><time class="cvm-doc-date" datetime="2026-08-17">17/08/2026</time><span class="cvm-doc-out" aria-hidden="true">ver na CVM &nearr;</span></span>
+          <span class="cvm-doc-title">Migração e concomitante adesão ao Regime FÁCIL da B3 S.A. e classificação como companhia de menor porte (CMP) perante a…</span>
+        </a></li>
+        <li><a class="cvm-doc-link" href="http://www.rad.cvm.gov.br/ENETCONSULTA/frmDownloadDocumento.aspx?CodigoInstituicao=1&amp;NumeroSequencialDocumento=160382" target="_blank" rel="noopener nofollow">
+          <span class="cvm-doc-meta"><span class="cvm-doc-type">Informações Trimestrais</span><time class="cvm-doc-date" datetime="2026-08-11">11/08/2026</time><span class="cvm-doc-out" aria-hidden="true">ver na CVM &nearr;</span></span>
+          <span class="cvm-doc-title">NUTRIPLANT INDUSTRIA E COMERCIO S.A. | ref 2026-06-30 | v1 | id 160382</span>
+        </a></li>
+        <li><a class="cvm-doc-link" href="https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&amp;descTipo=IPE&amp;CodigoInstituicao=1&amp;numProtocolo=1555536&amp;numSequencia=1080242&amp;numVersao=1" target="_blank" rel="noopener nofollow">
+          <span class="cvm-doc-meta"><span class="cvm-doc-type">Divulgação de Resultados</span><time class="cvm-doc-date" datetime="2026-08-11">11/08/2026</time><span class="cvm-doc-out" aria-hidden="true">ver na CVM &nearr;</span></span>
+          <span class="cvm-doc-title">COMENTÁRIOS DO DESEMPENHO DO SEMESTRE ENCERRADO EM 30/06/26</span>
+        </a></li>
+        <li><a class="cvm-doc-link" href="https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&amp;descTipo=IPE&amp;CodigoInstituicao=1&amp;numProtocolo=1546308&amp;numSequencia=1071014&amp;numVersao=1" target="_blank" rel="noopener nofollow">
+          <span class="cvm-doc-meta"><span class="cvm-doc-type">Fato Relevante</span><time class="cvm-doc-date" datetime="2026-07-20">20/07/2026</time><span class="cvm-doc-out" aria-hidden="true">ver na CVM &nearr;</span></span>
+          <span class="cvm-doc-title">Agenda de divulgação de resultados do segundo trimestre de 2026</span>
+        </a></li>
+      </ol>
+      <div class="cvm-docs-cta">
+        <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=NUTR3&intent=alerta" class="cvm-docs-btn" data-cta="alerta-cvm-topo" onclick="_iaClick(event)">Receba os pr&oacute;ximos no WhatsApp &rarr;</a>
+        <p class="cvm-docs-foot">Gr&aacute;tis, sem cart&atilde;o.</p>
       </div>
-
-      <ul class="airton-caps" aria-label="O que o AIrton faz">
-        <li><span class="airton-cap-ico" aria-hidden="true">&#x1F4BC;</span>Acessa sua carteira</li>
-        <li><span class="airton-cap-ico" aria-hidden="true">&#x2705;</span>Valida suas teses</li>
-        <li><span class="airton-cap-ico" aria-hidden="true">&#x26A1;</span>Resume a CVM em segundos</li>
-      </ul>
-
-      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=NUTR3&intent=airton" class="airton-intro-btn" data-cta="airton-intro" onclick="_iaClick(event)">Conversar com o AIrton sobre NUTR3 &rarr;</a>
     </div>
   </section>
 
-  <!-- FEATURES SHOWCASE -->
-  <section class="features-showcase animate-in" aria-label="Funcionalidades da plataforma">
-    <div class="features-inner">
-      <h3 class="features-title">Tudo que voc&ecirc; precisa para analisar NUTR3</h3>
-      <div class="features-grid">
-        <div class="feature-item">
-          <span class="feature-icon" role="img" aria-label="DCF Completo">&#x1F4CA;</span>
-          <span class="feature-name">DCF Completo</span>
-          <span class="feature-desc">Fluxo de caixa descontado com premissas edit&aacute;veis</span>
-        </div>
-        <div class="feature-item">
-          <span class="feature-icon" role="img" aria-label="Nota Qualitativa">&#x1F3AF;</span>
-          <span class="feature-name">Nota Qualitativa</span>
-          <span class="feature-desc">Auditoria com IA em 6 categorias</span>
-        </div>
-        <div class="feature-item">
-          <span class="feature-icon" role="img" aria-label="AIrton">&#x1F916;</span>
-          <span class="feature-name">AIrton</span>
-          <span class="feature-desc">Assistente de IA que audita teses no app e no WhatsApp</span>
-        </div>
-        <div class="feature-item">
-          <span class="feature-icon" role="img" aria-label="Alertas CVM em tempo real">&#x1F514;</span>
-          <span class="feature-name">Alertas CVM em tempo real</span>
-          <span class="feature-desc">Fato Relevante, ITR, DFP e proventos no instante da publica&ccedil;&atilde;o</span>
-        </div>
-        <div class="feature-item">
-          <span class="feature-icon" role="img" aria-label="Minhas Teses">&#x1F4DD;</span>
-          <span class="feature-name">Minhas Teses</span>
-          <span class="feature-desc">Registre sua tese e acompanhe se ela segue de p&eacute;</span>
-        </div>
-        <div class="feature-item">
-          <span class="feature-icon" role="img" aria-label="Documentos CVM">&#x1F4C4;</span>
-          <span class="feature-name">Documentos CVM</span>
-          <span class="feature-desc">Feed de ITRs, DFPs e fatos relevantes</span>
-        </div>
-      </div>
-      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="features-cta" data-cta="features-card" onclick="_iaClick(event)">Explorar plataforma gr&aacute;tis &rarr;</a>
-    </div>
+  <!-- FEATURES POR TICKER (ordem = cliques em 90 dias: dcf 61, auditoria 47, features 12, nota 8, alerta 0) -->
+  <section class="tk-features animate-in" aria-label="O que a plataforma tem para NUTR3">
+    <h2 class="tk-features-title">O que a plataforma tem para NUTR3</h2>
+    <ul class="tk-features-list">
+      <li><a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=NUTR3" data-cta="dcf-locked" onclick="_iaClick(event)"><span class="tkf-ico" aria-hidden="true">&#x1F4C8;</span><span class="tkf-body"><strong>DCF completo de NUTR3</strong><span>WACC, cen&aacute;rios, sensibilidade e premissas suas &mdash; n&atilde;o as nossas.</span></span><span class="tkf-arrow">&rarr;</span></a></li>
+      <li><a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=NUTR3&intent=airton" data-cta="airton-intro" onclick="_iaClick(event)"><span class="tkf-ico" aria-hidden="true">&#x1F4AC;</span><span class="tkf-body"><strong>AIrton, seu copiloto para NUTR3</strong><span>Conhece sua carteira, valida suas teses e resume a CVM &mdash; no app e no WhatsApp.</span></span><span class="tkf-arrow">&rarr;</span></a></li>
+      <li><a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" data-cta="nota-qualitativa" onclick="_iaClick(event)"><span class="tkf-ico" aria-hidden="true">&#x2B50;</span><span class="tkf-body"><strong>Nota qualitativa de NUTR3 <span class="tkf-blur">?.??</span>/4</strong><span>Governan&ccedil;a, vantagem competitiva, gest&atilde;o e riscos, com score por categoria.</span></span><span class="tkf-arrow">&rarr;</span></a></li>
+      <li><a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=NUTR3&intent=alerta" data-cta="alerta-cvm" onclick="_iaClick(event)"><span class="tkf-ico" aria-hidden="true">&#x1F514;</span><span class="tkf-body"><strong>Alertas de NUTR3 no WhatsApp</strong><span>Fato Relevante, ITR, DFP e proventos no instante em que saem na CVM, com resumo do AIrton. Gr&aacute;tis, sem cart&atilde;o.</span></span><span class="tkf-arrow">&rarr;</span></a></li>
+    </ul>
   </section>
 
-  <!-- NOTA QUALITATIVA (PAYWALL) -->
-  <section class="section-card animate-in nota-section" id="nota-section" aria-label="Nota Qualitativa de NUTR3">
-    <div class="nota-header">
-      <div>
-        <div class="nota-label">Nota Qualitativa</div>
-        <div style="margin-top:0.3rem">
-          <span class="nota-score">?.??</span>
-          <span class="nota-scale">0 &rarr; 4</span>
-        </div>
-      </div>
-      <span class="nota-sector-badge">Setor Qualitativo: Materiais Básicos</span>
-    </div>
-
-    <div class="nota-categories">
-      <div class="nota-categories-title">Scores por Categoria</div>
-      <div class="nota-cat-item">
-          <div class="nota-cat-header"><span class="nota-cat-name">Governança</span><span class="nota-cat-score" style="color:#10b981">?.?</span></div>
-          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:77%;background:#10b981"></div></div>
-        </div>
-      <div class="nota-cat-item">
-          <div class="nota-cat-header"><span class="nota-cat-name">Management</span><span class="nota-cat-score" style="color:#B68F40">?.?</span></div>
-          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:57%;background:#B68F40"></div></div>
-        </div>
-      <div class="nota-cat-item">
-          <div class="nota-cat-header"><span class="nota-cat-name">Indústria</span><span class="nota-cat-score" style="color:#ef4444">?.?</span></div>
-          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:45%;background:#ef4444"></div></div>
-        </div>
-      <div class="nota-cat-item">
-          <div class="nota-cat-header"><span class="nota-cat-name">Vantagens Competitivas</span><span class="nota-cat-score" style="color:#B68F40">?.?</span></div>
-          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:53%;background:#B68F40"></div></div>
-        </div>
-      <div class="nota-cat-item">
-          <div class="nota-cat-header"><span class="nota-cat-name">Poder de Barganha</span><span class="nota-cat-score" style="color:#ef4444">?.?</span></div>
-          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:46%;background:#ef4444"></div></div>
-        </div>
-      <div class="nota-cat-item">
-          <div class="nota-cat-header"><span class="nota-cat-name">Riscos e Estrutura</span><span class="nota-cat-score" style="color:#ef4444">?.?</span></div>
-          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:42%;background:#ef4444"></div></div>
-        </div>
-    </div>
-
-    <div class="nota-blurred">
-      <div class="nota-detail-placeholder">
-        <div class="nota-detail-title">Detalhamento por Categoria</div>
-        <p>Análise qualitativa completa com mais de 50 perguntas de auditoria cobrindo governança corporativa, qualidade do management, dinâmica do setor, vantagens competitivas, poder de barganha e riscos estruturais.</p>
-        <p>Cada categoria é avaliada com perguntas específicas e respostas fundamentadas em dados públicos, relatórios anuais e fatos relevantes sobre Nutriplant Industria E Comercio S.A..</p>
-      </div>
-    </div>
-
-    <div class="nota-overlay">
-      <div class="nota-overlay-lock">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-      </div>
-      <div class="nota-overlay-title">Análise Qualitativa com IA</div>
-      <div class="nota-overlay-sub">Descubra a nota qualitativa de NUTR3 e o detalhamento completo das 6 categorias com respostas fundamentadas e auditoria por IA.</div>
-      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="nota-overlay-btn" data-cta="nota-qualitativa" onclick="_iaClick(event)">Desbloquear Análise &rarr;</a>
-    </div>
-  </section>
-
-  <!-- DEMONSTRAÇÕES FINANCEIRAS -->
+  <!-- DEMONSTRAÇÕES FINANCEIRAS (colapsadas: 10 anos de tabelas empurravam peers/FAQ para 8 telas abaixo) -->
   <section class="section-card animate-in" aria-label="Demonstrações Financeiras">
-    <div class="section-header-row">
+    <details class="fin-details">
+    <summary class="section-header-row fin-summary">
       <h2 class="section-title font-playfair">Demonstrações Financeiras</h2>
-      <span class="section-sub">Dados históricos</span>
-    </div>
+      <span class="section-sub">DRE, balan&ccedil;o, fluxo de caixa e dividendos &mdash; 10 anos &middot; <span class="fin-toggle">abrir</span></span>
+    </summary>
 
     <!-- DRE -->
     <div class="fin-tabs">
@@ -1694,7 +1677,7 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
     <div class="table-scroll">
       <table class="fin-table fin-transposed">
         <thead><tr><th class="sticky-col"></th><th>2016</th><th>2017</th><th>2018</th><th>2019</th><th>2020</th><th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th></tr></thead>
-        <tbody><tr><td class="sticky-col">Ativo Total</td><td>R$ 73,13 M</td><td>R$ 69,66 M</td><td>R$ 71,39 M</td><td>R$ 58,41 M</td><td>R$ 66,95 M</td><td>R$ 81,37 M</td><td>R$ 96,65 M</td><td>R$ 103,28 M</td><td>R$ 107,02 M</td><td>R$ 129,99 M</td></tr><tr><td class="sticky-col">Caixa</td><td>R$ 137,00 K</td><td>R$ 3,42 M</td><td>R$ 2,81 M</td><td>R$ 622,00 K</td><td>R$ 1,96 M</td><td>R$ 726,00 K</td><td>R$ 662,00 K</td><td>R$ 3,40 M</td><td>R$ 1,99 M</td><td>R$ 3,01 M</td></tr><tr><td class="sticky-col">Passivo Total</td><td>R$ 84,38 M</td><td>R$ 90,40 M</td><td>R$ 93,01 M</td><td>R$ 45,58 M</td><td>R$ 50,68 M</td><td>R$ 58,41 M</td><td>R$ 65,31 M</td><td>R$ 68,40 M</td><td>R$ 61,87 M</td><td>R$ 79,45 M</td></tr><tr><td class="sticky-col">Dívida LP</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td></tr><tr><td class="sticky-col">Patrimônio Líq.</td><td>R$ -11,25 M</td><td>R$ -20,73 M</td><td>R$ -21,63 M</td><td>R$ 12,83 M</td><td>R$ 16,26 M</td><td>R$ 22,95 M</td><td>R$ 31,34 M</td><td>R$ 34,88 M</td><td>R$ 45,16 M</td><td>R$ 50,54 M</td></tr></tbody>
+        <tbody><tr><td class="sticky-col">Ativo Total</td><td>R$ 73,13 M</td><td>R$ 69,66 M</td><td>R$ 71,39 M</td><td>R$ 58,41 M</td><td>R$ 66,95 M</td><td>R$ 81,37 M</td><td>R$ 96,65 M</td><td>R$ 103,28 M</td><td>R$ 107,02 M</td><td>R$ 129,99 M</td></tr><tr><td class="sticky-col">Caixa</td><td>R$ 137,00 K</td><td>R$ 3,42 M</td><td>R$ 2,81 M</td><td>R$ 622,00 K</td><td>R$ 1,96 M</td><td>R$ 726,00 K</td><td>R$ 662,00 K</td><td>R$ 3,40 M</td><td>R$ 1,99 M</td><td>R$ 3,01 M</td></tr><tr><td class="sticky-col">Passivo Total</td><td>R$ 84,38 M</td><td>R$ 90,40 M</td><td>R$ 93,01 M</td><td>R$ 45,58 M</td><td>R$ 50,68 M</td><td>R$ 58,41 M</td><td>R$ 65,31 M</td><td>R$ 68,40 M</td><td>R$ 61,87 M</td><td>R$ 79,45 M</td></tr><tr><td class="sticky-col">Dívida LP</td><td>R$ 4,07 M</td><td>R$ 3,48 M</td><td>R$ 8,19 M</td><td>R$ 8,41 M</td><td>R$ 5,37 M</td><td>R$ 4,78 M</td><td>R$ 6,03 M</td><td>R$ 2,88 M</td><td>R$ 1,08 M</td><td>R$ 4,90 M</td></tr><tr><td class="sticky-col">Patrimônio Líq.</td><td>R$ -11,25 M</td><td>R$ -20,73 M</td><td>R$ -21,63 M</td><td>R$ 12,83 M</td><td>R$ 16,26 M</td><td>R$ 22,95 M</td><td>R$ 31,34 M</td><td>R$ 34,88 M</td><td>R$ 45,16 M</td><td>R$ 50,54 M</td></tr></tbody>
       </table>
     </div>
 
@@ -1712,16 +1695,7 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
 
     
 
-    <!-- ALERTA CVM -->
-    <div class="alerta-cvm-card" role="complementary" aria-label="Alertas da CVM sobre NUTR3">
-      <div class="alerta-cvm-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      </div>
-      <div class="alerta-cvm-title">Fique sabendo antes do mercado</div>
-      <p class="alerta-cvm-sub">Receba no WhatsApp cada Fato Relevante, ITR, DFP e an&uacute;ncio de proventos de NUTR3 no instante em que sai na CVM &mdash; com o resumo do AIrton pronto.</p>
-      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=NUTR3&intent=alerta" class="alerta-cvm-btn" data-cta="alerta-cvm" onclick="_iaClick(event)">Ativar alertas de NUTR3 &rarr;</a>
-      <p class="alerta-cvm-foot">Gr&aacute;tis, sem cart&atilde;o. Tamb&eacute;m dispon&iacute;vel no Telegram.</p>
-    </div>
+    </details>
   </section>
 
   
@@ -1733,11 +1707,6 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
     </div>
     <div class="peers-grid">
       
-      <a href="/CRPG3/" class="peer-card">
-        <span class="peer-ticker">CRPG3</span>
-        <span class="peer-name">CRISTAL     ON</span>
-        <span class="peer-price">R$ 17,00</span>
-      </a>
       <a href="/SNSY3/" class="peer-card">
         <span class="peer-ticker">SNSY3</span>
         <span class="peer-name">SANSUY      ON</span>
@@ -1748,15 +1717,10 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
         <span class="peer-name">CRISTAL     ON</span>
         <span class="peer-price">R$ 17,00</span>
       </a>
-      <a href="/MSPA3/" class="peer-card">
-        <span class="peer-ticker">MSPA3</span>
-        <span class="peer-name">MELHOR SP   ON</span>
-        <span class="peer-price">R$ 37,40</span>
-      </a>
       <a href="/KLBN11/" class="peer-card">
         <span class="peer-ticker">KLBN11</span>
         <span class="peer-name">KLBN11</span>
-        <span class="peer-price">R$ 18,87</span>
+        <span class="peer-price">R$ 19,56</span>
       </a>
       <a href="/MSPA3/" class="peer-card">
         <span class="peer-ticker">MSPA3</span>
@@ -1766,22 +1730,22 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
       <a href="/VALE3/" class="peer-card">
         <span class="peer-ticker">VALE3</span>
         <span class="peer-name">VALE3</span>
-        <span class="peer-price">R$ 78,58</span>
+        <span class="peer-price">R$ 73,20</span>
       </a>
       <a href="/SUZB3/" class="peer-card">
         <span class="peer-ticker">SUZB3</span>
         <span class="peer-name">SUZB3</span>
-        <span class="peer-price">R$ 45,99</span>
-      </a>
-      <a href="/GGBR4/" class="peer-card">
-        <span class="peer-ticker">GGBR4</span>
-        <span class="peer-name">GGBR4</span>
-        <span class="peer-price">R$ 23,80</span>
+        <span class="peer-price">R$ 47,50</span>
       </a>
       <a href="/GGBR3/" class="peer-card">
         <span class="peer-ticker">GGBR3</span>
         <span class="peer-name">GGBR3</span>
-        <span class="peer-price">R$ 20,19</span>
+        <span class="peer-price">R$ 21,68</span>
+      </a>
+      <a href="/GGBR4/" class="peer-card">
+        <span class="peer-ticker">GGBR4</span>
+        <span class="peer-name">GGBR4</span>
+        <span class="peer-price">R$ 25,29</span>
       </a>
     </div>
     <a href="/acoes/materiais-basicos/" class="peers-more">Ver todas as ações de Materiais Básicos &rarr;</a>
@@ -1794,7 +1758,7 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
       
       <div class="faq-item">
         <dt class="faq-question">Quais os principais indicadores fundamentalistas de NUTR3?</dt>
-        <dd class="faq-answer">NUTR3 apresenta P/L de 3,18, P/VP de 0,58, ROE de 15.3%, ROIC de 6.4%, Margem Líquida de 4.4%, EV/EBITDA de 5,38 e Div. Liq./EBITDA de 2,98. Esses indicadores ajudam a avaliar a saúde financeira, rentabilidade e eficiência operacional da empresa.</dd>
+        <dd class="faq-answer">NUTR3 apresenta P/L de 3,83, P/VP de 0,59, ROE de 15.3%, ROIC de 6.4%, Margem Líquida de 4.4%, EV/EBITDA de 3,80 e Div. Liq./EBITDA de 1,35. Esses indicadores ajudam a avaliar a saúde financeira, rentabilidade e eficiência operacional da empresa.</dd>
       </div>
       <div class="faq-item">
         <dt class="faq-question">Em qual setor NUTR3 atua?</dt>
@@ -1834,7 +1798,7 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
       </div>
       <div class="faq-item">
         <dt class="faq-question">Qual o nível de endividamento de NUTR3?</dt>
-        <dd class="faq-answer">NUTR3 possui Dívida Líquida/EBITDA de 2,98x, Dívida Bruta/Patrimônio de 0,00x e Liquidez Corrente de 0,00x. A Dívida Líquida/EBITDA indica quantos anos de geração operacional seriam necessários para quitar a dívida líquida. A Liquidez Corrente mostra a capacidade de honrar obrigações de curto prazo com ativos circulantes.</dd>
+        <dd class="faq-answer">NUTR3 possui Dívida Líquida/EBITDA de 1,35x, Dívida Bruta/Patrimônio de 0,43x e Liquidez Corrente de 1,59x. A Dívida Líquida/EBITDA indica quantos anos de geração operacional seriam necessários para quitar a dívida líquida. A Liquidez Corrente mostra a capacidade de honrar obrigações de curto prazo com ativos circulantes.</dd>
       </div>
     </dl>
   </section>
@@ -1886,7 +1850,7 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
       <span class="footer-iacoes"><span class="footer-iacoes-i">i</span>Ações</span>
     </div>
     <div class="footer-copy">
-      &copy; 2026 ValuAI by <a href="https://brasilhorizonte.com.br" target="_blank" rel="noopener">Brasil Horizonte</a>. Todos os direitos reservados. Dados atualizados em 31/08/2026. Balanço: 30/12/2025.
+      &copy; 2026 ValuAI by <a href="https://brasilhorizonte.com.br" target="_blank" rel="noopener">Brasil Horizonte</a>. Todos os direitos reservados. Dados atualizados em 18/09/2026. Balanço: 30/12/2025.
     </div>
   </footer>
 
@@ -1894,9 +1858,9 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
 
 <script>
 (function() {
-  var price = 2.22;
-  var lpa = 0.6986111;
-  var vpa = 3.8564224;
+  var price = 2.26;
+  var lpa = 0.5899852012926218;
+  var vpa = 3.856422336987708;
   var divTTM = 0;
   var divData = [];
 

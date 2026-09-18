@@ -403,6 +403,81 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   const airtonAuditHref = `https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}&intent=auditoria`;
   const airtonIntroHref = `https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}&intent=airton`;
   const alertaCvmHref = `https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}&intent=alerta`;
+  const heroDcfHref = `https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}&intent=dcf`;
+
+  // --- Faixa de veredito (acima da dobra) ---
+  // O visitante chega do Google por "preço justo {TICKER}" e, até set/2026, o preço justo
+  // ponderado era calculado mas nunca exibido — só aparecia nos cards, 3 telas abaixo.
+  // Regra: só mostra número se ele existe (wfv > 0 e price > 0); senão só o CTA.
+  const hasVerdict = Number.isFinite(wfv) && wfv > 0 && Number.isFinite(data.price) && data.price > 0;
+  // --- Gráfico "preço justo por método" (SVG inline, sem JS) ---
+  // 3 métodos abertos (Graham, Bazin, Gordon) e 3 atrás do paywall (DCF, EVA, Múltiplos).
+  // Os valores travados entram só como geometria da barra, sem número — mesmo padrão do
+  // sensitivity table do DCF, que já vai borrado para o DOM. Métodos sem valor (<= 0) não entram.
+  const dcfFV = val.results.find(r => r.method === 'FDC')?.fairValue || 0;
+  const evaFV = val.results.find(r => r.method === 'EVA/MVA')?.fairValue || 0;
+  const multFV = val.results.find(r => r.method === 'MULTIPLO')?.fairValue || 0;
+  const chartRows = [
+    { label: 'Graham', fv: grahamFV, locked: false },
+    { label: 'Bazin', fv: bazinFV, locked: false },
+    { label: 'Gordon', fv: gordonFV, locked: false },
+    { label: 'DCF', fv: dcfFV, locked: true },
+    { label: 'EVA', fv: evaFV, locked: true },
+    { label: 'M&uacute;ltiplos', fv: multFV, locked: true },
+  ].filter(r => Number.isFinite(r.fv) && r.fv > 0);
+  const chartOpen = chartRows.filter(r => !r.locked).length;
+  const chartLocked = chartRows.filter(r => r.locked).length;
+  let methodsChart = '';
+  if (chartOpen >= 2 && data.price > 0) {
+    const W = 640, LBL = 92, RGT = 84, ROW = 30, TOP = 12;
+    const H = TOP + chartRows.length * ROW + 24;
+    const maxV = Math.max(data.price, ...chartRows.map(r => r.fv)) * 1.12;
+    const x = (v: number) => LBL + (v / maxV) * (W - LBL - RGT);
+    const px = x(data.price);
+    const bars = chartRows.map((r, i) => {
+      const y = TOP + i * ROW;
+      const up = r.fv >= data.price;
+      const color = r.locked ? '#94a3b8' : (up ? '#10b981' : '#ef4444');
+      const bar = `<rect x="${LBL}" y="${y + 7}" width="${(x(r.fv) - LBL).toFixed(1)}" height="16" rx="3" fill="${color}" ${r.locked ? 'class="mc-locked-bar"' : ''}/>`;
+      const lbl = `<text x="${LBL - 8}" y="${y + 19}" text-anchor="end" class="mc-label">${r.label}${r.locked ? ' &#x1F512;' : ''}</text>`;
+      const valTxt = r.locked ? '' : `<text x="${(x(r.fv) + 6).toFixed(1)}" y="${y + 19}" class="mc-val ${up ? 'mc-up' : 'mc-down'}">R$ ${fmt(r.fv)}</text>`;
+      return lbl + bar + valTxt;
+    }).join('');
+    methodsChart = `
+  <section class="methods-chart animate-in" aria-label="Pre&ccedil;o justo de ${f.symbol} por m&eacute;todo de valuation">
+    <div class="mc-head">
+      <div>
+        <h2 class="mc-title">Pre&ccedil;o justo por m&eacute;todo</h2>
+        <p class="mc-sub">${chartOpen} m&eacute;todos abertos${chartLocked ? ` &middot; ${chartLocked} exclusivos da plataforma` : ''} &middot; linha = cota&ccedil;&atilde;o atual</p>
+      </div>
+      ${chartLocked ? `<a href="${heroDcfHref}" class="mc-unlock" data-cta="chart-locked" onclick="_iaClick(event)">Desbloquear os ${chartLocked} m&eacute;todos &rarr;</a>` : ''}
+    </div>
+    <div class="mc-wrap">
+      <svg viewBox="0 0 ${W} ${H}" class="mc-svg" role="img" aria-label="Barras com o pre&ccedil;o justo de ${f.symbol} por m&eacute;todo, comparadas &agrave; cota&ccedil;&atilde;o de R$ ${fmt(data.price)}">
+        ${bars}
+        ${chartLocked ? (() => { const y0 = TOP + chartOpen * ROW; const yc = y0 + (chartLocked * ROW) / 2; const cx = LBL + (W - LBL - RGT) / 2; return `<g class="mc-pill"><rect x="${cx - 120}" y="${yc - 12}" width="240" height="24" rx="12"/><text x="${cx}" y="${yc + 4}" text-anchor="middle">&#x1F512; Exclusivo da plataforma: DCF, EVA e M&uacute;ltiplos</text></g>`; })() : ''}
+        <line x1="${px.toFixed(1)}" y1="${TOP - 4}" x2="${px.toFixed(1)}" y2="${H - 22}" stroke="#0f172a" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="${px.toFixed(1)}" y="${H - 8}" text-anchor="middle" class="mc-price">Cota&ccedil;&atilde;o R$ ${fmt(data.price)}</text>
+      </svg>
+    </div>
+  </section>`;
+  }
+
+  const verdictStrip = `
+  <section class="verdict-strip animate-in" aria-label="Pre&ccedil;o justo estimado de ${f.symbol}">
+    ${hasVerdict ? `<div class="verdict-left">
+      <p class="verdict-label">Pre&ccedil;o justo estimado <span class="verdict-methods">m&eacute;dia ponderada de 5 m&eacute;todos</span></p>
+      <p class="verdict-value"><sup>R$</sup>${fmt(wfv)} <span class="verdict-upside ${upsideColor}">${introVerdictLabel}</span></p>
+      <p class="verdict-note">vs. cota&ccedil;&atilde;o de R$ ${fmt(data.price)}. Estimativa por modelos com premissas p&uacute;blicas &mdash; n&atilde;o &eacute; recomenda&ccedil;&atilde;o.</p>
+    </div>` : `<div class="verdict-left">
+      <p class="verdict-label">Pre&ccedil;o justo de ${f.symbol}</p>
+      <p class="verdict-note">Os modelos cl&aacute;ssicos n&atilde;o fecham para ${f.symbol} com os dados p&uacute;blicos. O DCF completo, com premissas suas, fecha.</p>
+    </div>`}
+    <div class="verdict-right">
+      <a href="${heroDcfHref}" class="verdict-btn" data-cta="hero-dcf" onclick="_iaClick(event)">Ver o DCF completo de ${f.symbol} &rarr;</a>
+      <p class="verdict-foot">Gr&aacute;tis, sem cart&atilde;o. Premissas suas, cen&aacute;rios e WACC.</p>
+    </div>
+  </section>`;
   const airtonQuestions = [
     `Minha tese em ${f.symbol} se sustenta?`,
     `Resume o último Fato Relevante de ${f.symbol}`,
@@ -434,16 +509,13 @@ ${d.title ? `          <span class="cvm-doc-title">${escHtml(truncate(d.title, 1
       <div class="cvm-docs-cta">
         <a href="${alertaCvmHref}" class="cvm-docs-btn" data-cta="alerta-cvm-topo" onclick="_iaClick(event)">Receba os pr&oacute;ximos no WhatsApp &rarr;</a>
         <p class="cvm-docs-foot">Gr&aacute;tis, sem cart&atilde;o.</p>
-        <p class="social-proof-count" style="margin-top:1.1rem">${socialProofLine}</p>
-        <a href="${airtonIntroHref}" class="cvm-docs-secondary" data-cta="airton-audit" onclick="_iaClick(event)">Ou pe&ccedil;a ao AIrton para auditar sua tese em ${f.symbol} &rarr;</a>
       </div>
     </div>
   </section>`;
 
-  // Fallback — ticker sem cobertura em `cvm_documents`. Mantém a posição, o CTA de topo
-  // e a linha de prova social; nada é inventado.
+  // Auditoria de tese — sempre renderiza, logo abaixo da faixa de veredito.
   const airtonAuditBlock = `
-  <!-- AUDITORIA DE TESE PELO AIRTON (fallback: sem documentos da CVM para este ticker) -->
+  <!-- AUDITORIA DE TESE PELO AIRTON (sempre, logo abaixo da faixa de veredito) -->
   <section class="social-proof-section animate-in" aria-label="Auditoria de tese pelo AIrton">
     <div class="social-proof-card">
       <p class="social-proof-headline">Leu um relat&oacute;rio sobre ${f.symbol}? Pergunte ao AIrton.</p>
@@ -456,13 +528,16 @@ ${airtonQuestions.map(q => `        <li><a href="${airtonAuditHref}&prompt=${enc
     </div>
   </section>`;
 
-  const cvmOrAuditBlock = cvmDocs.length ? cvmDocsBlock : airtonAuditBlock;
+  // Ordem (set/2026): auditoria do AIrton logo abaixo da faixa de veredito (43+4 cliques
+  // em 90 dias); documentos da CVM descem para depois dos cards de valuation (0 cliques
+  // em 18 dias no topo). Sem documentos, o bloco da CVM simplesmente não existe.
+  const cvmDocsBlockOrEmpty = cvmDocs.length ? cvmDocsBlock : '';
 
   // Bolha de demonstração do AIrton — REGRA DURA: nunca inventar número.
   // Cada frase só entra se o dado existir de fato para este ticker.
   const airtonDemoSentences: string[] = [];
   if (Number.isFinite(wfv) && wfv > 0 && Number.isFinite(data.price) && data.price > 0) {
-    airtonDemoSentences.push(`O preço justo ponderado de ${f.symbol} pelos 3 métodos clássicos é R$ ${fmt(wfv)}, contra R$ ${fmt(data.price)} de cotação (${upsideFmt}).`);
+    airtonDemoSentences.push(`O preço justo ponderado de ${f.symbol} por 5 métodos de valuation é R$ ${fmt(wfv)}, contra R$ ${fmt(data.price)} de cotação (${upsideFmt}).`);
   }
   if (Number.isFinite(grahamFV) && grahamFV > 0) {
     airtonDemoSentences.push(`Por Graham, com 25% de margem de segurança, o valor intrínseco fica em R$ ${fmt(grahamFV)}.`);
@@ -1380,9 +1455,61 @@ ${airtonQuestions.map(q => `        <li><a href="${airtonAuditHref}&prompt=${enc
     .hero-nota-qual { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.7rem; background: rgba(182,143,64,0.08); border: 1px solid rgba(182,143,64,0.15); border-radius: 6px; font-size: 0.75rem; color: #64748b; margin-top: 0.3rem; }
     .hero-nota-qual .nota-teaser-lock { font-size: 0.75rem; }
 
-    /* ============ HERO MICRO-CTA ============ */
-    .hero-cta-anchor { display: inline-block; margin-top: 0.75rem; padding: 0.4rem 1rem; background: transparent; border: 1.5px solid #B68F40; color: #B68F40; border-radius: 6px; font-size: 0.78rem; font-weight: 600; text-decoration: none; transition: all 0.2s; }
-    .hero-cta-anchor:hover { background: #B68F40; color: white; }
+    /* ============ FEATURES POR TICKER ============ */
+    .tk-features { background: #041C24; border-radius: 12px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; }
+    .tk-features-title { color: #fff; font-family: 'Playfair Display', serif; font-size: 1.15rem; margin: 0 0 1rem; }
+    .tk-features-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+    .tk-features-list a { display: flex; align-items: center; gap: 0.9rem; padding: 0.8rem 1rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; text-decoration: none; color: #fff; transition: border-color 0.15s, background 0.15s; }
+    .tk-features-list a:hover { border-color: #B68F40; background: rgba(182,143,64,0.1); }
+    .tkf-ico { font-size: 1.2rem; flex-shrink: 0; }
+    .tkf-body { display: flex; flex-direction: column; gap: 0.1rem; flex: 1; min-width: 0; }
+    .tkf-body strong { font-size: 0.92rem; color: #fff; }
+    .tkf-body span { font-size: 0.78rem; color: rgba(255,255,255,0.65); line-height: 1.45; }
+    .tkf-blur { filter: blur(4px); color: #B68F40; }
+    .tkf-arrow { color: #B68F40; font-weight: 700; flex-shrink: 0; }
+    /* demonstrações colapsadas */
+    .fin-details > summary { list-style: none; cursor: pointer; }
+    .fin-details > summary::-webkit-details-marker { display: none; }
+    .fin-toggle { color: #B68F40; font-weight: 700; }
+    .fin-details[open] .fin-toggle::after { content: ' ↑'; }
+    .fin-details:not([open]) .fin-toggle::after { content: ' ↓'; }
+    .fin-details[open] > summary { margin-bottom: 1rem; }
+
+    /* ============ GRÁFICO POR MÉTODO ============ */
+    .methods-chart { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.25rem 1.5rem; margin: 0 0 1.5rem; }
+    .mc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+    .mc-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: #0f172a; margin: 0 0 0.2rem; }
+    .mc-sub { font-size: 0.78rem; color: #64748b; margin: 0; }
+    .mc-unlock { flex-shrink: 0; font-size: 0.8rem; font-weight: 700; color: #B68F40; text-decoration: none; border: 1.5px solid #B68F40; border-radius: 6px; padding: 0.4rem 0.8rem; }
+    .mc-unlock:hover { background: #B68F40; color: #fff; }
+    .mc-wrap { position: relative; }
+    .mc-svg { width: 100%; height: auto; display: block; font-family: 'Montserrat', sans-serif; }
+    .mc-label { font-size: 12px; font-weight: 600; fill: #334155; }
+    .mc-val { font-size: 11.5px; font-weight: 700; font-family: 'SFMono-Regular', Consolas, monospace; }
+    .mc-up { fill: #059669; } .mc-down { fill: #dc2626; }
+    .mc-price { font-size: 10.5px; font-weight: 600; fill: #0f172a; }
+    .mc-locked-bar { filter: blur(3px); opacity: 0.55; }
+    .mc-pill rect { fill: rgba(255,255,255,0.94); stroke: rgba(182,143,64,0.5); }
+    .mc-pill text { font-size: 10.5px; font-weight: 700; fill: #0f172a; }
+
+    /* ============ FAIXA DE VEREDITO (acima da dobra) ============ */
+    .verdict-strip { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; background: #041C24; color: #fff; border-radius: 12px; padding: 1.25rem 1.75rem; margin: -0.5rem 0 1.5rem; border: 1px solid rgba(182,143,64,0.35); }
+    .verdict-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: #B68F40; font-weight: 700; margin-bottom: 0.3rem; }
+    .verdict-methods { color: rgba(255,255,255,0.55); font-weight: 500; text-transform: none; letter-spacing: 0; margin-left: 0.4rem; }
+    .verdict-value { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 2rem; font-weight: 700; line-height: 1.1; display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+    .verdict-value sup { font-size: 0.9rem; font-weight: 600; vertical-align: super; margin-right: 0.15rem; color: rgba(255,255,255,0.7); }
+    .verdict-upside { font-family: 'Montserrat', sans-serif; font-size: 0.85rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px; background: rgba(255,255,255,0.08); }
+    .verdict-upside.val-positive { color: #34d399; } .verdict-upside.val-negative { color: #f87171; } .verdict-upside.val-neutral { color: #cbd5e1; }
+    .verdict-note { font-size: 0.72rem; color: rgba(255,255,255,0.6); margin-top: 0.4rem; line-height: 1.5; }
+    .verdict-right { flex-shrink: 0; text-align: center; }
+    .verdict-btn { display: inline-block; background: #B68F40; color: #041C24; font-weight: 700; font-size: 0.92rem; padding: 0.8rem 1.4rem; border-radius: 8px; text-decoration: none; font-family: 'Montserrat', sans-serif; transition: transform 0.15s, box-shadow 0.15s; }
+    .verdict-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(182,143,64,0.35); }
+    .verdict-foot { font-size: 0.7rem; color: rgba(255,255,255,0.55); margin-top: 0.45rem; }
+    @media (max-width: 768px) {
+      .verdict-strip { flex-direction: column; align-items: stretch; padding: 1.1rem 1.2rem; }
+      .verdict-value { font-size: 1.7rem; }
+      .verdict-btn { display: block; }
+    }
 
     /* ============ DIFERENCIADOR ============ */
     .diferenciador { text-align: center; padding: 1rem 1.5rem; margin: 0.5rem 0 1rem; }
@@ -1679,11 +1806,13 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
         <span>Nota Qualitativa: <strong style="filter:blur(4px)">?.??</strong> / 4.0</span>
       </div>
       <div class="price-date" id="live-date">Dados de ${today}</div>
-      <a href="#valuation-section" class="hero-cta-anchor" onclick="document.getElementById('valuation-section').scrollIntoView({behavior:'smooth'});return false;">Fazer meu Valuation &darr;</a>
     </div>
   </header>
 
-${cvmOrAuditBlock}
+${verdictStrip}
+${methodsChart}
+
+${airtonAuditBlock}
 
   <!-- SOBRE A EMPRESA (SEO + NEGÓCIO) -->
   <section class="section-card intro-combined animate-in" aria-label="Sobre ${f.symbol}">
@@ -1930,127 +2059,26 @@ ${cvmOrAuditBlock}
       </div>
     </div>
   </section>
+${cvmDocsBlockOrEmpty}
 
-
-  <!-- APRESENTAÇÃO DO AIRTON -->
-  <section class="airton-intro animate-in" aria-label="Conhe&ccedil;a o AIrton, assistente de IA">
-    <div class="airton-intro-inner">
-      <p class="airton-eyebrow">Assistente IA</p>
-      <h2 class="airton-intro-title">Conhe&ccedil;a o AIrton, seu copiloto para ${f.symbol}</h2>
-      <p class="airton-intro-sub">Ele conhece sua carteira, valida suas teses contra os fundamentos reais e resume os documentos da CVM &mdash; no app e no seu WhatsApp.</p>
-
-      <div class="airton-chat" role="img" aria-label="Exemplo ilustrativo de conversa com o AIrton sobre ${f.symbol}">
-        <span class="airton-chat-tag">Exemplo ilustrativo &mdash; n&atilde;o &eacute; recomenda&ccedil;&atilde;o de investimento</span>
-        <div class="airton-bubble airton-bubble-user"><span class="airton-bubble-who">Voc&ecirc;</span>${airtonQuestions[0]}</div>
-        <div class="airton-bubble airton-bubble-ai"><span class="airton-bubble-who">AIrton</span>${airtonDemoAnswer}</div>
-      </div>
-
-      <ul class="airton-caps" aria-label="O que o AIrton faz">
-        <li><span class="airton-cap-ico" aria-hidden="true">&#x1F4BC;</span>Acessa sua carteira</li>
-        <li><span class="airton-cap-ico" aria-hidden="true">&#x2705;</span>Valida suas teses</li>
-        <li><span class="airton-cap-ico" aria-hidden="true">&#x26A1;</span>Resume a CVM em segundos</li>
-      </ul>
-
-      <a href="${airtonIntroHref}" class="airton-intro-btn" data-cta="airton-intro" onclick="_iaClick(event)">Conversar com o AIrton sobre ${f.symbol} &rarr;</a>
-    </div>
+  <!-- FEATURES POR TICKER (ordem = cliques em 90 dias: dcf 61, auditoria 47, features 12, nota 8, alerta 0) -->
+  <section class="tk-features animate-in" aria-label="O que a plataforma tem para ${f.symbol}">
+    <h2 class="tk-features-title">O que a plataforma tem para ${f.symbol}</h2>
+    <ul class="tk-features-list">
+      <li><a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" data-cta="dcf-locked" onclick="_iaClick(event)"><span class="tkf-ico" aria-hidden="true">&#x1F4C8;</span><span class="tkf-body"><strong>DCF completo de ${f.symbol}</strong><span>WACC, cen&aacute;rios, sensibilidade e premissas suas &mdash; n&atilde;o as nossas.</span></span><span class="tkf-arrow">&rarr;</span></a></li>
+      <li><a href="${airtonIntroHref}" data-cta="airton-intro" onclick="_iaClick(event)"><span class="tkf-ico" aria-hidden="true">&#x1F4AC;</span><span class="tkf-body"><strong>AIrton, seu copiloto para ${f.symbol}</strong><span>Conhece sua carteira, valida suas teses e resume a CVM &mdash; no app e no WhatsApp.</span></span><span class="tkf-arrow">&rarr;</span></a></li>
+      <li><a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" data-cta="nota-qualitativa" onclick="_iaClick(event)"><span class="tkf-ico" aria-hidden="true">&#x2B50;</span><span class="tkf-body"><strong>Nota qualitativa de ${f.symbol} <span class="tkf-blur">?.??</span>/4</strong><span>Governan&ccedil;a, vantagem competitiva, gest&atilde;o e riscos, com score por categoria.</span></span><span class="tkf-arrow">&rarr;</span></a></li>
+      <li><a href="${alertaCvmHref}" data-cta="alerta-cvm" onclick="_iaClick(event)"><span class="tkf-ico" aria-hidden="true">&#x1F514;</span><span class="tkf-body"><strong>Alertas de ${f.symbol} no WhatsApp</strong><span>Fato Relevante, ITR, DFP e proventos no instante em que saem na CVM, com resumo do AIrton. Gr&aacute;tis, sem cart&atilde;o.</span></span><span class="tkf-arrow">&rarr;</span></a></li>
+    </ul>
   </section>
 
-  <!-- FEATURES SHOWCASE -->
-  <section class="features-showcase animate-in" aria-label="Funcionalidades da plataforma">
-    <div class="features-inner">
-      <h3 class="features-title">Tudo que voc&ecirc; precisa para analisar ${f.symbol}</h3>
-      <div class="features-grid">
-        <div class="feature-item">
-          <span class="feature-icon" role="img" aria-label="DCF Completo">&#x1F4CA;</span>
-          <span class="feature-name">DCF Completo</span>
-          <span class="feature-desc">Fluxo de caixa descontado com premissas edit&aacute;veis</span>
-        </div>
-        <div class="feature-item">
-          <span class="feature-icon" role="img" aria-label="Nota Qualitativa">&#x1F3AF;</span>
-          <span class="feature-name">Nota Qualitativa</span>
-          <span class="feature-desc">Auditoria com IA em 6 categorias</span>
-        </div>
-        <div class="feature-item">
-          <span class="feature-icon" role="img" aria-label="AIrton">&#x1F916;</span>
-          <span class="feature-name">AIrton</span>
-          <span class="feature-desc">Assistente de IA que audita teses no app e no WhatsApp</span>
-        </div>
-        <div class="feature-item">
-          <span class="feature-icon" role="img" aria-label="Alertas CVM em tempo real">&#x1F514;</span>
-          <span class="feature-name">Alertas CVM em tempo real</span>
-          <span class="feature-desc">Fato Relevante, ITR, DFP e proventos no instante da publica&ccedil;&atilde;o</span>
-        </div>
-        <div class="feature-item">
-          <span class="feature-icon" role="img" aria-label="Minhas Teses">&#x1F4DD;</span>
-          <span class="feature-name">Minhas Teses</span>
-          <span class="feature-desc">Registre sua tese e acompanhe se ela segue de p&eacute;</span>
-        </div>
-        <div class="feature-item">
-          <span class="feature-icon" role="img" aria-label="Documentos CVM">&#x1F4C4;</span>
-          <span class="feature-name">Documentos CVM</span>
-          <span class="feature-desc">Feed de ITRs, DFPs e fatos relevantes</span>
-        </div>
-      </div>
-      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="features-cta" data-cta="features-card" onclick="_iaClick(event)">Explorar plataforma gr&aacute;tis &rarr;</a>
-    </div>
-  </section>
-
-  <!-- NOTA QUALITATIVA (PAYWALL) -->
-  <section class="section-card animate-in nota-section" id="nota-section" aria-label="Nota Qualitativa de ${f.symbol}">
-    <div class="nota-header">
-      <div>
-        <div class="nota-label">Nota Qualitativa</div>
-        <div style="margin-top:0.3rem">
-          <span class="nota-score">?.??</span>
-          <span class="nota-scale">0 &rarr; 4</span>
-        </div>
-      </div>
-      <span class="nota-sector-badge">Setor Qualitativo: ${f.sector}</span>
-    </div>
-
-    ${qualScore ? `<div class="nota-categories">
-      <div class="nota-categories-title">Scores por Categoria</div>
-      ${[
-        { name: 'Governança', score: qualScore.c1 },
-        { name: 'Management', score: qualScore.c2 },
-        { name: 'Indústria', score: qualScore.c3 },
-        { name: 'Vantagens Competitivas', score: qualScore.c4 },
-        { name: 'Poder de Barganha', score: qualScore.c5 },
-        { name: 'Riscos e Estrutura', score: qualScore.c6 },
-      ].map(cat => {
-        const pct = Math.round((cat.score / 4) * 100);
-        const color = cat.score >= 3 ? '#10b981' : cat.score >= 2 ? '#B68F40' : '#ef4444';
-        return `<div class="nota-cat-item">
-          <div class="nota-cat-header"><span class="nota-cat-name">${cat.name}</span><span class="nota-cat-score" style="color:${color}">?.?</span></div>
-          <div class="nota-cat-bar"><div class="nota-cat-bar-fill" style="width:${pct}%;background:${color}"></div></div>
-        </div>`;
-      }).join('\n      ')}
-    </div>` : ''}
-
-    <div class="nota-blurred">
-      <div class="nota-detail-placeholder">
-        <div class="nota-detail-title">Detalhamento por Categoria</div>
-        <p>Análise qualitativa completa com mais de 50 perguntas de auditoria cobrindo governança corporativa, qualidade do management, dinâmica do setor, vantagens competitivas, poder de barganha e riscos estruturais.</p>
-        <p>Cada categoria é avaliada com perguntas específicas e respostas fundamentadas em dados públicos, relatórios anuais e fatos relevantes sobre ${f.name}.</p>
-      </div>
-    </div>
-
-    <div class="nota-overlay">
-      <div class="nota-overlay-lock">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-      </div>
-      <div class="nota-overlay-title">Análise Qualitativa com IA</div>
-      <div class="nota-overlay-sub">Descubra a nota qualitativa de ${f.symbol} e o detalhamento completo das 6 categorias com respostas fundamentadas e auditoria por IA.</div>
-      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="nota-overlay-btn" data-cta="nota-qualitativa" onclick="_iaClick(event)">Desbloquear Análise &rarr;</a>
-    </div>
-  </section>
-
-  <!-- DEMONSTRAÇÕES FINANCEIRAS -->
+  <!-- DEMONSTRAÇÕES FINANCEIRAS (colapsadas: 10 anos de tabelas empurravam peers/FAQ para 8 telas abaixo) -->
   <section class="section-card animate-in" aria-label="Demonstrações Financeiras">
-    <div class="section-header-row">
+    <details class="fin-details">
+    <summary class="section-header-row fin-summary">
       <h2 class="section-title font-playfair">Demonstrações Financeiras</h2>
-      <span class="section-sub">Dados históricos</span>
-    </div>
+      <span class="section-sub">DRE, balan&ccedil;o, fluxo de caixa e dividendos &mdash; 10 anos &middot; <span class="fin-toggle">abrir</span></span>
+    </summary>
 
     <!-- DRE -->
     <div class="fin-tabs">
@@ -2102,16 +2130,7 @@ ${cvmOrAuditBlock}
       </table>
     </div>` : ''}
 
-    <!-- ALERTA CVM -->
-    <div class="alerta-cvm-card" role="complementary" aria-label="Alertas da CVM sobre ${f.symbol}">
-      <div class="alerta-cvm-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      </div>
-      <div class="alerta-cvm-title">Fique sabendo antes do mercado</div>
-      <p class="alerta-cvm-sub">Receba no WhatsApp cada Fato Relevante, ITR, DFP e an&uacute;ncio de proventos de ${f.symbol} no instante em que sai na CVM &mdash; com o resumo do AIrton pronto.</p>
-      <a href="${alertaCvmHref}" class="alerta-cvm-btn" data-cta="alerta-cvm" onclick="_iaClick(event)">Ativar alertas de ${f.symbol} &rarr;</a>
-      <p class="alerta-cvm-foot">Gr&aacute;tis, sem cart&atilde;o. Tamb&eacute;m dispon&iacute;vel no Telegram.</p>
-    </div>
+    </details>
   </section>
 
   ${peers.length > 0 ? `

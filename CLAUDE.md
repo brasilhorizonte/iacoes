@@ -236,37 +236,46 @@ Estrutura atual (redesign de 10/abr/2026, reforma de oferta em ago/2026):
 
 1. **Nav** — Logo BH + iAcoes + busca de ticker + botoes "Acessar App" / "Assinar Plano" (data-cta: nav-app, nav-assinar)
 2. **Breadcrumb** — Navegacao hierarquica (Home > Acoes > Setor > TICKER)
-3. **Hero** — Ticker, nome, setor, preco atual, variacao dia/12m, nota qualitativa blur ao lado da cotacao, micro-CTA anchor "Fazer meu Valuation" (scroll suave para cards)
-4. **Bloco de Documentos da CVM** — "O que TICKER publicou na CVM": lista `<ol>` dos 4 documentos
-   reais mais recentes (tipo traduzido, `<time datetime>`, titulo, resumo do AIrton), cada um linkando
-   o documento oficial (`target="_blank" rel="noopener nofollow"`, sem `_iaClick` — e link externo,
-   nao CTA). CTA primario "Receba os proximos no WhatsApp" (data-cta: alerta-cvm-topo), linha de
-   social proof e CTA secundario "Ou peca ao AIrton para auditar sua tese" (data-cta: airton-audit).
-   **Fallback:** ticker sem cobertura na CVM nao renderiza este bloco — no lugar volta o **Card de
-   Auditoria do AIrton** ("Leu um relatorio sobre TICKER? Pergunte ao AIrton.") com 3 perguntas
-   prontas clicaveis e a mesma linha de social proof, todos com data-cta `airton-audit`.
-   Hoje: 297 paginas com documentos reais, 25 com o card de auditoria.
+3. **Hero** — Ticker, nome, setor, preco atual, variacao dia/12m, nota qualitativa blur ao lado da cotacao
+3b. **Faixa de veredito** (set/2026) — fundo escuro, logo abaixo do hero: preco justo estimado
+   (**media ponderada dos 5 metodos** — DCF, Gordon, EVA, Multiplos, Graham; nao so os classicos)
+   + badge de upside/downside + nota "estimativa, nao recomendacao" + CTA "Ver o DCF completo de
+   TICKER" (data-cta: hero-dcf). So mostra numero se `wfv > 0 && price > 0`; senao so o CTA.
+   Motivo: ate set/2026 o preco justo ponderado era calculado mas nunca exibido.
+3c. **Grafico "Preco justo por metodo"** (set/2026) — SVG inline sem JS, barras horizontais por
+   metodo vs. linha da cotacao. Graham/Bazin/Gordon abertos com valor; DCF/EVA/Multiplos entram so
+   como barra borrada **sem numero** (mesmo padrao do sensitivity table) + pill "Exclusivo da
+   plataforma" + CTA "Desbloquear os 3 metodos" (data-cta: chart-locked). Metodo com valor <= 0
+   nao entra; o grafico so renderiza com >= 2 metodos abertos.
+4. **Card de Auditoria do AIrton** — "Leu um relatorio sobre TICKER? Pergunte ao AIrton." com 3
+   perguntas prontas clicaveis + botao + linha de social proof, todos com data-cta `airton-audit`.
+   Desde set/2026 renderiza **sempre**, logo abaixo do grafico (era fallback do bloco da CVM; a
+   auditoria tinha 43+4 cliques em 90 dias contra 0 do bloco da CVM em 18 dias no topo).
 5. **Card Combinado SEO** — Intro analise (3 paragrafos SEO) + Visao de Negocio (longBusinessSummary) unificados num card com divisor
 6. **Metricas em Tabs CSS-only** — 4 abas (Mercado, Valuation, Rentabilidade, Endividamento) com radio inputs, todo conteudo no DOM para SEO. Tab Valuation aberta por default. Timestamp de atualizacao
 7. **Cards de Valuation** — Graham, Bazin, Gordon com sliders funcionais (pulse animation via IntersectionObserver). Premissas sem slider (P/L Maximo, P/VP Maximo, Anos para Media) sao locked com blur e redirecionam para login (data-cta: dcf-locked)
 8. **Card DCF Full-width** — Tabela de sensibilidade WACC x G Perpetuo com gradiente verde/vermelho (visual fixo), badge PRO, frase diferenciadora, CTA "Fazer Valuation DCF" (data-cta: dcf-locked)
-9. **Apresentacao do AIrton** — Eyebrow "Assistente IA", titulo "Conheca o AIrton, seu copiloto para
-   TICKER", bolha de conversa de demonstracao com dados **reais** do ticker, 3 capacidades
-   (Acessa sua carteira / Valida suas teses / Resume a CVM em segundos), CTA
-   "Conversar com o AIrton sobre TICKER" (data-cta: airton-intro). Ver [AIrton](#airton--assistente-de-ia)
-10. **Card Features** — Fundo escuro (#041C24), full-width, 6 features com icones: DCF Completo,
-    Nota Qualitativa, AIrton, Alertas CVM em tempo real, Minhas Teses, Documentos CVM (data-cta: features-card)
-11. **Nota Qualitativa** — Paywall com blur, barras de progresso por categoria com scores reais, CTA "Desbloquear Analise" (data-cta: nota-qualitativa)
-12. **Demonstracoes Financeiras** — DRE, Balanco, Fluxo de Caixa, Dividendos (tabelas com 10 anos)
-13. **Card de Alerta CVM** — Card escuro centrado com icone de sino, "Fique sabendo antes do mercado",
-    CTA "Ativar alertas de TICKER" (data-cta: alerta-cvm), rodape "Gratis, sem cartao. Tambem
-    disponivel no Telegram."
-14. **Peers** — Acoes do mesmo setor com links internos + link para `/acoes/{setor}/`
-15. **FAQ** — perguntas frequentes dinamicas por ticker (Schema.org FAQPage)
-16. **CTA Final** — Link para a plataforma paga (data-cta: footer)
-17. **Acoes Populares** — Links cross-sector para internal linking
-18. **Disclaimer + Footer** — Notas metodologicas (Graham, Bazin, Gordon) + disclaimer legal + logos
-19. **CTA fixo mobile** — Barra `position:fixed` na base, so em `@media (max-width:768px)`,
+9. **Bloco de Documentos da CVM** (movido para ca em set/2026) — "O que TICKER publicou na CVM":
+   lista `<ol>` dos 4 documentos reais mais recentes (tipo traduzido, `<time datetime>`, titulo,
+   resumo do AIrton), cada um linkando o documento oficial (`target="_blank" rel="noopener
+   nofollow"`, sem `_iaClick`). CTA "Receba os proximos no WhatsApp" (data-cta: alerta-cvm-topo).
+   Ticker sem cobertura nao renderiza o bloco. Hoje: 297 paginas com documentos reais.
+10. **Faixa "O que a plataforma tem para TICKER"** (set/2026) — fundo escuro, 4 linhas clicaveis,
+    **ordenadas pelos cliques de 90 dias** (dcf-locked 61 > airton-audit 47 > features-card 12 >
+    nota-qualitativa 8 > alerta-cvm 0): DCF completo (`dcf-locked`), AIrton (`airton-intro`), Nota
+    qualitativa com score borrado (`nota-qualitativa`), Alertas no WhatsApp (`alerta-cvm`). Os ids
+    foram mantidos para nao quebrar series. **Substituiu 4 blocos inteiros** — apresentacao do
+    AIrton (0 cliques), card de features, paywall da nota qualitativa e card de alerta da CVM.
+    O id `features-card` deixou de ser emitido.
+11. **Demonstracoes Financeiras** — DRE, Balanco, Fluxo de Caixa, Dividendos (10 anos) dentro de um
+    `<details class="fin-details">` **fechado por default** (set/2026). Todo o conteudo segue no
+    DOM para o Google; so parou de empurrar peers/FAQ para 8 telas abaixo.
+12. **Peers** — Acoes do mesmo setor com links internos + link para `/acoes/{setor}/`
+13. **FAQ** — perguntas frequentes dinamicas por ticker (Schema.org FAQPage)
+14. **CTA Final** — Link para a plataforma paga (data-cta: footer)
+15. **Acoes Populares** — Links cross-sector para internal linking
+16. **Disclaimer + Footer** — Notas metodologicas (Graham, Bazin, Gordon) + disclaimer legal + logos
+17. **CTA fixo mobile** — Barra `position:fixed` na base, so em `@media (max-width:768px)`,
     "Auditar TICKER gratis" (data-cta: sticky-mobile). `body` ganha `padding-bottom` para a barra
     nao cobrir conteudo.
 
@@ -288,20 +297,21 @@ Cada CTA tem `onclick="_iaClick(event)"` + `data-cta="ID"` para tracking granula
 |----------|---------|------|
 | `nav-app` | Nav: Acessar App | `ref=iacoes` |
 | `nav-assinar` | Nav: Assinar Plano | `ref=iacoes` |
-| `alerta-cvm-topo` | Bloco de documentos da CVM (topo) | `ref=iacoes&ticker=T&intent=alerta` |
-| `airton-audit` | Link secundario do bloco da CVM; nos tickers sem cobertura, as 3 perguntas prontas + botao do card de auditoria (4 links) | `ref=iacoes&ticker=T&intent=airton` (secundario) / `intent=auditoria&prompt=...` (card) |
-| `dcf-locked` | Premissas locked (3x) + card DCF | `ref=iacoes&ticker=T` |
-| `airton-intro` | Bloco de apresentacao do AIrton | `ref=iacoes&ticker=T&intent=airton` |
-| `features-card` | Card de features | `ref=iacoes` |
-| `nota-qualitativa` | Paywall da nota qualitativa | `ref=iacoes` |
-| `alerta-cvm` | Card de alerta (fim das demonstracoes) | `ref=iacoes&ticker=T&intent=alerta` |
+| `alerta-cvm-topo` | Bloco de documentos da CVM (apos os cards de valuation) | `ref=iacoes&ticker=T&intent=alerta` |
+| `airton-audit` | Card de auditoria (3 perguntas prontas + botao = 4 links), abaixo da faixa de veredito | `ref=iacoes&ticker=T&intent=auditoria` (+`&prompt=...` nas perguntas) |
+| `hero-dcf` | Faixa de veredito abaixo do hero (preco justo ponderado + upside, set/2026) | `ref=iacoes&ticker=T&intent=dcf` |
+| `chart-locked` | Grafico por metodo, botao "Desbloquear os 3 metodos" | `ref=iacoes&ticker=T&intent=dcf` |
+| `dcf-locked` | Premissas locked (3x) + card DCF + linha DCF da faixa de features (5 links) | `ref=iacoes&ticker=T` |
+| `airton-intro` | Linha AIrton da faixa de features | `ref=iacoes&ticker=T&intent=airton` |
+| `nota-qualitativa` | Linha da nota qualitativa na faixa de features | `ref=iacoes` |
+| `alerta-cvm` | Linha de alertas na faixa de features | `ref=iacoes&ticker=T&intent=alerta` |
 | `footer` | CTA final | `ref=iacoes&ticker=T` |
 | `disclaimer` | Link inline no disclaimer | `ref=iacoes` |
 | `sticky-mobile` | Barra fixa (so mobile) | `ref=iacoes&ticker=T&intent=auditoria` |
 
 **IMPORTANTE para dashboards:** `airton-audit` e o **sucessor historico de `social-proof`** — o card
 foi reescrito e o id renomeado em 31/ago/2026. Quem agrega por `cta_id` precisa unir as duas series,
-senao o grafico quebra na data da troca. O id **`markowitz`** deixou de ser emitido (card removido).
+senao o grafico quebra na data da troca. Os ids **`markowitz`** (ago/2026) e **`features-card`** (set/2026) deixaram de ser emitidos.
 
 **Landing page** (`/`, destino sempre `?ref=iacoes-lp`): `nav-comecar`, `hero`, `plataforma-calc`,
 `metodologias`, `comparativo`, `alerta-cvm` (`&intent=alerta`), `preco-ianalista`, `preco-ialocador`,
@@ -325,6 +335,7 @@ Os CTAs passam um `intent` para a plataforma saber o que abrir depois do cadastr
 | `alerta` | Configurar alerta de CVM do ticker |
 | `airton` | Abrir conversa com o AIrton sobre o ticker |
 | `auditoria` | Auditoria de tese; pode vir com `&prompt=<encodeURIComponent(pergunta)>` |
+| `dcf` | Abrir o DCF completo do ticker (faixa de veredito, `hero-dcf`) |
 
 ### Social Proof Dinamico
 
@@ -531,6 +542,33 @@ operacional: sumiu a tabela intermediaria e o RLS que ja quebrou uma vez.
 - **Codigo morto de `_iaLeadSubmit` / `iacoes_email_leads`** em `scripts/inline/tracking.js` e nas
   5 paginas geradas — residuo do lead magnet de CSV removido em ago/2026. Nenhum formulario o chama.
   Se for limpar, e no `tracking.js`, e as 5 paginas precisam ser regeneradas.
+
+## Landing `/fundamentalista/` (set/2026)
+
+Escrita manualmente, vende o **plano Fundamentalista** (R$ 79,90/mes · R$ 790/ano — o anual e 790,
+nao 799; o Stripe fatura 790). Mesmo design system da landing (DM Sans + JetBrains Mono, tokens
+`:root` copiados). Estrutura: nav → hero (h1 + card "Voce recebe") → `#inclui` (6 cards) →
+`#comparar` (tabela IAcoes vs Fundamentalista) → `#como` (3 passos) → `#preco` (mensal/anual) →
+`#sobre` (bios CNPI/CGA) → `#faq` (5 Q&As) → `#assinar` (CTA final) → footer com disclaimer.
+3 grafos JSON-LD: `Product` (2 ofertas), `FAQPage`, `BreadcrumbList`. GA4 + Pixel + tracking Supabase.
+
+**Regras de copy, verificadas com o runbook do go-live (sessoes dashbrasilhorizonte-5a/5b, 18/set/2026):**
+- **NAO prometer "7 dias gratis"** — o trial concede o IAcoes, nao o Fundamentalista (e quem esta em
+  trial nao ve carteira). QA: `grep -ci "7 dias" fundamentalista/index.html` deve dar 0.
+- **NAO prometer carteiras da casa, nem data.** Decisao do Gabriel em 18/set/2026: o go-live nao lanca
+  carteiras (GL-CASA-02/03/04 sairam do caminho critico). Quando entrarem, ha uma decisao de
+  empacotamento a tomar antes de anunciar (access_tier = 'fundamentalista' e tier de banco, nao claim).
+- **Nao existe deeplink de checkout** — nenhum `plan=` e lido pelo app. CTA:
+  `/authnew?ref=iacoes-fundamentalista&next=%2Fplanos`; o usuario escolhe o card em Planos.
+- Claim "sem conflito de interesse" **nao esta aprovado** por ninguem verificavel — nao usar aqui.
+- Itens do plano = a copy do card de `/planos` do app, literal.
+
+**Tracking:** `data-cta` = `nav-assinar`, `hero`, `comparativo`, `preco-mensal`, `preco-anual`,
+`final`, `sticky-mobile`. `utm_medium` default `landing`, `utm_campaign` default
+**`fundamentalista-lp`** (5a copia do bloco de tracking; difere das outras so nessa constante — nao
+tem o ramo `data-promo`). Scroll depth: `#inclui` / `#como` / `#sobre` / `#assinar`.
+
+**Pendente:** linkar da landing e da `/airton/` (hoje e orfa); adicionar ao sitemap quando publicar.
 
 ## Paginas de setor (`/acoes/{setor}/`)
 
