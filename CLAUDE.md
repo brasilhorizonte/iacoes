@@ -632,7 +632,11 @@ operacional: sumiu a tabela intermediaria e o RLS que ja quebrou uma vez.
   5 paginas geradas — residuo do lead magnet de CSV removido em ago/2026. Nenhum formulario o chama.
   Se for limpar, e no `tracking.js`, e as 5 paginas precisam ser regeneradas.
 
-## Landing `/fundamentalista/` (set/2026)
+## Landing `/fundamentalista/` (set/2026) — FORA DO AR desde 22/set/2026
+
+> Subiu no go-live de 22/set e foi retirada no mesmo dia a pedido do Gabriel (`git rm --cached`).
+> Os arquivos seguem em `fundamentalista/` no working tree, untracked. Nao estava no sitemap nem
+> linkada de lugar nenhum.
 
 Escrita manualmente, vende o **plano Fundamentalista** (R$ 79,90/mes · R$ 790/ano — o anual e 790,
 nao 799; o Stripe fatura 790). Mesmo design system da landing (DM Sans + JetBrains Mono, tokens
