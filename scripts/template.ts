@@ -243,38 +243,6 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     }
   }
 
-  // DCF Sensitivity Table (visual fixo — gradiente verde/vermelho)
-  const sensWacc = ['14.2%','14.7%','15.2%','15.7%','16.2%','16.7%','17.2%'];
-  const sensG = ['3.5%','4.0%','4.5%','5.0%','5.5%','6.0%','6.5%'];
-  // Valores placeholder — números plausíveis baseados no preço atual
-  const sensBase = Math.round(f.price * 0.95);
-  const sensGrid = sensWacc.map((_, ri) => sensG.map((_, ci) => {
-    const val = sensBase * (1 + (ci - 3) * 0.06 - (ri - 3) * 0.07);
-    return Math.round(val * 10) / 10;
-  }));
-  const sensitivityHTML = `
-    <div class="sensitivity-table-wrap">
-      <div class="sensitivity-title">G PERP&Eacute;TUO</div>
-      <table class="sensitivity-table">
-        <thead><tr><th></th>${sensG.map((g, i) => `<th${i === 3 ? ' class="sensitivity-center-col"' : ''}>${g}</th>`).join('')}</tr></thead>
-        <tbody>${sensGrid.map((row, ri) => {
-          return `<tr${ri === 3 ? ' class="sensitivity-center-row"' : ''}><td class="sensitivity-wacc">${sensWacc[ri]}</td>${row.map((v, ci) => {
-            if (ri === 3 && ci === 3) return `<td class="sensitivity-center">${fmt(v)}</td>`;
-            // Gradiente fixo: top-right = verde, bottom-left = vermelho
-            const t = (ci - ri + 6) / 12; // 0 = vermelho, 1 = verde
-            const r = Math.round(220 - t * 180);
-            const g = Math.round(80 + t * 140);
-            const b = Math.round(70 + t * 50);
-            const alpha = 0.13 + Math.abs(t - 0.5) * 0.2;
-            const bg = 'rgba(' + r + ',' + g + ',' + b + ',' + alpha.toFixed(2) + ')';
-            const fg = t < 0.35 ? '#991b1b' : t > 0.65 ? '#065f46' : '#92400e';
-            return `<td style="background:${bg};color:${fg}">${fmt(v)}</td>`;
-          }).join('')}</tr>`;
-        }).join('')}</tbody>
-      </table>
-      <div class="sensitivity-footer">WACC &darr; &mdash; Centro: WACC 15.7% &times; g 5.0% = <strong>R$ ${fmt(sensGrid[3][3])}</strong></div>
-    </div>`;
-
   // SEO: meta description, title, FAQ
   const currentYear = new Date().getFullYear();
   const desc = `Calculadora de valor justo para ${f.name} (${f.symbol}) com Graham, Bazin e Gordon. Premissas ajustáveis — calcule o valor justo agora. Indicadores, balanço e dividendos atualizados.`;
@@ -300,7 +268,7 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     },
     {
       q: `Quanto ${f.symbol} pagou de dividendos em ${currentYear - 1}?`,
-      a: `${divByYear.has(String(currentYear - 1)) ? `Em ${currentYear - 1}, ${f.symbol} distribuiu R$ ${fmt(divByYear.get(String(currentYear - 1))!.total)} por ação em ${divByYear.get(String(currentYear - 1))!.count} pagamentos entre dividendos e JCP.` : `${f.symbol} não possui registros de dividendos pagos em ${currentYear - 1}.`} Para baixar o histórico completo de proventos com datas e valores, insira seu e-mail na seção de dividendos acima.`
+      a: `${divByYear.has(String(currentYear - 1)) ? `Em ${currentYear - 1}, ${f.symbol} distribuiu R$ ${fmt(divByYear.get(String(currentYear - 1))!.total)} por ação em ${divByYear.get(String(currentYear - 1))!.count} pagamentos entre dividendos e JCP.` : `${f.symbol} não possui registros de dividendos pagos em ${currentYear - 1}.`} O histórico completo de proventos, com datas e valores, está na seção de demonstrações financeiras desta página.`
     },
     {
       q: `Como calcular o preço justo de ${f.symbol}?`,
@@ -411,9 +379,10 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
   // Regra: só mostra número se ele existe (wfv > 0 e price > 0); senão só o CTA.
   const hasVerdict = Number.isFinite(wfv) && wfv > 0 && Number.isFinite(data.price) && data.price > 0;
   // --- Gráfico "preço justo por método" (SVG inline, sem JS) ---
-  // 3 métodos abertos (Graham, Bazin, Gordon) e 3 atrás do paywall (DCF, EVA, Múltiplos).
-  // Os valores travados entram só como geometria da barra, sem número — mesmo padrão do
-  // sensitivity table do DCF, que já vai borrado para o DOM. Métodos sem valor (<= 0) não entram.
+  // 4 métodos abertos (Graham, Bazin, Gordon, EVA) e 2 atrás do paywall (DCF e Múltiplos —
+  // decisão do Gabriel em 21/set/2026: DCF travado, EVA aberto). Os valores travados entram só como
+  // geometria da barra, sem número. Métodos sem valor (<= 0) não entram. O gráfico vive DENTRO
+  // do card de veredito (eram dois cards de valuation colados; consolidados em set/2026).
   const dcfFV = val.results.find(r => r.method === 'FDC')?.fairValue || 0;
   const evaFV = val.results.find(r => r.method === 'EVA/MVA')?.fairValue || 0;
   const multFV = val.results.find(r => r.method === 'MULTIPLO')?.fairValue || 0;
@@ -422,14 +391,14 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
     { label: 'Bazin', fv: bazinFV, locked: false },
     { label: 'Gordon', fv: gordonFV, locked: false },
     { label: 'DCF', fv: dcfFV, locked: true },
-    { label: 'EVA', fv: evaFV, locked: true },
+    { label: 'EVA', fv: evaFV, locked: false },
     { label: 'M&uacute;ltiplos', fv: multFV, locked: true },
   ].filter(r => Number.isFinite(r.fv) && r.fv > 0);
   const chartOpen = chartRows.filter(r => !r.locked).length;
   const chartLocked = chartRows.filter(r => r.locked).length;
   let methodsChart = '';
   if (chartOpen >= 2 && data.price > 0) {
-    const W = 640, LBL = 92, RGT = 84, ROW = 30, TOP = 12;
+    const W = 480, LBL = 100, RGT = 76, ROW = 30, TOP = 12;
     const H = TOP + chartRows.length * ROW + 24;
     const maxV = Math.max(data.price, ...chartRows.map(r => r.fv)) * 1.12;
     const x = (v: number) => LBL + (v / maxV) * (W - LBL - RGT);
@@ -444,27 +413,22 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       return lbl + bar + valTxt;
     }).join('');
     methodsChart = `
-  <section class="methods-chart animate-in" aria-label="Pre&ccedil;o justo de ${f.symbol} por m&eacute;todo de valuation">
-    <div class="mc-head">
-      <div>
-        <h2 class="mc-title">Pre&ccedil;o justo por m&eacute;todo</h2>
-        <p class="mc-sub">${chartOpen} m&eacute;todos abertos${chartLocked ? ` &middot; ${chartLocked} exclusivos da plataforma` : ''} &middot; linha = cota&ccedil;&atilde;o atual</p>
-      </div>
-      ${chartLocked ? `<a href="${heroDcfHref}" class="mc-unlock" data-cta="chart-locked" onclick="_iaClick(event)">Desbloquear os ${chartLocked} m&eacute;todos &rarr;</a>` : ''}
-    </div>
+    <div class="vc-chart" aria-label="Pre&ccedil;o justo de ${f.symbol} por m&eacute;todo de valuation">
+      <p class="vc-chart-title">Por m&eacute;todo <span>${chartOpen} abertos${chartLocked ? ` &middot; ${chartLocked} exclusivos da plataforma` : ''} &middot; linha tracejada = cota&ccedil;&atilde;o</span></p>
     <div class="mc-wrap">
       <svg viewBox="0 0 ${W} ${H}" class="mc-svg" role="img" aria-label="Barras com o pre&ccedil;o justo de ${f.symbol} por m&eacute;todo, comparadas &agrave; cota&ccedil;&atilde;o de R$ ${fmt(data.price)}">
         ${bars}
-        ${chartLocked ? (() => { const y0 = TOP + chartOpen * ROW; const yc = y0 + (chartLocked * ROW) / 2; const cx = LBL + (W - LBL - RGT) / 2; return `<g class="mc-pill"><rect x="${cx - 120}" y="${yc - 12}" width="240" height="24" rx="12"/><text x="${cx}" y="${yc + 4}" text-anchor="middle">&#x1F512; Exclusivo da plataforma: DCF, EVA e M&uacute;ltiplos</text></g>`; })() : ''}
+        ${chartLocked ? (() => { const y0 = TOP + chartOpen * ROW; const yc = y0 + (chartLocked * ROW) / 2; const cx = LBL + (W - LBL - RGT) / 2; return `<g class="mc-pill"><rect x="${cx - 118}" y="${yc - 12}" width="236" height="24" rx="12"/><text x="${cx}" y="${yc + 4}" text-anchor="middle">&#x1F512; Exclusivo da plataforma: ${(() => { const l = chartRows.filter(r => r.locked).map(r => r.label); return l.length > 1 ? l.slice(0, -1).join(', ') + ' e ' + l[l.length - 1] : l.join(''); })()}</text></g>`; })() : ''}
         <line x1="${px.toFixed(1)}" y1="${TOP - 4}" x2="${px.toFixed(1)}" y2="${H - 22}" stroke="#0f172a" stroke-width="1.5" stroke-dasharray="4 3"/>
         <text x="${px.toFixed(1)}" y="${H - 8}" text-anchor="middle" class="mc-price">Cota&ccedil;&atilde;o R$ ${fmt(data.price)}</text>
       </svg>
     </div>
-  </section>`;
+    </div>`;
   }
 
   const verdictStrip = `
-  <section class="verdict-strip animate-in" aria-label="Pre&ccedil;o justo estimado de ${f.symbol}">
+  <section class="verdict-card animate-in" aria-label="Pre&ccedil;o justo estimado de ${f.symbol}">
+  <div class="verdict-strip">
     ${hasVerdict ? `<div class="verdict-left">
       <p class="verdict-label">Pre&ccedil;o justo estimado <span class="verdict-methods">m&eacute;dia ponderada de 5 m&eacute;todos</span></p>
       <p class="verdict-value"><sup>R$</sup>${fmt(wfv)} <span class="verdict-upside ${upsideColor}">${introVerdictLabel}</span></p>
@@ -474,9 +438,12 @@ export const generateTickerHTML = (data: FinancialData, val: ComprehensiveValuat
       <p class="verdict-note">Os modelos cl&aacute;ssicos n&atilde;o fecham para ${f.symbol} com os dados p&uacute;blicos. O DCF completo, com premissas suas, fecha.</p>
     </div>`}
     <div class="verdict-right">
-      <a href="${heroDcfHref}" class="verdict-btn" data-cta="hero-dcf" onclick="_iaClick(event)">Ver o DCF completo de ${f.symbol} &rarr;</a>
-      <p class="verdict-foot">Gr&aacute;tis, sem cart&atilde;o. Premissas suas, cen&aacute;rios e WACC.</p>
+      <a href="${heroDcfHref}" class="verdict-btn" data-cta="hero-dcf" onclick="_iaClick(event)">&#x1F512; Desbloquear DCF e M&uacute;ltiplos &rarr;</a>
+      <p class="verdict-foot">Gr&aacute;tis, sem cart&atilde;o. WACC, cen&aacute;rios e premissas suas.</p>
+      <a href="${alertaCvmHref}" class="verdict-alt" data-cta="alerta-cvm-topo" onclick="_iaClick(event)">&#x1F514; Me avisa quando ${f.symbol} publicar na CVM</a>
     </div>
+  </div>
+  ${methodsChart}
   </section>`;
   // Página completa do ativo no app (15/09/2026). `next` devolve à /ativo/TICKER depois
   // do cadastro/login; quem já está logado é mandado direto (o Auth.tsx do app honra o
@@ -512,7 +479,7 @@ ${d.title ? `          <span class="cvm-doc-title">${escHtml(truncate(d.title, 1
       </ol>
       <div class="cvm-docs-cta">
         <a href="${alertaCvmHref}" class="cvm-docs-btn" data-cta="alerta-cvm-topo" onclick="_iaClick(event)">Receba os pr&oacute;ximos no WhatsApp &rarr;</a>
-        <p class="cvm-docs-foot">Gr&aacute;tis, sem cart&atilde;o.</p>
+        <p class="cvm-docs-foot">Gr&aacute;tis, sem cart&atilde;o. <a href="/airton/${f.symbol}/" class="cvm-docs-airton-link">Veja como o alerta de ${f.symbol} chega no WhatsApp &rarr;</a></p>
       </div>
     </div>
   </section>`;
@@ -1015,10 +982,8 @@ ${airtonQuestions.map(q => `        <li><a href="${airtonAuditHref}&prompt=${enc
       font-size: 0.75rem; color: #64748b;
       padding: 0.5rem 0.6rem; margin-top: 0.5rem;
       background: rgba(182,143,64,0.06); border: 1px solid rgba(182,143,64,0.15);
-      border-radius: 6px; text-decoration: none; cursor: pointer;
-      transition: background 0.15s;
+      border-radius: 6px; text-decoration: none; cursor: default;
     }
-    .premissa-locked-row:hover { background: rgba(182,143,64,0.12); }
     .premissa-locked-row strong { font-family: 'SFMono-Regular', Consolas, monospace; }
     .methods-note {
       margin-top: 1rem; padding: 0.75rem 1rem;
@@ -1480,27 +1445,28 @@ ${airtonQuestions.map(q => `        <li><a href="${airtonAuditHref}&prompt=${enc
     .fin-details[open] > summary { margin-bottom: 1rem; }
 
     /* ============ GRÁFICO POR MÉTODO ============ */
-    .methods-chart { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.25rem 1.5rem; margin: 0 0 1.5rem; }
+    .verdict-card { background: #fff; border: 1px solid rgba(182,143,64,0.35); border-radius: 12px; margin: -0.5rem 0 1.5rem; overflow: hidden; box-shadow: 0 8px 30px -18px rgba(4,28,36,0.35); }
+    .vc-chart { padding: 1rem 1.5rem 0.75rem; }
+    .vc-chart-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; font-weight: 700; margin: 0 0 0.5rem; }
+    .vc-chart-title span { text-transform: none; letter-spacing: 0; font-weight: 500; margin-left: 0.4rem; }
     .mc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
     .mc-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: #0f172a; margin: 0 0 0.2rem; }
     .mc-sub { font-size: 0.78rem; color: #64748b; margin: 0; }
-    .mc-unlock { flex-shrink: 0; font-size: 0.8rem; font-weight: 700; color: #B68F40; text-decoration: none; border: 1.5px solid #B68F40; border-radius: 6px; padding: 0.4rem 0.8rem; }
-    .mc-unlock:hover { background: #B68F40; color: #fff; }
     .mc-wrap { position: relative; }
     .mc-svg { width: 100%; height: auto; display: block; font-family: 'Montserrat', sans-serif; }
-    .mc-label { font-size: 12px; font-weight: 600; fill: #334155; }
-    .mc-val { font-size: 11.5px; font-weight: 700; font-family: 'SFMono-Regular', Consolas, monospace; }
+    .mc-label { font-size: 13px; font-weight: 600; fill: #334155; }
+    .mc-val { font-size: 12.5px; font-weight: 700; font-family: 'SFMono-Regular', Consolas, monospace; }
     .mc-up { fill: #059669; } .mc-down { fill: #dc2626; }
-    .mc-price { font-size: 10.5px; font-weight: 600; fill: #0f172a; }
+    .mc-price { font-size: 11.5px; font-weight: 600; fill: #0f172a; }
     .mc-locked-bar { filter: blur(3px); opacity: 0.55; }
     .mc-pill rect { fill: rgba(255,255,255,0.94); stroke: rgba(182,143,64,0.5); }
-    .mc-pill text { font-size: 10.5px; font-weight: 700; fill: #0f172a; }
+    .mc-pill text { font-size: 11px; font-weight: 700; fill: #0f172a; }
 
     /* ============ FAIXA DE VEREDITO (acima da dobra) ============ */
-    .verdict-strip { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; background: #041C24; color: #fff; border-radius: 12px; padding: 1.25rem 1.75rem; margin: -0.5rem 0 1.5rem; border: 1px solid rgba(182,143,64,0.35); }
+    .verdict-strip { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; background: #041C24; color: #fff; padding: 1.25rem 1.75rem; }
     .verdict-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: #B68F40; font-weight: 700; margin-bottom: 0.3rem; }
     .verdict-methods { color: rgba(255,255,255,0.55); font-weight: 500; text-transform: none; letter-spacing: 0; margin-left: 0.4rem; }
-    .verdict-value { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 2rem; font-weight: 700; line-height: 1.1; display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+    .verdict-value { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 2.4rem; font-weight: 700; line-height: 1.1; display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
     .verdict-value sup { font-size: 0.9rem; font-weight: 600; vertical-align: super; margin-right: 0.15rem; color: rgba(255,255,255,0.7); }
     .verdict-upside { font-family: 'Montserrat', sans-serif; font-size: 0.85rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px; background: rgba(255,255,255,0.08); }
     .verdict-upside.val-positive { color: #34d399; } .verdict-upside.val-negative { color: #f87171; } .verdict-upside.val-neutral { color: #cbd5e1; }
@@ -1509,6 +1475,8 @@ ${airtonQuestions.map(q => `        <li><a href="${airtonAuditHref}&prompt=${enc
     .verdict-btn { display: inline-block; background: #B68F40; color: #041C24; font-weight: 700; font-size: 0.92rem; padding: 0.8rem 1.4rem; border-radius: 8px; text-decoration: none; font-family: 'Montserrat', sans-serif; transition: transform 0.15s, box-shadow 0.15s; }
     .verdict-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(182,143,64,0.35); }
     .verdict-foot { font-size: 0.7rem; color: rgba(255,255,255,0.55); margin-top: 0.45rem; }
+    .verdict-alt { display: inline-block; margin-top: 0.7rem; font-size: 0.78rem; color: #34d399; text-decoration: none; border-bottom: 1px dashed rgba(52,211,153,0.5); padding-bottom: 1px; }
+    .verdict-alt:hover { color: #6ee7b7; border-bottom-color: #6ee7b7; }
     @media (max-width: 768px) {
       .verdict-strip { flex-direction: column; align-items: stretch; padding: 1.1rem 1.2rem; }
       .verdict-value { font-size: 1.7rem; }
@@ -1545,22 +1513,10 @@ ${airtonQuestions.map(q => `        <li><a href="${airtonAuditHref}&prompt=${enc
     .intro-combined-divider { height: 1px; background: #e2e8f0; margin: 1.2rem 0; }
 
     /* ============ DCF FULL-WIDTH ============ */
-    .dcf-locked-card { margin-top: 1rem; grid-column: 1 / -1; }
-    .dcf-locked-inner { display: flex; gap: 1.5rem; align-items: center; }
-    .dcf-locked-left { flex: 1; filter: blur(4px); pointer-events: none; user-select: none; }
-    .dcf-locked-left .method-body { filter: none; }
-    .dcf-locked-right { flex: 1; text-align: center; padding: 1.5rem; }
-    .dcf-locked-right svg { color: #B68F40; margin-bottom: 0.75rem; }
-    .dcf-locked-headline { font-size: 1rem; color: #0f172a; margin-bottom: 0.4rem; font-weight: 500; line-height: 1.5; }
-    .dcf-locked-headline strong { color: #B68F40; }
-    .dcf-locked-sub { font-size: 0.82rem; color: #64748b; margin-bottom: 1rem; }
     @media (max-width: 768px) {
-      .dcf-locked-inner { flex-direction: column; }
-      .dcf-locked-left { display: none; }
     }
 
     /* ============ SENSITIVITY TABLE ============ */
-    .dcf-sensitivity-blur { filter: blur(3px); pointer-events: none; user-select: none; }
     .sensitivity-table-wrap { text-align: center; }
     .sensitivity-title { font-size: 0.7rem; font-weight: 700; color: #64748b; letter-spacing: 0.1em; margin-bottom: 0.4rem; }
     .sensitivity-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; font-family: 'SFMono-Regular', Consolas, monospace; }
@@ -1643,6 +1599,7 @@ ${airtonQuestions.map(q => `        <li><a href="${airtonAuditHref}&prompt=${enc
       font-family: 'Montserrat', sans-serif;
     }
     .cvm-docs-btn:hover { background: #093848; }
+    .cvm-docs-airton-link { color: #B68F40; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
     .cvm-docs-foot { margin-top: 0.7rem; font-size: 0.75rem; color: #64748b; }
     .cvm-docs-secondary {
       display: inline-block; margin-top: 1rem; font-size: 0.83rem;
@@ -1817,7 +1774,6 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
   </header>
 
 ${verdictStrip}
-${methodsChart}
 
 ${airtonAuditBlock}
 
@@ -1927,10 +1883,10 @@ ${airtonAuditBlock}
 
           <div class="premissas-section">
             <div class="premissas-label">PREMISSAS</div>
-            <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="premissa-locked-row" data-cta="dcf-locked" onclick="_iaClick(event)">
+            <div class="premissa-locked-row" title="Ajust\&aacute;vel na plataforma">
               <span>&#x1F512; P/L Máximo: <strong style="filter:blur(4px)">15</strong></span>
               <span>P/VP Máximo: <strong style="filter:blur(4px)">1.5</strong></span>
-            </a>
+            </div>
             <input type="hidden" id="graham-pl" value="15">
             <input type="hidden" id="graham-pvp" value="1.5">
             <div class="premissa-row">
@@ -1977,9 +1933,9 @@ ${airtonAuditBlock}
                 <span class="premissa-slider-val" id="bazin-dy-val">6.0%</span>
               </div>
             </div>
-            <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="premissa-locked-row" data-cta="dcf-locked" onclick="_iaClick(event)">
+            <div class="premissa-locked-row" title="Ajust\&aacute;vel na plataforma">
               <span>&#x1F512; Anos para Média: <strong style="filter:blur(4px)">5 anos</strong></span>
-            </a>
+            </div>
             <input type="hidden" id="bazin-years" value="5">
           </div>
 
@@ -2027,9 +1983,9 @@ ${airtonAuditBlock}
                 <span class="premissa-slider-val" id="gordon-g-val">5.0%</span>
               </div>
             </div>
-            <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="premissa-locked-row" data-cta="dcf-locked" onclick="_iaClick(event)">
+            <div class="premissa-locked-row" title="Ajust\&aacute;vel na plataforma">
               <span>&#x1F512; Anos para Média: <strong style="filter:blur(4px)">5 anos</strong></span>
-            </a>
+            </div>
             <input type="hidden" id="gordon-years" value="5">
           </div>
 
@@ -2042,29 +1998,6 @@ ${airtonAuditBlock}
 
     </div>
 
-    <!-- DCF (LOCKED — FULL WIDTH) -->
-    <div class="dcf-locked-card method-card method-card-locked">
-      <div class="dcf-locked-inner">
-        <div class="dcf-locked-left">
-          <div class="method-header" style="margin-bottom:0.5rem">
-            <div>
-              <span class="method-name">DCF</span>
-              <span class="method-sub">Tabela de Sensibilidade</span>
-            </div>
-            <span class="method-locked-badge">PRO</span>
-          </div>
-          <div class="dcf-sensitivity-blur">
-            ${sensitivityHTML}
-          </div>
-        </div>
-        <div class="dcf-locked-right">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          <p class="dcf-locked-headline">Diferente de agregadores de dados, aqui <strong>voc&ecirc; monta seu pr&oacute;prio valuation</strong></p>
-          <p class="dcf-locked-sub">Premissas avan&ccedil;adas, cen&aacute;rios e compara&ccedil;&atilde;o com intelig&ecirc;ncia artificial.</p>
-          <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="method-unlock-btn" data-cta="dcf-locked" onclick="_iaClick(event)">Fazer Valuation DCF &rarr;</a>
-        </div>
-      </div>
-    </div>
   </section>
 ${cvmDocsBlockOrEmpty}
 
@@ -2173,8 +2106,8 @@ ${cvmDocsBlockOrEmpty}
   <!-- CTA -->
   <section class="cta-card animate-in" aria-label="Acesse a plataforma">
     <h2>Sua an&aacute;lise de ${f.symbol} come&ccedil;a aqui</h2>
-    <p>Premissas edit&aacute;veis, cen&aacute;rios Bear/Base/Bull, an&aacute;lise qualitativa com IA, alertas da CVM e o AIrton &mdash; tudo gr&aacute;tis para come&ccedil;ar.</p>
-    <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}" class="cta-btn" data-cta="footer" onclick="_iaClick(event)">Comece sua an&aacute;lise gr&aacute;tis &rarr;</a>
+    <p>O AIrton cruza sua tese com os n&uacute;meros reais de ${f.symbol} e diz onde ela n&atilde;o se sustenta. DCF com premissas suas, alertas da CVM no WhatsApp &mdash; gr&aacute;tis, sem cart&atilde;o.</p>
+    <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=${f.symbol}&intent=auditoria" class="cta-btn" data-cta="footer" onclick="_iaClick(event)">Auditar ${f.symbol} gr&aacute;tis &rarr;</a>
   </section>
 
   </article>
@@ -2411,14 +2344,14 @@ ${cvmDocsBlockOrEmpty}
 };
 
 // --- Index Page (/acoes/index.html) ---
-export const generateIndexHTML = (tickers: TickerIndexEntry[]): string => {
+export const generateIndexHTML = (tickers: TickerIndexEntry[], airtonSet: Set<string> = new Set()): string => {
   const today = new Date().toLocaleDateString('pt-BR');
   const year = new Date().getFullYear();
   const sectors = [...new Set(tickers.map(t => t.sector).filter(Boolean))].sort();
 
   const tickerRows = tickers.map(t => `
     <tr data-sector="${t.sector}">
-      <td><a href="/${t.ticker}/" class="idx-ticker-link">${t.ticker}</a></td>
+      <td><a href="/${t.ticker}/" class="idx-ticker-link">${t.ticker}</a>${airtonSet.has(t.ticker) ? ` <a href="/airton/${t.ticker}/" class="idx-alert-link" title="Alertas de ${t.ticker} na CVM pelo WhatsApp" aria-label="Alertas de ${t.ticker} na CVM pelo WhatsApp">&#x1F514;</a>` : ''}</td>
       <td class="idx-name">${t.name}</td>
       <td>${t.sector}</td>
       <td class="idx-num">${t.price > 0 ? 'R$ ' + fmt(t.price) : '-'}</td>
@@ -2597,6 +2530,8 @@ export const generateIndexHTML = (tickers: TickerIndexEntry[]): string => {
       white-space: nowrap;
     }
     .idx-table tbody tr:hover { background: #fafaf8; }
+    .idx-alert-link { font-size: 0.7rem; text-decoration: none; opacity: 0.55; margin-left: 0.2rem; }
+    .idx-alert-link:hover { opacity: 1; }
     .idx-ticker-link {
       font-family: 'SFMono-Regular', Consolas, monospace;
       font-weight: 700; color: #0f172a; text-decoration: none;
@@ -2664,7 +2599,7 @@ export const generateIndexHTML = (tickers: TickerIndexEntry[]): string => {
         <tbody id="idx-tbody">
           ${sectors.map(s => `<tr id="setor-${sectorSlug(s)}" class="idx-sector-anchor"><td colspan="7" style="background:#f8f6f1;padding:0.5rem 0.9rem;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#B68F40;border-bottom:1px solid #e2e8f0;">${s}</td></tr>
           ${tickers.filter(t => t.sector === s).map(t => `<tr data-sector="${t.sector}">
-            <td><a href="/${t.ticker}/" class="idx-ticker-link">${t.ticker}</a></td>
+            <td><a href="/${t.ticker}/" class="idx-ticker-link">${t.ticker}</a>${airtonSet.has(t.ticker) ? ` <a href="/airton/${t.ticker}/" class="idx-alert-link" title="Alertas de ${t.ticker} na CVM pelo WhatsApp" aria-label="Alertas de ${t.ticker} na CVM pelo WhatsApp">&#x1F514;</a>` : ''}</td>
             <td class="idx-name">${t.name}</td>
             <td>${t.sector}</td>
             <td class="idx-num">${t.price > 0 ? 'R$ ' + fmt(t.price) : '-'}</td>
@@ -2718,7 +2653,7 @@ function filterSector(sector) {
 };
 
 // --- Sector Page (/acoes/{setor}/index.html) ---
-export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[]): string => {
+export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[], airtonSet: Set<string> = new Set()): string => {
   const today = new Date().toLocaleDateString('pt-BR');
   const year = new Date().getFullYear();
   const slug = sectorSlug(sector);
@@ -2730,7 +2665,7 @@ export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[]):
 
   const rows = tickers.map(t => `
     <tr>
-      <td><a href="/${t.ticker}/" class="idx-ticker-link">${t.ticker}</a></td>
+      <td><a href="/${t.ticker}/" class="idx-ticker-link">${t.ticker}</a>${airtonSet.has(t.ticker) ? ` <a href="/airton/${t.ticker}/" class="idx-alert-link" title="Alertas de ${t.ticker} na CVM pelo WhatsApp" aria-label="Alertas de ${t.ticker} na CVM pelo WhatsApp">&#x1F514;</a>` : ''}</td>
       <td class="idx-name">${t.name}</td>
       <td class="idx-num">${t.price > 0 ? 'R$ ' + fmt(t.price) : '-'}</td>
       <td class="idx-num">${t.pl > 0 ? fmtNum(t.pl) : '-'}</td>
@@ -2822,6 +2757,7 @@ export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[]):
     .idx-table tbody tr:hover{background:#fafaf8}
     .idx-num{font-family:'SFMono-Regular',monospace;text-align:right;font-size:0.8rem}
     .idx-ticker-link{color:#B68F40;font-weight:700;text-decoration:none}
+    .idx-alert-link{font-size:.7rem;text-decoration:none;opacity:.55;margin-left:.2rem}.idx-alert-link:hover{opacity:1}
     .idx-ticker-link:hover{text-decoration:underline}
     .idx-name{color:#475569;font-size:0.78rem}
     .faq-section{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:2rem;margin-top:1.5rem}
@@ -2891,7 +2827,7 @@ export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[]):
 </html>`;
 };
 
-export const generateSitemap = (tickers: string[], sectors: string[] = [], lastmodMap: Record<string, string> = {}): string => {
+export const generateSitemap = (tickers: string[], sectors: string[] = [], lastmodMap: Record<string, string> = {}, airtonTickers: string[] = []): string => {
   const today = new Date().toISOString().split('T')[0];
   const urls = [
     `  <url><loc>https://iacoes.com.br/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>`,
@@ -2901,6 +2837,10 @@ export const generateSitemap = (tickers: string[], sectors: string[] = [], lastm
     ),
     ...tickers.map(t =>
       `  <url><loc>https://iacoes.com.br/${t}/</loc><lastmod>${lastmodMap[t] || today}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>`
+    ),
+    `  <url><loc>https://iacoes.com.br/airton/</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`,
+    ...airtonTickers.map(t =>
+      `  <url><loc>https://iacoes.com.br/airton/${t}/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>`
     )
   ];
   return `<?xml version="1.0" encoding="UTF-8"?>

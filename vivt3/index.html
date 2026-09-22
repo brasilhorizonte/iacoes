@@ -17,8 +17,8 @@
   <meta property="og:url" content="https://iacoes.com.br/VIVT3/">
   <meta property="og:site_name" content="IAções — Análise de Ações | Brasil Horizonte">
   <meta property="og:locale" content="pt_BR">
-  <meta property="article:published_time" content="2026-09-18T03:00:00.000Z">
-  <meta property="article:modified_time" content="2026-09-18T03:00:00.000Z">
+  <meta property="article:published_time" content="2026-09-22T03:00:00.000Z">
+  <meta property="article:modified_time" content="2026-09-22T03:00:00.000Z">
   <meta property="article:section" content="Análise Fundamentalista">
   <meta property="article:tag" content="VIVT3">
   <meta property="article:tag" content="Valuation">
@@ -51,8 +51,8 @@
     "@type": "Article",
     "headline": "VIVT3 — Preço Justo e Análise Fundamentalista 2026",
     "description": "Calculadora de valor justo para Telefonica Brasil S.A. (VIVT3) com Graham, Bazin e Gordon. Premissas ajustáveis — calcule o valor justo agora. Indicadores, balanço e dividendos atualizados.",
-    "datePublished": "2026-09-18T03:00:00.000Z",
-    "dateModified": "2026-09-18T03:00:00.000Z",
+    "datePublished": "2026-09-22T03:00:00.000Z",
+    "dateModified": "2026-09-22T03:00:00.000Z",
     "author": { "@type": "Organization", "name": "Brasil Horizonte", "url": "https://brasilhorizonte.com.br" },
     "publisher": {
       "@type": "Organization",
@@ -98,7 +98,7 @@
       {
         "@type": "Question",
         "name": "Quais os principais indicadores fundamentalistas de VIVT3?",
-        "acceptedAnswer": { "@type": "Answer", "text": "VIVT3 apresenta P/L de 15,06, P/VP de 1,51, ROE de 10.1%, ROIC de 5.1%, Margem Líquida de 10.7%, EV/EBITDA de 4,26 e Div. Liq./EBITDA de 0,43. Esses indicadores ajudam a avaliar a saúde financeira, rentabilidade e eficiência operacional da empresa." }
+        "acceptedAnswer": { "@type": "Answer", "text": "VIVT3 apresenta P/L de 14,88, P/VP de 1,50, ROE de 10.1%, ROIC de 5.1%, Margem Líquida de 10.7%, EV/EBITDA de 4,21 e Div. Liq./EBITDA de 0,43. Esses indicadores ajudam a avaliar a saúde financeira, rentabilidade e eficiência operacional da empresa." }
       },
       {
         "@type": "Question",
@@ -113,12 +113,12 @@
       {
         "@type": "Question",
         "name": "Qual o histórico de dividendos de VIVT3?",
-        "acceptedAnswer": { "@type": "Answer", "text": "VIVT3 possui Dividend Yield de 4.1% e distribuiu R$ 1,26 por ação nos últimos 12 meses. O histórico completo inclui 175 pagamentos (dividendos, JCP e rendimentos) desde 1998. O histórico de dividendos é um dos fatores analisados para entender a política de remuneração ao acionista e a consistência dos pagamentos ao longo dos anos." }
+        "acceptedAnswer": { "@type": "Answer", "text": "VIVT3 possui Dividend Yield de 4.2% e distribuiu R$ 1,14 por ação nos últimos 12 meses. O histórico completo inclui 175 pagamentos (dividendos, JCP e rendimentos) desde 1998. O histórico de dividendos é um dos fatores analisados para entender a política de remuneração ao acionista e a consistência dos pagamentos ao longo dos anos." }
       },
       {
         "@type": "Question",
         "name": "Quanto VIVT3 pagou de dividendos em 2025?",
-        "acceptedAnswer": { "@type": "Answer", "text": "Em 2025, VIVT3 distribuiu R$ 3,85 por ação em 14 pagamentos entre dividendos e JCP. Para baixar o histórico completo de proventos com datas e valores, insira seu e-mail na seção de dividendos acima." }
+        "acceptedAnswer": { "@type": "Answer", "text": "Em 2025, VIVT3 distribuiu R$ 3,85 por ação em 14 pagamentos entre dividendos e JCP. O histórico completo de proventos, com datas e valores, está na seção de demonstrações financeiras desta página." }
       },
       {
         "@type": "Question",
@@ -509,10 +509,8 @@
       font-size: 0.75rem; color: #64748b;
       padding: 0.5rem 0.6rem; margin-top: 0.5rem;
       background: rgba(182,143,64,0.06); border: 1px solid rgba(182,143,64,0.15);
-      border-radius: 6px; text-decoration: none; cursor: pointer;
-      transition: background 0.15s;
+      border-radius: 6px; text-decoration: none; cursor: default;
     }
-    .premissa-locked-row:hover { background: rgba(182,143,64,0.12); }
     .premissa-locked-row strong { font-family: 'SFMono-Regular', Consolas, monospace; }
     .methods-note {
       margin-top: 1rem; padding: 0.75rem 1rem;
@@ -974,27 +972,28 @@
     .fin-details[open] > summary { margin-bottom: 1rem; }
 
     /* ============ GRÁFICO POR MÉTODO ============ */
-    .methods-chart { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.25rem 1.5rem; margin: 0 0 1.5rem; }
+    .verdict-card { background: #fff; border: 1px solid rgba(182,143,64,0.35); border-radius: 12px; margin: -0.5rem 0 1.5rem; overflow: hidden; box-shadow: 0 8px 30px -18px rgba(4,28,36,0.35); }
+    .vc-chart { padding: 1rem 1.5rem 0.75rem; }
+    .vc-chart-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; font-weight: 700; margin: 0 0 0.5rem; }
+    .vc-chart-title span { text-transform: none; letter-spacing: 0; font-weight: 500; margin-left: 0.4rem; }
     .mc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
     .mc-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: #0f172a; margin: 0 0 0.2rem; }
     .mc-sub { font-size: 0.78rem; color: #64748b; margin: 0; }
-    .mc-unlock { flex-shrink: 0; font-size: 0.8rem; font-weight: 700; color: #B68F40; text-decoration: none; border: 1.5px solid #B68F40; border-radius: 6px; padding: 0.4rem 0.8rem; }
-    .mc-unlock:hover { background: #B68F40; color: #fff; }
     .mc-wrap { position: relative; }
     .mc-svg { width: 100%; height: auto; display: block; font-family: 'Montserrat', sans-serif; }
-    .mc-label { font-size: 12px; font-weight: 600; fill: #334155; }
-    .mc-val { font-size: 11.5px; font-weight: 700; font-family: 'SFMono-Regular', Consolas, monospace; }
+    .mc-label { font-size: 13px; font-weight: 600; fill: #334155; }
+    .mc-val { font-size: 12.5px; font-weight: 700; font-family: 'SFMono-Regular', Consolas, monospace; }
     .mc-up { fill: #059669; } .mc-down { fill: #dc2626; }
-    .mc-price { font-size: 10.5px; font-weight: 600; fill: #0f172a; }
+    .mc-price { font-size: 11.5px; font-weight: 600; fill: #0f172a; }
     .mc-locked-bar { filter: blur(3px); opacity: 0.55; }
     .mc-pill rect { fill: rgba(255,255,255,0.94); stroke: rgba(182,143,64,0.5); }
-    .mc-pill text { font-size: 10.5px; font-weight: 700; fill: #0f172a; }
+    .mc-pill text { font-size: 11px; font-weight: 700; fill: #0f172a; }
 
     /* ============ FAIXA DE VEREDITO (acima da dobra) ============ */
-    .verdict-strip { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; background: #041C24; color: #fff; border-radius: 12px; padding: 1.25rem 1.75rem; margin: -0.5rem 0 1.5rem; border: 1px solid rgba(182,143,64,0.35); }
+    .verdict-strip { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; background: #041C24; color: #fff; padding: 1.25rem 1.75rem; }
     .verdict-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: #B68F40; font-weight: 700; margin-bottom: 0.3rem; }
     .verdict-methods { color: rgba(255,255,255,0.55); font-weight: 500; text-transform: none; letter-spacing: 0; margin-left: 0.4rem; }
-    .verdict-value { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 2rem; font-weight: 700; line-height: 1.1; display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+    .verdict-value { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 2.4rem; font-weight: 700; line-height: 1.1; display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
     .verdict-value sup { font-size: 0.9rem; font-weight: 600; vertical-align: super; margin-right: 0.15rem; color: rgba(255,255,255,0.7); }
     .verdict-upside { font-family: 'Montserrat', sans-serif; font-size: 0.85rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px; background: rgba(255,255,255,0.08); }
     .verdict-upside.val-positive { color: #34d399; } .verdict-upside.val-negative { color: #f87171; } .verdict-upside.val-neutral { color: #cbd5e1; }
@@ -1003,6 +1002,8 @@
     .verdict-btn { display: inline-block; background: #B68F40; color: #041C24; font-weight: 700; font-size: 0.92rem; padding: 0.8rem 1.4rem; border-radius: 8px; text-decoration: none; font-family: 'Montserrat', sans-serif; transition: transform 0.15s, box-shadow 0.15s; }
     .verdict-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(182,143,64,0.35); }
     .verdict-foot { font-size: 0.7rem; color: rgba(255,255,255,0.55); margin-top: 0.45rem; }
+    .verdict-alt { display: inline-block; margin-top: 0.7rem; font-size: 0.78rem; color: #34d399; text-decoration: none; border-bottom: 1px dashed rgba(52,211,153,0.5); padding-bottom: 1px; }
+    .verdict-alt:hover { color: #6ee7b7; border-bottom-color: #6ee7b7; }
     @media (max-width: 768px) {
       .verdict-strip { flex-direction: column; align-items: stretch; padding: 1.1rem 1.2rem; }
       .verdict-value { font-size: 1.7rem; }
@@ -1039,22 +1040,10 @@
     .intro-combined-divider { height: 1px; background: #e2e8f0; margin: 1.2rem 0; }
 
     /* ============ DCF FULL-WIDTH ============ */
-    .dcf-locked-card { margin-top: 1rem; grid-column: 1 / -1; }
-    .dcf-locked-inner { display: flex; gap: 1.5rem; align-items: center; }
-    .dcf-locked-left { flex: 1; filter: blur(4px); pointer-events: none; user-select: none; }
-    .dcf-locked-left .method-body { filter: none; }
-    .dcf-locked-right { flex: 1; text-align: center; padding: 1.5rem; }
-    .dcf-locked-right svg { color: #B68F40; margin-bottom: 0.75rem; }
-    .dcf-locked-headline { font-size: 1rem; color: #0f172a; margin-bottom: 0.4rem; font-weight: 500; line-height: 1.5; }
-    .dcf-locked-headline strong { color: #B68F40; }
-    .dcf-locked-sub { font-size: 0.82rem; color: #64748b; margin-bottom: 1rem; }
     @media (max-width: 768px) {
-      .dcf-locked-inner { flex-direction: column; }
-      .dcf-locked-left { display: none; }
     }
 
     /* ============ SENSITIVITY TABLE ============ */
-    .dcf-sensitivity-blur { filter: blur(3px); pointer-events: none; user-select: none; }
     .sensitivity-table-wrap { text-align: center; }
     .sensitivity-title { font-size: 0.7rem; font-weight: 700; color: #64748b; letter-spacing: 0.1em; margin-bottom: 0.4rem; }
     .sensitivity-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; font-family: 'SFMono-Regular', Consolas, monospace; }
@@ -1137,6 +1126,7 @@
       font-family: 'Montserrat', sans-serif;
     }
     .cvm-docs-btn:hover { background: #093848; }
+    .cvm-docs-airton-link { color: #B68F40; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
     .cvm-docs-foot { margin-top: 0.7rem; font-size: 0.75rem; color: #64748b; }
     .cvm-docs-secondary {
       display: inline-block; margin-top: 1rem; font-size: 0.83rem;
@@ -1296,48 +1286,45 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
     </div>
     <div class="company-right">
       <div class="price-label">Cotação Atual</div>
-      <div class="price-value" id="live-price"><sup>R$</sup>30,81</div>
+      <div class="price-value" id="live-price"><sup>R$</sup>30,44</div>
       <div class="price-changes">
-        <span id="live-change-day" class="val-negative">-0.3% dia</span>
+        <span id="live-change-day" class="val-negative">-0.9% dia</span>
         <span class="val-negative">-0.1% 12m</span>
       </div>
       <div class="hero-nota-qual">
         <span class="nota-teaser-lock" aria-hidden="true">&#x1F512;</span>
         <span>Nota Qualitativa: <strong style="filter:blur(4px)">?.??</strong> / 4.0</span>
       </div>
-      <div class="price-date" id="live-date">Dados de 18/09/2026</div>
+      <div class="price-date" id="live-date">Dados de 22/09/2026</div>
       <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=VIVT3&next=%2Fativo%2FVIVT3" class="hero-cta-app" data-cta="asset-page" onclick="_iaClick(event)">Ver VIVT3 na plataforma &rarr;</a>
     </div>
   </header>
 
 
-  <section class="verdict-strip animate-in" aria-label="Pre&ccedil;o justo estimado de VIVT3">
+  <section class="verdict-card animate-in" aria-label="Pre&ccedil;o justo estimado de VIVT3">
+  <div class="verdict-strip">
     <div class="verdict-left">
       <p class="verdict-label">Pre&ccedil;o justo estimado <span class="verdict-methods">m&eacute;dia ponderada de 5 m&eacute;todos</span></p>
-      <p class="verdict-value"><sup>R$</sup>30,64 <span class="verdict-upside val-neutral">Neutro (-0.6%)</span></p>
-      <p class="verdict-note">vs. cota&ccedil;&atilde;o de R$ 30,81. Estimativa por modelos com premissas p&uacute;blicas &mdash; n&atilde;o &eacute; recomenda&ccedil;&atilde;o.</p>
+      <p class="verdict-value"><sup>R$</sup>30,48 <span class="verdict-upside val-neutral">Neutro (+0.1%)</span></p>
+      <p class="verdict-note">vs. cota&ccedil;&atilde;o de R$ 30,44. Estimativa por modelos com premissas p&uacute;blicas &mdash; n&atilde;o &eacute; recomenda&ccedil;&atilde;o.</p>
     </div>
     <div class="verdict-right">
-      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=VIVT3&intent=dcf" class="verdict-btn" data-cta="hero-dcf" onclick="_iaClick(event)">Ver o DCF completo de VIVT3 &rarr;</a>
-      <p class="verdict-foot">Gr&aacute;tis, sem cart&atilde;o. Premissas suas, cen&aacute;rios e WACC.</p>
+      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=VIVT3&intent=dcf" class="verdict-btn" data-cta="hero-dcf" onclick="_iaClick(event)">&#x1F512; Desbloquear DCF e M&uacute;ltiplos &rarr;</a>
+      <p class="verdict-foot">Gr&aacute;tis, sem cart&atilde;o. WACC, cen&aacute;rios e premissas suas.</p>
+      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=VIVT3&intent=alerta" class="verdict-alt" data-cta="alerta-cvm-topo" onclick="_iaClick(event)">&#x1F514; Me avisa quando VIVT3 publicar na CVM</a>
     </div>
-  </section>
-
-  <section class="methods-chart animate-in" aria-label="Pre&ccedil;o justo de VIVT3 por m&eacute;todo de valuation">
-    <div class="mc-head">
-      <div>
-        <h2 class="mc-title">Pre&ccedil;o justo por m&eacute;todo</h2>
-        <p class="mc-sub">3 m&eacute;todos abertos &middot; 3 exclusivos da plataforma &middot; linha = cota&ccedil;&atilde;o atual</p>
-      </div>
-      <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=VIVT3&intent=dcf" class="mc-unlock" data-cta="chart-locked" onclick="_iaClick(event)">Desbloquear os 3 m&eacute;todos &rarr;</a>
-    </div>
+  </div>
+  
+    <div class="vc-chart" aria-label="Pre&ccedil;o justo de VIVT3 por m&eacute;todo de valuation">
+      <p class="vc-chart-title">Por m&eacute;todo <span>4 abertos &middot; 2 exclusivos da plataforma &middot; linha tracejada = cota&ccedil;&atilde;o</span></p>
     <div class="mc-wrap">
-      <svg viewBox="0 0 640 216" class="mc-svg" role="img" aria-label="Barras com o pre&ccedil;o justo de VIVT3 por m&eacute;todo, comparadas &agrave; cota&ccedil;&atilde;o de R$ 30,81">
-        <text x="84" y="31" text-anchor="end" class="mc-label">Graham</text><rect x="92" y="19" width="256.3" height="16" rx="3" fill="#10b981" /><text x="354.3" y="31" class="mc-val mc-up">R$ 31,38</text><text x="84" y="61" text-anchor="end" class="mc-label">Bazin</text><rect x="92" y="49" width="414.3" height="16" rx="3" fill="#10b981" /><text x="512.3" y="61" class="mc-val mc-up">R$ 50,72</text><text x="84" y="91" text-anchor="end" class="mc-label">Gordon</text><rect x="92" y="79" width="116.9" height="16" rx="3" fill="#ef4444" /><text x="214.9" y="91" class="mc-val mc-down">R$ 14,32</text><text x="84" y="121" text-anchor="end" class="mc-label">DCF &#x1F512;</text><rect x="92" y="109" width="398.5" height="16" rx="3" fill="#94a3b8" class="mc-locked-bar"/><text x="84" y="151" text-anchor="end" class="mc-label">EVA &#x1F512;</text><rect x="92" y="139" width="65.3" height="16" rx="3" fill="#94a3b8" class="mc-locked-bar"/><text x="84" y="181" text-anchor="end" class="mc-label">M&uacute;ltiplos &#x1F512;</text><rect x="92" y="169" width="120.8" height="16" rx="3" fill="#94a3b8" class="mc-locked-bar"/>
-        <g class="mc-pill"><rect x="204" y="135" width="240" height="24" rx="12"/><text x="324" y="151" text-anchor="middle">&#x1F512; Exclusivo da plataforma: DCF, EVA e M&uacute;ltiplos</text></g>
-        <line x1="343.7" y1="8" x2="343.7" y2="194" stroke="#0f172a" stroke-width="1.5" stroke-dasharray="4 3"/>
-        <text x="343.7" y="208" text-anchor="middle" class="mc-price">Cota&ccedil;&atilde;o R$ 30,81</text>
+      <svg viewBox="0 0 480 216" class="mc-svg" role="img" aria-label="Barras com o pre&ccedil;o justo de VIVT3 por m&eacute;todo, comparadas &agrave; cota&ccedil;&atilde;o de R$ 30,44">
+        <text x="92" y="31" text-anchor="end" class="mc-label">Graham</text><rect x="100" y="19" width="167.4" height="16" rx="3" fill="#10b981" /><text x="273.4" y="31" class="mc-val mc-up">R$ 31,28</text><text x="92" y="61" text-anchor="end" class="mc-label">Bazin</text><rect x="100" y="49" width="271.4" height="16" rx="3" fill="#10b981" /><text x="377.4" y="61" class="mc-val mc-up">R$ 50,72</text><text x="92" y="91" text-anchor="end" class="mc-label">Gordon</text><rect x="100" y="79" width="76.6" height="16" rx="3" fill="#ef4444" /><text x="182.6" y="91" class="mc-val mc-down">R$ 14,32</text><text x="92" y="121" text-anchor="end" class="mc-label">DCF &#x1F512;</text><rect x="100" y="109" width="259.5" height="16" rx="3" fill="#94a3b8" class="mc-locked-bar"/><text x="92" y="151" text-anchor="end" class="mc-label">EVA</text><rect x="100" y="139" width="42.5" height="16" rx="3" fill="#ef4444" /><text x="148.5" y="151" class="mc-val mc-down">R$ 7,95</text><text x="92" y="181" text-anchor="end" class="mc-label">M&uacute;ltiplos &#x1F512;</text><rect x="100" y="169" width="78.6" height="16" rx="3" fill="#94a3b8" class="mc-locked-bar"/>
+        <g class="mc-pill"><rect x="134" y="150" width="236" height="24" rx="12"/><text x="252" y="166" text-anchor="middle">&#x1F512; Exclusivo da plataforma: DCF e M&uacute;ltiplos</text></g>
+        <line x1="262.9" y1="8" x2="262.9" y2="194" stroke="#0f172a" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="262.9" y="208" text-anchor="middle" class="mc-price">Cota&ccedil;&atilde;o R$ 30,44</text>
       </svg>
+    </div>
     </div>
   </section>
 
@@ -1347,7 +1334,7 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
     <div class="social-proof-card">
       <p class="social-proof-headline">Leu um relat&oacute;rio sobre VIVT3? Pergunte ao AIrton.</p>
       <p class="social-proof-text">O AIrton cruza a tese com os n&uacute;meros reais de VIVT3 &mdash; governan&ccedil;a, vantagem competitiva, endividamento e riscos &mdash; e diz onde ela <strong>n&atilde;o se sustenta</strong>.</p>
-      <p class="social-proof-count">547 investidores j&aacute; validaram teses em VIVT3</p>
+      <p class="social-proof-count">543 investidores j&aacute; validaram teses em VIVT3</p>
       <ul class="airton-q-list" aria-label="Perguntas prontas para o AIrton sobre VIVT3">
         <li><a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=VIVT3&intent=auditoria&prompt=Minha%20tese%20em%20VIVT3%20se%20sustenta%3F" class="airton-q" data-cta="airton-audit" onclick="_iaClick(event)"><span class="airton-q-mark" aria-hidden="true">&#x201C;</span>Minha tese em VIVT3 se sustenta?<span class="airton-q-arrow" aria-hidden="true">&rarr;</span></a></li>
         <li><a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=VIVT3&intent=auditoria&prompt=Resume%20o%20%C3%BAltimo%20Fato%20Relevante%20de%20VIVT3" class="airton-q" data-cta="airton-audit" onclick="_iaClick(event)"><span class="airton-q-mark" aria-hidden="true">&#x201C;</span>Resume o último Fato Relevante de VIVT3<span class="airton-q-arrow" aria-hidden="true">&rarr;</span></a></li>
@@ -1361,9 +1348,9 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
   <section class="section-card intro-combined animate-in" aria-label="Sobre VIVT3">
     <div class="intro-combined-section">
       <h2 class="section-legend">Análise Fundamentalista</h2>
-      <p><strong>VIVT3</strong> é a ação ordinária de <strong>Telefonica Brasil S.A.</strong>, negociada na B3 (bolsa brasileira) no setor de Comunicações, segmento de Telecomunicações. Com cotação atual de <strong>R$ 30,81</strong> e valor de mercado de R$ 99,34 B, a empresa é analisada abaixo por 3 metodologias clássicas de valuation: Graham, Bazin e Gordon (DDM).</p>
+      <p><strong>VIVT3</strong> é a ação ordinária de <strong>Telefonica Brasil S.A.</strong>, negociada na B3 (bolsa brasileira) no setor de Comunicações, segmento de Telecomunicações. Com cotação atual de <strong>R$ 30,44</strong> e valor de mercado de R$ 98,79 B, a empresa é analisada abaixo por 3 metodologias clássicas de valuation: Graham, Bazin e Gordon (DDM).</p>
       <p>A análise fundamentalista de VIVT3 utiliza 3 métodos clássicos de valuation — <strong>Graham</strong>, <strong>Bazin</strong> e <strong>Gordon (DDM)</strong> — para estimar o preço justo da ação com premissas ajustáveis. Confira os resultados abaixo e ajuste as premissas para sua própria análise.</p>
-      <p>Negocia a um P/L de 15,1x e EV/EBITDA de 4,3x, com dividend yield de 4.1% nos últimos 12 meses. O retorno sobre patrimônio (ROE) é de 10.1%, e a margem líquida de 10.7%. Abaixo, você encontra todos os indicadores fundamentalistas, demonstrações financeiras históricas e o preço justo calculado com premissas ajustáveis.</p>
+      <p>Negocia a um P/L de 14,9x e EV/EBITDA de 4,2x, com dividend yield de 4.2% nos últimos 12 meses. O retorno sobre patrimônio (ROE) é de 10.1%, e a margem líquida de 10.7%. Abaixo, você encontra todos os indicadores fundamentalistas, demonstrações financeiras históricas e o preço justo calculado com premissas ajustáveis.</p>
     </div>
     
     <div class="intro-combined-divider"></div>
@@ -1388,23 +1375,23 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
 
       <div class="tab-panel" id="panel-mercado">
         <div class="metrics-grid">
-          <div class="metric-box"><span class="metric-label">Valor de Mercado</span><span class="metric-value ">R$ 99,34 B</span></div>
-          <div class="metric-box"><span class="metric-label">Valor da Firma (EV)</span><span class="metric-value ">R$ 110,55 B</span></div>
-          <div class="metric-box"><span class="metric-label">Nro. Ações</span><span class="metric-value ">3,22 B</span></div>
-          <div class="metric-box"><span class="metric-label">Volume Médio (3M)</span><span class="metric-value ">1,59 M</span></div>
+          <div class="metric-box"><span class="metric-label">Valor de Mercado</span><span class="metric-value ">R$ 98,79 B</span></div>
+          <div class="metric-box"><span class="metric-label">Valor da Firma (EV)</span><span class="metric-value ">R$ 109,36 B</span></div>
+          <div class="metric-box"><span class="metric-label">Nro. Ações</span><span class="metric-value ">3,25 B</span></div>
+          <div class="metric-box"><span class="metric-label">Volume Médio (3M)</span><span class="metric-value ">1,36 M</span></div>
           <div class="metric-box"><span class="metric-label">Min. 52 Semanas</span><span class="metric-value ">R$ 28,99</span></div>
           <div class="metric-box"><span class="metric-label">Max. 52 Semanas</span><span class="metric-value ">R$ 43,47</span></div>
         </div>
       </div>
       <div class="tab-panel" id="panel-valuation">
         <div class="metrics-grid">
-          <div class="metric-box"><span class="metric-label">P/L</span><span class="metric-value ">15,06</span></div>
-          <div class="metric-box"><span class="metric-label">P/VP</span><span class="metric-value ">1,51</span></div>
-          <div class="metric-box"><span class="metric-label">P/EBIT</span><span class="metric-value ">10,08</span></div>
-          <div class="metric-box"><span class="metric-label">PSR (Price/Sales)</span><span class="metric-value ">1,67</span></div>
-          <div class="metric-box"><span class="metric-label">EV/EBITDA</span><span class="metric-value ">4,26</span></div>
-          <div class="metric-box"><span class="metric-label">EV/EBIT</span><span class="metric-value ">10,48</span></div>
-          <div class="metric-box"><span class="metric-label">Div. Yield</span><span class="metric-value val-positive">4.1%</span></div>
+          <div class="metric-box"><span class="metric-label">P/L</span><span class="metric-value ">14,88</span></div>
+          <div class="metric-box"><span class="metric-label">P/VP</span><span class="metric-value ">1,50</span></div>
+          <div class="metric-box"><span class="metric-label">P/EBIT</span><span class="metric-value ">10,02</span></div>
+          <div class="metric-box"><span class="metric-label">PSR (Price/Sales)</span><span class="metric-value ">1,66</span></div>
+          <div class="metric-box"><span class="metric-label">EV/EBITDA</span><span class="metric-value ">4,21</span></div>
+          <div class="metric-box"><span class="metric-label">EV/EBIT</span><span class="metric-value ">10,36</span></div>
+          <div class="metric-box"><span class="metric-label">Div. Yield</span><span class="metric-value val-positive">4.2%</span></div>
           <div class="metric-box"><span class="metric-label">LPA</span><span class="metric-value ">R$ 2,05</span></div>
           <div class="metric-box"><span class="metric-label">VPA</span><span class="metric-value ">R$ 20,34</span></div>
         </div>
@@ -1427,7 +1414,7 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
         </div>
       </div>
 
-      <div class="metrics-timestamp">Atualizado em 18/09/2026 (p&oacute;s-fechamento B3)</div>
+      <div class="metrics-timestamp">Atualizado em 22/09/2026 (p&oacute;s-fechamento B3)</div>
     </div>
   </section>
 
@@ -1438,7 +1425,7 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
         <h3 class="section-title font-playfair">Calcule o pre&ccedil;o justo de VIVT3 com suas premissas</h3>
         <span class="section-sub">3 m&eacute;todos cl&aacute;ssicos + DCF avan&ccedil;ado na plataforma</span>
       </div>
-      <div class="section-price-ref">Cotação Atual<br><strong>R$ 30,81</strong></div>
+      <div class="section-price-ref">Cotação Atual<br><strong>R$ 30,44</strong></div>
     </div>
     <div class="methods-grid">
 
@@ -1454,19 +1441,19 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
         <div class="method-body">
           <div class="method-fv-row">
             <span class="method-fv-label">PRECO JUSTO</span>
-            <span class="method-fv val-positive" id="graham-fv">R$ 31,38</span>
+            <span class="method-fv val-positive" id="graham-fv">R$ 31,28</span>
           </div>
           <div class="method-upside-row">
             <span class="method-fv-label">Upside</span>
-            <span class="method-upside val-positive" id="graham-upside">+1.9%</span>
+            <span class="method-upside val-positive" id="graham-upside">+2.8%</span>
           </div>
 
           <div class="premissas-section">
             <div class="premissas-label">PREMISSAS</div>
-            <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=VIVT3" class="premissa-locked-row" data-cta="dcf-locked" onclick="_iaClick(event)">
+            <div class="premissa-locked-row" title="Ajust&aacute;vel na plataforma">
               <span>&#x1F512; P/L Máximo: <strong style="filter:blur(4px)">15</strong></span>
               <span>P/VP Máximo: <strong style="filter:blur(4px)">1.5</strong></span>
-            </a>
+            </div>
             <input type="hidden" id="graham-pl" value="15">
             <input type="hidden" id="graham-pvp" value="1.5">
             <div class="premissa-row">
@@ -1501,7 +1488,7 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
           </div>
           <div class="method-upside-row">
             <span class="method-fv-label">Upside</span>
-            <span class="method-upside val-positive" id="bazin-upside">+64.6%</span>
+            <span class="method-upside val-positive" id="bazin-upside">+66.6%</span>
           </div>
 
           <div class="premissas-section">
@@ -1513,17 +1500,17 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
                 <span class="premissa-slider-val" id="bazin-dy-val">6.0%</span>
               </div>
             </div>
-            <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=VIVT3" class="premissa-locked-row" data-cta="dcf-locked" onclick="_iaClick(event)">
+            <div class="premissa-locked-row" title="Ajust&aacute;vel na plataforma">
               <span>&#x1F512; Anos para Média: <strong style="filter:blur(4px)">5 anos</strong></span>
-            </a>
+            </div>
             <input type="hidden" id="bazin-years" value="5">
           </div>
 
           <div class="premissa-info-row">
-            <span>Dividendos TTM:</span> <strong>R$ 1,26</strong>
+            <span>Dividendos TTM:</span> <strong>R$ 1,14</strong>
           </div>
           <div class="premissa-info-row">
-            <span>DY Atual:</span> <strong>4.1%</strong>
+            <span>DY Atual:</span> <strong>3.7%</strong>
           </div>
         </div>
       </div>
@@ -1544,7 +1531,7 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
           </div>
           <div class="method-upside-row">
             <span class="method-fv-label">Upside</span>
-            <span class="method-upside val-negative" id="gordon-upside">-53.5%</span>
+            <span class="method-upside val-negative" id="gordon-upside">-53.0%</span>
           </div>
 
           <div class="premissas-section">
@@ -1563,9 +1550,9 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
                 <span class="premissa-slider-val" id="gordon-g-val">5.0%</span>
               </div>
             </div>
-            <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=VIVT3" class="premissa-locked-row" data-cta="dcf-locked" onclick="_iaClick(event)">
+            <div class="premissa-locked-row" title="Ajust&aacute;vel na plataforma">
               <span>&#x1F512; Anos para Média: <strong style="filter:blur(4px)">5 anos</strong></span>
-            </a>
+            </div>
             <input type="hidden" id="gordon-years" value="5">
           </div>
 
@@ -1578,37 +1565,6 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
 
     </div>
 
-    <!-- DCF (LOCKED — FULL WIDTH) -->
-    <div class="dcf-locked-card method-card method-card-locked">
-      <div class="dcf-locked-inner">
-        <div class="dcf-locked-left">
-          <div class="method-header" style="margin-bottom:0.5rem">
-            <div>
-              <span class="method-name">DCF</span>
-              <span class="method-sub">Tabela de Sensibilidade</span>
-            </div>
-            <span class="method-locked-badge">PRO</span>
-          </div>
-          <div class="dcf-sensitivity-blur">
-            
-    <div class="sensitivity-table-wrap">
-      <div class="sensitivity-title">G PERP&Eacute;TUO</div>
-      <table class="sensitivity-table">
-        <thead><tr><th></th><th>3.5%</th><th>4.0%</th><th>4.5%</th><th class="sensitivity-center-col">5.0%</th><th>5.5%</th><th>6.0%</th><th>6.5%</th></tr></thead>
-        <tbody><tr><td class="sensitivity-wacc">14.2%</td><td style="background:rgba(130,150,95,0.13);color:#92400e">29,90</td><td style="background:rgba(115,162,99,0.15);color:#92400e">31,60</td><td style="background:rgba(100,173,103,0.16);color:#065f46">33,30</td><td style="background:rgba(85,185,108,0.18);color:#065f46">35,10</td><td style="background:rgba(70,197,112,0.20);color:#065f46">36,80</td><td style="background:rgba(55,208,116,0.21);color:#065f46">38,60</td><td style="background:rgba(40,220,120,0.23);color:#065f46">40,30</td></tr><tr><td class="sensitivity-wacc">14.7%</td><td style="background:rgba(145,138,91,0.15);color:#92400e">27,80</td><td style="background:rgba(130,150,95,0.13);color:#92400e">29,60</td><td style="background:rgba(115,162,99,0.15);color:#92400e">31,30</td><td style="background:rgba(100,173,103,0.16);color:#065f46">33,10</td><td style="background:rgba(85,185,108,0.18);color:#065f46">34,80</td><td style="background:rgba(70,197,112,0.20);color:#065f46">36,50</td><td style="background:rgba(55,208,116,0.21);color:#065f46">38,30</td></tr><tr><td class="sensitivity-wacc">15.2%</td><td style="background:rgba(160,127,87,0.16);color:#991b1b">25,80</td><td style="background:rgba(145,138,91,0.15);color:#92400e">27,60</td><td style="background:rgba(130,150,95,0.13);color:#92400e">29,30</td><td style="background:rgba(115,162,99,0.15);color:#92400e">31,00</td><td style="background:rgba(100,173,103,0.16);color:#065f46">32,80</td><td style="background:rgba(85,185,108,0.18);color:#065f46">34,50</td><td style="background:rgba(70,197,112,0.20);color:#065f46">36,30</td></tr><tr class="sensitivity-center-row"><td class="sensitivity-wacc">15.7%</td><td style="background:rgba(175,115,83,0.18);color:#991b1b">23,80</td><td style="background:rgba(160,127,87,0.16);color:#991b1b">25,50</td><td style="background:rgba(145,138,91,0.15);color:#92400e">27,30</td><td class="sensitivity-center">29,00</td><td style="background:rgba(115,162,99,0.15);color:#92400e">30,70</td><td style="background:rgba(100,173,103,0.16);color:#065f46">32,50</td><td style="background:rgba(85,185,108,0.18);color:#065f46">34,20</td></tr><tr><td class="sensitivity-wacc">16.2%</td><td style="background:rgba(190,103,78,0.20);color:#991b1b">21,80</td><td style="background:rgba(175,115,83,0.18);color:#991b1b">23,50</td><td style="background:rgba(160,127,87,0.16);color:#991b1b">25,20</td><td style="background:rgba(145,138,91,0.15);color:#92400e">27,00</td><td style="background:rgba(130,150,95,0.13);color:#92400e">28,70</td><td style="background:rgba(115,162,99,0.15);color:#92400e">30,50</td><td style="background:rgba(100,173,103,0.16);color:#065f46">32,20</td></tr><tr><td class="sensitivity-wacc">16.7%</td><td style="background:rgba(205,92,74,0.21);color:#991b1b">19,70</td><td style="background:rgba(190,103,78,0.20);color:#991b1b">21,50</td><td style="background:rgba(175,115,83,0.18);color:#991b1b">23,20</td><td style="background:rgba(160,127,87,0.16);color:#991b1b">24,90</td><td style="background:rgba(145,138,91,0.15);color:#92400e">26,70</td><td style="background:rgba(130,150,95,0.13);color:#92400e">28,40</td><td style="background:rgba(115,162,99,0.15);color:#92400e">30,20</td></tr><tr><td class="sensitivity-wacc">17.2%</td><td style="background:rgba(220,80,70,0.23);color:#991b1b">17,70</td><td style="background:rgba(205,92,74,0.21);color:#991b1b">19,40</td><td style="background:rgba(190,103,78,0.20);color:#991b1b">21,20</td><td style="background:rgba(175,115,83,0.18);color:#991b1b">22,90</td><td style="background:rgba(160,127,87,0.16);color:#991b1b">24,70</td><td style="background:rgba(145,138,91,0.15);color:#92400e">26,40</td><td style="background:rgba(130,150,95,0.13);color:#92400e">28,10</td></tr></tbody>
-      </table>
-      <div class="sensitivity-footer">WACC &darr; &mdash; Centro: WACC 15.7% &times; g 5.0% = <strong>R$ 29,00</strong></div>
-    </div>
-          </div>
-        </div>
-        <div class="dcf-locked-right">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          <p class="dcf-locked-headline">Diferente de agregadores de dados, aqui <strong>voc&ecirc; monta seu pr&oacute;prio valuation</strong></p>
-          <p class="dcf-locked-sub">Premissas avan&ccedil;adas, cen&aacute;rios e compara&ccedil;&atilde;o com intelig&ecirc;ncia artificial.</p>
-          <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=VIVT3" class="method-unlock-btn" data-cta="dcf-locked" onclick="_iaClick(event)">Fazer Valuation DCF &rarr;</a>
-        </div>
-      </div>
-    </div>
   </section>
 
   <!-- ÚLTIMOS DOCUMENTOS DA CVM -->
@@ -1623,24 +1579,24 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
           <span class="cvm-doc-title">Incorporação Fibrasil</span>
           <span class="cvm-doc-excerpt">Em um desenvolvimento corporativo significativo, a Telefônica Brasil S.A. (listada na B3 sob o ticker VIVT3 e na NYSE como VIV), divulgou em 31 de julho de 2026 a aprovação de uma incorporação estratégica. A decisão, tomada em Assembleia…</span>
         </a></li>
-        <li><a class="cvm-doc-link" href="https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&amp;descTipo=IPE&amp;CodigoInstituicao=1&amp;numProtocolo=1548479&amp;numSequencia=1073185&amp;numVersao=1" target="_blank" rel="noopener nofollow">
-          <span class="cvm-doc-meta"><span class="cvm-doc-type">Comunicado ao Mercado</span><time class="cvm-doc-date" datetime="2026-07-27">27/07/2026</time><span class="cvm-doc-out" aria-hidden="true">ver na CVM &nearr;</span></span>
-          <span class="cvm-doc-title">Apresentação de resultados 2T26</span>
-          <span class="cvm-doc-excerpt">Análise Detalhada dos Resultados da Telefônica Brasil S.A. (Vivo) no 2T26 A Telefônica Brasil S.A., operando sob a marca Vivo, divulgou em 27 de julho de 2026, um conjunto de resultados robustos para o segundo trimestre de 2026 (2T26)…</span>
+        <li><a class="cvm-doc-link" href="http://www.rad.cvm.gov.br/ENETCONSULTA/frmDownloadDocumento.aspx?CodigoInstituicao=1&amp;NumeroSequencialDocumento=159694" target="_blank" rel="noopener nofollow">
+          <span class="cvm-doc-meta"><span class="cvm-doc-type">Informações Trimestrais</span><time class="cvm-doc-date" datetime="2026-07-27">27/07/2026</time><span class="cvm-doc-out" aria-hidden="true">ver na CVM &nearr;</span></span>
+          <span class="cvm-doc-title">TELEFÔNICA BRASIL S.A | ref 2026-06-30 | v1 | id 159694</span>
         </a></li>
         <li><a class="cvm-doc-link" href="https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&amp;descTipo=IPE&amp;CodigoInstituicao=1&amp;numProtocolo=1548519&amp;numSequencia=1073225&amp;numVersao=1" target="_blank" rel="noopener nofollow">
           <span class="cvm-doc-meta"><span class="cvm-doc-type">Fato Relevante</span><time class="cvm-doc-date" datetime="2026-07-27">27/07/2026</time><span class="cvm-doc-out" aria-hidden="true">ver na CVM &nearr;</span></span>
           <span class="cvm-doc-title">Política de Direitos Humanos</span>
           <span class="cvm-doc-excerpt">A Telefônica Brasil S.A. divulgou a segunda edição de sua Política de Direitos Humanos, aprovada pelo Conselho de Administração em 22 de julho de 2026. Este documento, classificado como público, reafirma o compromisso da companhia com o…</span>
         </a></li>
-        <li><a class="cvm-doc-link" href="http://www.rad.cvm.gov.br/ENETCONSULTA/frmDownloadDocumento.aspx?CodigoInstituicao=1&amp;NumeroSequencialDocumento=159694" target="_blank" rel="noopener nofollow">
-          <span class="cvm-doc-meta"><span class="cvm-doc-type">Informações Trimestrais</span><time class="cvm-doc-date" datetime="2026-07-27">27/07/2026</time><span class="cvm-doc-out" aria-hidden="true">ver na CVM &nearr;</span></span>
-          <span class="cvm-doc-title">TELEFÔNICA BRASIL S.A | ref 2026-06-30 | v1 | id 159694</span>
+        <li><a class="cvm-doc-link" href="https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&amp;descTipo=IPE&amp;CodigoInstituicao=1&amp;numProtocolo=1548479&amp;numSequencia=1073185&amp;numVersao=1" target="_blank" rel="noopener nofollow">
+          <span class="cvm-doc-meta"><span class="cvm-doc-type">Comunicado ao Mercado</span><time class="cvm-doc-date" datetime="2026-07-27">27/07/2026</time><span class="cvm-doc-out" aria-hidden="true">ver na CVM &nearr;</span></span>
+          <span class="cvm-doc-title">Apresentação de resultados 2T26</span>
+          <span class="cvm-doc-excerpt">Análise Detalhada dos Resultados da Telefônica Brasil S.A. (Vivo) no 2T26 A Telefônica Brasil S.A., operando sob a marca Vivo, divulgou em 27 de julho de 2026, um conjunto de resultados robustos para o segundo trimestre de 2026 (2T26)…</span>
         </a></li>
       </ol>
       <div class="cvm-docs-cta">
         <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=VIVT3&intent=alerta" class="cvm-docs-btn" data-cta="alerta-cvm-topo" onclick="_iaClick(event)">Receba os pr&oacute;ximos no WhatsApp &rarr;</a>
-        <p class="cvm-docs-foot">Gr&aacute;tis, sem cart&atilde;o.</p>
+        <p class="cvm-docs-foot">Gr&aacute;tis, sem cart&atilde;o. <a href="/airton/VIVT3/" class="cvm-docs-airton-link">Veja como o alerta de VIVT3 chega no WhatsApp &rarr;</a></p>
       </div>
     </div>
   </section>
@@ -1734,27 +1690,27 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
       <a href="/TIMS3/" class="peer-card">
         <span class="peer-ticker">TIMS3</span>
         <span class="peer-name">TIMS3</span>
-        <span class="peer-price">R$ 19,27</span>
+        <span class="peer-price">R$ 19,25</span>
       </a>
       <a href="/DESK3/" class="peer-card">
         <span class="peer-ticker">DESK3</span>
         <span class="peer-name">DESK3</span>
-        <span class="peer-price">R$ 19,43</span>
+        <span class="peer-price">R$ 19,34</span>
       </a>
       <a href="/FIQE3/" class="peer-card">
         <span class="peer-ticker">FIQE3</span>
         <span class="peer-name">FIQE3</span>
-        <span class="peer-price">R$ 5,08</span>
+        <span class="peer-price">R$ 5,11</span>
       </a>
       <a href="/TELB3/" class="peer-card">
         <span class="peer-ticker">TELB3</span>
         <span class="peer-name">TELB3</span>
-        <span class="peer-price">R$ 16,52</span>
+        <span class="peer-price">R$ 16,93</span>
       </a>
       <a href="/BRST3/" class="peer-card">
         <span class="peer-ticker">BRST3</span>
         <span class="peer-name">BRST3</span>
-        <span class="peer-price">R$ 2,82</span>
+        <span class="peer-price">R$ 2,88</span>
       </a>
     </div>
     <a href="/acoes/comunicacoes/" class="peers-more">Ver todas as ações de Comunicações &rarr;</a>
@@ -1767,7 +1723,7 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
       
       <div class="faq-item">
         <dt class="faq-question">Quais os principais indicadores fundamentalistas de VIVT3?</dt>
-        <dd class="faq-answer">VIVT3 apresenta P/L de 15,06, P/VP de 1,51, ROE de 10.1%, ROIC de 5.1%, Margem Líquida de 10.7%, EV/EBITDA de 4,26 e Div. Liq./EBITDA de 0,43. Esses indicadores ajudam a avaliar a saúde financeira, rentabilidade e eficiência operacional da empresa.</dd>
+        <dd class="faq-answer">VIVT3 apresenta P/L de 14,88, P/VP de 1,50, ROE de 10.1%, ROIC de 5.1%, Margem Líquida de 10.7%, EV/EBITDA de 4,21 e Div. Liq./EBITDA de 0,43. Esses indicadores ajudam a avaliar a saúde financeira, rentabilidade e eficiência operacional da empresa.</dd>
       </div>
       <div class="faq-item">
         <dt class="faq-question">Em qual setor VIVT3 atua?</dt>
@@ -1779,11 +1735,11 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
       </div>
       <div class="faq-item">
         <dt class="faq-question">Qual o histórico de dividendos de VIVT3?</dt>
-        <dd class="faq-answer">VIVT3 possui Dividend Yield de 4.1% e distribuiu R$ 1,26 por ação nos últimos 12 meses. O histórico completo inclui 175 pagamentos (dividendos, JCP e rendimentos) desde 1998. O histórico de dividendos é um dos fatores analisados para entender a política de remuneração ao acionista e a consistência dos pagamentos ao longo dos anos.</dd>
+        <dd class="faq-answer">VIVT3 possui Dividend Yield de 4.2% e distribuiu R$ 1,14 por ação nos últimos 12 meses. O histórico completo inclui 175 pagamentos (dividendos, JCP e rendimentos) desde 1998. O histórico de dividendos é um dos fatores analisados para entender a política de remuneração ao acionista e a consistência dos pagamentos ao longo dos anos.</dd>
       </div>
       <div class="faq-item">
         <dt class="faq-question">Quanto VIVT3 pagou de dividendos em 2025?</dt>
-        <dd class="faq-answer">Em 2025, VIVT3 distribuiu R$ 3,85 por ação em 14 pagamentos entre dividendos e JCP. Para baixar o histórico completo de proventos com datas e valores, insira seu e-mail na seção de dividendos acima.</dd>
+        <dd class="faq-answer">Em 2025, VIVT3 distribuiu R$ 3,85 por ação em 14 pagamentos entre dividendos e JCP. O histórico completo de proventos, com datas e valores, está na seção de demonstrações financeiras desta página.</dd>
       </div>
       <div class="faq-item">
         <dt class="faq-question">Como calcular o preço justo de VIVT3?</dt>
@@ -1815,8 +1771,8 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
   <!-- CTA -->
   <section class="cta-card animate-in" aria-label="Acesse a plataforma">
     <h2>Sua an&aacute;lise de VIVT3 come&ccedil;a aqui</h2>
-    <p>Premissas edit&aacute;veis, cen&aacute;rios Bear/Base/Bull, an&aacute;lise qualitativa com IA, alertas da CVM e o AIrton &mdash; tudo gr&aacute;tis para come&ccedil;ar.</p>
-    <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=VIVT3" class="cta-btn" data-cta="footer" onclick="_iaClick(event)">Comece sua an&aacute;lise gr&aacute;tis &rarr;</a>
+    <p>O AIrton cruza sua tese com os n&uacute;meros reais de VIVT3 e diz onde ela n&atilde;o se sustenta. DCF com premissas suas, alertas da CVM no WhatsApp &mdash; gr&aacute;tis, sem cart&atilde;o.</p>
+    <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes&ticker=VIVT3&intent=auditoria" class="cta-btn" data-cta="footer" onclick="_iaClick(event)">Auditar VIVT3 gr&aacute;tis &rarr;</a>
   </section>
 
   </article>
@@ -1859,7 +1815,7 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
       <span class="footer-iacoes"><span class="footer-iacoes-i">i</span>Ações</span>
     </div>
     <div class="footer-copy">
-      &copy; 2026 ValuAI by <a href="https://brasilhorizonte.com.br" target="_blank" rel="noopener">Brasil Horizonte</a>. Todos os direitos reservados. Dados atualizados em 18/09/2026. Balanço: 30/12/2025.
+      &copy; 2026 ValuAI by <a href="https://brasilhorizonte.com.br" target="_blank" rel="noopener">Brasil Horizonte</a>. Todos os direitos reservados. Dados atualizados em 22/09/2026. Balanço: 30/12/2025.
     </div>
   </footer>
 
@@ -1867,10 +1823,10 @@ document.addEventListener('DOMContentLoaded',function(){var _fb=new URLSearchPar
 
 <script>
 (function() {
-  var price = 30.81;
+  var price = 30.44;
   var lpa = 2.0451835268723415;
   var vpa = 20.340407156218056;
-  var divTTM = 1.2634284559300002;
+  var divTTM = 1.13862208724;
   var divData = [{"y":1998,"a":1.4699999400000001},{"y":1999,"a":2.194625},{"y":2000,"a":1.796716},{"y":2001,"a":2.1479976},{"y":2002,"a":1.8724519000000002},{"y":2003,"a":7.307640319999999},{"y":2004,"a":5.8855914},{"y":2005,"a":7.172606249999999},{"y":2006,"a":5.79816291},{"y":2007,"a":5.42591453},{"y":2008,"a":4.7110904300000005},{"y":2009,"a":5.0693100399999995},{"y":2010,"a":3.7808260000000002},{"y":2011,"a":6.0596732499999995},{"y":2012,"a":2.56750963},{"y":2013,"a":7.039499280000001},{"y":2014,"a":4.842544975},{"y":2015,"a":5.786958822},{"y":2016,"a":1.92120094},{"y":2017,"a":2.405063853},{"y":2018,"a":3.74417405},{"y":2019,"a":3.36365129},{"y":2020,"a":3.41514358},{"y":2021,"a":3.462643314},{"y":2022,"a":3.056297266},{"y":2023,"a":2.05849995},{"y":2024,"a":3.7106798139999997},{"y":2025,"a":3.85333199314},{"y":2026,"a":0.80422921879}];
 
   function fmt(n) { return n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }

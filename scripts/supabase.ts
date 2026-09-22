@@ -191,7 +191,10 @@ export const CVM_DOC_LIMIT = 4;
 
 // Linhas lidas por consulta antes de deduplicar (o feed repete o mesmo `link`
 // com títulos diferentes; 40 dá folga para sobrar CVM_DOC_LIMIT depois).
-const CVM_FETCH_ROWS = 40;
+const CVM_FETCH_ROWS = 150;
+// Quantos documentos deduplicados ficam no cache por ticker: a página de ticker usa os 4
+// primeiros; /airton/{TICKER}/ usa até 5 e conta os últimos 90 dias.
+export const CVM_CACHE_LIMIT = 30;
 
 // `summary` vem no formato "<Tipo> - <título> - Date YYYY-MM-DD"
 // (algumas linhas usam "Data" em vez de "Date", e o título pode ser vazio: "- - -").
@@ -204,7 +207,9 @@ const cleanCvmText = (raw: string): string =>
     .replace(/^\s{0,3}#{1,6}\s*/gm, '')
     .replace(/[`_]/g, '')
     .replace(/\s+/g, ' ')
-    .trim();
+    .trim()
+    // preâmbulo de persona do LLM ("Como analista financeiro, apresento abaixo...") não é informação
+    .replace(/^(como|na qualidade de|enquanto)\s+analista[^.:]*[.:]\s*/i, '');
 
 const cvmTitleFromSummary = (summary: string): string => {
   let s = summary.replace(CVM_DATE_SUFFIX, '').trim();
@@ -295,7 +300,8 @@ export const fetchCvmDocuments = async (ticker: string, limit = CVM_DOC_LIMIT): 
 // de forma síncrona pelo template, que não pode fazer I/O.
 const cvmDocsCache = new Map<string, CvmDocument[]>();
 
-export const getCvmDocuments = (ticker: string): CvmDocument[] => cvmDocsCache.get(normSym(ticker)) || [];
+export const getCvmDocuments = (ticker: string, limit = CVM_DOC_LIMIT): CvmDocument[] =>
+  (cvmDocsCache.get(normSym(ticker)) || []).slice(0, limit);
 
 // --- Ticker candidates ---
 
@@ -366,7 +372,7 @@ export const fetchFinancials = async (ticker: string): Promise<SupabaseFinancial
     fetchTable('brapi_balance_sheets'),
     fetchTable('brapi_cashflows'),
     fetchTable('brapi_dividends'),
-    fetchCvmDocuments(sym)
+    fetchCvmDocuments(sym, CVM_CACHE_LIMIT)
   ]);
 
   cvmDocsCache.set(normSym(sym), cvmDocs);

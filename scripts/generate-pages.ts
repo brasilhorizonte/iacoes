@@ -1,7 +1,8 @@
 import 'dotenv/config';
 import { mkdirSync, writeFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import { getAllTickers, getTickersWithNames, getAllTickersWithSector, getPeersBySector, fetchQualitativeScore, saveQualitativeCache } from './supabase';
+import { getAllTickers, getTickersWithNames, getAllTickersWithSector, getPeersBySector, fetchQualitativeScore, saveQualitativeCache, getCvmDocuments, CVM_CACHE_LIMIT } from './supabase';
+import { generateAirtonTickerHTML } from './airton-template';
 import { getFinancialData, performValuation } from './valuation';
 import { generateTickerHTML, generateIndexHTML, generateSectorPage, generateSitemap, generateRobots, sectorSlug } from './template';
 import { SCENARIO_PRESETS, DEFAULT_COST_OF_DEBT } from './constants';
@@ -65,6 +66,26 @@ async function generatePage(ticker: string): Promise<boolean> {
     const dir = join(ROOT, ticker);
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, 'index.html'), html, 'utf-8');
+
+    // /airton/{TICKER}/ — só existe para ticker com documento real na CVM.
+    // Sem documento não há página: um mock vazio seria pior do que nada.
+    const airtonDocs = getCvmDocuments(ticker, CVM_CACHE_LIMIT);
+    if (airtonDocs.length > 0) {
+      const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 90);
+      const cutoffISO = cutoff.toISOString().slice(0, 10);
+      const in90 = airtonDocs.filter(d => d.date >= cutoffISO).length;
+      const airtonHtml = generateAirtonTickerHTML({
+        symbol: ticker,
+        name: data.fundamentals.name,
+        sector: data.fundamentals.sector,
+        docs: airtonDocs,
+        docsIn90Days: in90,
+        docsIn90DaysCapped: in90 >= CVM_CACHE_LIMIT,
+      });
+      const airtonDir = join(ROOT, 'airton', ticker);
+      mkdirSync(airtonDir, { recursive: true });
+      writeFileSync(join(airtonDir, 'index.html'), airtonHtml, 'utf-8');
+    }
 
     // Widget valuation data (Graham, Bazin, Gordon)
     const grahamFV = val.results.find(r => r.method === 'GRAHAM')?.fairValue || 0;
@@ -158,10 +179,17 @@ async function main() {
 
   // Generate index page, sitemap, robots.txt and tickers.json
   if (generated.length > 0) {
+    // /airton/{TICKER}/ existentes no disco — alimenta os links de /acoes/, setores e o sitemap
+    const airtonDirs = readdirSync(join(ROOT, 'airton')).filter(d => {
+      if (d !== d.toUpperCase() || d.startsWith('.')) return false;
+      try { return statSync(join(ROOT, 'airton', d, 'index.html')).isFile(); } catch { return false; }
+    }).sort();
+    const airtonSet = new Set(airtonDirs);
+
     // Generate /acoes/index.html — always lists ALL tickers from Supabase
     const indexTickers = allTickerData.filter(t => t.price > 0);
     if (indexTickers.length > 0) {
-      const indexHTML = generateIndexHTML(indexTickers);
+      const indexHTML = generateIndexHTML(indexTickers, airtonSet);
       const acoesDir = join(ROOT, 'acoes');
       mkdirSync(acoesDir, { recursive: true });
       writeFileSync(join(acoesDir, 'index.html'), indexHTML, 'utf-8');
@@ -175,7 +203,7 @@ async function main() {
         const slug = sectorSlug(sector);
         const sectorDir = join(ROOT, 'acoes', slug);
         mkdirSync(sectorDir, { recursive: true });
-        writeFileSync(join(sectorDir, 'index.html'), generateSectorPage(sector, sectorTickers), 'utf-8');
+        writeFileSync(join(sectorDir, 'index.html'), generateSectorPage(sector, sectorTickers, airtonSet), 'utf-8');
       }
       console.log(`📂 ${sectors.length} páginas de setor geradas (/acoes/{setor}/)`);
     }
@@ -189,9 +217,9 @@ async function main() {
     });
     // Get sectors for sitemap
     const allSectors = [...new Set(allTickerData.map(t => t.sector).filter(Boolean))].sort();
-    const sitemap = generateSitemap(allTickerDirs, allSectors, tickerLastmod);
+    const sitemap = generateSitemap(allTickerDirs, allSectors, tickerLastmod, airtonDirs);
     writeFileSync(join(ROOT, 'sitemap.xml'), sitemap, 'utf-8');
-    console.log(`📄 sitemap.xml gerado (${allTickerDirs.length} tickers)`);
+    console.log(`📄 sitemap.xml gerado (${allTickerDirs.length} tickers, ${airtonDirs.length} páginas /airton/{TICKER}/)`);
 
     const robots = generateRobots();
     writeFileSync(join(ROOT, 'robots.txt'), robots, 'utf-8');

@@ -30,6 +30,7 @@ O deploy e feito via **GitHub Pages** (branch `main`, path `/`).
 iacoes/
 ├── index.html              # Landing page institucional (escrita manualmente)
 ├── airton/index.html        # Pagina do AIrton (escrita manualmente)
+├── airton/PETR4/index.html  # Pagina de alerta por ticker (gerada; so tickers com docs na CVM)
 ├── PETR4/index.html         # Pagina de ticker (gerada automaticamente)
 ├── VALE3/index.html         # Pagina de ticker (gerada automaticamente)
 ├── WEGE3/index.html         # Pagina de ticker (gerada automaticamente)
@@ -43,6 +44,7 @@ iacoes/
 ├── scripts/                 # Geradores de paginas estaticas (TypeScript)
 │   ├── generate-pages.ts        # Orquestrador principal (tickers, indice, setores, sitemap)
 │   ├── template.ts              # Template HTML de ticker/indice/setor + sitemap/robots
+│   ├── airton-template.ts       # Template de /airton/{TICKER}/ (simulacao do alerta)
 │   ├── validate-html.ts         # Validacao pos-geracao (8 regras, roda via postgenerate)
 │   ├── valuation.ts         # Calculos de valuation (DCF, Graham, Gordon, EVA, Multiplos)
 │   ├── supabase.ts          # Client Supabase + fetch + mappers de dados
@@ -237,24 +239,33 @@ Estrutura atual (redesign de 10/abr/2026, reforma de oferta em ago/2026):
 1. **Nav** — Logo BH + iAcoes + busca de ticker + botoes "Acessar App" / "Assinar Plano" (data-cta: nav-app, nav-assinar)
 2. **Breadcrumb** — Navegacao hierarquica (Home > Acoes > Setor > TICKER)
 3. **Hero** — Ticker, nome, setor, preco atual, variacao dia/12m, nota qualitativa blur ao lado da cotacao e link "Ver TICKER na plataforma" (data-cta: asset-page) — pagina completa do ativo no app (`/ativo/TICKER`) via `next`. A ancora "Fazer meu Valuation" saiu em set/2026 (a faixa de veredito assumiu o papel)
-3b. **Faixa de veredito** (set/2026) — fundo escuro, logo abaixo do hero: preco justo estimado
+3b. **Card de veredito** (set/2026; consolidado em 21/set/2026 com o grafico por metodo — eram
+   dois cards de valuation colados) — topo escuro logo abaixo do hero: preco justo estimado
    (**media ponderada dos 5 metodos** — DCF, Gordon, EVA, Multiplos, Graham; nao so os classicos)
-   + badge de upside/downside + nota "estimativa, nao recomendacao" + CTA "Ver o DCF completo de
-   TICKER" (data-cta: hero-dcf). So mostra numero se `wfv > 0 && price > 0`; senao so o CTA.
+   + badge de upside/downside + nota "estimativa, nao recomendacao" + CTA "Desbloquear DCF e
+   Multiplos" (data-cta: hero-dcf, `intent=dcf`) + link secundario "Me avisa quando TICKER publicar na CVM"
+   (data-cta: alerta-cvm-topo, 21/set/2026 — o alerta tinha 0 cliques em 90 dias porque so existia
+   no fim da pagina; e a unica oferta que nao exige confiar no nosso numero). So mostra numero se
+   `wfv > 0 && price > 0`; senao so o CTA.
    Motivo: ate set/2026 o preco justo ponderado era calculado mas nunca exibido.
-3c. **Grafico "Preco justo por metodo"** (set/2026) — SVG inline sem JS, barras horizontais por
-   metodo vs. linha da cotacao. Graham/Bazin/Gordon abertos com valor; DCF/EVA/Multiplos entram so
-   como barra borrada **sem numero** (mesmo padrao do sensitivity table) + pill "Exclusivo da
-   plataforma" + CTA "Desbloquear os 3 metodos" (data-cta: chart-locked). Metodo com valor <= 0
-   nao entra; o grafico so renderiza com >= 2 metodos abertos.
+3c. **Corpo do card de veredito: grafico "Por metodo"** — SVG inline sem JS, barras horizontais
+   por metodo vs. linha da cotacao. Graham/Bazin/Gordon **e EVA** abertos com valor; **DCF e Multiplos
+   entram so como barra borrada sem numero** + pill "Exclusivo da plataforma". Decisao do Gabriel
+   em 21/set/2026: **DCF e Multiplos travados, EVA aberto**. O botao
+   `chart-locked` saiu — o unico CTA de DCF acima da dobra e o `hero-dcf` do topo do card. Metodo
+   com valor <= 0 nao entra; o grafico so renderiza com >= 2 metodos abertos.
 4. **Card de Auditoria do AIrton** — "Leu um relatorio sobre TICKER? Pergunte ao AIrton." com 3
    perguntas prontas clicaveis + botao + linha de social proof, todos com data-cta `airton-audit`.
    Desde set/2026 renderiza **sempre**, logo abaixo do grafico (era fallback do bloco da CVM; a
    auditoria tinha 43+4 cliques em 90 dias contra 0 do bloco da CVM em 18 dias no topo).
 5. **Card Combinado SEO** — Intro analise (3 paragrafos SEO) + Visao de Negocio (longBusinessSummary) unificados num card com divisor
 6. **Metricas em Tabs CSS-only** — 4 abas (Mercado, Valuation, Rentabilidade, Endividamento) com radio inputs, todo conteudo no DOM para SEO. Tab Valuation aberta por default. Timestamp de atualizacao
-7. **Cards de Valuation** — Graham, Bazin, Gordon com sliders funcionais (pulse animation via IntersectionObserver). Premissas sem slider (P/L Maximo, P/VP Maximo, Anos para Media) sao locked com blur e redirecionam para login (data-cta: dcf-locked)
-8. **Card DCF Full-width** — Tabela de sensibilidade WACC x G Perpetuo com gradiente verde/vermelho (visual fixo), badge PRO, frase diferenciadora, CTA "Fazer Valuation DCF" (data-cta: dcf-locked)
+7. **Cards de Valuation** — Graham, Bazin, Gordon com sliders funcionais (pulse animation via IntersectionObserver). Premissas sem slider (P/L Maximo, P/VP Maximo, Anos para Media) sao borradas **e nao sao mais links** (set/2026; eram 3 dos 5 `dcf-locked` que geraram 0 contas)
+8. **Card DCF full-width — REMOVIDO em 21/set/2026.** Era a tabela de sensibilidade WACC x G com
+   **numeros placeholder** (`price * 0.95` com gradiente fixo) borrada + CTA. 62 cliques e 0 contas
+   em 90 dias. O DCF travado agora aparece so no card de veredito (barra borrada + `hero-dcf`) e na
+   faixa de features (`dcf-locked`). `matrixHTML` (matriz real de `val.sensitivityMatrix`) segue
+   como codigo morto em `template.ts`
 9. **Bloco de Documentos da CVM** (movido para ca em set/2026) — "O que TICKER publicou na CVM":
    lista `<ol>` dos 4 documentos reais mais recentes (tipo traduzido, `<time datetime>`, titulo,
    resumo do AIrton), cada um linkando o documento oficial (`target="_blank" rel="noopener
@@ -266,7 +277,7 @@ Estrutura atual (redesign de 10/abr/2026, reforma de oferta em ago/2026):
     qualitativa com score borrado (`nota-qualitativa`), Alertas no WhatsApp (`alerta-cvm`). Os ids
     foram mantidos para nao quebrar series. **Substituiu 4 blocos inteiros** — apresentacao do
     AIrton (0 cliques), card de features, paywall da nota qualitativa e card de alerta da CVM.
-    O id `features-card` deixou de ser emitido.
+    Os ids `features-card` e (desde 21/set/2026) `chart-locked` deixaram de ser emitidos.
 11. **Demonstracoes Financeiras** — DRE, Balanco, Fluxo de Caixa, Dividendos (10 anos) dentro de um
     `<details class="fin-details">` **fechado por default** (set/2026). Todo o conteudo segue no
     DOM para o Google; so parou de empurrar peers/FAQ para 8 telas abaixo.
@@ -297,15 +308,14 @@ Cada CTA tem `onclick="_iaClick(event)"` + `data-cta="ID"` para tracking granula
 |----------|---------|------|
 | `nav-app` | Nav: Acessar App | `ref=iacoes` |
 | `nav-assinar` | Nav: Assinar Plano | `ref=iacoes` |
-| `alerta-cvm-topo` | Bloco de documentos da CVM (apos os cards de valuation) | `ref=iacoes&ticker=T&intent=alerta` |
+| `alerta-cvm-topo` | Link secundario da faixa de veredito + botao do bloco de documentos da CVM (2 links) | `ref=iacoes&ticker=T&intent=alerta` |
 | `airton-audit` | Card de auditoria (3 perguntas prontas + botao = 4 links), abaixo da faixa de veredito | `ref=iacoes&ticker=T&intent=auditoria` (+`&prompt=...` nas perguntas) |
-| `hero-dcf` | Faixa de veredito abaixo do hero (preco justo ponderado + upside, set/2026) | `ref=iacoes&ticker=T&intent=dcf` |
-| `chart-locked` | Grafico por metodo, botao "Desbloquear os 3 metodos" | `ref=iacoes&ticker=T&intent=dcf` |
-| `dcf-locked` | Premissas locked (3x) + card DCF + linha DCF da faixa de features (5 links) | `ref=iacoes&ticker=T` |
+| `hero-dcf` | Card de veredito abaixo do hero, botao "Desbloquear DCF e Multiplos" (unico CTA de DCF acima da dobra) | `ref=iacoes&ticker=T&intent=dcf` |
+| `dcf-locked` | Linha DCF da faixa de features (1 link; eram 5 ate 21/set/2026 — 3 premissas travadas viraram texto, o card DCF saiu) | `ref=iacoes&ticker=T` |
 | `airton-intro` | Linha AIrton da faixa de features | `ref=iacoes&ticker=T&intent=airton` |
 | `nota-qualitativa` | Linha da nota qualitativa na faixa de features | `ref=iacoes` |
 | `alerta-cvm` | Linha de alertas na faixa de features | `ref=iacoes&ticker=T&intent=alerta` |
-| `footer` | CTA final | `ref=iacoes&ticker=T` |
+| `footer` | CTA final "Auditar TICKER gratis" (set/2026; antes generico, 11 cliques e 0 contas) | `ref=iacoes&ticker=T&intent=auditoria` |
 | `disclaimer` | Link inline no disclaimer | `ref=iacoes` |
 | `sticky-mobile` | Barra fixa (so mobile) | `ref=iacoes&ticker=T&intent=auditoria` |
 | `asset-page` | Hero: "Ver TICKER na plataforma" | `ref=iacoes&ticker=T&next=/ativo/T` (encoded) |
@@ -328,8 +338,11 @@ Atencao: `alerta-cvm` e `sticky-mobile` sao usados **tanto** na landing quanto n
 entao o dashboard agrega as duas superficies na mesma serie. O `utm_medium` diferencia
 (`landing` vs `ticker`); separar por `cta_id` seria decisao nova.
 
-**Pagina `/airton/`:** `nav-comecar`, `hero-trial`, `plano-free`, `plano-ianalista`, `final-trial`,
-`footer-link`, `sticky-mobile`.
+**Paginas `/airton/{TICKER}/`:** ver secao propria abaixo.
+
+**Pagina `/airton/`:** `nav-comecar`, `hero-trial` (hero, "Conectar meu WhatsApp", `intent=airton`),
+`airton-prompt` (3 perguntas prontas, `intent=airton&prompt=`), `plano-free`, `plano-ianalista`,
+`final-trial`, `footer-link`, `sticky-mobile`. Destino `?ref=iacoes-airton`.
 
 **Paginas de setor** (`/acoes/{setor}/`): nenhum CTA com `data-cta` hoje.
 
@@ -426,14 +439,83 @@ em TypeScript, nao em copy: o array `airtonDemoSentences` recebe cada frase **so
 `airtonDemoAnswer` de fallback **sem nenhum numero**. Nunca relaxar isso — a Brasil Horizonte tem
 CNPI e a bolha carrega badge de exemplo ilustrativo + `role="img"` com `aria-label`.
 
-### Pagina `/airton/`
+### Pagina `/airton/` (redesign de 21/set/2026, publica no go-live)
 
-Escrita manualmente, WhatsApp-first, canonical `https://iacoes.com.br/airton/`.
-Fontes proprias (Fraunces + DM Sans + JetBrains Mono) — nao usa nem o design system da landing nem o
-das paginas de ticker. Estrutura: hero → `#como` (3 passos: criar conta gratis → vincular WhatsApp
-com codigo unico → falar com o AIrton) → `#recursos` (conversa de verdade, alertas CVM em tempo
-real, etc.) → `#planos` → FAQ → disclaimer. 1 grafo JSON-LD. Tem GA4, Pixel do Facebook e o mesmo
-bloco de tracking Supabase das demais paginas.
+Escrita manualmente, WhatsApp-first, canonical `https://iacoes.com.br/airton/`. Desde set/2026 usa o
+**mesmo design system da landing** (DM Sans + JetBrains Mono, tokens `:root` copiados, nav
+`#093848`, fundo `#FAFAF8`); o tema escuro com Fraunces foi aposentado.
+
+Motivo do redesign (90 dias medidos): 593 sessoes, 7,8% de CTR. Trafego de Twitter (45% do total)
+convertia 2,5% e 80% saia sem rolar 25%; publico quente (direto/interno) convertia 11-13%. O hero
+antigo era texto + "7 dias gratis"; o visitante frio queria ver o AIrton funcionando.
+
+Estrutura: hero (h1 "Pergunte. Ele le a CVM por voce." + mock de conversa real + CTA "Conectar meu
+WhatsApp") → `#perguntas` (3 perguntas prontas clicaveis, mesma mecanica do card de auditoria do
+ticker) → `#como` (3 passos) → `#recursos` (**3** cards: CVM, dividendos/JCP, tese violada; eram 6)
+→ `#planos` → FAQ → CTA final → footer. 1 grafo JSON-LD (FAQPage). GA4, Pixel e o bloco de tracking
+identico ao da landing.
+
+Regras:
+
+- **A conversa do hero e baseada em documento real da CVM** (Fato Relevante WEGE3 de 16/09/2026,
+  planejamento sucessorio) e **nao tem nenhum numero**. O mock anterior inventava ROE, Div/EBITDA,
+  upside e valor de dividendo — proibido (CNPI). Ao trocar o exemplo, usar `cvm_documents` e manter
+  o badge "Exemplo ilustrativo — nao e recomendacao de investimento" + `role="img"` com `aria-label`.
+- **`data-promo` foi removido** de todos os CTAs. Ele trocava o `utm_campaign` para
+  `balancos-1t26`, campanha encerrada em mai/2026 — a pagina estava atribuindo trafego a uma promo
+  morta.
+- O bloco de tracking desta pagina divergia da landing (`fbq('track','Lead')` em vez de
+  `fbq('trackCustom','CTAIAcoes')`). Agora e copia literal; `diff` entre as duas copias deve dar vazio.
+- Prova social "Mais de 200 investidores ja conectaram o WhatsApp" vem de
+  `usage_events.whatsapp_token_generated` (236 usuarios distintos em 21/set/2026). Atualizar a mao.
+- Ids de CTA mantidos para nao quebrar series: `hero-trial` e `final-trial` continuam sendo os ids
+  do hero e do CTA final, mesmo que o botao agora diga "Conectar meu WhatsApp" (`intent=airton`).
+  Novo: `airton-prompt` (3 links, `intent=airton&prompt=...&ticker=`).
+
+## Paginas `/airton/{TICKER}/` (set/2026) — a porta de entrada por notificacao
+
+Geradas por `scripts/airton-template.ts` (`generateAirtonTickerHTML`) dentro de `generatePage`, **so
+para ticker com documento real em `cvm_documents`** (sem documento nao ha pagina — mock vazio seria
+pior que nada). Design system da landing (DM Sans + JetBrains Mono). Quem chega veio de um tweet
+sobre o ativo ou do Google por "fato relevante {TICKER}" / "{TICKER} comunicado CVM" — um cluster
+de busca distinto de "preco justo {TICKER}", por isso **indexaveis e no sitemap** (priority 0.7).
+
+**A pagina e uma simulacao que roda sozinha, sem clique**: carrega → o card "Alerta de {TICKER}
+ativo" liga → uma notificacao estilo push desce do topo (`.push`, `position:fixed`) → "digitando" →
+o **ultimo documento real** da CVM aparece como card do AIrton (tipo, data, titulo, `ai_summary`).
+**O botao do card NAO abre a CVM** (decisao de 21/set/2026: precisamos do lead) — vai para o app
+com `intent=airton&prompt=Resume o {tipo} de {T} publicado em {data}` e
+`utm_content=doc-{doc_type}-{yyyy-mm-dd}` (`data-cta="doc-open"`), identificando o documento clicado → linha "Imagina receber tudo isso no seu WhatsApp, no instante em que sai na CVM?"
++ chips: "Mostra o anterior" (revela o proximo documento, evento `demo_prev`) e o CTA real
+"Quero isso no meu WhatsApp" (`hero-alerta`, `intent=alerta`). Decisao do Gabriel em 21/set/2026:
+sem moldura de celular ("old") e sem toggle para o usuario mexer — "extremamente rapido e dinamico".
+
+Regras:
+- **Todos os documentos (ate 5) estao no DOM** desde o HTML; o JS so esconde e revela. Sem JS
+  (`<noscript>`) a lista inteira aparece. `prefers-reduced-motion` zera os delays.
+- **Nenhum numero inventado**: so titulo/`ai_summary` reais. `stripPreamble` corta preambulos de
+  persona do `ai_summary` ("Como analista financeiro, apresento..."), que nao sao informacao.
+- Contagem "N documentos em 90 dias" vem dos ate 30 documentos deduplicados do cache
+  (`CVM_CACHE_LIMIT`); se bater no teto vira "Mais de 30".
+- `page_path` grava `/AIRTON/{TICKER}`; `utm_medium` default **`airton-ticker`**; `ref=iacoes-airton`.
+  O bloco de tracking e copia literal do de `/airton/` (via `String.raw`), so muda esse default.
+- Sem `wa.me`, sem "sem cadastro", `noindex` nunca.
+- Link de tweet sugerido: `https://iacoes.com.br/airton/{TICKER}/?utm_source=twitter&utm_medium=social`.
+
+`data-cta` da pagina: `nav-comecar`, `hero-alerta` (chip do feed), `doc-open` (botao de cada
+documento; `utm_content` proprio), `airton-prompt` (3 perguntas),
+`final-alerta`, `footer-link`, `sticky-mobile`, e `ver-valuation` (link interno para `/{TICKER}/`,
+gravado via `_iaTrack('cta_click','ver-valuation')` sem `_iaClick`, porque nao sai do site).
+Eventos proprios: `demo_prev`.
+
+**Internal linking:** `/{TICKER}/` linka no rodape do bloco de documentos da CVM; `/acoes/` e as
+paginas de setor mostram um sino (`.idx-alert-link`) ao lado do ticker que tem pagina (o
+orquestrador passa o `Set` de diretorios `airton/*` existentes no disco para
+`generateIndexHTML`/`generateSectorPage`). Schema.org: `BreadcrumbList`, `FAQPage` (4 Q&As) e
+`WebPage` com `about: Corporation`.
+
+**Pendente (produto, repo do app):** hoje o alerta real so dispara quando um documento novo sai.
+A promessa da pagina fica mais forte se o app enviar o ultimo documento **no ato da ativacao**.
 
 ## Alertas e canal (WhatsApp first)
 
@@ -843,11 +925,21 @@ Defaults de `utm_medium` por pagina, distintos e intencionais: `ticker` / `acoes
       31/ago/2026) — ver a secao Calculadoras. Se forem publicadas: linkar da landing e/ou das
       paginas de ticker, enviar `is_bot`/`interacted` no `tracking.js` e limpar o codigo morto de
       `_iaLeadSubmit` / `iacoes_email_leads`
+- [~] **Twitter → pagina do ativo, nao para `/airton/`** (decisao de 21/set/2026). **Parcialmente
+      resolvido no mesmo dia** pelas paginas `/airton/{TICKER}/` (ver secao propria): o link de tweet
+      passa a ser `/airton/{TICKER}/?utm_source=twitter&utm_medium=social`. Falta so medir depois
+      do go-live. Contexto original: Medido em 90 dias: `/airton/` converte 2,5% no trafego de Twitter (242 sessoes, 6
+      cliques, 80% saem sem rolar 25%) contra 11-13% no publico quente. A ideia: os posts sobre
+      um ticker linkam direto para `/{TICKER}/` (auditoria do AIrton + veredito acima da dobra),
+      com `utm_source=twitter` para separar a serie. Exige: (1) decidir o formato do link nos
+      posts, (2) garantir que o card de auditoria fica na primeira tela no mobile, (3) dashboard
+      separando `utm_source`. Redesign da `/airton/` (hero = conversa real, CTA "Conectar meu
+      WhatsApp", design system da landing) fica como frente separada
 - [ ] Limpar o CSS orfao da promo 50% em `index.html`
 - [ ] Depreciar as views `iacoes_page_views_human` e `iacoes_sessions_enriched` (heuristica de bot
       incorreta) — decisao explicita necessaria
 - [ ] Decidir o destino da coluna `variant` (criada, sem uso, teste A/B cancelado)
-- [ ] Unificar design system entre landing page, `/airton/` e paginas de ticker
+- [ ] Unificar design system entre landing page e paginas de ticker (`/airton/` ja usa o da landing desde set/2026)
 - [ ] Criar imagem OG 1200x628 (atual e 300x300)
 - [ ] Adicionar informacoes de contato visiveis (email/telefone)
 - [ ] Social proof na landing page (depoimentos, numero de usuarios)
