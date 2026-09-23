@@ -14,6 +14,16 @@
             return;
         }
     }
+    // /airton/{ticker}/ (páginas de alerta, set/2026): minúsculo vira MAIÚSCULO; se a
+    // versão MAIÚSCULA também não existe (ticker sem documento na CVM), cai na página
+    // de valuation /{TICKER}/, que existe para todos os tickers ativos.
+    var am = path.match(/^\/airton\/([A-Za-z]{4}\d{1,2})\/?$/);
+    if (am) {
+        var t = am[1].toUpperCase();
+        var dest = (path === '/airton/' + t + '/' || path === '/airton/' + t) ? '/' + t + '/' : '/airton/' + t + '/';
+        window.location.replace(window.location.origin + dest);
+        return;
+    }
     // For non-ticker paths, show 404 content
     document.addEventListener('DOMContentLoaded', function() {
         document.body.style.display = 'block';
