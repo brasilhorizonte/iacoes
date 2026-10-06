@@ -1,0 +1,9 @@
+# IAções
+> Análise fundamentalista e valuation de ações da B3, da Brasil Horizonte: preço justo por Graham, Bazin, Gordon e DCF, sem conflito de interesse.
+
+## Indicadores macro
+- [Indicador de Buffett Brasil](https://iacoes.com.br/macro/indicador-de-buffett/): valor de mercado das empresas listadas na B3 ÷ PIB de 12 meses. Hoje: 43,45% (fechamento oficial de 05/10/2026); média desde 2000: 47,7%; faixa histórica (p25–p75): 38,1% a 55,4%. Série mensal em CSV (CC BY 4.0): https://iacoes.com.br/macro/indicador-de-buffett/indicador-buffett-brasil.csv
+
+## Ações
+- [Todas as ações da B3](https://iacoes.com.br/acoes/): preço justo e indicadores fundamentalistas de cada ação, atualizados todo dia útil.
+- [AIrton](https://iacoes.com.br/airton/): alertas de documentos da CVM com resumo por inteligência artificial.
