@@ -30,7 +30,12 @@ const fmtNum = (n: number, dec = 2): string => {
 };
 
 // --- Index Page (/acoes/index.html) ---
-export const generateIndexHTML = (tickers: TickerIndexEntry[], airtonSet: Set<string> = new Set()): string => {
+export const generateIndexHTML = (
+  tickers: TickerIndexEntry[],
+  airtonSet: Set<string> = new Set(),
+  // Link para o Indicador de Buffett (só existe com MACRO_BUFFETT_ENABLED=true).
+  macroLink?: { href: string; label: string },
+): string => {
   const today = new Date().toLocaleDateString('pt-BR');
   const year = new Date().getFullYear();
   const sectors = [...new Set(tickers.map(t => t.sector).filter(Boolean))].sort();
@@ -265,7 +270,8 @@ export const generateIndexHTML = (tickers: TickerIndexEntry[], airtonSet: Set<st
 <main class="page">
   <header class="page-header">
     <h1 class="font-playfair">Todas as Ações da B3</h1>
-    <p><span class="count">${tickers.length}</span> ações com análise fundamentalista e preço justo por Graham, Bazin e Gordon. Dados atualizados em ${today}.</p>
+    <p><span class="count">${tickers.length}</span> ações com análise fundamentalista e preço justo por Graham, Bazin e Gordon. Dados atualizados em ${today}.</p>${macroLink ? `
+    <p><a href="${macroLink.href}" style="color:#8a6a24;font-weight:600">${macroLink.label} →</a></p>` : ''}
   </header>
 
   <div class="idx-filters">
@@ -513,7 +519,14 @@ export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[], 
 </html>`;
 };
 
-export const generateSitemap = (tickers: string[], sectors: string[] = [], lastmodMap: Record<string, string> = {}, airtonTickers: string[] = []): string => {
+export const generateSitemap = (
+  tickers: string[],
+  sectors: string[] = [],
+  lastmodMap: Record<string, string> = {},
+  airtonTickers: string[] = [],
+  // Páginas fora do padrão ticker/setor (ex.: /macro/, só com MACRO_BUFFETT_ENABLED=true).
+  extra: { loc: string; lastmod: string; changefreq: string; priority: string }[] = [],
+): string => {
   const today = new Date().toISOString().split('T')[0];
   const urls = [
     `  <url><loc>https://iacoes.com.br/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>`,
@@ -527,6 +540,9 @@ export const generateSitemap = (tickers: string[], sectors: string[] = [], lastm
     `  <url><loc>https://iacoes.com.br/airton/</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>`,
     ...airtonTickers.map(t =>
       `  <url><loc>https://iacoes.com.br/airton/${t}/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>`
+    ),
+    ...extra.map(e =>
+      `  <url><loc>${e.loc}</loc><lastmod>${e.lastmod}</lastmod><changefreq>${e.changefreq}</changefreq><priority>${e.priority}</priority></url>`
     )
   ];
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -535,7 +551,10 @@ ${urls.join('\n')}
 </urlset>`;
 };
 
+// /rest/ não existe no site: o Google tirou o caminho do tracking inline (fetch para
+// <supabase>/rest/v1/iacoes_page_views) e passou a rastrear /rest/... como URL daqui (404 no GSC).
 export const generateRobots = (): string => `User-agent: *
 Allow: /
+Disallow: /rest/
 Sitemap: https://iacoes.com.br/sitemap.xml
 `;

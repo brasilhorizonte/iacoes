@@ -80,6 +80,10 @@ export function SiteFooter({ m }: { m: TickerModel }) {
             <a className="text-muted-foreground hover:text-foreground" href="https://www.instagram.com/brasil.horizonte/" rel="noopener" target="_blank">Instagram</a>
             <a className="text-muted-foreground hover:text-foreground" href="https://t.me/brasilhorizonte" rel="noopener" target="_blank">Telegram</a>
           </div>
+          {/* Só com a página macro publicada (trava em scripts/macro/index.ts). */}
+          {process.env.MACRO_BUFFETT_ENABLED === 'true' && (
+            <a href="/macro/indicador-de-buffett/" className="inline-flex text-sm font-semibold text-gold-strong hover:underline">A bolsa está cara? Indicador de Buffett de hoje →</a>
+          )}
         </div>
         <div className="space-y-3 text-xs leading-relaxed text-muted-foreground lg:col-span-7">
           <h2 className="text-sm font-semibold text-foreground">Metodologia e aviso legal</h2>

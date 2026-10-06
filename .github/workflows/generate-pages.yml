@@ -29,6 +29,10 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          # Trava da página /macro/indicador-de-buffett/: só publica com a variável de
+          # repositório MACRO_BUFFETT_ENABLED = true (Settings > Secrets and variables >
+          # Actions > Variables). Sem a variável, nada da página macro é gerado.
+          MACRO_BUFFETT_ENABLED: ${{ vars.MACRO_BUFFETT_ENABLED }}
         run: npm run generate
 
       - name: Commit e push se houver mudanças

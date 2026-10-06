@@ -197,8 +197,10 @@ export function buildModel(data: FinancialData, val: ComprehensiveValuation, all
     dy: median(sectorRows.map(t => t.divYield).filter(v => v >= 0 && v < 1)),
     count: sectorRows.length,
   };
+  // Só pares com página: AXIA6 e CTAX3 têm cotação mas a página nunca é gerada, e viravam
+  // link 404 em dezenas de páginas (GSC, out/2026).
   const peers: Peer[] = sectorRows
-    .filter(t => t.ticker !== symbol)
+    .filter(t => t.ticker !== symbol && t.hasPage !== false)
     .slice(0, 8)
     .map(t => ({ ticker: t.ticker, name: t.name, price: t.price, pl: t.pl, dy: t.divYield, marketCap: t.marketCap }));
 
@@ -210,7 +212,9 @@ export function buildModel(data: FinancialData, val: ComprehensiveValuation, all
     dcf: `${APP}?ref=iacoes&ticker=${symbol}&intent=dcf`,
     airton: `${APP}?ref=iacoes&ticker=${symbol}&intent=auditoria`,
     airtonIntro: `${APP}?ref=iacoes&ticker=${symbol}&intent=airton`,
-    alerta: `${APP}?ref=iacoes&ticker=${symbol}&intent=alerta`,
+    // O app ainda não lê `intent`: sem `next`, quem cria a conta cai na Home. `tab` vai fora do
+    // `next` porque o Auth.tsx concatena o resto da query com outro `?` (next com `?` quebra a aba).
+    alerta: `${APP}?ref=iacoes&ticker=${symbol}&intent=alerta&next=${q(`/ativo/${symbol}`)}&tab=tese`,
     asset: `${APP}?ref=iacoes&ticker=${symbol}&next=${q(`/ativo/${symbol}`)}`,
     generic: `${APP}?ref=iacoes`,
     ticker: `${APP}?ref=iacoes&ticker=${symbol}`,

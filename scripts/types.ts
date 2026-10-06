@@ -293,4 +293,6 @@ export interface TickerIndexEntry {
   pl: number;
   divYield: number;
   marketCap: number;
+  /** Tem /{TICKER}/index.html de verdade no disco (não redirect). Sem página, não entra em links. */
+  hasPage?: boolean;
 }
