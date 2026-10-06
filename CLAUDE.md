@@ -332,9 +332,11 @@ por e-mail passa pela confirmacao e pode perder o `next`; pelo Google ele e pres
 foi reescrito e o id renomeado em 31/ago/2026. Quem agrega por `cta_id` precisa unir as duas series,
 senao o grafico quebra na data da troca. Os ids **`markowitz`** (ago/2026) e **`features-card`** (set/2026) deixaram de ser emitidos.
 
-**Landing page** (`/`, destino sempre `?ref=iacoes-lp`): `nav-comecar`, `hero`, `plataforma-calc`,
-`metodologias`, `comparativo`, `alerta-cvm` (`&intent=alerta`), `preco-ianalista`, `preco-ialocador`,
-`preco-fundamentalista`, `footer`, `sticky-mobile`.
+**Landing page** (`/`, destino sempre `?ref=iacoes-lp`; redesign de 06/out/2026): `nav-comecar`, `hero`,
+`lp-calc-alerta` (`next=/ativo/T&tab=tese`), `lp-calc-recalcular` (`next=/ativo/T&tab=valuation` + premissas),
+`metodologias` (`intent=dcf`), `alerta-cvm` (`&intent=alerta`), `preco-iacoes`, `preco-fundamentalista`, `footer`,
+`sticky-mobile`. Links internos medidos com `_iaTrack('cta_click', id)` (sem redirect e sem UTM): `lp-buffett`,
+`lp-buffett-tape`, `lp-airton`, `lp-tape`. Deixaram de existir: `plataforma-calc`, `comparativo`.
 
 Atencao: `alerta-cvm` e `sticky-mobile` sao usados **tanto** na landing quanto nas paginas de ticker,
 entao o dashboard agrega as duas superficies na mesma serie. O `utm_medium` diferencia
@@ -358,6 +360,12 @@ Os CTAs passam um `intent` para a plataforma saber o que abrir depois do cadastr
 | `airton` | Abrir conversa com o AIrton sobre o ticker |
 | `auditoria` | Auditoria de tese; pode vir com `&prompt=<encodeURIComponent(pergunta)>` |
 | `dcf` | Abrir o DCF completo do ticker (faixa de veredito, `hero-dcf`) |
+
+**⚠️ O app ainda NAO le `intent` nem `ticker` (verificado no codigo do app em 06/out/2026):** depois do login
+tudo cai na Home. So o `next` leva a uma tela especifica, e ele quebra se ja tiver `?` — o `Auth.tsx` concatena
+o resto da query com outro `?`. Para abrir uma aba da pagina do ativo, use `next=/ativo/T&tab=valuation` (ou
+`tese`), nunca `next=/ativo/T?tab=...`. Cadastro por e-mail perde o `next` (o link de confirmacao vai para a
+Home); pelo Google, o `tab` se perde.
 
 ### Social Proof Dinamico
 
@@ -674,38 +682,53 @@ nao carregam o Pixel do Facebook.
 
 ## Landing Page (index.html)
 
-A landing page institucional e escrita manualmente (nao gerada). Contem:
-- Hero section com proposta de valor (CTA primario dourado)
-- Ticker strip animada (dados estaticos, scroll infinito)
-- Secao de modulos (iAnalista, iAlocador)
-- **Secao `#airton` ("Assistente IA")** — apresentacao do AIrton, com a sub canonica
-  ("...no app e no seu WhatsApp")
-- **Secao `#alertas` ("AIrton no WhatsApp")** — titulo `Fique sabendo antes do mercado`, mock de
-  conversa (`online · WhatsApp`, sem identificador), CTA `Ativar alertas no WhatsApp →`
-  (data-cta: `alerta-cvm`, `intent=alerta`) e a linha `.alerts-note`
-  "Gratis, sem cartao. Tambem disponivel no Telegram." Lista de beneficios: alertas CVM em tempo
-  real, resultados com resumo do AIrton, dividendos/JCP e criterio de tese violado.
-  **Nota de manutencao:** as classes CSS dessa secao ainda se chamam `.tg-*` (heranca de quando era
-  "AIrton no Telegram"). So o conteudo textual mudou; renomear as classes mexeria em layout
-- Secao de features (9 cards com emojis + aria-label), incluindo "AIrton — Copiloto IA" e
-  "Alertas no WhatsApp" (tag `VIA WHATSAPP`)
-- Secao de metodologias (Graham, Bazin, Gordon, DCF com layout 2 colunas)
-- **Widget Calculadora de Preco Justo** — calculadora interativa com autocomplete de tickers, sliders para premissas (margem de seguranca Graham, DY minimo Bazin, taxa de desconto/crescimento Gordon), recalculo em tempo real. Dados carregados de `/valuations.json` (gerado no build). Exibe data da cotacao. Tease para DCF na plataforma paga.
-- Secao de diferenciais (sem conflito de interesse, IA, etc.)
-- Secao comparativa vs mercado (Corretoras vs Casas de Research vs iAcoes)
-- Secao de precos (3 planos: IAnalista, IAlocador, Fundamentalista) — badge "MAIS POPULAR" no IAlocador
-- Secao comparativa de recursos (tabela Free vs IAnalista vs IAlocador vs Fundamentalista) — Free com limitacoes (1/dia), inclui Painel Macro no IAlocador
-- Secao "Sobre Nos" (#sobre) — bios dos fundadores com credenciais CNPI (APIMEC) e CGA (ANBIMA), links sociais (LinkedIn, Twitter/X, Instagram, Telegram)
-- FAQ expandido (14 perguntas com Schema.org FAQPage, aria-expanded)
-- Secao de acoes populares (21 tickers + link para /acoes/)
-- Footer com links sociais (LinkedIn, Twitter/X, Instagram, Telegram)
-- Multiplos CTAs com tracking (`_iaClick`) apontando para `/authnew`
-- Design system: DM Sans + JetBrains Mono, paleta verde escuro (#093848) + dourado (#B8923E)
-- Schema.org: 5 grafos JSON-LD — Organization, WebSite (com SearchAction), FAQPage (14 Q&As), Product (3 planos com precos), SpeakableSpecification (AEO). **Quando a copy visivel citada num grafo mudar, atualizar o JSON-LD junto** (ex: as `Question` sobre o AIrton e sobre planos citam "notificacoes no WhatsApp e no Telegram")
+Escrita a mao (nao gerada). **Redesign de 06/out/2026:** menos texto (−41% de palavras fora FAQ e
+bios), a calculadora no topo e scroll dinamico. Ordem das secoes:
+
+1. **Hero = calculadora.** H1 "Quanto vale a acao que voce quer comprar?" + a **regua do preco
+   justo**: cotacao x Graham, Bazin e Gordon de qualquer ticker do `/valuations.json`, com marcadores
+   que andam ate o valor (ticker inicial muda por dia entre liquidos com os 3 metodos validos).
+   - Premissas padrao fixas: margem 0, DY 6%, desconto 12%, crescimento 5%. Mexer nas premissas
+     **nao recalcula na landing**: aparece "Recalcular na plataforma" (`lp-calc-recalcular`), que abre
+     `/ativo/T?tab=valuation` no app e leva as premissas na URL com os nomes e fracoes dos campos do app
+     (`marginOfSafety`, `minDividendYield`, `discountRate`, `dividendGrowth`) — o app ainda nao le.
+   - "Salvar e criar alerta no WhatsApp" (`lp-calc-alerta`) abre `/ativo/T?tab=tese`.
+   - `#calculadora` e uma ancora vazia no topo do `<main>`: o hero e sticky e nao pode ser alvo de ancora.
+2. **Faixa de cotacoes** — preco x preco justo de ~25 tickers (dados reais do `valuations.json`), com
+   botao de pausa. Quando a pagina do Buffett existe, o primeiro item e o indicador do dia.
+3. **Plataforma** (`#plataforma`) — 3 passos: DCF com a IA questionando a premissa, AIrton (3 modos de
+   resposta) e alertas no WhatsApp. No desktop a tela fica fixa e o scroll conduz os passos (o AIrton
+   digita conforme o scroll); no celular os passos empilham e animam ao aparecer. Chips "Tambem na
+   plataforma" no fim.
+4. **A bolsa esta cara hoje?** (`#bolsa`; o link "Bolsa hoje" aponta para a ancora `#bolsa-hoje`, perto do
+   fim da cena) — **so aparece quando `/macro/indicador-de-buffett/dados.json` existe** (gerado pela pagina
+   do Buffett com a trava ligada). Antes disso fica `hidden`, sem nenhum link para a pagina. O scroll e a
+   linha do tempo de 2000 ate hoje: a linha se desenha, o numero acompanha mes a mes e os marcos (minima,
+   maxima, crise de 2008, pandemia) acendem quando a linha passa.
+5. **Ferramenta de analise, nao corretora** (`#comparativo`) — manifesto que acende palavra por palavra +
+   tabela vs corretoras e casas de research.
+6. **Planos** (`#precos`) — IAcoes (destaque) e Fundamentalista; a tabela completa Free x IAcoes x
+   Fundamentalista fica num `<details>`.
+7. **Quem somos** (`#sobre`), **FAQ** (`#faq`, `<details>`), **chamada final** (`#acesso`) e **analises
+   por acao** (`#acoes`, 21 links + `/acoes/`).
+
+**Scroll dinamico:** so com a classe `.fx` no `<html>` (JS ligado e sem `prefers-reduced-motion`). Sem
+`.fx`, nada fica preso e tudo aparece no estado final. O hero fica sticky e a pagina sobe por cima dele
+como uma folha (`.sheet`); cenas fixadas (`.scene` + `.scene-stage`) tem progresso 0→1 calculado no
+scroll; elementos com `data-rise` sobem com `animation-timeline: view()` (sem suporte:
+IntersectionObserver). A historia da plataforma so fixa com largura ≥ 1000px e altura ≥ 600px; Buffett e
+manifesto fixam com altura ≥ 600px.
+
+**Copy:** sem eyebrow em caixa alta e sem `→` nos botoes. Numero grande em DM Sans com algarismos
+tabulares (a virgula do JetBrains Mono abre espaco demais); mono so em ticker e valor de tabela.
+
+**Schema.org:** 5 blocos JSON-LD — Organization, WebSite (SearchAction), FAQPage (14 Q&As), Product (2
+planos, com `image`) e SpeakableSpecification (`.hero h1`, `.hero-sub`, `.porque-lead`). **O texto de
+cada `Question` tem que ser identico ao do `<details>` visivel** — mudou um, mude o outro.
 
 ### Widget Calculadora (`valuations.json`)
 
-O widget da landing page carrega `/valuations.json` via fetch. Este arquivo e gerado automaticamente pelo `generate-pages.ts` e contem para cada ticker:
+A calculadora do hero carrega `/valuations.json` via fetch. Este arquivo e gerado automaticamente pelo `generate-pages.ts` e contem para cada ticker:
 - `name`, `sector`, `price` (cotacao atual)
 - `graham`, `bazin`, `gordon` (precos justos pre-calculados)
 - `lpa`, `vpa` (lucro e valor patrimonial por acao)
@@ -713,7 +736,8 @@ O widget da landing page carrega `/valuations.json` via fetch. Este arquivo e ge
 - `avgDiv` (media de dividendos por janela: 1, 3, 5 e 10 anos)
 - `_quoteDate` (campo global com data da geracao)
 
-O JavaScript inline na landing recalcula os precos justos em tempo real quando o usuario ajusta os sliders. Tracking via `_iaTrack('widget_search')`.
+A regua recalcula com as premissas padrao a partir de `lpa`, `vpa`, `divTTM` e `avgDiv['5']`. Tracking
+via `_iaTrack('widget_search')` quando a pessoa escolhe um ticker (o inicial, automatico, nao conta).
 
 ## Design System
 
