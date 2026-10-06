@@ -766,49 +766,29 @@ O workflow `.github/workflows/generate-pages.yml` roda automaticamente:
 - **Secrets necessarios:** `SUPABASE_URL` e `SUPABASE_ANON_KEY` (configurados no repositorio)
 - **Processo:** Gera todas as paginas, commita e faz push automaticamente
 - **Nota:** Redirects case-insensitive sao tratados pelo `404.html` via JavaScript client-side (converte path para uppercase)
-- **Geracao lowercase (CI):** O workflow tambem gera diretorios lowercase (`petr4/`, `vale3/`, etc.) com conteudo completo e `<link rel="canonical">` apontando para a versao UPPERCASE. Isso e feito no CI (Ubuntu, case-sensitive) porque macOS e case-insensitive e nao permite criar ambos os diretorios localmente.
+- **Sem diretorios lowercase (desde 2026-10-06):** o CI so gera UPPERCASE. As copias minusculas (`petr4/` etc.) foram removidas — ver "Arquitetura de URLs" abaixo. URL minuscula cai no `404.html`, que redireciona para a maiuscula.
 
-## Arquitetura de URLs: UPPERCASE vs lowercase
+## Arquitetura de URLs: UPPERCASE (unica)
 
 ### Decisao arquitetural
 
-As URLs primarias do iAcoes usam **UPPERCASE** para os tickers (ex: `/PETR4/`, `/VALE3/`). Isso reflete a convencao da B3, onde tickers sao sempre em maiusculas.
+As URLs de ticker usam **UPPERCASE** (ex: `/PETR4/`, `/VALE3/`), a convencao da B3. Existe **um so diretorio por ticker**.
 
-### Estrutura dual (UPPERCASE + lowercase)
+### Historico: copias lowercase (mar-out/2026, removidas)
 
-Para cada ticker, existem **dois diretorios** no repositorio:
+Entre 30/03 e 06/10/2026 existiram copias completas em minusculas (`/petr4/`) com canonical para a maiuscula. Foram removidas porque:
+- o passo do CI que as gerava saiu do workflow, e elas so mudavam como efeito colateral de commits feitos em macOS (APFS nao diferencia maiusculas: `PETR4/` e `petr4/` sao o mesmo arquivo, e `git add -A` gravava o mesmo conteudo nos dois caminhos) — ficavam semanas desatualizadas;
+- no GSC (06/10/2026) tinham 0 cliques, 0 impressoes e 0 URLs indexadas, e nenhum link externo ou interno apontava para elas;
+- em clones macOS/Windows as duas entradas por ticker deixavam ~315 arquivos sempre "modificados".
 
-| Diretorio | Conteudo | Gerado por | Exemplo |
-|-----------|----------|-----------|---------|
-| `/{TICKER}/` (UPPERCASE) | Pagina completa de analise | `generate-pages.ts` (local ou CI) | `/PETR4/index.html` |
-| `/{ticker}/` (lowercase) | Pagina completa com canonical para UPPERCASE | GitHub Actions (Ubuntu) | `/petr4/index.html` |
-
-**Por que dois diretorios?**
-- Usuarios podem digitar URLs em lowercase no navegador
-- Buscas no Google podem retornar variantes de case
-- O lowercase serve como ponto de entrada alternativo, consolidando autoridade via canonical
-
-**Por que gerar lowercase no CI e nao localmente?**
-- macOS tem filesystem case-insensitive: `/PETR4/` e `/petr4/` sao o mesmo diretorio
-- Ubuntu (GitHub Actions) tem filesystem case-sensitive: permite criar ambos
-- O script `generate-pages.ts` sempre gera UPPERCASE; o workflow do CI gera os lowercase
-
-### Configuracao SEO das paginas lowercase
-
-- `<link rel="canonical" href="https://iacoes.com.br/{TICKER}/">` — aponta para UPPERCASE
-- `<meta name="robots" content="index, follow">` — permite indexacao
-- `og:url` aponta para UPPERCASE
-- Sitemap (`sitemap.xml`) contem **somente URLs UPPERCASE**
-- Schema.org usa URLs UPPERCASE
-
-**IMPORTANTE — NAO usar `noindex` nas paginas lowercase.** Isso foi testado anteriormente e causou problemas na indexacao do Google (possivelmente propagacao do `noindex` para a URL canonica UPPERCASE, bug documentado pelo Google/John Mueller). O `noindex` foi removido em fev-abr 2026. Nao reintroduzir sem investigacao aprofundada.
+**IMPORTANTE — se um dia voltarem copias lowercase, NAO usar `noindex` nelas.** Isso foi testado e causou problemas na indexacao do Google (possivel propagacao do `noindex` para a canonica UPPERCASE, bug documentado pelo Google/John Mueller); o `noindex` foi removido em fev-abr 2026.
 
 ### Redirect via 404.html
 
-O `404.html` contem JavaScript que redireciona URLs de ticker para UPPERCASE:
-- Padrao detectado: `/[A-Za-z]{4}\d{1,2}/` (ex: `/petr4`, `/vale3`)
-- Redirect via `window.location.replace()` (client-side, nao 301 HTTP)
-- Funciona como fallback para tickers que nao tem diretorio lowercase
+O `404.html` redireciona URLs de ticker em qualquer caixa para UPPERCASE:
+- Padrao: `/[A-Za-z][A-Za-z0-9]{3}\d{1,2}/` (cobre `/petr4`, `/vale3` e radicais com digito como `/b3sa3`); o mesmo vale para `/airton/{ticker}/`
+- Redirect via `window.location.replace()` (client-side; o GitHub Pages nao faz 301)
+- Sitemap, canonical, `og:url` e Schema.org usam so UPPERCASE
 
 ### Impacto em Analytics
 

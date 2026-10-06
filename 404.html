@@ -5,8 +5,8 @@
 <script>
 (function() {
     var path = window.location.pathname;
-    // Only redirect if path looks like a ticker: /XXXX3/ or /xxxx11/ etc.
-    var match = path.match(/^\/([A-Za-z]{4}\d{1,2})\/?$/);
+    // Only redirect if path looks like a ticker: /XXXX3/, /xxxx11/, /b3sa3/ (radical com digito) etc.
+    var match = path.match(/^\/([A-Za-z][A-Za-z0-9]{3}\d{1,2})\/?$/);
     if (match) {
         var upper = '/' + match[1].toUpperCase() + '/';
         if (upper !== path) {
@@ -17,7 +17,7 @@
     // /airton/{ticker}/ (páginas de alerta, set/2026): minúsculo vira MAIÚSCULO; se a
     // versão MAIÚSCULA também não existe (ticker sem documento na CVM), cai na página
     // de valuation /{TICKER}/, que existe para todos os tickers ativos.
-    var am = path.match(/^\/airton\/([A-Za-z]{4}\d{1,2})\/?$/);
+    var am = path.match(/^\/airton\/([A-Za-z][A-Za-z0-9]{3}\d{1,2})\/?$/);
     if (am) {
         var t = am[1].toUpperCase();
         var dest = (path === '/airton/' + t + '/' || path === '/airton/' + t) ? '/' + t + '/' : '/airton/' + t + '/';
