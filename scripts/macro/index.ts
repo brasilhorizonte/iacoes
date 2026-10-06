@@ -9,9 +9,8 @@
  */
 import { existsSync, mkdirSync, statSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import type { TickerIndexEntry } from '../types';
 import { fetchBuffettData, headline, validate, type BuffettData } from './data';
-import { buildBuffettModel, CSV_NAME, HUB_PATH, PAGE_PATH, type BuffettModel, type ValuationLite } from './model';
+import { buildBuffettModel, CSV_NAME, HUB_PATH, PAGE_PATH, type BuffettModel } from './model';
 import { buildMacroCss, renderBuffettPage, renderMacroHub } from './render';
 
 export const macroEnabled = (): boolean => process.env.MACRO_BUFFETT_ENABLED === 'true';
@@ -54,8 +53,6 @@ export function llmsTxt(m: BuffettModel): string {
  */
 export async function generateMacro(opts: {
   outRoot: string;
-  all?: TickerIndexEntry[];
-  valuations?: Record<string, ValuationLite>;
   enabled?: boolean;
   data?: BuffettData;
 }): Promise<SitemapEntry[]> {
@@ -74,7 +71,7 @@ export async function generateMacro(opts: {
       warn(`não regerada (a anterior continua no ar): ${problems.join('; ')}`);
       return existingEntries(opts.outRoot);
     }
-    const m = buildBuffettModel(data, { valuations: opts.valuations, all: opts.all });
+    const m = buildBuffettModel(data);
     buildMacroCss();
     const pageDir = join(opts.outRoot, PAGE_PATH);
     mkdirSync(pageDir, { recursive: true });
@@ -82,7 +79,7 @@ export async function generateMacro(opts: {
     writeFileSync(join(pageDir, 'index.html'), renderBuffettPage(m), 'utf-8');
     writeFileSync(join(pageDir, CSV_NAME), m.csv, 'utf-8');
     writeFileSync(join(opts.outRoot, 'llms.txt'), llmsTxt(m), 'utf-8');
-    console.log(`📉 Indicador de Buffett: ${m.v}% (fechamento oficial de ${m.dateBR}) — ${PAGE_PATH}, ${HUB_PATH}, CSV e llms.txt gerados${m.bridge.length ? `; ponte com ${m.bridge.length} ações` : ''}`);
+    console.log(`📉 Indicador de Buffett: ${m.v}% (fechamento oficial de ${m.dateBR}) — ${PAGE_PATH}, ${HUB_PATH}, CSV e llms.txt gerados`);
     return [
       { loc: m.hubUrl, lastmod: m.h.date, changefreq: 'daily', priority: '0.7' },
       { loc: m.url, lastmod: m.h.date, changefreq: 'daily', priority: '0.85' },

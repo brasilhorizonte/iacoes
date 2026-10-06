@@ -1,9 +1,8 @@
 /**
  * Modelo da página /macro/indicador-de-buffett/: números já formatados, textos, FAQ e SEO.
- * Os textos seguem o brief de SEO (_bmad-output/specs/seo-brief-buffett.md): número e data
- * na primeira frase, régua brasileira (percentis), nunca verbo de compra/venda.
+ * Os textos seguem o brief de SEO (interno): número e data na primeira frase, régua
+ * brasileira (percentis), nunca verbo de compra/venda e nenhuma lista de ações.
  */
-import type { TickerIndexEntry } from '../types';
 import { APP, SITE } from '../ticker/model';
 import { MONTHS, isoToBR, num } from '../ticker/lib/format';
 import {
@@ -20,54 +19,6 @@ export const monthLabel = (isoOrMonth: string): string => `${MES_CURTO[Number(is
 const longDate = (iso: string): string => `${Number(iso.slice(8, 10))} de ${MONTHS[Number(iso.slice(5, 7)) - 1]} de ${iso.slice(0, 4)}`;
 const tri = (mm: number): string => num(mm / 1e6, 2);
 const pp = (n: number): string => `${n > 0 ? '+' : n < 0 ? '−' : ''}${num(Math.abs(n), 1)} p.p.`;
-
-export interface ValuationLite {
-  name: string;
-  price: number;
-  graham: number;
-}
-
-export interface BridgeRow {
-  ticker: string;
-  name: string;
-  price: number;
-  graham: number;
-  upside: number;
-}
-
-/** Nome do brapi sem os sufixos de classe em inglês ("SA Pfd", "Non-Cum Perp Pfd Registered Shs"). */
-export const cleanCompanyName = (name: string): string =>
-  name
-    .replace(/\s+(Non-Cum\s+)?(Perp\s+)?Pfd(\s+Registered\s+Shs)?\s*$/i, '')
-    .replace(/\s+Registered\s+Shs\s*$/i, '')
-    .replace(/\s+Unit\s*$/i, '')
-    .trim();
-
-/**
- * Ponte para as ações: maior desconto pelo Graham entre as 100 maiores por valor de mercado
- * (proxy de liquidez), 1 classe por empresa. Só sai com o universo completo (run diário),
- * nunca de um run parcial — senão a "lista" teria 3 nomes. Descontos acima de 200% saem
- * como dado suspeito.
- */
-export function bridgeRows(valuations: Record<string, ValuationLite>, all: TickerIndexEntry[], size = 10): BridgeRow[] {
-  const keys = Object.keys(valuations).filter((k) => !k.startsWith('_'));
-  if (keys.length < 200 || all.length < 200) return [];
-  const top = new Set([...all].filter((t) => t.price > 0 && t.marketCap > 0).sort((a, b) => b.marketCap - a.marketCap).slice(0, 100).map((t) => t.ticker));
-  const companies = new Set<string>();
-  return keys
-    .filter((k) => top.has(k))
-    .map((k) => ({ ticker: k, name: cleanCompanyName(valuations[k].name), price: valuations[k].price, graham: valuations[k].graham, upside: valuations[k].graham / valuations[k].price - 1 }))
-    .filter((r) => Number.isFinite(r.upside) && r.price > 0 && r.graham > 0 && r.upside > 0 && r.upside < 2)
-    .sort((a, b) => b.upside - a.upside)
-    .filter((r) => {
-      // GOAU3 e GOAU4 são a mesma empresa: fica a classe de maior diferença.
-      const company = r.ticker.replace(/\d+$/, '');
-      if (companies.has(company)) return false;
-      companies.add(company);
-      return true;
-    })
-    .slice(0, size);
-}
 
 export interface BuffettModel {
   url: string;
@@ -93,7 +44,6 @@ export interface BuffettModel {
   monthly: Point[];
   decembers: { year: string; value: string; mcap: string; source: Source }[];
   estimatedRanges: { from: string; to: string }[];
-  bridge: BridgeRow[];
   faq: { q: string; a: string }[];
   seo: { title: string; description: string };
   links: { app: string };
@@ -102,7 +52,7 @@ export interface BuffettModel {
 
 const tone = (d: number): 'up' | 'down' | 'flat' => (d > 0.05 ? 'up' : d < -0.05 ? 'down' : 'flat');
 
-export function buildBuffettModel(d: BuffettData, opts: { valuations?: Record<string, ValuationLite>; all?: TickerIndexEntry[]; today?: Date } = {}): BuffettModel {
+export function buildBuffettModel(d: BuffettData, opts: { today?: Date } = {}): BuffettModel {
   const h = headline(d);
   const stats = seriesStats(d.monthly);
   const percentile = percentileOf(h.value, d.monthly);
@@ -224,7 +174,6 @@ export function buildBuffettModel(d: BuffettData, opts: { valuations?: Record<st
     monthly: d.monthly,
     decembers,
     estimatedRanges,
-    bridge: opts.valuations && opts.all ? bridgeRows(opts.valuations, opts.all) : [],
     faq,
     seo: {
       title: `Indicador de Buffett Brasil Hoje: ${vShort}% do PIB | IAções`,

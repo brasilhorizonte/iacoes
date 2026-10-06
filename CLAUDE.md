@@ -688,8 +688,6 @@ Geradas por `scripts/macro/` (React + mesmos componentes/tokens das paginas de t
   `::warning::` no log e a pagina anterior continua no ar. O `validate-html` so AVISA sobre a pagina macro.
 - **Saidas:** `/macro/index.html` (hub), `/macro/indicador-de-buffett/index.html`, o CSV publico
   `indicador-buffett-brasil.csv` (CC BY 4.0, distribution do JSON-LD Dataset) e `/llms.txt`.
-- **Ponte para acoes:** top 10 pelo Graham entre as 100 maiores por valor de mercado, 1 classe por empresa,
-  so em run completo. Revisao de CNPI antes de ligar a trava (ranking de acoes = risco CVM).
 - **Comandos:** `npm run preview:macro` (gera em `preview/`, fora do git, ignorando a trava; sirva a raiz
   com `npx serve .` e abra `/preview/macro/indicador-de-buffett/`) e `npm run test:macro` (node:test).
 

@@ -191,7 +191,7 @@ async function main() {
     const airtonSet = new Set(airtonDirs);
 
     // Páginas macro (/macro/): trava MACRO_BUFFETT_ENABLED; nunca derruba o build.
-    const macroEntries = await generateMacro({ outRoot: ROOT, all: allTickerData, valuations: widgetValuations });
+    const macroEntries = await generateMacro({ outRoot: ROOT });
     const macroLink = macroEntries.length ? { href: '/macro/indicador-de-buffett/', label: 'A bolsa está cara? Veja o Indicador de Buffett de hoje' } : undefined;
 
     // Generate /acoes/index.html — always lists ALL tickers from Supabase

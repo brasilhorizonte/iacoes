@@ -5,8 +5,7 @@ import { Badge } from '../ticker/components/ui/badge';
 import { Card, CardContent } from '../ticker/components/ui/card';
 import { AccordionItem } from '../ticker/components/ui/misc';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ticker/components/ui/table';
-import { ArrowRight, ChartColumn, FileText, Info, TrendingDown, TrendingUp } from '../ticker/components/icons';
-import { num } from '../ticker/lib/format';
+import { ArrowRight, ChartColumn, FileText, TrendingDown, TrendingUp } from '../ticker/components/icons';
 import { BuffettChart } from './chart';
 import { MacroBreadcrumb, MacroFooter, MacroHeader } from './chrome';
 import { CSV_NAME, HUB_PATH, PAGE_PATH, type BuffettModel } from './model';
@@ -153,29 +152,6 @@ export function BuffettPage({ m }: { m: BuffettModel }) {
 
           <Section id="acoes" title="E as ações que você acompanha?">
             <p className="leading-relaxed">A bolsa como um todo está {m.faixa}. Para uma empresa específica, o que importa é o preço frente ao valor dela — veja o preço justo por Graham, Bazin e Gordon de cada ação.</p>
-            {m.bridge.length > 0 && (
-              <Card>
-                <CardContent className="space-y-2 p-0">
-                  <Table>
-                    <TableHeader>
-                      <TableRow><TableHead>Ação</TableHead><TableHead>Empresa</TableHead><TableHead className="text-right">Preço</TableHead><TableHead className="text-right">Graham</TableHead><TableHead className="text-right">Diferença</TableHead></TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {m.bridge.map((r) => (
-                        <TableRow key={r.ticker}>
-                          <TableCell><a href={`/${r.ticker}/`} className="font-mono font-bold hover:underline">{r.ticker}</a></TableCell>
-                          <TableCell className="max-w-[16rem] truncate text-muted-foreground">{r.name}</TableCell>
-                          <TableCell className="text-right font-mono tnum">R$ {num(r.price, 2)}</TableCell>
-                          <TableCell className="text-right font-mono tnum">R$ {num(r.graham, 2)}</TableCell>
-                          <TableCell className="text-right font-mono tnum text-positive">+{num(100 * r.upside, 0)}%</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  <p className="flex items-start gap-2 px-4 pb-4 text-xs text-muted-foreground"><Info className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />Entre as 100 maiores empresas da B3 por valor de mercado, as de maior diferença entre o preço e o valor justo pelo método de Graham. Lista gerada por modelo matemático, com fim educativo: não é recomendação de compra.</p>
-                </CardContent>
-              </Card>
-            )}
             <a href="/acoes/" className="inline-flex items-center gap-2 text-sm font-semibold text-gold-strong hover:underline">Preço justo de todas as ações da B3 <ArrowRight className="size-4" aria-hidden="true" /></a>
             <div className="flex flex-col gap-4 rounded-xl bg-ink p-6 text-white sm:flex-row sm:items-center sm:justify-between">
               <div>

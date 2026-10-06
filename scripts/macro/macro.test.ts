@@ -7,8 +7,9 @@ import {
   comparisons, csvRows, faixaOf, headline, percentileOf, pibFor, quantile, seriesStats, sourceOf, toCsv, validate,
   type BuffettData, type Point,
 } from './data';
-import { bridgeRows, buildBuffettModel, cleanCompanyName } from './model';
+import { buildBuffettModel } from './model';
 import { generateMacro, llmsTxt } from './index';
+import { renderBuffettPage } from './render';
 
 // Valores reais de produção nas pontas (R$ MM): PIB 12m e valor de mercado oficial da B3.
 const pib: Point[] = [
@@ -102,28 +103,6 @@ test('validação: bloqueia série curta, valor absurdo e dado velho; avisa desc
   assert.match(validate(behind, h, new Date('2026-10-06')).warnings.join(), /atrasada/);
 });
 
-test('ponte Graham: só com universo completo, entre as 100 maiores, sem descontos absurdos', () => {
-  const all = Array.from({ length: 250 }, (_, i) => ({ ticker: `T${String(i).padStart(3, '0')}3`, name: `E${i}`, sector: 'X', price: 10, pl: 5, divYield: 0, marketCap: 1000 - i }));
-  const valuations = Object.fromEntries(all.map((t, i) => [t.ticker, { name: t.name, price: 10, graham: i === 0 ? 50 : 10 + (i % 7) }]));
-  const rows = bridgeRows(valuations, all);
-  assert.ok(rows.length <= 10 && rows.length > 0);
-  assert.ok(rows.every((r) => r.upside > 0 && r.upside < 2), 'desconto acima de 200% sai');
-  assert.ok(rows.every((r) => Number(r.ticker.slice(1, 4)) < 100), 'só as 100 maiores');
-  assert.deepEqual(bridgeRows(Object.fromEntries(Object.entries(valuations).slice(0, 50)), all), [], 'run parcial não gera lista');
-});
-
-test('ponte: 1 classe por empresa e nome sem sufixo em inglês', () => {
-  const all = Array.from({ length: 250 }, (_, i) => ({ ticker: `X${String(i).padStart(3, '0')}3`, name: `E${i}`, sector: 'X', price: 10, pl: 5, divYield: 0, marketCap: 1000 - i }));
-  all.push({ ticker: 'GOAU4', name: 'G', sector: 'X', price: 10, pl: 5, divYield: 0, marketCap: 5000 }, { ticker: 'GOAU3', name: 'G', sector: 'X', price: 10, pl: 5, divYield: 0, marketCap: 5000 });
-  const valuations: Record<string, { name: string; price: number; graham: number }> = Object.fromEntries(all.map((t) => [t.ticker, { name: t.name, price: 10, graham: 10.5 }]));
-  valuations.GOAU4 = { name: 'Metalurgica Gerdau SA Pfd', price: 10, graham: 19 };
-  valuations.GOAU3 = { name: 'Metalurgica Gerdau S.A.', price: 10, graham: 18 };
-  const rows = bridgeRows(valuations, all);
-  assert.deepEqual(rows.filter((r) => r.ticker.startsWith('GOAU')).map((r) => [r.ticker, r.name]), [['GOAU4', 'Metalurgica Gerdau SA']]);
-  assert.equal(cleanCompanyName('Isa Energia Brasil SA Non-Cum Perp Pfd Registered Shs'), 'Isa Energia Brasil SA');
-  assert.equal(cleanCompanyName('Transmissora Alianca De Energia Eletrica S.A. Unit'), 'Transmissora Alianca De Energia Eletrica S.A.');
-});
-
 test('modelo: SEO no limite, 12 perguntas, sem marca aposentada', () => {
   const m = buildBuffettModel(synthetic(), { today: new Date('2026-10-06T12:00:00Z') });
   assert.ok(m.seo.title.length <= 60, m.seo.title);
@@ -136,6 +115,15 @@ test('modelo: SEO no limite, 12 perguntas, sem marca aposentada', () => {
   const marcaAposentada = new RegExp(['IAn' + 'alista', 'IAl' + 'ocador', '14 ' + 'dias'].join('|'));
   assert.doesNotMatch(all, marcaAposentada);
   assert.doesNotMatch(all, /\b(compre|venda já|vender agora)\b/i);
+});
+
+test('página renderizada: CTAs rastreados, Dataset e nenhuma tabela de preços de ações', () => {
+  const html = renderBuffettPage(buildBuffettModel(synthetic(), { today: new Date('2026-10-06T12:00:00Z') }));
+  assert.match(html, /onclick="_iaClick\(event\)" data-cta="macro-buffett"/);
+  assert.match(html, /"@type":"Dataset"/);
+  assert.match(html, /data-ref-date="2026-10-02"/);
+  // Decisão do Gabriel (06/10): a página não lista ações com preço/valor justo.
+  assert.doesNotMatch(html, />Graham<\/th>|>Diferença<\/th>|>Preço<\/th>/);
 });
 
 test('trava de publicação: desligada não escreve nada', async () => {
