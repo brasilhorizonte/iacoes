@@ -679,7 +679,8 @@ Geradas por `scripts/macro/` (React + mesmos componentes/tokens das paginas de t
 
 - **TRAVA DE PUBLICACAO:** so gera com `MACRO_BUFFETT_ENABLED=true` (env do build). Desligada, nada e
   escrito, nada entra no sitemap e nenhum link interno aponta para la — o site sai identico. Para publicar:
-  definir a variavel no workflow `generate-pages.yml` (ou em um repository variable) e deixar o cron rodar.
+  criar a variavel de repositorio `MACRO_BUFFETT_ENABLED` = `true` no GitHub (Settings > Secrets and
+  variables > Actions > Variables); o workflow `generate-pages.yml` ja le `vars.MACRO_BUFFETT_ENABLED`.
 - **Dado:** series do Supabase montadas no dashbrasilhorizonte — 99020 (valor de mercado oficial da B3,
   diario), 99021 (mensal), 99010 (Buffett mensal desde 2000), 4382 (PIB 12m). Manchete = ultimo fechamento
   OFICIAL publicado pela B3 (D-1), nunca estimativa.
