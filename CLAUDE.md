@@ -675,7 +675,7 @@ nao carregam o Pixel do Facebook.
 ## Paginas macro (/macro/ e /macro/indicador-de-buffett/)
 
 Geradas por `scripts/macro/` (React + mesmos componentes/tokens das paginas de ticker, CSS proprio em
-`scripts/macro/styles.css`). Spec: `_bmad-output/specs/spec-indicador-buffett.md`; SEO: `seo-brief-buffett.md`.
+`scripts/macro/styles.css`). Spec e brief de SEO sao internos (fora deste repositorio, que e publico).
 
 - **TRAVA DE PUBLICACAO:** so gera com `MACRO_BUFFETT_ENABLED=true` (env do build). Desligada, nada e
   escrito, nada entra no sitemap e nenhum link interno aponta para la — o site sai identico. Para publicar:
