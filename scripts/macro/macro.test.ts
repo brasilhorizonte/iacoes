@@ -124,6 +124,8 @@ test('página renderizada: CTAs rastreados, Dataset e nenhuma tabela de preços 
   assert.match(html, /data-ref-date="2026-10-02"/);
   // Decisão do Gabriel (06/10): a página não lista ações com preço/valor justo.
   assert.doesNotMatch(html, />Graham<\/th>|>Diferença<\/th>|>Preço<\/th>/);
+  // Decisão do Gabriel (06/10): sem a tabela de dezembros (a série completa fica no CSV).
+  assert.doesNotMatch(html, />Dezembro<\/th>|>Procedência<\/th>/);
 });
 
 test('resumo JSON da landing: manchete no último ponto, URL relativa e leve', () => {

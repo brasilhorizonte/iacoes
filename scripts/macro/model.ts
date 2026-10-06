@@ -6,7 +6,7 @@
 import { APP, SITE } from '../ticker/model';
 import { MONTHS, isoToBR, num } from '../ticker/lib/format';
 import {
-  type BuffettData, type Faixa, type Headline, type Point, type Source, type Stats,
+  type BuffettData, type Faixa, type Headline, type Point, type Stats,
   comparisons, csvRows, faixaOf, headline, monthOf, percentileOf, seriesStats, sourceOf, toCsv,
 } from './data';
 
@@ -43,7 +43,6 @@ export interface BuffettModel {
   yearAgo: { label: string; delta: string; tone: 'up' | 'down' | 'flat' } | null;
   prevMcap: { label: string; tri: string } | null;
   monthly: Point[];
-  decembers: { year: string; value: string; mcap: string; source: Source }[];
   estimatedRanges: { from: string; to: string }[];
   faq: { q: string; a: string }[];
   seo: { title: string; description: string };
@@ -90,14 +89,6 @@ export function buildBuffettModel(d: BuffettData, opts: { today?: Date } = {}): 
     if (last && i > 0 && d.monthly[i - 1].date === last.to) last.to = p.date;
     else estimatedRanges.push({ from: p.date, to: p.date });
   });
-
-  const mcapByMonth = new Map(d.mcapMonthly.map((p) => [monthOf(p.date), p.value]));
-  const decembers = d.monthly
-    .filter((p) => p.date.slice(5, 7) === '12')
-    .map((p) => {
-      const mcap = mcapByMonth.get(monthOf(p.date));
-      return { year: p.date.slice(0, 4), value: num(p.value, 1), mcap: mcap ? tri(mcap) : '—', source: sourceOf(p.date) };
-    });
 
   const app = `${APP}?ref=iacoes&page=buffett&utm_medium=macro`;
   const faq = [
@@ -173,7 +164,6 @@ export function buildBuffettModel(d: BuffettData, opts: { today?: Date } = {}): 
     yearAgo: yearAgo ? { label: monthLabel(yearAgo.date), delta: pp(h.value - yearAgo.value), tone: tone(h.value - yearAgo.value) } : null,
     prevMcap: prevMcapPoint ? { label: monthLabel(prevMcapPoint.date), tri: tri(prevMcapPoint.value) } : null,
     monthly: d.monthly,
-    decembers,
     estimatedRanges,
     faq,
     seo: {

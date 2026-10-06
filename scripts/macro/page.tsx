@@ -4,7 +4,6 @@ import { ButtonLink } from '../ticker/components/ui/button';
 import { Badge } from '../ticker/components/ui/badge';
 import { Card, CardContent } from '../ticker/components/ui/card';
 import { AccordionItem } from '../ticker/components/ui/misc';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ticker/components/ui/table';
 import { ArrowRight, ChartColumn, FileText, TrendingDown, TrendingUp } from '../ticker/components/icons';
 import { BuffettChart } from './chart';
 import { MacroBreadcrumb, MacroFooter, MacroHeader } from './chrome';
@@ -129,25 +128,6 @@ export function BuffettPage({ m }: { m: BuffettModel }) {
                 <Card key={k}><CardContent className="p-4"><div className="text-xs uppercase tracking-wide text-muted-foreground">{k}</div><div className="font-mono text-2xl font-bold tnum">{v}</div><div className="text-xs text-muted-foreground">{w}</div></CardContent></Card>
               ))}
             </div>
-            <Card>
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow><TableHead>Dezembro</TableHead><TableHead className="text-right">Indicador</TableHead><TableHead className="text-right">Valor de mercado</TableHead><TableHead>Procedência</TableHead></TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {m.decembers.map((r) => (
-                      <TableRow key={r.year}>
-                        <TableCell className="font-mono">{r.year}</TableCell>
-                        <TableCell className="text-right font-mono tnum">{r.value}%</TableCell>
-                        <TableCell className="text-right font-mono tnum">R$ {r.mcap} tri</TableCell>
-                        <TableCell className="text-xs text-muted-foreground">{r.source.label}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
           </Section>
 
           <Section id="acoes" title="E as ações que você acompanha?">
