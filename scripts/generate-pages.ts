@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { mkdirSync, writeFileSync, readdirSync, statSync } from 'fs';
+import { mkdirSync, writeFileSync, readdirSync, statSync, openSync, readSync, closeSync } from 'fs';
 import { join } from 'path';
 import { getAllTickers, getTickersWithNames, getAllTickersWithSector, saveQualitativeCache, getCvmDocuments, CVM_CACHE_LIMIT } from './supabase';
 import { generateAirtonTickerHTML } from './airton-template';
@@ -15,6 +15,27 @@ const BATCH_SIZE = 5;
 const DELAY_MS = 300;
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+/**
+ * /{TICKER}/index.html existe e é página de verdade — não um redirect (stub com meta refresh,
+ * como ELET3 → AXIA3). Lê só o começo do arquivo: o stub se denuncia no <head>.
+ *
+ * ⚠️ Ter cotação não basta: AXIA6 e CTAX3 estão no Supabase, mas a geração delas falha todo
+ * dia, e /acoes/, setores e pares linkavam as duas — 47 páginas com link 404 (GSC, out/2026).
+ */
+function hasRealPage(ticker: string): boolean {
+  let fd: number | null = null;
+  try {
+    fd = openSync(join(ROOT, ticker, 'index.html'), 'r');
+    const buf = Buffer.alloc(2048);
+    const n = readSync(fd, buf, 0, buf.length, 0);
+    return !buf.toString('utf-8', 0, n).includes('http-equiv="refresh"');
+  } catch {
+    return false;
+  } finally {
+    if (fd !== null) closeSync(fd);
+  }
+}
 
 let allTickerData: TickerIndexEntry[] = [];
 const tickerLastmod: Record<string, string> = {};
@@ -147,7 +168,9 @@ async function main() {
   // Fetch all tickers with sector data (for peers and index page)
   console.log('📊 Buscando dados de setor...');
   allTickerData = await getAllTickersWithSector();
-  console.log(`   ${allTickerData.length} tickers com dados de setor\n`);
+  // Pares só linkam quem já tem página (de runs anteriores); ticker novo entra no dia seguinte.
+  for (const t of allTickerData) t.hasPage = hasRealPage(t.ticker);
+  console.log(`   ${allTickerData.length} tickers com dados de setor (${allTickerData.filter(t => t.hasPage).length} com página)\n`);
 
   // Get tickers (or use CLI args)
   const cliTickers = process.argv.slice(2).map(t => t.toUpperCase());
@@ -194,8 +217,8 @@ async function main() {
     const macroEntries = await generateMacro({ outRoot: ROOT });
     const macroLink = macroEntries.length ? { href: '/macro/indicador-de-buffett/', label: 'A bolsa está cara? Veja o Indicador de Buffett de hoje' } : undefined;
 
-    // Generate /acoes/index.html — always lists ALL tickers from Supabase
-    const indexTickers = allTickerData.filter(t => t.price > 0);
+    // Generate /acoes/index.html — todos os tickers do Supabase QUE TÊM PÁGINA (inclui os gerados agora)
+    const indexTickers = allTickerData.filter(t => t.price > 0 && hasRealPage(t.ticker));
     if (indexTickers.length > 0) {
       const indexHTML = generateIndexHTML(indexTickers, airtonSet, macroLink);
       const acoesDir = join(ROOT, 'acoes');
@@ -216,12 +239,12 @@ async function main() {
       console.log(`📂 ${sectors.length} páginas de setor geradas (/acoes/{setor}/)`);
     }
 
-    // Sitemap includes ALL existing ticker pages on disk, not just current run
+    // Sitemap includes ALL existing ticker pages on disk, not just current run — menos os redirects
+    // (ELET3 → AXIA3 etc.): URL que redireciona não vai para o sitemap.
     const allTickerDirs = readdirSync(ROOT).filter(d => {
       if (d === 'acoes' || d === 'assets' || d === 'scripts' || d === 'node_modules' || d.startsWith('.')) return false;
       if (d !== d.toUpperCase()) return false;
-      const p = join(ROOT, d, 'index.html');
-      try { return statSync(p).isFile(); } catch { return false; }
+      return hasRealPage(d);
     });
     // Get sectors for sitemap
     const allSectors = [...new Set(allTickerData.map(t => t.sector).filter(Boolean))].sort();

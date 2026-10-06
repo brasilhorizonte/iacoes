@@ -22,3 +22,8 @@ scripts/macro/.build/
 
 # Prévia local das páginas macro (npm run preview:macro)
 preview/
+
+# Documentos internos (specs, relatórios do GSC, sessões) — o repositório é público
+_bmad-output/specs/
+_bmad-output/party-mode/
+_bmad-output/gsc/

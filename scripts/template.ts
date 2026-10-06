@@ -551,7 +551,10 @@ ${urls.join('\n')}
 </urlset>`;
 };
 
+// /rest/ não existe no site: o Google tirou o caminho do tracking inline (fetch para
+// <supabase>/rest/v1/iacoes_page_views) e passou a rastrear /rest/... como URL daqui (404 no GSC).
 export const generateRobots = (): string => `User-agent: *
 Allow: /
+Disallow: /rest/
 Sitemap: https://iacoes.com.br/sitemap.xml
 `;
