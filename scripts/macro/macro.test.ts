@@ -140,6 +140,22 @@ test('resumo JSON da landing: manchete no último ponto, URL relativa e leve', (
   assert.ok(json.length < 10_000, String(json.length));
 });
 
+test('download do CSV pede e-mail: formulário + lead em iacoes_email_leads, sem link direto', () => {
+  const html = renderBuffettPage(buildBuffettModel(synthetic(), { today: new Date('2026-10-06T12:00:00Z') }));
+  assert.match(html, /<form id="csv-lead"[^>]*data-csv="\/macro\/indicador-de-buffett\/indicador-buffett-brasil\.csv"/);
+  assert.match(html, /<input id="csv-email"[^>]*type="email"/);
+  assert.match(html, /\/rest\/v1\/iacoes_email_leads/);
+  assert.match(html, /source: 'buffett-csv'/);
+  assert.doesNotMatch(html, /<a [^>]*indicador-buffett-brasil\.csv/);
+  // LGPD: aviso com canal para sair e política; sem JS o botão fica desabilitado e o campo sem name.
+  assert.match(html, /mailto:contato@brasilhorizonte\.com\.br/);
+  assert.match(html, /LGPD\/LGPD\.pdf/);
+  assert.match(html, /<button type="submit" disabled=""/);
+  assert.doesNotMatch(html, /<input id="csv-email"[^>]* name="/);
+  // A regex de e-mail sobreviveu inteira (sem barras invertidas engolidas).
+  assert.match(html, /\[\^\\s@\]\+@\[\^\\s@\]\+\\\.\[\^\\s@\]\{2,\}/);
+});
+
 test('trava de publicação: desligada não escreve nada', async () => {
   const prev = process.env.MACRO_BUFFETT_ENABLED;
   delete process.env.MACRO_BUFFETT_ENABLED;

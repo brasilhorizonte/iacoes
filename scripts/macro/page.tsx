@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Container } from '../ticker/components/chrome';
-import { ButtonLink } from '../ticker/components/ui/button';
+import { ButtonLink, buttonVariants } from '../ticker/components/ui/button';
 import { Badge } from '../ticker/components/ui/badge';
 import { Card, CardContent } from '../ticker/components/ui/card';
 import { AccordionItem } from '../ticker/components/ui/misc';
@@ -8,6 +8,9 @@ import { ArrowRight, ChartColumn, FileText, TrendingDown, TrendingUp } from '../
 import { BuffettChart } from './chart';
 import { MacroBreadcrumb, MacroFooter, MacroHeader } from './chrome';
 import { CSV_NAME, HUB_PATH, PAGE_PATH, type BuffettModel } from './model';
+
+// Política de privacidade da Brasil Horizonte (a mesma que o app linka no cadastro).
+const PRIVACY_URL = 'https://dawvgbopyemcayavcatd.supabase.co/storage/v1/object/public/LGPD/LGPD.pdf';
 
 export const SOURCES_NOTE =
   'Valor de mercado: B3 (TOTAL GERAL, desde jul/2026), Banco Central SGS 7849 (2000 a 2019) e Banco Mundial/WFE convertido pela PTAX de 31/dez (dezembros de 2019 a 2025); meses entre âncoras anuais interpolados pelo Ibovespa e marcados como estimados. PIB de 12 meses: Banco Central SGS 4382.';
@@ -91,9 +94,27 @@ export function BuffettPage({ m }: { m: BuffettModel }) {
               <CardContent className="space-y-3 p-4 sm:p-6">
                 <BuffettChart m={m} />
                 <p className="text-xs text-muted-foreground">Linha: valor de mercado da B3 ÷ PIB de 12 meses (1 ponto por mês). Faixa verde: entre os percentis 25 e 75 da série. Tracejado: média. Áreas cinzas: períodos em que os meses são estimados entre âncoras oficiais (detalhes em Metodologia e no CSV).</p>
-                <a href={`${PAGE_PATH}${CSV_NAME}`} className="inline-flex items-center gap-2 text-sm font-semibold text-gold-strong hover:underline" download>
-                  <FileText className="size-4" aria-hidden="true" /> Baixar a série completa (CSV, licença CC BY 4.0)
-                </a>
+                {/* Download com captura de e-mail (iacoes_email_leads, source buffett-csv): o JS de
+                    csv-lead.client.js grava o lead e dispara o arquivo. Sem JS o botão fica desabilitado
+                    (e o campo não tem name), então nada vai para a URL — só o aviso do noscript. */}
+                <form id="csv-lead" data-csv={`${PAGE_PATH}${CSV_NAME}`} className="space-y-2 rounded-lg border border-border bg-muted/40 p-3 sm:p-4" noValidate>
+                  <p className="flex items-center gap-2 text-sm font-semibold">
+                    <FileText className="size-4 text-gold-strong" aria-hidden="true" /> Baixar a série completa (CSV, licença CC BY 4.0)
+                  </p>
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <label htmlFor="csv-email" className="sr-only">Seu e-mail</label>
+                    <input id="csv-email" type="email" required maxLength={254} autoComplete="email" inputMode="email" placeholder="Seu melhor e-mail" aria-describedby="csv-hint" className="h-9 w-full rounded-md border border-border bg-background px-3 text-base outline-none placeholder:text-muted-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:max-w-xs" />
+                    <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
+                    <button type="submit" disabled className={buttonVariants({ variant: 'gold' })}>Baixar CSV</button>
+                  </div>
+                  <p id="csv-hint" className="text-xs text-muted-foreground">
+                    Para baixar, deixe seu e-mail: você passa a receber novidades do indicador e da plataforma IAções (Brasil Horizonte). Para sair ou pedir a exclusão, escreva para{' '}
+                    <a href="mailto:contato@brasilhorizonte.com.br" className="underline">contato@brasilhorizonte.com.br</a>.{' '}
+                    <a href={PRIVACY_URL} target="_blank" rel="noopener" className="underline">Política de Privacidade</a>.
+                  </p>
+                  <p id="csv-msg" role="status" aria-live="polite" className="text-xs font-semibold text-foreground"></p>
+                </form>
+                <noscript><p className="text-xs text-muted-foreground">Ative o JavaScript para baixar o CSV.</p></noscript>
               </CardContent>
             </Card>
           </Section>

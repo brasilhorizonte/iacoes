@@ -38,6 +38,8 @@ const attr = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').rep
 const jsonLd = (o: unknown) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, '\\u003c')}</script>`;
 // Mesmo pós-processamento das páginas de ticker: o React não renderiza onclick em string.
 const withClicks = (html: string) => html.replace(/ data-cta="/g, ' onclick="_iaClick(event)" data-cta="');
+// Formulário de e-mail do download do CSV (JS puro em arquivo próprio; ver csv-lead.client.js).
+const csvLeadScript = (): string => `<script>${readFileSync(join(__dirname, 'csv-lead.client.js'), 'utf-8')}</script>`;
 
 function shell(p: { title: string; description: string; url: string; ogAlt: string; ld: unknown[]; body: string }): string {
   return `<!DOCTYPE html>
@@ -142,7 +144,7 @@ export function renderBuffettPage(m: BuffettModel): string {
     url: m.url,
     ogAlt: `Indicador de Buffett do Brasil: ${m.vShort}% do PIB | IAções`,
     ld,
-    body: withClicks(renderToStaticMarkup(<BuffettPage m={m} />)),
+    body: `${withClicks(renderToStaticMarkup(<BuffettPage m={m} />))}\n${csvLeadScript()}`,
   });
 }
 

@@ -583,8 +583,27 @@ O que saiu de `scripts/template.ts`:
   `_iaCfData`) — isso encolheu cada pagina de ticker de forma relevante
 
 No lugar entrou o **card de alerta de CVM** (`data-cta="alerta-cvm"`), que leva direto ao
-`/authnew` com o ticker no contexto. **Sem formulario e sem captura de email no iAcoes.** Ganho
+`/authnew` com o ticker no contexto. **Sem formulario e sem captura de email nas paginas regeneradas** (excecao: as 6
+paginas orfas, abaixo). Ganho
 operacional: sumiu a tabela intermediaria e o RLS que ja quebrou uma vez.
+
+**Segunda origem ativa em `iacoes_email_leads`: o CSV do Indicador de Buffett (out/2026, pedido do Gabriel).** Para baixar
+a serie completa em `/macro/indicador-de-buffett/` a pessoa deixa o e-mail. Reaproveita `iacoes_email_leads`
+(RLS: anon so insere, so admin le; `name` e NOT NULL e vai vazio), com `source = 'buffett-csv'`. O formulario
+fica em `scripts/macro/page.tsx` e o JS em `scripts/macro/csv-lead.client.js` (JS puro de proposito: regex
+dentro de template literal do TS perde as barras invertidas). Eventos: `lead_buffett_csv` e, se a gravacao
+falhar, `lead_buffett_csv_erro` — o arquivo e entregue mesmo assim. Campo invisivel `website` como armadilha
+de robo. O CSV continua com URL publica (o JSON-LD `Dataset` aponta para ele, para o Google Dataset Search):
+e um gate leve, nao um bloqueio. Testado com insert como `anon` dentro de transacao desfeita.
+O aviso do formulario (LGPD) diz para que serve o e-mail, da o canal para sair (contato@brasilhorizonte.com.br)
+e linka a Politica de Privacidade (o mesmo `LGPD.pdf` do storage que o app usa no cadastro). Sem JS o botao fica
+desabilitado e o campo nao tem `name`, entao o e-mail nunca vai para a URL.
+
+**Atencao — primeira origem, ainda no ar:** as 6 paginas orfas (AZUL4, CPLE5, GUAR3, MERC4, MOAR3, RDNI3), que
+nao sao regeneradas, ainda tem o formulario antigo de nome + e-mail (`_iaLeadSubmit`, evento `lead_financeiras`) e
+gravam `source = 'financeiras'`, sem aviso de marketing — e ainda recebem leads (ex.: CPLE5).
+Para mandar novidades, exportar so `source = 'buffett-csv'`. Os leads aparecem no admin do app
+(`AdminEmailsTab.tsx`, aba "Leads IAcoes"); os do Buffett vem com nome vazio.
 
 ## Calculadoras (`/calculadoras/`) — TRABALHO EM ANDAMENTO, FORA DO REPO
 
