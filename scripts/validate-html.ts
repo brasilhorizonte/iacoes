@@ -85,6 +85,9 @@ function collectHTMLFiles(): string[] {
 
 // ── Regras de validacao ──────────────────────────────────────────
 
+/** Página que só redireciona (canonical + meta refresh no <head>), como os setores legados e ELET3. */
+const isRedirectStub = (html: string): boolean => html.slice(0, 2048).includes('http-equiv="refresh"');
+
 /**
  * RULE: regex-escaping
  * Detecta regexes quebradas por template literals que engolem backslashes.
@@ -134,6 +137,8 @@ function checkTrackingFunctions(file: string, html: string) {
   // Sector pages (acoes/energia/, acoes/saude/, etc.) nao tem tracking script
   const isSectorPage = /^acoes\/[^/]+\/index\.html$/.test(file) && file !== 'acoes/index.html';
   if (isSectorPage) return;
+  // Redirect (ticker que mudou de código, ex.: ELET3 → AXIA3): só canonical + meta refresh, sem CTA.
+  if (isRedirectStub(html)) return;
 
   if (!html.includes('function _iaTrack(')) {
     addIssue(file, 'tracking-functions', '_iaTrack nao encontrada no HTML');
