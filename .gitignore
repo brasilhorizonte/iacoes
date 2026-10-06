@@ -18,3 +18,7 @@ node_modules/
 # SEO audit reports (local only)
 seo-audit-*.html
 scripts/ticker/.build/
+scripts/macro/.build/
+
+# Prévia local das páginas macro (npm run preview:macro)
+preview/

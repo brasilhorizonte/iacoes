@@ -672,6 +672,26 @@ da B3, com slug via `sectorSlug()`. Estao no sitemap (priority 0.85, changefreq 
 link do breadcrumb e do bloco de peers de cada pagina de ticker. Nao tem CTA com `data-cta` hoje, e
 nao carregam o Pixel do Facebook.
 
+## Paginas macro (/macro/ e /macro/indicador-de-buffett/)
+
+Geradas por `scripts/macro/` (React + mesmos componentes/tokens das paginas de ticker, CSS proprio em
+`scripts/macro/styles.css`). Spec: `_bmad-output/specs/spec-indicador-buffett.md`; SEO: `seo-brief-buffett.md`.
+
+- **TRAVA DE PUBLICACAO:** so gera com `MACRO_BUFFETT_ENABLED=true` (env do build). Desligada, nada e
+  escrito, nada entra no sitemap e nenhum link interno aponta para la — o site sai identico. Para publicar:
+  definir a variavel no workflow `generate-pages.yml` (ou em um repository variable) e deixar o cron rodar.
+- **Dado:** series do Supabase montadas no dashbrasilhorizonte — 99020 (valor de mercado oficial da B3,
+  diario), 99021 (mensal), 99010 (Buffett mensal desde 2000), 4382 (PIB 12m). Manchete = ultimo fechamento
+  OFICIAL publicado pela B3 (D-1), nunca estimativa.
+- **Nunca derruba o build:** dado velho (>7 dias), fora da faixa (10-150%) ou erro de rede vira
+  `::warning::` no log e a pagina anterior continua no ar. O `validate-html` so AVISA sobre a pagina macro.
+- **Saidas:** `/macro/index.html` (hub), `/macro/indicador-de-buffett/index.html`, o CSV publico
+  `indicador-buffett-brasil.csv` (CC BY 4.0, distribution do JSON-LD Dataset) e `/llms.txt`.
+- **Ponte para acoes:** top 10 pelo Graham entre as 100 maiores por valor de mercado, 1 classe por empresa,
+  so em run completo. Revisao de CNPI antes de ligar a trava (ranking de acoes = risco CVM).
+- **Comandos:** `npm run preview:macro` (gera em `preview/`, fora do git, ignorando a trava; sirva a raiz
+  com `npx serve .` e abra `/preview/macro/indicador-de-buffett/`) e `npm run test:macro` (node:test).
+
 ## Landing Page (index.html)
 
 A landing page institucional e escrita manualmente (nao gerada). Contem:

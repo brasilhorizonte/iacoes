@@ -7,7 +7,9 @@
     "generate": "npx tsx scripts/generate-pages.ts",
     "generate:test": "npx tsx scripts/generate-pages.ts VALE3 PETR4 WEGE3",
     "test": "npx tsx scripts/validate-html.ts",
-    "postgenerate": "npx tsx scripts/validate-html.ts"
+    "postgenerate": "npx tsx scripts/validate-html.ts",
+    "test:macro": "npx tsx --test scripts/macro/macro.test.ts",
+    "preview:macro": "npx tsx scripts/macro/preview.ts"
   },
   "private": true,
   "dependencies": {

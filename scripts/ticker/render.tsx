@@ -34,6 +34,9 @@ const css = () => {
 const headTracking = () => (headCache ??= readFileSync(join(DIR, 'head-tracking.html'), 'utf-8'));
 const clientJs = () => (clientCache ??= readFileSync(join(DIR, 'client.js'), 'utf-8'));
 
+/** Mesmo tracking para as páginas macro (scripts/macro/), que reusam o design. */
+export const pageHeadTracking = (): string => headTracking();
+
 const attr = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 const jsonLd = (o: unknown) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, '\\u003c')}</script>`;
 

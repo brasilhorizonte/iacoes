@@ -1,0 +1,147 @@
+/**
+ * Testes das páginas macro. Uso: npm run test:macro (node:test via tsx).
+ */
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  comparisons, csvRows, faixaOf, headline, percentileOf, pibFor, quantile, seriesStats, sourceOf, toCsv, validate,
+  type BuffettData, type Point,
+} from './data';
+import { bridgeRows, buildBuffettModel, cleanCompanyName } from './model';
+import { generateMacro, llmsTxt } from './index';
+
+// Valores reais de produção nas pontas (R$ MM): PIB 12m e valor de mercado oficial da B3.
+const pib: Point[] = [
+  { date: '2026-07-01', value: 13258459.8 },
+  { date: '2026-08-01', value: 13342452.6 },
+];
+
+/** Série mensal sintética de 322 meses (2000-01 .. 2026-10) com nível conhecido. */
+function synthetic(): BuffettData {
+  const monthly: Point[] = [];
+  const mcapMonthly: Point[] = [];
+  const pibHist: Point[] = [];
+  for (let i = 0; i < 321; i++) {
+    const y = 2000 + Math.floor(i / 12);
+    const mo = String((i % 12) + 1).padStart(2, '0');
+    const date = `${y}-${mo}-28`;
+    const value = 30 + (i % 40); // 30..69
+    monthly.push({ date, value });
+    mcapMonthly.push({ date, value: value * 1000 });
+    pibHist.push({ date: `${y}-${mo}-01`, value: 100000 });
+  }
+  monthly.push({ date: '2026-10-02', value: 40.43 });
+  return { monthly, mcapMonthly, mcapDaily: [{ date: '2026-10-02', value: 5393880.66 }], pib: [...pibHist.filter((p) => p.date < '2026-07'), ...pib] };
+}
+
+test('pibFor: mesmo mês ou o último anterior', () => {
+  assert.equal(pibFor(pib, '2026-07-31')?.date, '2026-07-01');
+  assert.equal(pibFor(pib, '2026-10-02')?.date, '2026-08-01');
+  assert.equal(pibFor(pib, '2026-06-30'), null);
+});
+
+test('quantile e estatísticas', () => {
+  assert.equal(quantile([1, 2, 3, 4, 5], 0.5), 3);
+  assert.equal(quantile([1, 2, 3, 4], 0.25), 1.75);
+  const s = seriesStats([{ date: '2000-01-31', value: 10 }, { date: '2000-02-29', value: 30 }, { date: '2000-03-31', value: 20 }]);
+  assert.equal(s.mean, 20);
+  assert.equal(s.median, 20);
+  assert.equal(s.max.date, '2000-02-29');
+  assert.equal(s.min.value, 10);
+});
+
+test('percentil e faixa', () => {
+  const pts = [10, 20, 30, 40].map((value, i) => ({ date: `2000-0${i + 1}-28`, value }));
+  assert.equal(percentileOf(25, pts), 50);
+  const s = seriesStats(pts);
+  assert.equal(faixaOf(5, s), 'historicamente barata');
+  assert.equal(faixaOf(25, s), 'dentro da faixa histórica');
+  assert.equal(faixaOf(45, s), 'historicamente cara');
+});
+
+test('manchete = último diário oficial ÷ PIB aplicável (2 casas)', () => {
+  const h = headline({ monthly: [], mcapMonthly: [], mcapDaily: [{ date: '2026-10-02', value: 5393880.66 }], pib });
+  assert.equal(h.value, 40.43);
+  assert.equal(h.pibMonth, '2026-08');
+});
+
+test('comparações: fim do mês anterior e mesmo mês um ano antes', () => {
+  const pts = [{ date: '2025-10-31', value: 38 }, { date: '2026-08-31', value: 37.51 }, { date: '2026-09-30', value: 39.29 }, { date: '2026-10-02', value: 40.43 }];
+  const c = comparisons(pts, '2026-10-02');
+  assert.equal(c.prevMonth?.date, '2026-09-30');
+  assert.equal(c.yearAgo?.date, '2025-10-31');
+});
+
+test('procedência por período', () => {
+  assert.equal(sourceOf('2010-03-31').label, 'BCB SGS 7849');
+  assert.equal(sourceOf('2018-12-28').kind, 'estimado');
+  assert.equal(sourceOf('2020-06-30').kind, 'estimado');
+  assert.equal(sourceOf('2020-12-30').kind, 'oficial');
+  assert.equal(sourceOf('2026-03-31').kind, 'estimado');
+  assert.equal(sourceOf('2026-08-31').label, 'B3 (TOTAL GERAL)');
+});
+
+test('CSV: cabeçalho, mês corrente pelo diário e aspas em vírgula', () => {
+  const d = synthetic();
+  const csv = toCsv(csvRows(d));
+  const lines = csv.trim().split('\n');
+  assert.equal(lines[0], 'data,indicador_buffett_pct,valor_mercado_b3_rs_milhoes,pib_12m_rs_milhoes,procedencia,fonte');
+  assert.equal(lines.length, 323);
+  assert.equal(lines[lines.length - 1], '2026-10-02,40.43,5393880.66,13342452.6,oficial,B3 (TOTAL GERAL)');
+  assert.match(toCsv([{ date: 'x', buffett: 1, mcapMM: null, pibMM: null, source: { kind: 'oficial', label: 'a, b' } }]), /"a, b"/);
+});
+
+test('validação: bloqueia série curta, valor absurdo e dado velho; avisa descompasso', () => {
+  const d = synthetic();
+  const h = headline(d);
+  assert.deepEqual(validate(d, h, new Date('2026-10-06T12:00:00Z')).problems, []);
+  assert.match(validate(d, h, new Date('2026-10-20T12:00:00Z')).problems.join(), /dias/);
+  assert.match(validate({ ...d, monthly: d.monthly.slice(0, 10) }, h, new Date('2026-10-06')).problems.join(), /backfill/);
+  assert.match(validate(d, { ...h, value: 300 }, new Date('2026-10-06')).problems.join(), /faixa/);
+  const behind = { ...d, monthly: [...d.monthly.slice(0, -1), { date: '2026-10-01', value: 39 }] };
+  assert.match(validate(behind, h, new Date('2026-10-06')).warnings.join(), /atrasada/);
+});
+
+test('ponte Graham: só com universo completo, entre as 100 maiores, sem descontos absurdos', () => {
+  const all = Array.from({ length: 250 }, (_, i) => ({ ticker: `T${String(i).padStart(3, '0')}3`, name: `E${i}`, sector: 'X', price: 10, pl: 5, divYield: 0, marketCap: 1000 - i }));
+  const valuations = Object.fromEntries(all.map((t, i) => [t.ticker, { name: t.name, price: 10, graham: i === 0 ? 50 : 10 + (i % 7) }]));
+  const rows = bridgeRows(valuations, all);
+  assert.ok(rows.length <= 10 && rows.length > 0);
+  assert.ok(rows.every((r) => r.upside > 0 && r.upside < 2), 'desconto acima de 200% sai');
+  assert.ok(rows.every((r) => Number(r.ticker.slice(1, 4)) < 100), 'só as 100 maiores');
+  assert.deepEqual(bridgeRows(Object.fromEntries(Object.entries(valuations).slice(0, 50)), all), [], 'run parcial não gera lista');
+});
+
+test('ponte: 1 classe por empresa e nome sem sufixo em inglês', () => {
+  const all = Array.from({ length: 250 }, (_, i) => ({ ticker: `X${String(i).padStart(3, '0')}3`, name: `E${i}`, sector: 'X', price: 10, pl: 5, divYield: 0, marketCap: 1000 - i }));
+  all.push({ ticker: 'GOAU4', name: 'G', sector: 'X', price: 10, pl: 5, divYield: 0, marketCap: 5000 }, { ticker: 'GOAU3', name: 'G', sector: 'X', price: 10, pl: 5, divYield: 0, marketCap: 5000 });
+  const valuations: Record<string, { name: string; price: number; graham: number }> = Object.fromEntries(all.map((t) => [t.ticker, { name: t.name, price: 10, graham: 10.5 }]));
+  valuations.GOAU4 = { name: 'Metalurgica Gerdau SA Pfd', price: 10, graham: 19 };
+  valuations.GOAU3 = { name: 'Metalurgica Gerdau S.A.', price: 10, graham: 18 };
+  const rows = bridgeRows(valuations, all);
+  assert.deepEqual(rows.filter((r) => r.ticker.startsWith('GOAU')).map((r) => [r.ticker, r.name]), [['GOAU4', 'Metalurgica Gerdau SA']]);
+  assert.equal(cleanCompanyName('Isa Energia Brasil SA Non-Cum Perp Pfd Registered Shs'), 'Isa Energia Brasil SA');
+  assert.equal(cleanCompanyName('Transmissora Alianca De Energia Eletrica S.A. Unit'), 'Transmissora Alianca De Energia Eletrica S.A.');
+});
+
+test('modelo: SEO no limite, 12 perguntas, sem marca aposentada', () => {
+  const m = buildBuffettModel(synthetic(), { today: new Date('2026-10-06T12:00:00Z') });
+  assert.ok(m.seo.title.length <= 60, m.seo.title);
+  assert.ok(m.seo.description.length <= 160, String(m.seo.description.length));
+  assert.equal(m.faq.length, 12);
+  assert.equal(m.v, '40,43');
+  assert.equal(m.dateLong, '2 de outubro de 2026');
+  const all = JSON.stringify(m) + llmsTxt(m);
+  // Montada em pedaços: o literal aqui seria acusado pelo gate de marca do validate-html.
+  const marcaAposentada = new RegExp(['IAn' + 'alista', 'IAl' + 'ocador', '14 ' + 'dias'].join('|'));
+  assert.doesNotMatch(all, marcaAposentada);
+  assert.doesNotMatch(all, /\b(compre|venda já|vender agora)\b/i);
+});
+
+test('trava de publicação: desligada não escreve nada', async () => {
+  const prev = process.env.MACRO_BUFFETT_ENABLED;
+  delete process.env.MACRO_BUFFETT_ENABLED;
+  const entries = await generateMacro({ outRoot: 'nao-existe-e-nao-deve-ser-criado', data: synthetic() });
+  assert.deepEqual(entries, []);
+  if (prev !== undefined) process.env.MACRO_BUFFETT_ENABLED = prev;
+});
