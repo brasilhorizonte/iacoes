@@ -18,3 +18,8 @@ node_modules/
 # SEO audit reports (local only)
 seo-audit-*.html
 scripts/ticker/.build/
+
+# Documentos internos (specs, relatórios do GSC, sessões) — o repositório é público
+_bmad-output/specs/
+_bmad-output/party-mode/
+_bmad-output/gsc/
