@@ -59,6 +59,13 @@ const pick = (row: Record<string, any>, keys: string[]): unknown => {
   return undefined;
 };
 
+// O short_name da brapi às vezes vem igual ao ticker ("IGTI11"): aí o long_name serve melhor.
+const bestName = (short: unknown, long: unknown): string => {
+  const s = String(short || '').trim();
+  const l = String(long || '').trim();
+  return s && !/^[A-Z0-9]{4}\d{1,2}$/i.test(s.replace(/\s/g, '')) ? s : (l || s);
+};
+
 const normSym = (v: unknown): string => {
   if (v == null) return '';
   return String(v).trim().toUpperCase();
@@ -156,7 +163,17 @@ const mapBrapi = (row: Record<string, any>): RawBrapiQuote => {
     liquidity_ratio: toNumber(pick(r, ['liquidity_ratio'])),
     ev_ebit: toNumber(pick(r, ['ev_ebit'])),
     beta5y: toNumber(pick(r, ['beta_5y', 'beta5y'])),
-    revenueGrowth: toNumber(pick(r, ['revenue_growth']))
+    revenueGrowth: toNumber(pick(r, ['revenue_growth'])),
+    logoUrl: toStr(pick(r, ['logo_url', 'logourl'])),
+    website: toStr(pick(r, ['website'])),
+    employees: toNumber(pick(r, ['full_time_employees'])),
+    city: toStr(pick(r, ['city'])),
+    state: toStr(pick(r, ['state'])),
+    weekChange: toNumber(pick(r, ['week_change'])),
+    monthChange: toNumber(pick(r, ['month_change'])),
+    sixMonthChange: toNumber(pick(r, ['six_month_change'])),
+    ytdReturn: toNumber(pick(r, ['ytd_return'])),
+    dividendYield5y: toNumber(pick(r, ['dividend_yield_5y']))
   };
 };
 
@@ -411,7 +428,7 @@ export const getTickersWithNames = async (): Promise<{ ticker: string; name: str
   if (error || !data) return [];
   return data.map((r: any) => ({
     ticker: String(r.symbol).toUpperCase(),
-    name: String(r.short_name || r.long_name || '').trim()
+    name: bestName(r.short_name, r.long_name)
   })).filter(t => t.ticker);
 };
 
@@ -425,7 +442,7 @@ export const getAllTickersWithSector = async (): Promise<TickerIndexEntry[]> => 
   if (error || !data) { console.warn('getAllTickersWithSector error:', error?.message); return []; }
   return data.map((r: any) => ({
     ticker: String(r.symbol).toUpperCase(),
-    name: String(r.short_name || r.long_name || '').trim(),
+    name: bestName(r.short_name, r.long_name),
     sector: normalizeSector(String(r.sector || '').trim()),
     price: toNumber(r.price) || toNumber(r.regular_market_price),
     pl: toNumber(r.pl),

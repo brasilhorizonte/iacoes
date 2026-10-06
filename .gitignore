@@ -17,3 +17,4 @@ node_modules/
 
 # SEO audit reports (local only)
 seo-audit-*.html
+scripts/ticker/.build/

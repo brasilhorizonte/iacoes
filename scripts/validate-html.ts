@@ -10,7 +10,7 @@
  */
 
 import { readdirSync, readFileSync, statSync } from 'fs';
-import { join } from 'path';
+import { join, relative, sep } from 'path';
 
 const ROOT = join(__dirname, '..');
 const REQUIRED_CTA_PATH = '/authnew';
@@ -284,7 +284,8 @@ function main() {
   let checked = 0;
   for (const file of files) {
     const html = readFileSync(file, 'utf-8');
-    const relPath = file.replace(ROOT + '/', '');
+    // relative + '/' fixo: no Windows o caminho vem com '\' e as regras que casam 'acoes/...' erravam.
+    const relPath = relative(ROOT, file).split(sep).join('/');
 
     checkRegexEscaping(relPath, html);
     checkCTALinks(relPath, html);
@@ -311,11 +312,29 @@ function main() {
     addIssue('scripts/template.ts', 'marca-aposentada', 'template não encontrado — o gate da causa não rodou');
   }
 
+  // Desde out/2026 as páginas de ticker saem de scripts/ticker/ (React + shadcn): a
+  // CAUSA agora mora lá, então o gate da marca também varre esses fontes.
+  const tickerSrc = join(ROOT, 'scripts', 'ticker');
+  const walkSrc = (dir: string) => {
+    for (const e of readdirSync(dir)) {
+      if (e.startsWith('.')) continue;
+      const full = join(dir, e);
+      if (statSync(full).isDirectory()) walkSrc(full);
+      else if (/\.(tsx?|js|html)$/.test(e)) {
+        checkMarcaAposentada(full.replace(ROOT, '').replace(/\\/g, '/').replace(/^\//, ''), readFileSync(full, 'utf-8'));
+        checked++;
+      }
+    }
+  };
+  try { walkSrc(tickerSrc); } catch {
+    addIssue('scripts/ticker', 'marca-aposentada', 'fontes das páginas de ticker não encontrados — o gate da causa não rodou');
+  }
+
   // ── Resultado ──
 
   // `checked` conta as páginas MAIS o template — dizer só "N arquivos" fazia o número
   // final sair maior que o de "arquivos encontrados", o que parece defeito de contagem.
-  const resumo = `${files.length} páginas + scripts/template.ts`;
+  const resumo = `${files.length} páginas + fontes dos templates`;
 
   if (suprimidos.length > 0) {
     console.log(`⚠️  ${suprimidos.length} problema(s) conhecido(s) suprimido(s) (KNOWN_BROKEN):`);

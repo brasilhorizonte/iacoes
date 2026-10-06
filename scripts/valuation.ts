@@ -171,7 +171,22 @@ export const getFinancialData = async (ticker: string): Promise<FinancialData> =
     _rawCashFlow: tickerCashFlow.map(c => ({ ...c, type: normalizeType(c.type, c.period) })),
     _rawDividends: rawDividends,
     fundamentals,
-    businessSummary: tickerBrapi.longBusinessSummary?.trim() || null
+    businessSummary: tickerBrapi.longBusinessSummary?.trim() || null,
+    // A brapi entrega estas variações em FRAÇÃO (0.81 = +81%). `fundamentals.change12m`
+    // divide por 100 e sai errado; as páginas de ticker leem daqui.
+    profile: {
+      logoUrl: tickerBrapi.logoUrl || null,
+      website: tickerBrapi.website || null,
+      employees: tickerBrapi.employees || null,
+      city: tickerBrapi.city || null,
+      state: tickerBrapi.state || null,
+      weekChange: tickerBrapi.weekChange ?? null,
+      monthChange: tickerBrapi.monthChange ?? null,
+      sixMonthChange: tickerBrapi.sixMonthChange ?? null,
+      ytdReturn: tickerBrapi.ytdReturn ?? null,
+      yearChange: tickerBrapi.fiftyTwoWeekChange ?? null,
+      dividendYield5y: tickerBrapi.dividendYield5y || null,
+    }
   };
 };
 

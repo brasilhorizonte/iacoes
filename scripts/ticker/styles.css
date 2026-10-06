@@ -1,0 +1,107 @@
+/* Páginas de ticker — Tailwind v4 + tokens shadcn/ui.
+   Compilado no build (scripts/ticker/build-css.ts) e embutido inline em cada página.
+   `source(none)` + @source: só escaneia os componentes, não as 700 páginas geradas. */
+@import "tailwindcss" source(none);
+@source "./";
+
+:root {
+  --radius: 0.625rem;
+  /* Paleta Brasil Horizonte (mesma da landing): verde petróleo + dourado */
+  --background: #f7f6f2;
+  --foreground: #0b1f26;
+  --card: #ffffff;
+  --card-foreground: #0b1f26;
+  --primary: #093848;
+  --primary-foreground: #ffffff;
+  --secondary: #eef2f1;
+  --secondary-foreground: #093848;
+  --muted: #f0eee8;
+  --muted-foreground: #5f6b70;
+  --accent: #eef3f2;
+  --accent-foreground: #093848;
+  --border: #e4e1d8;
+  --input: #e4e1d8;
+  --ring: #093848;
+  --gold: #b8923e;
+  --gold-strong: #8a6a24;
+  --gold-foreground: #1d1503;
+  --positive: #0f9f6e;
+  --negative: #dc3c3c;
+  --ink: #041c24;
+}
+
+@theme inline {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-gold: var(--gold);
+  --color-gold-strong: var(--gold-strong);
+  --color-gold-foreground: var(--gold-foreground);
+  --color-positive: var(--positive);
+  --color-negative: var(--negative);
+  --color-ink: var(--ink);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * { @apply border-border; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body { @apply bg-background text-foreground font-sans antialiased; }
+  .tnum { font-variant-numeric: tabular-nums; }
+  [hidden] { display: none !important; }
+}
+
+/* Slider no visual do shadcn (track fino, thumb branco com anel) sobre input nativo:
+   funciona sem hidratação, com teclado e leitor de tela. */
+@layer components {
+  .slider {
+    -webkit-appearance: none; appearance: none;
+    width: 100%; height: 1.25rem; background: transparent; cursor: pointer;
+    --pct: 50%;
+  }
+  .slider:focus-visible { outline: none; }
+  .slider::-webkit-slider-runnable-track {
+    height: 6px; border-radius: 999px;
+    background: linear-gradient(to right, var(--primary) var(--pct), var(--muted) var(--pct));
+  }
+  .slider::-moz-range-track { height: 6px; border-radius: 999px; background: var(--muted); }
+  .slider::-moz-range-progress { height: 6px; border-radius: 999px; background: var(--primary); }
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 18px; height: 18px; margin-top: -6px; border-radius: 999px;
+    background: #fff; border: 2px solid var(--primary);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.15); transition: box-shadow .15s;
+  }
+  .slider::-moz-range-thumb {
+    width: 16px; height: 16px; border-radius: 999px;
+    background: #fff; border: 2px solid var(--primary);
+  }
+  .slider:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 25%, transparent); }
+  .slider:hover::-webkit-slider-thumb { box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 15%, transparent); }
+
+  .locked-blur { filter: blur(6px); user-select: none; pointer-events: none; }
+  @media (min-width: 1024px) and (min-height: 820px) {
+    .aside-sticky { position: sticky; top: 5rem; }
+  }
+  .bg-grid-ink {
+    background-image: radial-gradient(circle at 1px 1px, rgb(255 255 255 / 0.07) 1px, transparent 0);
+    background-size: 18px 18px;
+  }
+}

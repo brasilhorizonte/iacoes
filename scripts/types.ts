@@ -88,6 +88,30 @@ export interface RawBrapiQuote {
   ev_ebit?: number;
   beta5y?: number;
   revenueGrowth?: number;
+  logoUrl?: string;
+  website?: string;
+  employees?: number;
+  city?: string;
+  state?: string;
+  weekChange?: number;
+  monthChange?: number;
+  sixMonthChange?: number;
+  dividendYield5y?: number;
+}
+
+/** Perfil e desempenho direto da brapi (variações em FRAÇÃO: 0.12 = 12%). */
+export interface CompanyProfile {
+  logoUrl: string | null;
+  website: string | null;
+  employees: number | null;
+  city: string | null;
+  state: string | null;
+  weekChange: number | null;
+  monthChange: number | null;
+  sixMonthChange: number | null;
+  ytdReturn: number | null;
+  yearChange: number | null;
+  dividendYield5y: number | null;
 }
 
 export interface RawDividend {
@@ -169,6 +193,7 @@ export interface FinancialData {
   _rawDividends: RawDividend[];
   fundamentals: FundamentalData;
   businessSummary?: string | null;
+  profile?: CompanyProfile;
 }
 
 export interface QualitativeScore {

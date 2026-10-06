@@ -43,7 +43,14 @@ iacoes/
 │       └── institucional_branco_amarelo_3x.png
 ├── scripts/                 # Geradores de paginas estaticas (TypeScript)
 │   ├── generate-pages.ts        # Orquestrador principal (tickers, indice, setores, sitemap)
-│   ├── template.ts              # Template HTML de ticker/indice/setor + sitemap/robots
+│   ├── template.ts              # Indice /acoes/, paginas de setor, sitemap/robots
+│   ├── ticker/                  # Paginas de ticker: React + shadcn/ui + Tailwind v4 -> HTML estatico
+│   │   ├── render.tsx           #   head/SEO/JSON-LD, CSS inline, injecao do onclick
+│   │   ├── model.ts             #   view model (dividendos, demonstracoes, FAQ, pares)
+│   │   ├── page.tsx, components/ #   secoes + components/ui (shadcn)
+│   │   ├── client.js            #   calculadoras, abas, busca, cotacao ao vivo, scroll
+│   │   ├── head-tracking.html   #   GA4 + Pixel + _iaTrack/_iaClick (literal)
+│   │   └── preview.ts           #   gera so os tickers pedidos
 │   ├── airton-template.ts       # Template de /airton/{TICKER}/ (simulacao do alerta)
 │   ├── validate-html.ts         # Validacao pos-geracao (8 regras, roda via postgenerate)
 │   ├── valuation.ts         # Calculos de valuation (DCF, Graham, Gordon, EVA, Multiplos)
@@ -234,61 +241,56 @@ Cada metodo possui sliders/inputs interativos no HTML para que o usuario ajuste 
 
 ## Paginas de Ticker (/{TICKER}/index.html)
 
-Estrutura atual (redesign de 10/abr/2026, reforma de oferta em ago/2026):
+Estrutura atual (**redesign de out/2026, React + Tailwind v4 + shadcn/ui** — o template antigo
+`generateTickerHTML` de `template.ts` foi apagado; nada dele foi reaproveitado):
 
-1. **Nav** — Logo BH + iAcoes + busca de ticker + botoes "Acessar App" / "Assinar Plano" (data-cta: nav-app, nav-assinar)
-2. **Breadcrumb** — Navegacao hierarquica (Home > Acoes > Setor > TICKER)
-3. **Hero** — Ticker, nome, setor, preco atual, variacao dia/12m, nota qualitativa blur ao lado da cotacao e link "Ver TICKER na plataforma" (data-cta: asset-page) — pagina completa do ativo no app (`/ativo/TICKER`) via `next`. A ancora "Fazer meu Valuation" saiu em set/2026 (a faixa de veredito assumiu o papel)
-3b. **Card de veredito** (set/2026; consolidado em 21/set/2026 com o grafico por metodo — eram
-   dois cards de valuation colados) — topo escuro logo abaixo do hero: preco justo estimado
-   (**media ponderada dos 5 metodos** — DCF, Gordon, EVA, Multiplos, Graham; nao so os classicos)
-   + badge de upside/downside + nota "estimativa, nao recomendacao" + CTA "Desbloquear DCF e
-   Multiplos" (data-cta: hero-dcf, `intent=dcf`) + link secundario "Me avisa quando TICKER publicar na CVM"
-   (data-cta: alerta-cvm-topo, 21/set/2026 — o alerta tinha 0 cliques em 90 dias porque so existia
-   no fim da pagina; e a unica oferta que nao exige confiar no nosso numero). So mostra numero se
-   `wfv > 0 && price > 0`; senao so o CTA.
-   Motivo: ate set/2026 o preco justo ponderado era calculado mas nunca exibido.
-3c. **Corpo do card de veredito: grafico "Por metodo"** — SVG inline sem JS, barras horizontais
-   por metodo vs. linha da cotacao. Graham/Bazin/Gordon **e EVA** abertos com valor; **DCF e Multiplos
-   entram so como barra borrada sem numero** + pill "Exclusivo da plataforma". Decisao do Gabriel
-   em 21/set/2026: **DCF e Multiplos travados, EVA aberto**. O botao
-   `chart-locked` saiu — o unico CTA de DCF acima da dobra e o `hero-dcf` do topo do card. Metodo
-   com valor <= 0 nao entra; o grafico so renderiza com >= 2 metodos abertos.
-4. **Card de Auditoria do AIrton** — "Leu um relatorio sobre TICKER? Pergunte ao AIrton." com 3
-   perguntas prontas clicaveis + botao + linha de social proof, todos com data-cta `airton-audit`.
-   Desde set/2026 renderiza **sempre**, logo abaixo do grafico (era fallback do bloco da CVM; a
-   auditoria tinha 43+4 cliques em 90 dias contra 0 do bloco da CVM em 18 dias no topo).
-5. **Card Combinado SEO** — Intro analise (3 paragrafos SEO) + Visao de Negocio (longBusinessSummary) unificados num card com divisor
-6. **Metricas em Tabs CSS-only** — 4 abas (Mercado, Valuation, Rentabilidade, Endividamento) com radio inputs, todo conteudo no DOM para SEO. Tab Valuation aberta por default. Timestamp de atualizacao
-7. **Cards de Valuation** — Graham, Bazin, Gordon com sliders funcionais (pulse animation via IntersectionObserver). Premissas sem slider (P/L Maximo, P/VP Maximo, Anos para Media) sao borradas **e nao sao mais links** (set/2026; eram 3 dos 5 `dcf-locked` que geraram 0 contas)
-8. **Card DCF full-width — REMOVIDO em 21/set/2026.** Era a tabela de sensibilidade WACC x G com
-   **numeros placeholder** (`price * 0.95` com gradiente fixo) borrada + CTA. 62 cliques e 0 contas
-   em 90 dias. O DCF travado agora aparece so no card de veredito (barra borrada + `hero-dcf`) e na
-   faixa de features (`dcf-locked`). `matrixHTML` (matriz real de `val.sensitivityMatrix`) segue
-   como codigo morto em `template.ts`
-9. **Bloco de Documentos da CVM** (movido para ca em set/2026) — "O que TICKER publicou na CVM":
-   lista `<ol>` dos 4 documentos reais mais recentes (tipo traduzido, `<time datetime>`, titulo,
-   resumo do AIrton), cada um linkando o documento oficial (`target="_blank" rel="noopener
-   nofollow"`, sem `_iaClick`). CTA "Receba os proximos no WhatsApp" (data-cta: alerta-cvm-topo).
-   Ticker sem cobertura nao renderiza o bloco. Hoje: 297 paginas com documentos reais.
-10. **Faixa "O que a plataforma tem para TICKER"** (set/2026) — fundo escuro, 4 linhas clicaveis,
-    **ordenadas pelos cliques de 90 dias** (dcf-locked 61 > airton-audit 47 > features-card 12 >
-    nota-qualitativa 8 > alerta-cvm 0): DCF completo (`dcf-locked`), AIrton (`airton-intro`), Nota
-    qualitativa com score borrado (`nota-qualitativa`), Alertas no WhatsApp (`alerta-cvm`). Os ids
-    foram mantidos para nao quebrar series. **Substituiu 4 blocos inteiros** — apresentacao do
-    AIrton (0 cliques), card de features, paywall da nota qualitativa e card de alerta da CVM.
-    Os ids `features-card` e (desde 21/set/2026) `chart-locked` deixaram de ser emitidos.
-11. **Demonstracoes Financeiras** — DRE, Balanco, Fluxo de Caixa, Dividendos (10 anos) dentro de um
-    `<details class="fin-details">` **fechado por default** (set/2026). Todo o conteudo segue no
-    DOM para o Google; so parou de empurrar peers/FAQ para 8 telas abaixo.
-12. **Peers** — Acoes do mesmo setor com links internos + link para `/acoes/{setor}/`
-13. **FAQ** — perguntas frequentes dinamicas por ticker (Schema.org FAQPage)
-14. **CTA Final** — Link para a plataforma paga (data-cta: footer)
-15. **Acoes Populares** — Links cross-sector para internal linking
-16. **Disclaimer + Footer** — Notas metodologicas (Graham, Bazin, Gordon) + disclaimer legal + logos
-17. **CTA fixo mobile** — Barra `position:fixed` na base, so em `@media (max-width:768px)`,
-    "Auditar TICKER gratis" (data-cta: sticky-mobile). `body` ganha `padding-bottom` para a barra
-    nao cobrir conteudo.
+**Stack.** `scripts/ticker/` tem componentes React no padrao shadcn (`components/ui/*`: Button,
+Card, Badge, Table, Tabs, Accordion, Separator, Progress — sem Radix, porque a pagina e renderizada
+com `renderToStaticMarkup` no build e nao e hidratada). Tailwind v4 compila `styles.css` (tokens
+shadcn com a paleta da landing: `#093848` + dourado `#B8923E`, DM Sans + JetBrains Mono) uma vez por
+execucao (`buildTickerCss`) e o CSS sai **inline** em cada pagina. Interatividade em `client.js` (ES5,
+inline). Tracking (`head-tracking.html`) e um HTML literal copiado byte a byte: nao passa por
+template literal, entao nenhum backslash de regex e engolido. O `onclick="_iaClick(event)"` e
+injetado no pos-processamento antes de cada `data-cta` (React nao renderiza onclick em string).
+Iterar sem mexer em sitemap/indices: `npx tsx scripts/ticker/preview.ts PETR4 VALE3`.
+
+Ordem da pagina (o DCF e o gancho; multiplos sobem; calculadoras logo abaixo):
+
+1. **Header** escuro sticky — logo BH + IAcoes, busca (`/tickers.json`), "Entrar" (`nav-app`) e
+   "Criar conta gratis" (`nav-assinar`).
+2. **Hero** — breadcrumb; **logo da empresa** (`brapi_quotes.logo_url`, monograma por baixo se
+   falhar); H1 com ticker + "{nome}: preco justo, DCF e indicadores"; cotacao (atualizada ao vivo),
+   variacao do dia, desempenho semana/mes/6m/ano/12m (`week_change` etc., em FRACAO), faixa de 52
+   semanas e **grade de multiplos** (P/L e DY com mediana do setor). Coluna direita: **card do DCF**
+   escuro — valor e upside so como placeholder borrado (o numero real NAO vai para o HTML), mini
+   heatmap de sensibilidade com os eixos reais de WACC/g e cores fixas, WACC estimado visivel, CTA
+   "Ver o DCF de TICKER gratis" (`hero-dcf`) + "Me avise quando TICKER publicar na CVM" (`alerta-cvm-topo`).
+3. **Calculadoras** (`#calculadoras`) — Graham (P/L max., P/VP max., margem), Bazin (DY minimo +
+   janela 1/3/5/10 anos), Gordon (r, g, janela). Tudo aberto, recalcula na hora. Abaixo: grafico
+   "Preco justo por metodo" (HTML/CSS, atualiza com os sliders, linha da cotacao, barra do DCF
+   travada -> `dcf-locked`, media dos metodos abertos) + **matriz de sensibilidade do DCF travada**
+   (celulas borradas sem numero, CTA `dcf-locked`). Primeira interacao com slider dispara
+   `_iaTrack('calc_interact')`.
+4. **Coluna principal** (8/12): Indicadores completos (4 grupos, sem abas), Dividendos (DY 12m,
+   media 5a, grafico por ano, ultimos 12 pagamentos — deduplicados por data-com + valor),
+   Demonstracoes (abas DRE/Balanco/Fluxo, grafico + tabela de 10 anos, todo painel no DOM), Sobre
+   (texto SEO com numeros reais + resumo do negocio — **omitido se a brapi so tiver em ingles** +
+   fatos: sede, funcionarios, site), Documentos da CVM (`alerta-cvm`), FAQ (accordion `<details>`).
+5. **Coluna lateral** (4/12, sticky em telas >= 820px de altura): AIrton (`airton-audit`, 3
+   perguntas + botao + social proof) e "Na plataforma para TICKER" (`dcf-locked`,
+   `nota-qualitativa` com score `?,??` borrado, `alerta-cvm`, `asset-page`).
+6. **Acoes do setor** — tabela com o proprio ticker destacado + 8 pares (cotacao, P/L, DY, valor de mercado).
+7. **Faixa final** (`footer` -> DCF, `asset-page`), acoes populares, footer com metodologia +
+   disclaimer (`disclaimer`), **CTA fixo mobile** "Ver DCF de TICKER" (`sticky-mobile`).
+
+**SEO:** title "TICKER Esta Cara ou Barata? Preco Justo e DCF (ANO) | IAcoes"; description com
+cotacao, P/L, DY e ROE reais; JSON-LD via `JSON.stringify` (WebPage + Corporation com
+`tickerSymbol`/logo, BreadcrumbList apontando para `/acoes/{setor}/`, FAQPage de 8 perguntas com
+numeros reais). Scroll depth: `scroll_25` calculadoras, `_50` indicadores, `_75` demonstracoes, `_100` FAQ.
+
+**Atencao (historico):** a matriz do DCF travada ja existiu e saiu em 21/set/2026 (62 cliques, 0
+contas em 90 dias). Voltou no redesign porque o DCF e o gancho principal — acompanhar `hero-dcf` e
+`dcf-locked` contra criacao de conta.
 
 **Saiu das paginas de ticker em ago/2026:** o **Card Markowitz** e o **Radar de Oportunidades** (do
 card de features). Ambos continuam existindo **no produto pago** — sairam so do SEO porque falam de

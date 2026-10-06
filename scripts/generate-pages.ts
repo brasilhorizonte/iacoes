@@ -1,12 +1,13 @@
 import 'dotenv/config';
 import { mkdirSync, writeFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import { getAllTickers, getTickersWithNames, getAllTickersWithSector, getPeersBySector, fetchQualitativeScore, saveQualitativeCache, getCvmDocuments, CVM_CACHE_LIMIT } from './supabase';
+import { getAllTickers, getTickersWithNames, getAllTickersWithSector, saveQualitativeCache, getCvmDocuments, CVM_CACHE_LIMIT } from './supabase';
 import { generateAirtonTickerHTML } from './airton-template';
 import { getFinancialData, performValuation } from './valuation';
-import { generateTickerHTML, generateIndexHTML, generateSectorPage, generateSitemap, generateRobots, sectorSlug } from './template';
+import { generateTickerPage, buildTickerCss } from './ticker/render';
+import { generateIndexHTML, generateSectorPage, generateSitemap, generateRobots, sectorSlug } from './template';
 import { SCENARIO_PRESETS, DEFAULT_COST_OF_DEBT } from './constants';
-import type { ValuationAssumptions, TickerIndexEntry, PeerTicker } from './types';
+import type { ValuationAssumptions, TickerIndexEntry } from './types';
 
 const ROOT = join(__dirname, '..');
 const BATCH_SIZE = 5;
@@ -60,9 +61,8 @@ async function generatePage(ticker: string): Promise<boolean> {
       tickerLastmod[ticker] = capped.toISOString().split('T')[0];
     }
 
-    const peers: PeerTicker[] = getPeersBySector(allTickerData, ticker, 8);
-    const qualScore = await fetchQualitativeScore(ticker);
-    const html = generateTickerHTML(data, val, peers, qualScore);
+    // Página de ticker: React + shadcn/ui renderizados para HTML estático (scripts/ticker/).
+    const html = generateTickerPage(data, val, allTickerData, getCvmDocuments(ticker));
     const dir = join(ROOT, ticker);
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, 'index.html'), html, 'utf-8');
@@ -139,6 +139,9 @@ async function main() {
     console.error('❌ Faltando SUPABASE_URL ou SUPABASE_ANON_KEY no .env');
     process.exit(1);
   }
+
+  console.log('🎨 Compilando CSS das páginas de ticker (Tailwind + shadcn)...');
+  buildTickerCss();
 
   // Fetch all tickers with sector data (for peers and index page)
   console.log('📊 Buscando dados de setor...');
