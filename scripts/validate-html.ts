@@ -9,7 +9,7 @@
  * Rodar: npm test (apos npm run generate ou generate:test)
  */
 
-import { readdirSync, readFileSync, statSync } from 'fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
 import { join, relative, sep } from 'path';
 
 const ROOT = join(__dirname, '..');
@@ -85,6 +85,9 @@ function collectHTMLFiles(): string[] {
 
 // ── Regras de validacao ──────────────────────────────────────────
 
+/** Página que só redireciona (canonical + meta refresh no <head>), como os setores legados e ELET3. */
+const isRedirectStub = (html: string): boolean => html.slice(0, 2048).includes('http-equiv="refresh"');
+
 /**
  * RULE: regex-escaping
  * Detecta regexes quebradas por template literals que engolem backslashes.
@@ -134,6 +137,8 @@ function checkTrackingFunctions(file: string, html: string) {
   // Sector pages (acoes/energia/, acoes/saude/, etc.) nao tem tracking script
   const isSectorPage = /^acoes\/[^/]+\/index\.html$/.test(file) && file !== 'acoes/index.html';
   if (isSectorPage) return;
+  // Redirect (ticker que mudou de código, ex.: ELET3 → AXIA3): só canonical + meta refresh, sem CTA.
+  if (isRedirectStub(html)) return;
 
   if (!html.includes('function _iaTrack(')) {
     addIssue(file, 'tracking-functions', '_iaTrack nao encontrada no HTML');
@@ -267,6 +272,32 @@ function checkMarcaAposentada(file: string, texto: string) {
   }
 }
 
+/**
+ * RULE: macro-page (só AVISO, nunca derruba o build)
+ *
+ * A página /macro/indicador-de-buffett/ depende de dado do dashbrasilhorizonte. Se esse
+ * pipeline parar, falhar aqui impediria o commit de TODAS as páginas do site — por isso
+ * o problema vira ::warning:: no log do CI e a página anterior segue no ar. As checagens
+ * de dado (frescor, faixa) moram em scripts/macro/index.ts, antes de escrever o HTML.
+ */
+function checkMacroPage() {
+  const dir = join(ROOT, 'macro', 'indicador-de-buffett');
+  const page = join(dir, 'index.html');
+  if (!existsSync(page)) return; // trava desligada: nada a checar
+  const warn = (m: string) => console.warn(`::warning title=Página macro::${m}`);
+  const html = readFileSync(page, 'utf-8');
+  if (!existsSync(join(dir, 'indicador-buffett-brasil.csv'))) warn('CSV do Dataset ausente (indicador-buffett-brasil.csv)');
+  if (!existsSync(join(ROOT, 'macro', 'index.html'))) warn('hub /macro/ ausente: o breadcrumb apontaria para 404');
+  if (!html.includes('data-cta="macro-buffett"')) warn('CTA macro-buffett ausente');
+  if (!html.includes('"@type":"Dataset"')) warn('JSON-LD Dataset ausente');
+  const ref = /data-ref-date="(\d{4}-\d{2}-\d{2})"/.exec(html)?.[1];
+  if (!ref) warn('data-ref-date ausente no <main>');
+  else {
+    const days = (Date.now() - Date.parse(`${ref}T00:00:00Z`)) / 86400000;
+    if (days > 7) warn(`fechamento oficial da página é de ${ref} (${Math.floor(days)} dias): pipeline da B3 parado?`);
+  }
+}
+
 // ── Runner ───────────────────────────────────────────────────────
 
 function main() {
@@ -329,6 +360,12 @@ function main() {
   try { walkSrc(tickerSrc); } catch {
     addIssue('scripts/ticker', 'marca-aposentada', 'fontes das páginas de ticker não encontrados — o gate da causa não rodou');
   }
+  // As páginas macro (scripts/macro/) também são causa: mesmo gate.
+  try { walkSrc(join(ROOT, 'scripts', 'macro')); } catch {
+    addIssue('scripts/macro', 'marca-aposentada', 'fontes das páginas macro não encontrados — o gate da causa não rodou');
+  }
+
+  checkMacroPage();
 
   // ── Resultado ──
 
