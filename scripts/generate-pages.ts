@@ -6,6 +6,7 @@ import { generateAirtonTickerHTML } from './airton-template';
 import { getFinancialData, performValuation } from './valuation';
 import { generateTickerPage, buildTickerCss } from './ticker/render';
 import { generateIndexHTML, generateSectorPage, generateSitemap, generateRobots, sectorSlug } from './template';
+import { generateMacro } from './macro';
 import { SCENARIO_PRESETS, DEFAULT_COST_OF_DEBT } from './constants';
 import type { ValuationAssumptions, TickerIndexEntry } from './types';
 
@@ -212,10 +213,14 @@ async function main() {
     }).sort();
     const airtonSet = new Set(airtonDirs);
 
+    // Páginas macro (/macro/): trava MACRO_BUFFETT_ENABLED; nunca derruba o build.
+    const macroEntries = await generateMacro({ outRoot: ROOT });
+    const macroLink = macroEntries.length ? { href: '/macro/indicador-de-buffett/', label: 'A bolsa está cara? Veja o Indicador de Buffett de hoje' } : undefined;
+
     // Generate /acoes/index.html — todos os tickers do Supabase QUE TÊM PÁGINA (inclui os gerados agora)
     const indexTickers = allTickerData.filter(t => t.price > 0 && hasRealPage(t.ticker));
     if (indexTickers.length > 0) {
-      const indexHTML = generateIndexHTML(indexTickers, airtonSet);
+      const indexHTML = generateIndexHTML(indexTickers, airtonSet, macroLink);
       const acoesDir = join(ROOT, 'acoes');
       mkdirSync(acoesDir, { recursive: true });
       writeFileSync(join(acoesDir, 'index.html'), indexHTML, 'utf-8');
@@ -243,7 +248,7 @@ async function main() {
     });
     // Get sectors for sitemap
     const allSectors = [...new Set(allTickerData.map(t => t.sector).filter(Boolean))].sort();
-    const sitemap = generateSitemap(allTickerDirs, allSectors, tickerLastmod, airtonDirs);
+    const sitemap = generateSitemap(allTickerDirs, allSectors, tickerLastmod, airtonDirs, macroEntries);
     writeFileSync(join(ROOT, 'sitemap.xml'), sitemap, 'utf-8');
     console.log(`📄 sitemap.xml gerado (${allTickerDirs.length} tickers, ${airtonDirs.length} páginas /airton/{TICKER}/)`);
 

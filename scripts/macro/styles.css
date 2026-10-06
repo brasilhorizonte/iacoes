@@ -1,0 +1,5 @@
+/* Páginas macro: mesmos tokens e componentes das páginas de ticker (import abaixo, que
+   também escaneia scripts/ticker/) + as classes dos componentes desta pasta. CSS separado
+   de propósito: as páginas de ticker não mudam nem um byte por causa das páginas macro. */
+@import "../ticker/styles.css";
+@source "./";
