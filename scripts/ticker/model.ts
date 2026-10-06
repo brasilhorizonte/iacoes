@@ -210,7 +210,9 @@ export function buildModel(data: FinancialData, val: ComprehensiveValuation, all
     dcf: `${APP}?ref=iacoes&ticker=${symbol}&intent=dcf`,
     airton: `${APP}?ref=iacoes&ticker=${symbol}&intent=auditoria`,
     airtonIntro: `${APP}?ref=iacoes&ticker=${symbol}&intent=airton`,
-    alerta: `${APP}?ref=iacoes&ticker=${symbol}&intent=alerta`,
+    // O app ainda não lê `intent`: sem `next`, quem cria a conta cai na Home. `tab` vai fora do
+    // `next` porque o Auth.tsx concatena o resto da query com outro `?` (next com `?` quebra a aba).
+    alerta: `${APP}?ref=iacoes&ticker=${symbol}&intent=alerta&next=${q(`/ativo/${symbol}`)}&tab=tese`,
     asset: `${APP}?ref=iacoes&ticker=${symbol}&next=${q(`/ativo/${symbol}`)}`,
     generic: `${APP}?ref=iacoes`,
     ticker: `${APP}?ref=iacoes&ticker=${symbol}`,
