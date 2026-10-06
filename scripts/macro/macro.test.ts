@@ -8,7 +8,7 @@ import {
   type BuffettData, type Point,
 } from './data';
 import { buildBuffettModel } from './model';
-import { generateMacro, llmsTxt } from './index';
+import { generateMacro, llmsTxt, resumoJson } from './index';
 import { renderBuffettPage } from './render';
 
 // Valores reais de produção nas pontas (R$ MM): PIB 12m e valor de mercado oficial da B3.
@@ -124,6 +124,18 @@ test('página renderizada: CTAs rastreados, Dataset e nenhuma tabela de preços 
   assert.match(html, /data-ref-date="2026-10-02"/);
   // Decisão do Gabriel (06/10): a página não lista ações com preço/valor justo.
   assert.doesNotMatch(html, />Graham<\/th>|>Diferença<\/th>|>Preço<\/th>/);
+});
+
+test('resumo JSON da landing: manchete no último ponto, URL relativa e leve', () => {
+  const json = resumoJson(buildBuffettModel(synthetic(), { today: new Date('2026-10-06T12:00:00Z') }));
+  const r = JSON.parse(json);
+  assert.equal(r.value, 40.43);
+  assert.equal(r.date, '2026-10-02');
+  assert.equal(r.url, '/macro/indicador-de-buffett/');
+  assert.equal(r.series.length, 322);
+  assert.deepEqual(r.series[r.series.length - 1], ['2026-10', 40.4]);
+  assert.equal(typeof r.percentile, 'number');
+  assert.ok(json.length < 10_000, String(json.length));
 });
 
 test('trava de publicação: desligada não escreve nada', async () => {

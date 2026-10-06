@@ -13,6 +13,7 @@ import {
 export const HUB_PATH = '/macro/';
 export const PAGE_PATH = '/macro/indicador-de-buffett/';
 export const CSV_NAME = 'indicador-buffett-brasil.csv';
+export const JSON_NAME = 'dados.json';
 
 const MES_CURTO = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
 export const monthLabel = (isoOrMonth: string): string => `${MES_CURTO[Number(isoOrMonth.slice(5, 7)) - 1]}/${isoOrMonth.slice(0, 4)}`;

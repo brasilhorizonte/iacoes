@@ -10,7 +10,7 @@
 import { existsSync, mkdirSync, statSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { fetchBuffettData, headline, validate, type BuffettData } from './data';
-import { buildBuffettModel, CSV_NAME, HUB_PATH, PAGE_PATH, type BuffettModel } from './model';
+import { buildBuffettModel, CSV_NAME, HUB_PATH, JSON_NAME, PAGE_PATH, type BuffettModel } from './model';
 import { buildMacroCss, renderBuffettPage, renderMacroHub } from './render';
 
 export const macroEnabled = (): boolean => process.env.MACRO_BUFFETT_ENABLED === 'true';
@@ -48,6 +48,36 @@ export function llmsTxt(m: BuffettModel): string {
 }
 
 /**
+ * Resumo público para a landing (e quem mais quiser): número do dia, régua histórica e a
+ * série mensal com 1 casa. A landing só mostra a seção "A bolsa está cara?" quando este
+ * arquivo existe — com a trava desligada ele não é gerado e a seção fica escondida, sem
+ * link apontando para página que ainda não existe.
+ */
+export function resumoJson(m: BuffettModel): string {
+  const r1 = (n: number) => Math.round(n * 10) / 10;
+  const series: [string, number][] = m.monthly.map((p) => [p.date.slice(0, 7), r1(p.value)]);
+  // O último ponto é sempre a manchete (fechamento oficial D-1), não o mensal da série.
+  const month = m.h.date.slice(0, 7);
+  if (series.length && series[series.length - 1][0] === month) series[series.length - 1][1] = r1(m.h.value);
+  else series.push([month, r1(m.h.value)]);
+  return JSON.stringify({
+    value: m.h.value,
+    date: m.h.date,
+    dateBR: m.dateBR,
+    band: m.faixa,
+    percentile: m.percentile,
+    since: m.s.since,
+    mean: r1(m.stats.mean),
+    p25: r1(m.stats.p25),
+    p75: r1(m.stats.p75),
+    min: { value: r1(m.stats.min.value), month: m.s.minMonth },
+    max: { value: r1(m.stats.max.value), month: m.s.maxMonth },
+    url: PAGE_PATH,
+    series,
+  });
+}
+
+/**
  * Gera as páginas macro em `outRoot` (raiz do site no build; outra pasta no preview).
  * Devolve as entradas do sitemap (vazio com a trava desligada).
  */
@@ -78,8 +108,9 @@ export async function generateMacro(opts: {
     writeFileSync(join(opts.outRoot, HUB_PATH, 'index.html'), renderMacroHub(m), 'utf-8');
     writeFileSync(join(pageDir, 'index.html'), renderBuffettPage(m), 'utf-8');
     writeFileSync(join(pageDir, CSV_NAME), m.csv, 'utf-8');
+    writeFileSync(join(pageDir, JSON_NAME), resumoJson(m), 'utf-8');
     writeFileSync(join(opts.outRoot, 'llms.txt'), llmsTxt(m), 'utf-8');
-    console.log(`📉 Indicador de Buffett: ${m.v}% (fechamento oficial de ${m.dateBR}) — ${PAGE_PATH}, ${HUB_PATH}, CSV e llms.txt gerados`);
+    console.log(`📉 Indicador de Buffett: ${m.v}% (fechamento oficial de ${m.dateBR}) — ${PAGE_PATH}, ${HUB_PATH}, CSV, ${JSON_NAME} e llms.txt gerados`);
     return [
       { loc: m.hubUrl, lastmod: m.h.date, changefreq: 'daily', priority: '0.7' },
       { loc: m.url, lastmod: m.h.date, changefreq: 'daily', priority: '0.85' },
