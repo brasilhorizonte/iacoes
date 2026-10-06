@@ -5,7 +5,7 @@ import { Container } from './chrome';
 import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardContent, CardFooter } from './ui/card';
 import { Badge } from './ui/badge';
 import { ButtonLink } from './ui/button';
-import { Lock, ArrowRight, Calculator } from './icons';
+import { Lock, ArrowRight, Calculator, Bell } from './icons';
 
 const upsideVariant = (fv: number, price: number) => (fv > 0 ? (fv >= price ? 'positive' : 'negative') : 'neutral') as 'positive' | 'negative' | 'neutral';
 
@@ -49,8 +49,10 @@ function FairValue({ id, fv, price, na }: { id: string; fv: number; price: numbe
   );
 }
 
-function MethodCard({ id, title, desc, fv, price, na, children, footer, formula }: {
+function MethodCard({ id, title, desc, fv, price, na, children, footer, formula, alerta }: {
   id: string; title: string; desc: string; fv: number; price: number; na: string; children: React.ReactNode; footer: React.ReactNode; formula: string;
+  /** Cadastro na plataforma com intenção de alerta (WhatsApp); cta por método para medir qual converte. */
+  alerta: string;
 }) {
   return (
     <Card className="gap-4" data-calc={id}>
@@ -68,6 +70,7 @@ function MethodCard({ id, title, desc, fv, price, na, children, footer, formula 
       <CardFooter className="mt-auto flex-col items-stretch gap-1.5 border-t pt-4 text-xs text-muted-foreground">
         <div className="flex flex-wrap gap-x-4 gap-y-1">{footer}</div>
         <code className="font-mono text-[11px] text-muted-foreground/90">{formula}</code>
+        <ButtonLink href={alerta} cta={`calc-alerta-${id}`} className="mt-2 w-full"><Bell /> Salvar e criar alerta no WhatsApp</ButtonLink>
       </CardFooter>
     </Card>
   );
@@ -181,7 +184,7 @@ export function Calculators({ m }: { m: TickerModel }) {
           <div className="max-w-2xl">
             <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-gold-strong uppercase"><Calculator className="size-3.5" /> Calculadoras de preço justo</p>
             <h2 id="calc-title" className="text-2xl font-bold tracking-tight sm:text-3xl">Calcule o preço justo de {m.symbol}</h2>
-            <p className="mt-1 text-muted-foreground">Três métodos clássicos com premissas ajustáveis. O resultado muda na hora; nada é salvo.</p>
+            <p className="mt-1 text-muted-foreground">Três métodos clássicos com premissas ajustáveis. O resultado muda na hora — salve e receba alertas de {m.symbol} no WhatsApp com sua conta grátis.</p>
           </div>
           <div className="rounded-lg border bg-card px-4 py-2 text-right">
             <div className="text-xs text-muted-foreground">Cotação de referência</div>
@@ -191,7 +194,7 @@ export function Calculators({ m }: { m: TickerModel }) {
 
         <div className="grid gap-4 md:grid-cols-3">
           <MethodCard
-            id="graham" title="Graham" desc="Valor intrínseco por lucro e patrimônio" fv={graham.fv} price={m.price}
+            id="graham" title="Graham" desc="Valor intrínseco por lucro e patrimônio" fv={graham.fv} price={m.price} alerta={`${m.links.alerta}&metodo=graham`}
             na="Não se aplica: LPA ou VPA negativo."
             formula="√(P/L máx. × P/VP máx. × LPA × VPA) × (1 − margem)"
             footer={<><span>LPA <strong className="font-mono text-foreground">{brl(graham.lpa)}</strong></span><span>VPA <strong className="font-mono text-foreground">{brl(graham.vpa)}</strong></span></>}
@@ -202,7 +205,7 @@ export function Calculators({ m }: { m: TickerModel }) {
           </MethodCard>
 
           <MethodCard
-            id="bazin" title="Bazin" desc="Preço teto pelos dividendos" fv={bazin.fv} price={m.price}
+            id="bazin" title="Bazin" desc="Preço teto pelos dividendos" fv={bazin.fv} price={m.price} alerta={`${m.links.alerta}&metodo=bazin`}
             na={hasDiv ? 'Sem dividendos na janela escolhida.' : 'Não se aplica: sem dividendos nos últimos 10 anos.'}
             formula="dividendo médio anual ÷ DY mínimo"
             footer={<><span>Proventos 12m <strong className="font-mono text-foreground">{brl(m.div.ttm)}</strong></span><span>DY atual <strong className="font-mono text-foreground">{m.div.dyTTM > 0 ? `${num(m.div.dyTTM * 100, 1)}%` : '—'}</strong></span></>}
@@ -212,7 +215,7 @@ export function Calculators({ m }: { m: TickerModel }) {
           </MethodCard>
 
           <MethodCard
-            id="gordon" title="Gordon (DDM)" desc="Desconto de dividendos com crescimento" fv={gordon.fv} price={m.price}
+            id="gordon" title="Gordon (DDM)" desc="Desconto de dividendos com crescimento" fv={gordon.fv} price={m.price} alerta={`${m.links.alerta}&metodo=gordon`}
             na={hasDiv ? 'Ajuste: a taxa de desconto precisa ser maior que o crescimento.' : 'Não se aplica: sem dividendos nos últimos 10 anos.'}
             formula="D₀ × (1 + g) ÷ (r − g)"
             footer={<><span>Média 5 anos <strong className="font-mono text-foreground">{brl(m.div.avg['5'])}</strong>/ação</span></>}
