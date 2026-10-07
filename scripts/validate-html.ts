@@ -298,6 +298,74 @@ function checkMacroPage() {
   }
 }
 
+/**
+ * RULE: ferramentas (páginas /ferramentas/, scripts/ferramentas)
+ *
+ * Checagem leve e DETERMINÍSTICA (reprova): o HTML sai de código, não de dado externo, então
+ * defeito aqui é bug de template. Hub presente, canonical igual ao caminho, um <h1>, JSON-LD que
+ * faz parse, FAQ visível com o mesmo número de perguntas do FAQPage, CTA para /authnew com
+ * data-cta, nenhum rascunho (noindex) na raiz e o bundle de widgets existindo quando é carregado.
+ * Frescor dos dados.json (ranking e fatos relevantes) só AVISA, no molde do checkMacroPage.
+ */
+function checkToolPages() {
+  const base = join(ROOT, 'ferramentas');
+  if (!existsSync(base)) return;
+  const hub = join(base, 'index.html');
+  const pages = readdirSync(base).filter((d) => !d.startsWith('.') && existsSync(join(base, d, 'index.html')));
+  if (pages.length && !existsSync(hub)) addIssue('ferramentas/index.html', 'ferramentas', 'hub ausente: o breadcrumb das ferramentas apontaria para 404');
+
+  const files: [string, string, string][] = [
+    ...(existsSync(hub) ? [['ferramentas/index.html', hub, ''] as [string, string, string]] : []),
+    ...pages.map((d) => [`ferramentas/${d}/index.html`, join(base, d, 'index.html'), d] as [string, string, string]),
+  ];
+  for (const [rel, file, slug] of files) {
+    const html = readFileSync(file, 'utf-8');
+    const expected = `https://iacoes.com.br/ferramentas/${slug ? `${slug}/` : ''}`;
+    const canon = /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1];
+    if (canon !== expected) addIssue(rel, 'ferramentas', `canonical ${canon ?? 'ausente'} (esperado ${expected})`);
+    const h1 = (html.match(/<h1[\s>]/g) || []).length;
+    if (h1 !== 1) addIssue(rel, 'ferramentas', `${h1} <h1> na página (esperado 1)`);
+    if (/<meta name="robots" content="noindex/.test(html)) addIssue(rel, 'ferramentas', 'página em rascunho (noindex) na raiz do site: rascunho só existe na prévia');
+    const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => m[1]);
+    if (!blocks.length) addIssue(rel, 'ferramentas', 'sem JSON-LD');
+    let faqQuestions = -1;
+    for (const b of blocks) {
+      try {
+        const o = JSON.parse(b);
+        if (o['@type'] === 'FAQPage') faqQuestions = Array.isArray(o.mainEntity) ? o.mainEntity.length : 0;
+      } catch (e) {
+        addIssue(rel, 'ferramentas', `JSON-LD que não faz parse: ${e instanceof Error ? e.message : String(e)}`);
+      }
+    }
+    if (!/href="https:\/\/app\.brasilhorizonte\.com\.br\/authnew[^"]*"[^>]*data-cta="/.test(html)) addIssue(rel, 'ferramentas', 'nenhum CTA para /authnew com data-cta');
+    if (slug) {
+      const faqHtml = (html.split('id="faq"')[1] || '').split('</section>')[0];
+      const details = (faqHtml.match(/<details/g) || []).length;
+      if (details === 0 || details !== faqQuestions) addIssue(rel, 'ferramentas', `FAQ visível com ${details} pergunta(s) e FAQPage com ${faqQuestions}`);
+    }
+    for (const [asset, path] of [['js', 'assets/js/ferramentas.js'], ['css', 'assets/css/ferramentas.css']]) {
+      if (html.includes(`/${path}?v=`) && !existsSync(join(ROOT, path))) addIssue(rel, 'ferramentas', `carrega /${path} (bundle ${asset} dos widgets), que não existe`);
+    }
+  }
+
+  const warn = (m: string) => console.warn(`::warning title=Ferramentas::${m}`);
+  for (const [path, key, label] of [
+    ['ferramentas/ranking-de-acoes/dados.json', 'date', 'ranking'],
+    ['ferramentas/fatos-relevantes/dados.json', 'updated', 'fatos relevantes'],
+  ]) {
+    const file = join(ROOT, path);
+    if (!existsSync(file)) continue;
+    try {
+      const ref = String(JSON.parse(readFileSync(file, 'utf-8'))[key] || '');
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(ref)) { warn(`${path}: sem data (${key})`); continue; }
+      const days = (Date.now() - Date.parse(`${ref}T12:00:00Z`)) / 86400000;
+      if (days > 7) warn(`${label}: dado de ${ref} (${Math.floor(days)} dias) — fonte parada?`);
+    } catch {
+      warn(`${path}: JSON inválido`);
+    }
+  }
+}
+
 // ── Runner ───────────────────────────────────────────────────────
 
 function main() {
@@ -351,7 +419,7 @@ function main() {
       if (e.startsWith('.')) continue;
       const full = join(dir, e);
       if (statSync(full).isDirectory()) walkSrc(full);
-      else if (/\.(tsx?|js|html)$/.test(e)) {
+      else if (/\.(tsx?|js|html|css)$/.test(e)) {
         checkMarcaAposentada(full.replace(ROOT, '').replace(/\\/g, '/').replace(/^\//, ''), readFileSync(full, 'utf-8'));
         checked++;
       }
@@ -364,8 +432,20 @@ function main() {
   try { walkSrc(join(ROOT, 'scripts', 'macro')); } catch {
     addIssue('scripts/macro', 'marca-aposentada', 'fontes das páginas macro não encontrados — o gate da causa não rodou');
   }
+  // Ferramentas (scripts/ferramentas/: conteúdo, páginas e widgets do bundle) e o template das
+  // páginas /airton/{TICKER}/ também são causa: mesmo gate.
+  try { walkSrc(join(ROOT, 'scripts', 'ferramentas')); } catch {
+    addIssue('scripts/ferramentas', 'marca-aposentada', 'fontes das ferramentas não encontrados — o gate da causa não rodou');
+  }
+  try {
+    checkMarcaAposentada('scripts/airton-template.ts', readFileSync(join(ROOT, 'scripts', 'airton-template.ts'), 'utf-8'));
+    checked++;
+  } catch {
+    addIssue('scripts/airton-template.ts', 'marca-aposentada', 'template do /airton/{TICKER}/ não encontrado — o gate da causa não rodou');
+  }
 
   checkMacroPage();
+  checkToolPages();
 
   // ── Resultado ──
 

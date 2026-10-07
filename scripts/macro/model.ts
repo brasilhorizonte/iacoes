@@ -90,7 +90,9 @@ export function buildBuffettModel(d: BuffettData, opts: { today?: Date } = {}): 
     else estimatedRanges.push({ from: p.date, to: p.date });
   });
 
-  const app = `${APP}?ref=iacoes&page=buffett&utm_medium=macro`;
+  // Painel Macro do app. `next` termina em `&_=` porque o Auth.tsx cola o resto da query com
+  // outro `?` (SPEC §2); sem isso a aba vira "macro?ref=…" e o app abre o Dashboard.
+  const app = `${APP}?ref=iacoes&page=buffett&utm_medium=macro&next=${encodeURIComponent('/?s=ialocador&t=macro&_=')}`;
   const faq = [
     {
       q: 'O que é o Indicador de Buffett?',

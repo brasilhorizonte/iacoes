@@ -208,13 +208,21 @@ export function buildModel(data: FinancialData, val: ComprehensiveValuation, all
   const monthYear = `${MONTHS[now.getMonth()]} de ${now.getFullYear()}`;
 
   const q = encodeURIComponent;
+  // Deep link (SPEC §2): o app só obedece `next`. O Auth.tsx cola o resto da query no fim do
+  // `next` com outro `?`, então todo `next` com query termina em `&_=`: o descartável engole o
+  // primeiro parâmetro repassado e `s`/`t`/`tab` chegam intactos (com utm_* e fbclid do _iaClick).
+  // `ref`, `ticker` e `intent` no topo não mudam a tela (o Auth.tsx só segue o `next`). O `ref` vale
+  // para a atribuição first-touch do app (`bh_utm`, gravada no cadastro por e-mail, ainda no /authnew);
+  // no destino ele é justamente o parâmetro que o descartável engole.
+  // Quem acrescenta parâmetros (`&metodo=` nas calculadoras, `&prompt=` no AIrton) acrescenta no
+  // topo, depois do `next`: vão junto no repasse e não mexem no destino.
+  const toApp = (intent: string, next: string) => `${APP}?ref=iacoes&ticker=${symbol}&intent=${intent}&next=${q(next)}`;
   const links = {
-    dcf: `${APP}?ref=iacoes&ticker=${symbol}&intent=dcf`,
-    airton: `${APP}?ref=iacoes&ticker=${symbol}&intent=auditoria`,
-    airtonIntro: `${APP}?ref=iacoes&ticker=${symbol}&intent=airton`,
-    // O app ainda não lê `intent`: sem `next`, quem cria a conta cai na Home. `tab` vai fora do
-    // `next` porque o Auth.tsx concatena o resto da query com outro `?` (next com `?` quebra a aba).
-    alerta: `${APP}?ref=iacoes&ticker=${symbol}&intent=alerta&next=${q(`/ativo/${symbol}`)}&tab=tese`,
+    dcf: toApp('dcf', `/?s=ianalista&t=valuai&ticker=${symbol}&_=`),                  // Valuation (DCF) com o ticker
+    airton: toApp('auditoria', `/?s=ianalista&t=validador&ticker=${symbol}&autorun=1&_=`), // Validador: preenche o ticker e foca a tese
+    airtonIntro: toApp('airton', '/?s=workspace&_='),                                   // AIrton
+    alerta: toApp('alerta', `/ativo/${symbol}?tab=tese&_=`),                            // aba Tese do ativo (alertas por ativo)
+    // Visão geral do ativo: sem `?` no `next`, dispensa o `&_=`.
     asset: `${APP}?ref=iacoes&ticker=${symbol}&next=${q(`/ativo/${symbol}`)}`,
     generic: `${APP}?ref=iacoes`,
     ticker: `${APP}?ref=iacoes&ticker=${symbol}`,

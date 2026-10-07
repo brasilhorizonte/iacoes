@@ -62,6 +62,8 @@ export interface RawBrapiQuote {
   dividendYield: number;
   enterpriseToEbitda: number;
   regularMarketTime?: string;
+  /** Só `regular_market_time` (sem o fallback de `updated_at`, que muda em fim de semana). */
+  marketTime?: string;
   fiftyTwoWeekLow?: number;
   fiftyTwoWeekHigh?: number;
   averageDailyVolume3Month?: number;
@@ -121,6 +123,10 @@ export interface RawDividend {
   paymentDate: string;
   dividendType: string;
   currency: string;
+  /** Valor como declarado na época; só existe quando o ajuste por desdobramento mudou `amount`. */
+  amountDeclared?: number;
+  /** Produto dos fatores de desdobramento/grupamento/bonificação aplicados (scripts/lib/splits.ts). */
+  splitDivisor?: number;
 }
 
 export interface FundamentalData {
@@ -194,6 +200,8 @@ export interface FinancialData {
   fundamentals: FundamentalData;
   businessSummary?: string | null;
   profile?: CompanyProfile;
+  /** `regular_market_time` da cotação usada (timestamptz em texto); alimenta o `_quoteDate`. */
+  quoteTime?: string | null;
 }
 
 export interface QualitativeScore {

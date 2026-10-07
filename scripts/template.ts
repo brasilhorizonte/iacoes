@@ -35,6 +35,8 @@ export const generateIndexHTML = (
   airtonSet: Set<string> = new Set(),
   // Link para o Indicador de Buffett (só existe com MACRO_BUFFETT_ENABLED=true).
   macroLink?: { href: string; label: string },
+  // Link para o hub /ferramentas/ (só quando o generateFerramentas publicou o hub nesta execução).
+  toolsLink?: { href: string; label: string },
 ): string => {
   const today = new Date().toLocaleDateString('pt-BR');
   const year = new Date().getFullYear();
@@ -254,7 +256,8 @@ export const generateIndexHTML = (
     <span class="nav-divider"></span>
     <a href="/" class="nav-iacoes"><span class="nav-iacoes-i">IA</span><span class="nav-iacoes-acoes">ções</span><span class="nav-cursor"></span></a>
   </div>
-  <div class="nav-links">
+  <div class="nav-links">${toolsLink ? `
+    <a href="${toolsLink.href}" class="nav-btn nav-btn-outline" onclick="_iaTrack('cta_click','acoes-ferramentas-nav')">Ferramentas</a>` : ''}
     <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="nav-btn nav-btn-outline" data-cta="nav-app" onclick="_iaClick(event)">Acessar App</a>
     <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes" class="nav-btn nav-btn-gold" data-cta="nav-assinar" onclick="_iaClick(event)">Assinar Plano</a>
   </div>
@@ -271,7 +274,8 @@ export const generateIndexHTML = (
   <header class="page-header">
     <h1 class="font-playfair">Todas as Ações da B3</h1>
     <p><span class="count">${tickers.length}</span> ações com análise fundamentalista e preço justo por Graham, Bazin e Gordon. Dados atualizados em ${today}.</p>${macroLink ? `
-    <p><a href="${macroLink.href}" style="color:#8a6a24;font-weight:600">${macroLink.label} →</a></p>` : ''}
+    <p><a href="${macroLink.href}" style="color:#8a6a24;font-weight:600">${macroLink.label} →</a></p>` : ''}${toolsLink ? `
+    <p><a href="${toolsLink.href}" style="color:#8a6a24;font-weight:600" onclick="_iaTrack('cta_click','acoes-ferramentas')">${toolsLink.label} →</a></p>` : ''}
   </header>
 
   <div class="idx-filters">
@@ -519,15 +523,35 @@ export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[], 
 </html>`;
 };
 
+/** Entrada extra do sitemap (macro, ferramentas): URL absoluta com barra final e data real. */
+export interface SitemapEntry {
+  loc: string;
+  lastmod: string;
+  changefreq: string;
+  priority: string;
+}
+
+/** Só URL do próprio site e lastmod AAAA-MM-DD; a 1ª ocorrência de cada loc vale (sem duplicata). */
+export const sanitizeSitemapEntries = (extra: SitemapEntry[], taken: string[] = []): SitemapEntry[] => {
+  const seen = new Set(taken);
+  return extra.filter(e => {
+    if (!/^https:\/\/iacoes\.com\.br\/[^\s<>"&']*$/.test(e.loc) || !/^\d{4}-\d{2}-\d{2}$/.test(e.lastmod) || seen.has(e.loc)) return false;
+    seen.add(e.loc);
+    return true;
+  });
+};
+
 export const generateSitemap = (
   tickers: string[],
   sectors: string[] = [],
   lastmodMap: Record<string, string> = {},
   airtonTickers: string[] = [],
-  // Páginas fora do padrão ticker/setor (ex.: /macro/, só com MACRO_BUFFETT_ENABLED=true).
-  extra: { loc: string; lastmod: string; changefreq: string; priority: string }[] = [],
+  // Páginas fora do padrão ticker/setor: /macro/ (com MACRO_BUFFETT_ENABLED=true) e /ferramentas/
+  // (hub + ferramentas prontas, lastmod = data do dado ou da revisão do conteúdo).
+  extra: SitemapEntry[] = [],
 ): string => {
   const today = new Date().toISOString().split('T')[0];
+  extra = sanitizeSitemapEntries(extra, ['https://iacoes.com.br/', 'https://iacoes.com.br/acoes/', 'https://iacoes.com.br/airton/']);
   const urls = [
     `  <url><loc>https://iacoes.com.br/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>`,
     `  <url><loc>https://iacoes.com.br/acoes/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>0.9</priority></url>`,

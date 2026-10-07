@@ -6,6 +6,7 @@ import type {
 import { ValuationMethodType } from './types';
 import { DEFAULT_WEIGHTS, SCENARIO_PRESETS, DEFAULT_COST_OF_DEBT } from './constants';
 import { fetchFinancials } from './supabase';
+import { splitAdjustedDividendYield } from './lib/splits';
 
 // --- Helpers ---
 
@@ -146,7 +147,9 @@ export const getFinancialData = async (ticker: string): Promise<FinancialData> =
     pl, pvp,
     pebit: ebit > 0 ? mCap / ebit : 0,
     psr: revenue > 0 ? mCap / revenue : 0,
-    divYield: tickerBrapi.dividendYield || 0,
+    // DY do banco (proventos crus) corrigido quando há desdobramento/grupamento/bonificação
+    // na janela de 12 meses: os proventos já chegam ajustados de fetchFinancials.
+    divYield: splitAdjustedDividendYield(rawDividends, tickerBrapi.regularMarketPrice, tickerBrapi.dividendYield || 0),
     evEbitda, evEbit, lpa, vpa,
     grossMargin: revenue > 0 ? (baseIncome?.gross_profit || 0) / revenue : 0,
     ebitMargin: revenue > 0 ? ebit / revenue : 0,
@@ -186,7 +189,8 @@ export const getFinancialData = async (ticker: string): Promise<FinancialData> =
       ytdReturn: tickerBrapi.ytdReturn ?? null,
       yearChange: tickerBrapi.fiftyTwoWeekChange ?? null,
       dividendYield5y: tickerBrapi.dividendYield5y || null,
-    }
+    },
+    quoteTime: tickerBrapi.marketTime || null,
   };
 };
 

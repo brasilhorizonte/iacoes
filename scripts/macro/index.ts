@@ -7,8 +7,9 @@
  * Nunca derruba o build: dado velho, fora da faixa ou erro de rede viram aviso no log do
  * CI (::warning::) e a página anterior, se existir, continua no ar e no sitemap.
  */
-import { existsSync, mkdirSync, statSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { num } from '../ticker/lib/format';
 import { fetchBuffettData, headline, validate, type BuffettData } from './data';
 import { buildBuffettModel, CSV_NAME, HUB_PATH, JSON_NAME, PAGE_PATH, type BuffettModel } from './model';
 import { buildMacroCss, renderBuffettPage, renderMacroHub } from './render';
@@ -34,17 +35,46 @@ function existingEntries(outRoot: string): SitemapEntry[] {
   return out;
 }
 
+/**
+ * Seção do macro no /llms.txt. O arquivo tem DONO ÚNICO (scripts/generate-pages.ts, via
+ * scripts/ferramentas/llms.ts): este módulo só entrega a seção, nunca escreve o arquivo.
+ */
+function llmsSection(p: { url: string; v: string; dateBR: string; since: string; mean: string; p25: string; p75: string; csvUrl: string }): string {
+  return `## Indicadores macro
+- [Indicador de Buffett Brasil](${p.url}): valor de mercado das empresas listadas na B3 ÷ PIB de 12 meses. Hoje: ${p.v}% (fechamento oficial de ${p.dateBR}); média desde ${p.since}: ${p.mean}%; faixa histórica (p25–p75): ${p.p25}% a ${p.p75}%. Série mensal em CSV (CC BY 4.0): ${p.csvUrl}`;
+}
+
+/** Seção do llms.txt a partir do modelo (mesmo texto que sai do dados.json no disco). */
 export function llmsTxt(m: BuffettModel): string {
-  return `# IAções
-> Análise fundamentalista e valuation de ações da B3, da Brasil Horizonte: preço justo por Graham, Bazin, Gordon e DCF, sem conflito de interesse.
+  return llmsSection({ url: m.url, v: m.v, dateBR: m.dateBR, since: m.s.since, mean: m.s.mean, p25: m.s.p25, p75: m.s.p75, csvUrl: m.csvUrl });
+}
 
-## Indicadores macro
-- [Indicador de Buffett Brasil](${m.url}): valor de mercado das empresas listadas na B3 ÷ PIB de 12 meses. Hoje: ${m.v}% (fechamento oficial de ${m.dateBR}); média desde ${m.s.since}: ${m.s.mean}%; faixa histórica (p25–p75): ${m.s.p25}% a ${m.s.p75}%. Série mensal em CSV (CC BY 4.0): ${m.csvUrl}
-
-## Ações
-- [Todas as ações da B3](${SITE}/acoes/): preço justo e indicadores fundamentalistas de cada ação, atualizados todo dia útil.
-- [AIrton](${SITE}/airton/): alertas de documentos da CVM com resumo por inteligência artificial.
-`;
+/**
+ * Seção do llms.txt lida do último dados.json bom no disco — vale também quando a geração de hoje
+ * falhou (a página anterior segue no ar). Trava desligada ou arquivo ausente/inválido: vazio.
+ */
+export function macroLlmsSection(outRoot: string, enabled = macroEnabled()): string {
+  if (!enabled) return '';
+  const file = join(outRoot, PAGE_PATH, JSON_NAME);
+  if (!existsSync(file) || !existsSync(join(outRoot, PAGE_PATH, 'index.html'))) return '';
+  try {
+    const r = JSON.parse(readFileSync(file, 'utf-8')) as Record<string, unknown>;
+    const n = (k: string) => (typeof r[k] === 'number' && Number.isFinite(r[k]) ? (r[k] as number) : null);
+    const value = n('value'), mean = n('mean'), p25 = n('p25'), p75 = n('p75');
+    if (value === null || mean === null || p25 === null || p75 === null || typeof r.dateBR !== 'string' || typeof r.since !== 'string') return '';
+    return llmsSection({
+      url: `${SITE}${PAGE_PATH}`,
+      v: num(value, 2),
+      dateBR: r.dateBR,
+      since: r.since,
+      mean: num(mean, 1),
+      p25: num(p25, 1),
+      p75: num(p75, 1),
+      csvUrl: `${SITE}${PAGE_PATH}${CSV_NAME}`,
+    });
+  } catch {
+    return '';
+  }
 }
 
 /**
@@ -109,8 +139,8 @@ export async function generateMacro(opts: {
     writeFileSync(join(pageDir, 'index.html'), renderBuffettPage(m), 'utf-8');
     writeFileSync(join(pageDir, CSV_NAME), m.csv, 'utf-8');
     writeFileSync(join(pageDir, JSON_NAME), resumoJson(m), 'utf-8');
-    writeFileSync(join(opts.outRoot, 'llms.txt'), llmsTxt(m), 'utf-8');
-    console.log(`📉 Indicador de Buffett: ${m.v}% (fechamento oficial de ${m.dateBR}) — ${PAGE_PATH}, ${HUB_PATH}, CSV, ${JSON_NAME} e llms.txt gerados`);
+    // llms.txt: dono único no generate-pages.ts (a seção do macro sai de macroLlmsSection).
+    console.log(`📉 Indicador de Buffett: ${m.v}% (fechamento oficial de ${m.dateBR}) — ${PAGE_PATH}, ${HUB_PATH}, CSV e ${JSON_NAME} gerados`);
     return [
       { loc: m.hubUrl, lastmod: m.h.date, changefreq: 'daily', priority: '0.7' },
       { loc: m.url, lastmod: m.h.date, changefreq: 'daily', priority: '0.85' },
