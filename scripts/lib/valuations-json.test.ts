@@ -4,7 +4,10 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cents, perShare, perShareSigned, widgetValuationFields } from './valuations-json';
+import { buildValuationsJson, cents, countValuations, perShare, perShareSigned, readValuationsFile, widgetValuationFields } from './valuations-json';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs';
+import { tmpdir } from 'os';
+import { join } from 'path';
 import { buildModel } from '../ticker/model';
 import { brl } from '../ticker/lib/format';
 import { ValuationMethodType, type ComprehensiveValuation, type FinancialData, type RawDividend } from '../types';
@@ -139,4 +142,78 @@ test('Graham recalculado a partir de lpa/vpa do arquivo = graham publicado (a la
     assert.equal(cents(recalc), w.graham);
     assert.equal(Math.sign(w.lpa), Math.sign(lpa));
   }
+});
+
+// ─── Arquivo inteiro: execução com tickers na linha de comando mescla (SPEC-v2 §E3) ─────────
+
+test('valuations.json: execução parcial (tickers na linha de comando) mescla com o anterior, não trunca', () => {
+  const previous = {
+    _quoteDate: '2026-10-06',
+    PETR4: { name: 'Petrobras', price: 53.98, divTTM: 3.0 },
+    VALE3: { name: 'Vale', price: 60.1, divTTM: 5.6 },
+    _outro: 'metadado antigo',
+    RUIM3: 'não é objeto',
+  };
+  const current = { PETR4: { name: 'Petrobras', price: 54.52, divTTM: 3.66 }, WEGE3: { name: 'WEG', price: 40, divTTM: 0.9 } };
+  const out = buildValuationsJson(current, '2026-10-07', { partial: true, previous });
+  assert.deepEqual(Object.keys(out), ['_quoteDate', 'PETR4', 'VALE3', 'WEGE3']);
+  assert.deepEqual(out.PETR4, current.PETR4);                 // o desta execução vence
+  assert.deepEqual(out.VALE3, previous.VALE3);                // o resto continua
+  assert.equal(out._quoteDate, '2026-10-06');                 // mistura dias: fica a data mais antiga
+  // Todos os papéis do arquivo regerados agora: a data é a desta execução.
+  assert.equal(buildValuationsJson({ ...current, VALE3: { price: 61 } }, '2026-10-07', { partial: true, previous })._quoteDate, '2026-10-07');
+  // Sem arquivo anterior (ou inválido): só esta execução, como antes.
+  assert.deepEqual(buildValuationsJson(current, '2026-10-07', { partial: true, previous: null }), { _quoteDate: '2026-10-07', ...current });
+});
+
+test('valuations.json: execução completa grava só esta execução (papel que saiu do universo sai do arquivo)', () => {
+  const out = buildValuationsJson({ PETR4: { price: 54.52 } }, '2026-10-07', { partial: false, previous: { _quoteDate: '2026-10-06', VELH3: { price: 1 } } });
+  assert.deepEqual(out, { _quoteDate: '2026-10-07', PETR4: { price: 54.52 } });
+});
+
+test('valuations.json: leitura do arquivo anterior tolera ausente e inválido', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'val-json-'));
+  try {
+    assert.equal(readValuationsFile(join(dir, 'nao-existe.json')), null);
+    writeFileSync(join(dir, 'a.json'), '{quebrado');
+    assert.equal(readValuationsFile(join(dir, 'a.json')), null);
+    writeFileSync(join(dir, 'b.json'), '[1,2]');
+    assert.equal(readValuationsFile(join(dir, 'b.json')), null);
+    writeFileSync(join(dir, 'c.json'), '{"_quoteDate":"2026-10-06","PETR4":{"price":1}}');
+    assert.deepEqual(readValuationsFile(join(dir, 'c.json')), { _quoteDate: '2026-10-06', PETR4: { price: 1 } });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('generate-pages.ts: execução com tickers na linha de comando passa pelo buildValuationsJson (mescla)', () => {
+  const src = readFileSync(join(__dirname, '..', 'generate-pages.ts'), 'utf-8');
+  assert.match(src, /const partial = cliTickers\.length > 0;/);
+  assert.match(src, /buildValuationsJson\(widgetValuations, quoteDate, \{ partial, previous: partial \? readValuationsFile\(valuationsFile\) : null \}\)/);
+  assert.doesNotMatch(src, /\{ _quoteDate: quoteDate, \.\.\.widgetValuations \}/);   // o jeito antigo truncava
+});
+
+test('generate-pages.ts: a calculadora de /ferramentas/ recebe a data do valuations.json DESTA execução', () => {
+  // Sem `quoteDate` no build, o generateFerramentas lia o `_quoteDate` do arquivo de ontem (o
+  // valuations.json só é regravado depois) e a página dizia "Dados de <ontem>".
+  const src = readFileSync(join(__dirname, '..', 'generate-pages.ts'), 'utf-8');
+  const calc = src.indexOf('const valuationsWithMeta = buildValuationsJson(');
+  const call = src.indexOf('await generateFerramentas(');
+  assert.ok(calc > 0 && call > 0 && calc < call, 'o conteúdo do valuations.json precisa existir antes do generateFerramentas');
+  assert.match(src, /build: \{ valuations: widgetValuations, quoteDate: String\(valuationsWithMeta\._quoteDate\),/);
+});
+
+test('generate-pages.ts: o {n} da calculadora é o total do valuations.json MESCLADO (execução parcial não diz "1 ação")', () => {
+  // Numa execução `generate-pages.ts PETR4`, widgetValuations tem 1 papel, mas o arquivo gravado
+  // (mesclado com o anterior) tem ~335: o build passa a contagem do arquivo, não a da execução.
+  const src = readFileSync(join(__dirname, '..', 'generate-pages.ts'), 'utf-8');
+  const total = src.indexOf('const valuationsTotal = countValuations(valuationsWithMeta);');
+  const call = src.indexOf('await generateFerramentas(');
+  assert.ok(total > 0 && total < call, 'a contagem do arquivo mesclado sai antes do generateFerramentas');
+  assert.match(src, /build: \{[^}]*\bvaluationsCount: valuationsTotal\b[^}]*\}/);
+  // A contagem ignora as chaves de metadado (_quoteDate) e conta o que fica no arquivo mesclado.
+  const previous = { _quoteDate: '2026-10-06', PETR4: { price: 1 }, VALE3: { price: 2 }, WEGE3: { price: 3 } };
+  const merged = buildValuationsJson({ PETR4: { price: 54.52 } }, '2026-10-07', { partial: true, previous });
+  assert.equal(countValuations(merged), 3);
+  assert.equal(countValuations(buildValuationsJson({ PETR4: { price: 54.52 } }, '2026-10-07', { partial: false, previous })), 1);
 });

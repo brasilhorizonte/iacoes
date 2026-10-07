@@ -1,5 +1,8 @@
 import type { FinancialData, ComprehensiveValuation, TickerIndexEntry, CvmDocument, RawIncomeStatement, RawBalanceSheet, RawCashFlow } from '../types';
 import { ok, num, brl, pct, mult, big, MONTHS } from './lib/format';
+import { dedupeDividends, incomeWindows, isPastIncome } from '../lib/dividends';
+import { brtDateISO } from '../lib/dates';
+import { companyName } from '../lib/company-name';
 
 export const APP = 'https://app.brasilhorizonte.com.br/authnew';
 export const SITE = 'https://iacoes.com.br';
@@ -29,6 +32,8 @@ export interface TickerModel {
     byYear: { year: number; total: number; count: number; partial: boolean }[];
     recent: { ex: string; pay: string; amount: number; type: string }[];
     totalPayments: number; firstYear: number | null; lastYearTotal: { year: number; total: number; count: number } | null;
+    /** Algum provento veio trazido para a base acionária de hoje (desdobramento, grupamento, bonificação)? */
+    adjusted?: boolean;
   };
   calc: {
     graham: { lpa: number; vpa: number; fv: number };
@@ -42,31 +47,33 @@ export interface TickerModel {
   faq: Faq[];
   seo: { title: string; description: string; h1Sub: string; intro: string[] };
   links: Record<'dcf' | 'airton' | 'airtonIntro' | 'alerta' | 'asset' | 'generic' | 'ticker', string>;
-  airtonQuestions: string[];
   socialProof: number;
 }
 
 // --- Dividendos -------------------------------------------------------------
 
-const yearsAgo = (y: number) => { const d = new Date(); d.setFullYear(d.getFullYear() - y); return d; };
-
-function dividends(data: FinancialData) {
-  const seen = new Set<string>();
-  const list = data._rawDividends
-    .filter(d => d.amount > 0 && d.exDate && !isNaN(new Date(d.exDate).getTime()))
-    // A tabela traz a mesma distribuição repetida (variantes do ticker, metadados diferentes):
-    // mesma data-com e mesmo valor contam uma vez só.
-    .filter(d => { const k = d.exDate.slice(0, 10) + '|' + d.amount.toFixed(6); if (seen.has(k)) return false; seen.add(k); return true; })
-    .sort((a, b) => new Date(b.exDate).getTime() - new Date(a.exDate).getTime());
-  const sumSince = (from: Date) => list.filter(d => new Date(d.exDate) >= from).reduce((s, d) => s + d.amount, 0);
-  const ttm = sumSince(yearsAgo(1));
+/**
+ * Proventos da página (e do valuations.json, da calculadora e do ranking, que leem daqui).
+ *
+ * Sem as duplicatas da fonte, pela régua do app (scripts/lib/dividends.ts): mesma natureza e
+ * valor com data-com a até 3 dias é a mesma linha; parcela (mesma data-com, pagamentos reais
+ * diferentes) e dividendo × JCP de mesmo valor continuam separados. DY de 12 meses, médias,
+ * gráfico por ano e contagem de pagamentos só com RENDA já ocorrida (data-com ≤ hoje em BRT;
+ * restituição de capital e amortização ficam fora). A tabela "Últimos pagamentos" mostra
+ * todos os eventos, inclusive o anunciado com data-com futura e a restituição de capital
+ * (o tipo aparece na linha). `now` só existe para os testes fixarem o relógio.
+ */
+export function dividends(data: Pick<FinancialData, '_rawDividends' | 'price'>, now: Date = new Date()): TickerModel['div'] {
+  const today = brtDateISO(now);
+  const events = dedupeDividends(data._rawDividends);          // crescente por data-com
+  const income = events.filter(d => isPastIncome(d, today));    // renda já ocorrida
   // Média anual por janela móvel (últimos N×12 meses ÷ N). Janela sem pagamento = 0, não inventa.
-  const avg = { '1': ttm, '3': sumSince(yearsAgo(3)) / 3, '5': sumSince(yearsAgo(5)) / 5, '10': sumSince(yearsAgo(10)) / 10 };
+  const { ttm, avg } = incomeWindows(events, today);
 
-  const curYear = new Date().getFullYear();
+  const curYear = Number(today.slice(0, 4));
   const byYearMap = new Map<number, { total: number; count: number }>();
-  for (const d of list) {
-    const y = new Date(d.exDate).getUTCFullYear();
+  for (const d of income) {
+    const y = Number(d.exDate.slice(0, 4));
     const e = byYearMap.get(y) || { total: 0, count: 0 };
     e.total += d.amount; e.count++;
     byYearMap.set(y, e);
@@ -80,10 +87,13 @@ function dividends(data: FinancialData) {
   return {
     ttm, dyTTM: data.price > 0 ? ttm / data.price : 0, avg,
     byYear,
-    recent: list.slice(0, 12).map(d => ({ ex: d.exDate.slice(0, 10), pay: (d.paymentDate || '').slice(0, 10), amount: d.amount, type: d.dividendType || '' })),
-    totalPayments: list.length,
-    firstYear: list.length ? new Date(list[list.length - 1].exDate).getUTCFullYear() : null,
+    recent: events.slice().reverse().slice(0, 12).map(d => ({ ex: d.exDate.slice(0, 10), pay: (d.paymentDate || '').slice(0, 10), amount: d.amount, type: d.dividendType || '' })),
+    totalPayments: income.length,
+    firstYear: income.length ? Number(income[0].exDate.slice(0, 4)) : null,
     lastYearTotal: ly ? { year: curYear - 1, ...ly } : null,
+    // A seção de dividendos avisa quando algum valor foi ajustado (scripts/lib/splits.ts marca a
+    // linha com splitDivisor ≠ 1); sem isto o aviso de proventosAjustados() nunca aparecia.
+    adjusted: events.some(d => typeof d.splitDivisor === 'number' && d.splitDivisor !== 1),
   };
 }
 
@@ -173,10 +183,11 @@ export function buildModel(data: FinancialData, val: ComprehensiveValuation, all
   const symbol = f.symbol;
   const type = f.type;
   const typeLabel = type === 'PN' ? 'preferencial' : type === 'UNT' ? 'unit' : 'ordinária';
-  // Nome curto para títulos: o short_name da brapi às vezes é só o ticker ("B3SA3");
-  // nesse caso usa o nome longo sem o sufixo societário.
+  // Nome curto para títulos, pela limpeza única do site (scripts/lib/company-name.ts): o nome
+  // longo da brapi sem a classe em inglês e sem o sufixo societário ("Itausa", não "Itausa SA
+  // Non-Cum Perp Pfd Registered Shs"); a abreviação da B3 ("KARSTEN     ON") só sem o longo.
   const rawShort = all.find(t => t.ticker === symbol)?.name || '';
-  const shortName = cleanName(rawShort && !/^[A-Z0-9]{4}\d{1,2}$/i.test(rawShort.replace(/\s/g, '')) ? rawShort : f.name) || symbol;
+  const shortName = companyName(rawShort, f.name, symbol);
 
   const div = dividends(data);
   const st = statements(data);
@@ -237,7 +248,7 @@ export function buildModel(data: FinancialData, val: ComprehensiveValuation, all
   const factsTxt = facts.length > 1 ? facts.slice(0, -1).join(', ') + ' e ' + facts[facts.length - 1] : facts.join('');
 
   const intro = [
-    `${symbol} é a ação ${typeLabel} de ${f.name}, listada na B3 no setor de ${f.sector}${f.subSector && f.subSector !== '-' ? ` (${f.subSector})` : ''}. Cotada a ${brl(f.price)}, a companhia vale ${big(f.marketCap)} em bolsa${factsTxt ? ` e negocia a ${factsTxt}` : ''}.`,
+    `${symbol} é a ação ${typeLabel} de ${shortName}, listada na B3 no setor de ${f.sector}${f.subSector && f.subSector !== '-' ? ` (${f.subSector})` : ''}. Cotada a ${brl(f.price)}, a companhia vale ${big(f.marketCap)} em bolsa${factsTxt ? ` e negocia a ${factsTxt}` : ''}.`,
     `${f.roe ? `O ROE é de ${pct(f.roe)}` : 'A rentabilidade'}${f.netMargin ? `, a margem líquida de ${pct(f.netMargin)}` : ''}${ok(f.debtEbitda) && f.debtEbitda !== 0 ? ` e a dívida líquida equivale a ${num(f.debtEbitda, 2)}x o EBITDA` : ''}. Nesta página você calcula o preço justo de ${symbol} por Graham, Bazin e Gordon com as suas premissas e vê ${div.totalPayments ? `o histórico de ${div.totalPayments} proventos, ` : ''}10 anos de demonstrações financeiras e a comparação com o setor.`,
   ];
 
@@ -245,7 +256,8 @@ export function buildModel(data: FinancialData, val: ComprehensiveValuation, all
   if (f.pl > 0) descParts.push(`P/L ${num(f.pl, 1)}`);
   if (f.divYield > 0) descParts.push(`DY ${pct(f.divYield)}`);
   if (f.roe) descParts.push(`ROE ${pct(f.roe)}`);
-  const description = `${descParts.join(', ')}. Calcule o preço justo de ${shortName} por Graham, Bazin e Gordon e veja o DCF completo. Indicadores, dividendos e balanço atualizados.`;
+  // O DCF fica travado na página (é da plataforma): "faça … na plataforma", não "veja".
+  const description = `${descParts.join(', ')}. Calcule o preço justo de ${shortName} por Graham, Bazin e Gordon e faça o DCF completo na plataforma. Indicadores, dividendos e balanço atualizados.`;
 
   const faq: Faq[] = [
     {
@@ -254,7 +266,9 @@ export function buildModel(data: FinancialData, val: ComprehensiveValuation, all
     },
     {
       q: `Qual o preço justo de ${symbol} pelo DCF?`,
-      a: `O DCF projeta o fluxo de caixa livre de ${f.name} e o traz a valor presente pelo WACC${val.calculatedWacc > 0 ? `, que estimamos em ${pct(val.calculatedWacc)} no cenário base` : ''}. O resultado, a matriz de sensibilidade WACC × crescimento perpétuo e os cenários otimista e pessimista ficam na plataforma IAções, onde você também troca as premissas. O cadastro é gratuito.`,
+      // Sem "cenários": os botões bear/base/bull do Valuation não existem no modelo editável
+      // (honestidade-rotas.md, ValuAI item 3). A IA propõe as premissas; o WACC é calculado.
+      a: `O DCF projeta o fluxo de caixa livre de ${shortName} e o traz a valor presente pelo WACC${val.calculatedWacc > 0 ? `, que estimamos em ${pct(val.calculatedWacc)} com as premissas padrão do site` : ''}. Na plataforma IAções, a IA propõe as premissas a partir do histórico da empresa (crescimento da receita, custos, capex e crescimento perpétuo) e você decide; o WACC vem decomposto e o resultado sai com a matriz de sensibilidade WACC × crescimento perpétuo. O cadastro é gratuito.`,
     },
     {
       q: `Quais os principais indicadores de ${symbol}?`,
@@ -278,7 +292,7 @@ export function buildModel(data: FinancialData, val: ComprehensiveValuation, all
     },
     {
       q: `O que faz a ${shortName}?`,
-      a: data.businessSummary && !looksEnglish(data.businessSummary) ? truncateSentence(data.businessSummary, 420) : `${f.name} é uma companhia aberta listada na B3 no setor de ${f.sector}.`,
+      a: data.businessSummary && !looksEnglish(data.businessSummary) ? truncateSentence(data.businessSummary, 420) : `${shortName} é uma companhia aberta listada na B3 no setor de ${f.sector}.`,
     },
     {
       q: `${symbol} está endividada?`,
@@ -327,7 +341,6 @@ export function buildModel(data: FinancialData, val: ComprehensiveValuation, all
       intro,
     },
     links,
-    airtonQuestions: [`Minha tese em ${symbol} se sustenta?`, `Resume o último Fato Relevante de ${symbol}`, `Compara ${symbol} com os pares do setor`],
     socialProof: socialProof(f.volMed2m, symbol),
   };
 }
@@ -335,14 +348,6 @@ export function buildModel(data: FinancialData, val: ComprehensiveValuation, all
 function looksEnglish(s: string) {
   const c = (re: RegExp) => (s.match(re) || []).length;
   return c(/(the|and|company|its|through|provides)/gi) > c(/(de|da|do|e|com|para|empresa)/gi);
-}
-
-function cleanName(s: string) {
-  return s
-    .replace(/\s+-\s+.*$/, '')                                        // "B3 S.A. - Brasil, Bolsa, Balcão" → "B3 S.A."
-    .replace(/(\s+(ON|PN|UNT|N[12M]|NM|EDJ|ED|EJ|PNA|PNB|PFD|PRF))+$/i, '')   // classe/listagem no fim do short_name
-    .replace(/[\s,]+(S\.?\/?A\.?|SA)$/i, '')                          // sufixo societário
-    .trim();
 }
 
 function titleCase(s: string) {

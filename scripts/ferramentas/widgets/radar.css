@@ -1,4 +1,6 @@
-/* Widget "radar": cartões das 6 listas. Tile (~300×220, landing) e page (~640×360). */
+/* Widget "radar": cartões das 6 listas. Tile (~300×220, landing) e page (~640×360).
+   Só transform e opacity animam (SPEC-v2 §E5): o "acender" do cartão é uma camada (::before) com
+   a cor da lista que entra por opacidade; as barras enchem com scaleX. */
 .iaw-radar { display: flex; flex-direction: column; gap: 10px; height: 100%; min-width: 0; }
 .iaw-radar-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
 .iaw-radar-top-right { display: flex; flex: none; align-items: center; gap: 6px; }
@@ -7,11 +9,17 @@
 
 .iaw-radar-card {
   --tone: #B8923E; --tone-bg: rgba(184, 146, 62, .1);
+  position: relative; isolation: isolate;
   display: flex; flex-direction: column; gap: 8px; min-width: 0;
   margin: 0; padding: 10px 12px; text-align: left;
   border: 1px solid var(--iaw-linha); border-radius: 12px; background: #fff; color: var(--iaw-tinta);
   font: inherit; cursor: pointer; opacity: .6;
-  transition: border-color .25s ease, background-color .25s ease, box-shadow .25s ease, opacity .25s ease;
+  transition: opacity .25s ease;
+}
+.iaw-radar-card::before {
+  content: ""; position: absolute; top: -1px; right: -1px; bottom: -1px; left: -1px; z-index: -1;
+  border-radius: inherit; background: var(--tone-bg); box-shadow: inset 0 0 0 2px var(--tone);
+  opacity: 0; transition: opacity .25s ease; pointer-events: none;
 }
 .iaw-radar-card[data-tone="emerald"] { --tone: #17794F; --tone-bg: rgba(23, 121, 79, .09); }
 .iaw-radar-card[data-tone="blue"] { --tone: #2F5D8A; --tone-bg: rgba(47, 93, 138, .09); }
@@ -19,7 +27,8 @@
 .iaw-radar-card[data-tone="purple"] { --tone: #6A4C93; --tone-bg: rgba(106, 76, 147, .09); }
 .iaw-radar-card[data-tone="red"] { --tone: #B93838; --tone-bg: rgba(185, 56, 56, .08); }
 .iaw-radar-card:hover { opacity: .85; }
-.iaw-radar-card.is-on { opacity: 1; border-color: var(--tone); background: var(--tone-bg); box-shadow: inset 0 0 0 1px var(--tone); }
+.iaw-radar-card.is-on { opacity: 1; }
+.iaw-radar-card.is-on::before { opacity: 1; }
 .iaw-radar-card:focus-visible { outline: 3px solid rgba(9, 56, 72, .35); outline-offset: 2px; }
 
 .iaw-radar-head { display: flex; align-items: center; gap: 8px; min-width: 0; }
@@ -73,6 +82,57 @@
 @media (max-width: 640px) {
   .iaw-radar--page .iaw-radar-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* Celular estreito (< 400 px, SPEC-v2 §C Radar): página compacta. Os papéis de exemplo viram
+   etiquetas "A", "C", "F" numa linha (a convergência de Oportunidades Claras continua visível),
+   cartões e texto menores, rodapé quebrando linha. */
+@media (max-width: 400px) {
+  .iaw-radar--page { gap: 8px; }
+  .iaw-radar--page .iaw-radar-title { font-size: 11px; }
+  .iaw-radar--page .iaw-radar-grid { gap: 6px; }
+  .iaw-radar--page .iaw-radar-card { gap: 6px; padding: 8px 7px; border-radius: 10px; }
+  .iaw-radar--page .iaw-radar-head { gap: 5px; }
+  .iaw-radar--page .iaw-radar-dot { width: 7px; height: 7px; }
+  .iaw-radar--page .iaw-radar-name { font-size: 11.5px; }
+  .iaw-radar--page .iaw-radar-rows { flex-direction: row; flex-wrap: wrap; gap: 4px; }
+  .iaw-radar--page .iaw-radar-row { gap: 0; font-size: 10.5px; }
+  .iaw-radar--page .iaw-radar-row-pre,
+  .iaw-radar--page .iaw-radar-row-bar { display: none; }
+  .iaw-radar--page .iaw-radar-row-name { width: auto; min-width: 22px; padding: 1px 6px; border-radius: 99px; background: var(--iaw-linha); text-align: center; }
+  /* Sem as barras, o cartão aceso marca os papéis dele com um contorno na cor da lista. */
+  .iaw-radar--page .iaw-radar-card.is-on .iaw-radar-row-name { color: var(--iaw-tinta); box-shadow: inset 0 0 0 1px var(--tone); }
+  .iaw-radar--page .iaw-radar-row.is-match .iaw-radar-row-name { background: rgba(184, 146, 62, .28); }
+  .iaw-radar--page .iaw-radar-rule { min-height: 6em; font-size: 12.5px; line-height: 1.4; }
+  .iaw-radar--page .iaw-radar-foot { flex-wrap: wrap; }
+  .iaw-radar--page .iaw-radar-note { text-align: left; }
+}
+
+/* Altura reservada do quadro na página da ferramenta (SPEC-v2 §E4: sem CLS). O quadro do servidor
+   reserva 300 px (360 a partir de 640), mas o Radar montado é mais alto e a altura dele muda com a
+   largura (a regra quebra em mais linhas) e com a lista em destaque (Oportunidades Claras é a mais
+   longa): no celular, o conteúdo abaixo descia até 213 px ao montar e voltava a pular a cada troca.
+   Cada faixa reserva a MAIOR altura entre as 6 listas na largura mais estreita dela. Medido no
+   Chrome com DM Sans, pixel a pixel de 300 a 1440, viewport sem barra de rolagem como no celular
+   (07/10/2026). Folga de até ~20 px no lado largo de algumas faixas (34 px só em 631–639).
+   Exceção: com "Retomar" no botão (depois que a pessoa pausa), o rodapé quebra em 381–390 e o
+   quadro cresce 24 px — resposta ao clique, fora do CLS. Seletor de atributo: vence o
+   min-h-[300px]/sm:min-h-[360px] do page.tsx. Os tiles da landing (data-size="tile") não mudam.
+   ⚠️ Mudou texto da regra, fonte, espaçamento ou colunas do widget: medir de novo. */
+[data-ia-widget="radar"][data-size="page"] { min-height: 408px; }                                  /* ≥ 1113 */
+@media (max-width: 1112px) { [data-ia-widget="radar"][data-size="page"] { min-height: 443px; } }   /* 1024–1112: coluna de 7/12 */
+@media (max-width: 1023px) { [data-ia-widget="radar"][data-size="page"] { min-height: 392px; } }   /* 776–1023 */
+@media (max-width: 775px) { [data-ia-widget="radar"][data-size="page"] { min-height: 408px; } }    /* 647–775 (768) */
+@media (max-width: 646px) { [data-ia-widget="radar"][data-size="page"] { min-height: 427px; } }    /* 641–646 */
+@media (max-width: 640px) { [data-ia-widget="radar"][data-size="page"] { min-height: 540px; } }    /* 488–640: 2 colunas */
+@media (max-width: 487px) { [data-ia-widget="radar"][data-size="page"] { min-height: 574px; } }    /* 434–487 */
+@media (max-width: 433px) { [data-ia-widget="radar"][data-size="page"] { min-height: 590px; } }    /* 415–433 (428, 430) */
+@media (max-width: 414px) { [data-ia-widget="radar"][data-size="page"] { min-height: 609px; } }    /* 401–414 (412, 414) */
+@media (max-width: 400px) { [data-ia-widget="radar"][data-size="page"] { min-height: 423px; } }    /* 381–400: compacto (390, 393) */
+@media (max-width: 380px) { [data-ia-widget="radar"][data-size="page"] { min-height: 447px; } }    /* 372–380 (375) */
+@media (max-width: 371px) { [data-ia-widget="radar"][data-size="page"] { min-height: 461px; } }    /* 347–371 (360) */
+@media (max-width: 346px) { [data-ia-widget="radar"][data-size="page"] { min-height: 479px; } }    /* 315–346 (320) */
+@media (max-width: 314px) { [data-ia-widget="radar"][data-size="page"] { min-height: 513px; } }    /* ≤ 314 */
+
 @media (prefers-reduced-motion: reduce) {
-  .iaw-radar-card, .iaw-radar-row-bar::after { transition: none; }
+  .iaw-radar-card, .iaw-radar-card::before, .iaw-radar-row-bar::after { transition: none; }
 }

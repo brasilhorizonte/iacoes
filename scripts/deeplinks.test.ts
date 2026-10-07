@@ -283,7 +283,8 @@ const ESPERADO_TICKER: Record<string, { tela: string; q?: Record<string, string>
   'nav-app': { tela: 'home/overview' },
   'nav-assinar': { tela: 'home/overview' },
   disclaimer: { tela: 'home/overview' },
-  'nota-qualitativa': { tela: 'home/overview' },
+  // A nota de cada empresa fica aberta (inclusive ao free) na Visão geral do ativo no app.
+  'nota-qualitativa': { tela: `ativo/${T}/overview` },
   'hero-dcf': { tela: 'ianalista/valuai', q: { ticker: T } },
   'dcf-locked': { tela: 'ianalista/valuai', q: { ticker: T } },
   'sticky-mobile': { tela: 'ianalista/valuai', q: { ticker: T } },
@@ -330,13 +331,13 @@ test('ticker: Validador e Valuation recebem o que os componentes do app leem', (
   const cta = (href: string, id: string): Cta => ({ href, cta: id, attrs: { href, 'data-cta': id } });
 
   // 'Validador - import/App.tsx':236-252: autorun=1 + ticker válido → preenche o ticker e foca a tese.
-  for (const href of [m.links.airton, `${m.links.airton}&prompt=${encodeURIComponent(m.airtonQuestions[0])}`]) {
-    const v = viajar(p, cta(href, 'airton-audit'));
-    for (const t of [v.email, v.google]) {
-      assert.equal(t.nome, 'ianalista/validador');
-      assert.equal(t.q.get('autorun'), '1');
-      assert.match((t.q.get('ticker') || '').toUpperCase(), B3_TICKER_RE);
-    }
+  // (O caso com &prompt= saiu junto com o campo airtonQuestions: o app ignora o prompt e a página
+  // não monta mais perguntas prontas.)
+  const v = viajar(p, cta(m.links.airton, 'airton-audit'));
+  for (const t of [v.email, v.google]) {
+    assert.equal(t.nome, 'ianalista/validador');
+    assert.equal(t.q.get('autorun'), '1');
+    assert.match((t.q.get('ticker') || '').toUpperCase(), B3_TICKER_RE);
   }
   // ValuAIApp.tsx:190-195: lê só o ticker; sem autorun, não gasta a análise do dia sozinho.
   const dcf = viajar(p, cta(m.links.dcf, 'hero-dcf'));

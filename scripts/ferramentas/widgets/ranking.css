@@ -1,0 +1,108 @@
+/* Widget "ranking": abas DY 12m / P/L / P/VP / ROE com reordenação FLIP. Tile (~300×220, landing)
+   e page (~640×360). Só transform e opacity animam (SPEC-v2 §E5): as linhas deslizam com
+   translateY e as barras enchem com scaleX; troca de aba e hover mudam cor sem transição.
+   Altura reservada: a lista tem a altura de N linhas desde o primeiro quadro (sem pulo ao trocar
+   de aba; N = 8 na página, 6 abaixo de 640 px, 5 no tile — o mesmo número do JS). */
+.iaw-ranking {
+  --iaw-rk-row: 28px; --iaw-rk-n: 8; --iaw-rk-cor: #B8923E;
+  display: flex; flex-direction: column; gap: 10px; height: 100%; min-width: 0;
+}
+.iaw-ranking[data-k="pl"] { --iaw-rk-cor: #093848; }
+.iaw-ranking[data-k="pvp"] { --iaw-rk-cor: #2F5D8A; }
+.iaw-ranking[data-k="roe"] { --iaw-rk-cor: #17794F; }
+
+.iaw-ranking-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+.iaw-ranking-tabs { display: inline-flex; flex: 0 1 auto; min-width: 0; gap: 2px; padding: 3px; border-radius: 999px; background: #EFEDE6; }
+.iaw-ranking-tab {
+  flex: 0 1 auto; min-width: 0; height: 30px; margin: 0; padding: 0 12px;
+  border: 0; border-radius: 999px; background: transparent; color: var(--iaw-mudo);
+  font: inherit; font-size: 12.5px; font-weight: 700; line-height: 1; white-space: nowrap; cursor: pointer;
+}
+.iaw-ranking-tab:hover { color: var(--iaw-tinta); }
+.iaw-ranking-tab.is-on { background: #fff; color: var(--iaw-petroleo); box-shadow: 0 1px 2px rgba(26, 26, 24, .14); }
+.iaw-ranking-tab:focus-visible { outline: 3px solid rgba(9, 56, 72, .35); outline-offset: 1px; }
+.iaw-ranking-pause { flex: none; }
+
+.iaw-ranking-sub { margin: 0; min-height: 1.35em; font-size: 12px; line-height: 1.35; color: var(--iaw-mudo); }
+
+.iaw-ranking-panel { min-width: 0; }
+.iaw-ranking-list {
+  position: relative; margin: 0; padding: 0; list-style: none;
+  min-height: calc(var(--iaw-rk-row) * var(--iaw-rk-n));
+}
+.iaw-ranking-row { height: var(--iaw-rk-row); transition: transform .45s cubic-bezier(.2, .8, .2, 1), opacity .3s ease; }
+.iaw-ranking-link {
+  display: flex; align-items: center; gap: 10px; height: 100%; min-width: 0;
+  padding: 0 8px; border-radius: 8px; color: var(--iaw-tinta); text-decoration: none;
+}
+.iaw-ranking-link:hover, .iaw-ranking-link:focus-visible { background: #F4F2EC; }
+.iaw-ranking-link:focus-visible { outline: 2px solid rgba(9, 56, 72, .45); outline-offset: -2px; }
+.iaw-ranking-pos { flex: none; width: 18px; text-align: right; font-size: 11px; color: var(--iaw-mudo); }
+.iaw-ranking-tk { flex: none; width: 54px; font-size: 12.5px; font-weight: 700; color: var(--iaw-petroleo); }
+.iaw-ranking-sector { flex: 0 1 150px; min-width: 0; overflow: hidden; font-size: 11.5px; color: var(--iaw-mudo); white-space: nowrap; text-overflow: ellipsis; }
+.iaw-ranking-bar { position: relative; flex: 1 1 auto; min-width: 36px; height: 8px; overflow: hidden; border-radius: 99px; background: rgba(232, 230, 224, .85); }
+.iaw-ranking-fill {
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0; border-radius: inherit; background: var(--iaw-rk-cor);
+  transform: scaleX(0); transform-origin: left center; transition: transform .5s cubic-bezier(.2, .8, .2, 1);
+}
+.iaw-ranking-val { flex: none; width: 58px; text-align: right; font-size: 12.5px; font-weight: 700; }
+.iaw-ranking-alt { flex: none; width: 92px; overflow: hidden; text-align: right; font-size: 11px; color: var(--iaw-mudo); white-space: nowrap; text-overflow: ellipsis; }
+
+.iaw-ranking-foot {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 10px;
+  margin: auto 0 0; font-size: 11px; line-height: 1.35; color: var(--iaw-mudo);
+}
+.iaw-ranking-foot strong { font-weight: 700; color: var(--iaw-tinta); }
+.iaw-ranking-erro { margin: 0; padding: 12px; font-size: 12.5px; line-height: 1.45; color: var(--iaw-mudo); }
+
+.iaw-ranking-pause-icon {
+  display: inline-flex; flex: none; align-items: center; justify-content: center;
+  width: 26px; height: 26px; margin: 0; padding: 0;
+  border: 1px solid var(--iaw-linha); border-radius: 50%; background: #fff; color: var(--iaw-petroleo); cursor: pointer;
+}
+.iaw-ranking-pause-icon svg { fill: currentColor; }
+.iaw-ranking-pause-icon:hover { border-color: var(--iaw-ouro); }
+.iaw-ranking-pause-icon:focus-visible { outline: 3px solid rgba(9, 56, 72, .35); outline-offset: 2px; }
+
+/* Tile (landing): 5 linhas, abas curtas, rodapé com a ordem, a data e o aviso. */
+.iaw-ranking--tile { --iaw-rk-row: 27px; --iaw-rk-n: 5; gap: 7px; }
+.iaw-ranking--tile .iaw-ranking-tab { height: 26px; padding: 0 9px; font-size: 11.5px; }
+.iaw-ranking--tile .iaw-ranking-link { gap: 8px; padding: 0 6px; }
+.iaw-ranking--tile .iaw-ranking-tk { width: 50px; font-size: 12px; }
+.iaw-ranking--tile .iaw-ranking-val { width: 52px; font-size: 12px; }
+.iaw-ranking--tile .iaw-ranking-foot { display: block; font-size: 10.5px; }
+.iaw-ranking--tile .iaw-ranking-foot span { display: block; }
+
+/* Página no celular: 6 linhas, sem setor e sem a parte longa da legenda (o texto da direita já
+   diz "5 anos" ou "setor"). */
+@media (max-width: 639px) {
+  .iaw-ranking--page { --iaw-rk-n: 6; gap: 8px; }
+  .iaw-ranking--page .iaw-ranking-sector,
+  .iaw-ranking--page .iaw-ranking-sub-extra,
+  .iaw-ranking--page .iaw-ranking-foot-extra { display: none; }
+  .iaw-ranking--page .iaw-ranking-link { gap: 8px; }
+  .iaw-ranking--page .iaw-ranking-alt { width: 76px; font-size: 10px; }
+}
+/* Celular estreito (< 400 px): tudo um pouco menor para caber em 320 px sem rolagem lateral. */
+@media (max-width: 400px) {
+  .iaw-ranking--page .iaw-ranking-tab { padding: 0 9px; font-size: 12px; }
+  .iaw-ranking--page .iaw-ranking-pause { padding: 4px 9px; }
+  .iaw-ranking--page .iaw-ranking-link { gap: 6px; padding: 0 4px; }
+  .iaw-ranking--page .iaw-ranking-pos { width: 14px; }
+  .iaw-ranking--page .iaw-ranking-tk { width: 50px; font-size: 12px; }
+  .iaw-ranking--page .iaw-ranking-bar { min-width: 28px; }
+  .iaw-ranking--page .iaw-ranking-val { width: 52px; font-size: 12px; }
+  .iaw-ranking--page .iaw-ranking-alt { width: 72px; }
+}
+/* 360 px ou menos: a barra cede espaço para o texto da direita caber inteiro ("5 anos 17,7%"). */
+@media (max-width: 360px) {
+  .iaw-ranking--page .iaw-ranking-link { gap: 5px; padding: 0 2px; }
+  .iaw-ranking--page .iaw-ranking-pos { width: 12px; }
+  .iaw-ranking--page .iaw-ranking-tk { width: 46px; }
+  .iaw-ranking--page .iaw-ranking-bar { min-width: 24px; }
+  .iaw-ranking--page .iaw-ranking-val { width: 48px; }
+  .iaw-ranking--page .iaw-ranking-alt { width: 76px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .iaw-ranking-row, .iaw-ranking-fill { transition: none; }
+}

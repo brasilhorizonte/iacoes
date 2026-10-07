@@ -52,6 +52,13 @@ export interface BuffettModel {
 
 const tone = (d: number): 'up' | 'down' | 'flat' => (d > 0.05 ? 'up' : d < -0.05 ? 'down' : 'flat');
 
+/**
+ * Períodos estimados em meses (AAAA-MM, inclusive), os mesmos que o gráfico da página sombreia:
+ * vão para o dados.json para o widget marcar "estimado" no hover (SPEC-v2 §C, Buffett).
+ */
+export const estimatedMonthRanges = (m: Pick<BuffettModel, 'estimatedRanges'>): { from: string; to: string }[] =>
+  m.estimatedRanges.map((r) => ({ from: r.from.slice(0, 7), to: r.to.slice(0, 7) }));
+
 export function buildBuffettModel(d: BuffettData, opts: { today?: Date } = {}): BuffettModel {
   const h = headline(d);
   const stats = seriesStats(d.monthly);

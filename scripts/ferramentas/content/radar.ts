@@ -6,6 +6,9 @@
  * Radar cobre o mercado inteiro, "descobrir o que comprar", que é IA, que envia alertas, ou
  * qualquer contagem/lista de tickers (a página é evergreen; o widget é ilustrativo).
  * O "ROIC > 10%" da tela é, na prática, ROA (lucro 12m ÷ ativo total): a página diz ROA.
+ * Acesso (SPEC-v2 §B2): o Radar é dos planos pagos e exige login; a página não linka a tabela de
+ * planos (/#precos) nem cita limites. FAQ com demanda e honesto (SPEC-v2 §C): barata ou cara, PEG,
+ * armadilha de valor — sem prometer que o Radar detecta armadilhas.
  */
 import { SCREENS } from '../links';
 import type { ToolContent } from '../types';
@@ -34,7 +37,7 @@ export const radar: ToolContent = {
     label: 'Abrir o Radar na plataforma',
     target: SCREENS.radar,
     screen: 'Radar',
-    note: 'Comece com uma conta grátis. O Radar completo faz parte dos planos pagos: [veja o que cada plano inclui](/#precos).',
+    note: 'O Radar completo faz parte dos planos pagos da IAções. Para abrir a tela, entre ou crie a sua conta.',
   },
   finalCta: {
     title: 'Use o Radar com os dados mais recentes',
@@ -113,11 +116,17 @@ export const radar: ToolContent = {
       ],
     },
     {
-      id: 'distorcao-nao-e-barata',
-      title: 'Distorção de valuation não é o mesmo que ação barata',
+      id: 'barata-ou-cara',
+      title: 'Como saber se uma ação está barata ou cara',
       blocks: [
-        { type: 'p', text: 'Muita gente procura por “ações descontadas”. No Radar, distorção quer dizer só que o P/L do papel está abaixo da metade da média do setor. Pode ser um desconto exagerado, mas também pode ser o mercado antecipando um lucro menor, um lucro inflado por um evento que não se repete ou um risco que os números ainda não mostram.' },
-        { type: 'p', text: 'Por isso a lista Oportunidades Claras exige que o papel apareça em mais de um sinal ao mesmo tempo, e por isso vale abrir a lista Riscos Elevados antes de tirar conclusões: um papel pode estar nas duas.' },
+        { type: 'p', text: 'Nenhum indicador sozinho responde. Uma ação está barata quando o preço fica abaixo do valor estimado da empresa, e esse valor depende do lucro, do crescimento, da dívida e do risco. Cotação baixa não quer dizer ação barata: uma ação de R$ 5 pode estar cara, e uma de R$ 100, barata.' },
+        { type: 'h3', text: 'Compare o P/L com o setor e com o crescimento' },
+        { type: 'p', text: 'O P/L mostra quantos anos do lucro atual o preço paga. Sozinho, ele engana: setores diferentes têm P/L diferentes, e um lucro que cresce justifica um P/L maior. Por isso o Radar mede a distorção contra a média do setor e usa o **PEG**, que divide o P/L pelo crescimento do lucro.' },
+        { type: 'p', text: 'No Radar, **distorção de valuation** quer dizer só que o P/L do papel está abaixo da metade da média do setor. Pode ser um desconto exagerado, mas também pode ser o mercado antecipando um lucro menor, um lucro inflado por um evento que não se repete ou um risco que os números ainda não mostram.' },
+        { type: 'h3', text: 'Cuidado com a armadilha de valor' },
+        { type: 'p', text: 'Armadilha de valor é a ação que parece barata porque o lucro de hoje ainda não caiu. O P/L é baixo, mas o lucro dos próximos anos tende a ser menor, e o desconto desaparece quando ele cai. Sinais comuns: lucro em queda, dívida alta e um setor perdendo espaço.' },
+        { type: 'p', text: 'O Radar não identifica armadilhas de valor sozinho, mas ajuda a desconfiar. A lista **Riscos Elevados** reúne lucro caindo com dívida alta, e um papel pode estar em Distorções de Valuation e em Riscos Elevados ao mesmo tempo. Oportunidades Claras exige mais de um sinal, mas não tira quem está em Riscos Elevados: confira as duas listas.' },
+        { type: 'h3', text: 'Depois da triagem, o preço justo' },
         { type: 'p', text: 'Para comparar o preço com o valor da empresa, o passo seguinte é o valuation: veja o preço justo por Graham, Bazin e Gordon na [página de cada ação](/acoes/) e, na plataforma, monte o seu [fluxo de caixa descontado](/ferramentas/fluxo-de-caixa-descontado/).' },
       ],
     },
@@ -159,15 +168,15 @@ export const radar: ToolContent = {
   faq: [
     {
       q: 'O que é o Radar de oportunidades?',
-      a: 'É a tela de triagem da plataforma IAções. Aplica 6 regras fixas de corte aos indicadores dos papéis e separa o resultado em 6 listas: Oportunidades Claras, Reprecificação (Momentum), Distorções de Valuation, PEG Ratio (< 1), Small Caps Ignoradas e Riscos Elevados.',
+      a: 'É a tela de triagem da plataforma IAções. Aplica 6 regras fixas de corte aos indicadores dos papéis e separa o resultado em 6 listas: Oportunidades Claras, Reprecificação (Momentum), Distorções de Valuation, PEG Ratio (< 1), Small Caps Ignoradas e Riscos Elevados. As listas não usam inteligência artificial: a única peça gerada por IA é a Nota Qualitativa, que vem de outra ferramenta, o Score Qualitativo, e ordena os papéis dentro das listas.',
     },
     {
       q: 'Quais critérios o Radar usa em cada lista?',
       a: 'Reprecificação: crescimento do lucro acima de 10%, ROA acima de 10% e P/L abaixo de 20. Distorções de Valuation: P/L positivo abaixo de 50% da média do setor. PEG Ratio: P/L dividido pelo crescimento do lucro abaixo de 1. Small Caps Ignoradas: valor de mercado abaixo de R$ 2 bilhões e crowdedness abaixo de 0,8. Riscos Elevados: Dívida líquida/EBITDA acima de 3,5, ou lucro caindo mais de 10% com Dívida/EBITDA acima de 2. Oportunidades Claras: papel com Nota Qualitativa que está em Distorções e em mais uma lista.',
     },
     {
-      q: 'O Radar usa inteligência artificial?',
-      a: 'Não. As listas saem de regras fixas e ordenações simples, calculadas no seu navegador. A ordem dentro das listas segue a Nota Qualitativa, que é gerada por IA a partir de critérios objetivos em outra ferramenta, o Score Qualitativo.',
+      q: 'Como saber se uma ação está barata ou cara?',
+      a: 'Compare o preço com o valor estimado da empresa, não com a cotação. Indicadores como P/L e P/VP servem para a triagem, mas precisam de contexto: o setor, o crescimento do lucro e a dívida. O Radar faz essa primeira triagem; o preço justo vem do valuation, por Graham, Bazin, Gordon ou fluxo de caixa descontado.',
     },
     {
       q: 'O que é distorção de valuation?',
@@ -178,20 +187,20 @@ export const radar: ToolContent = {
       a: 'PEG é o P/L dividido pelo crescimento do lucro em porcentagem. Abaixo de 1, o P/L é baixo diante do crescimento recente do lucro, medido nos últimos 12 meses contra os 12 anteriores. É um indicador de triagem: crescimento passado não garante crescimento futuro.',
     },
     {
+      q: 'O que é armadilha de valor?',
+      a: 'É a ação que parece barata pelos múltiplos de hoje, mas cujo lucro tende a cair, e o desconto some quando ele cai. Lucro em queda e dívida alta são sinais comuns. O Radar não identifica armadilhas de valor sozinho: vale conferir se o papel também está em Riscos Elevados e ler os documentos da empresa.',
+    },
+    {
       q: 'Uma ação pode estar em Oportunidades Claras e em Riscos Elevados ao mesmo tempo?',
       a: 'Pode. As listas são independentes, e Oportunidades Claras não exclui quem está em Riscos Elevados. Só os quatro rankings Top 20 tiram esses papéis. Vale conferir as duas listas antes de qualquer conclusão.',
     },
     {
       q: 'O Radar envia alertas?',
-      a: 'Não. O Radar não envia alertas nem notificações. Para acompanhar uma ação, registre a tese em Minhas Teses: nos planos pagos, os critérios são conferidos uma vez por dia e o aviso chega no resumo da manhã.',
-    },
-    {
-      q: 'Com que frequência as listas mudam?',
-      a: 'As listas são recalculadas toda vez que você abre a tela, com os dados mais recentes da plataforma. Small Caps Ignoradas e o ranking Top Crowded dependem do volume de um único pregão, então mudam todo dia.',
+      a: 'Não. O Radar não envia alertas nem notificações: as listas são recalculadas toda vez que você abre a tela, e Small Caps Ignoradas e o ranking Top Crowded mudam todo dia, porque dependem do volume de um único pregão. Para acompanhar uma ação, registre a tese em Minhas Teses: nos planos pagos, os critérios são conferidos uma vez por dia e o aviso chega no resumo da manhã.',
     },
     {
       q: 'O Radar é grátis?',
-      a: 'O Radar completo faz parte dos planos pagos da IAções e exige login. Você pode começar com uma conta grátis e ver o que cada plano inclui na página de preços.',
+      a: 'Não. O Radar completo faz parte dos planos pagos da IAções e exige login na plataforma.',
     },
     {
       q: 'O Radar é recomendação de investimento?',
@@ -199,5 +208,5 @@ export const radar: ToolContent = {
     },
   ],
   sources: 'Critérios, ordenações e rótulos: tela Radar da plataforma IAções. Indicadores: base de cotações, demonstrações financeiras, proventos e volume negociado da plataforma (dados de mercado via brapi).',
-  contentRevised: '2026-10-06',
+  contentRevised: '2026-10-07',
 };

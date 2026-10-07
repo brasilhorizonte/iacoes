@@ -1,16 +1,24 @@
 import type { CvmDocument } from './types';
 import { sectorSlug } from './template';
+import { nextPath, SCREENS } from './ferramentas/links';
+import { cleanCompanyName } from './lib/company-name';
+import { cvmDocTitle, dedupeCvmVersions } from './lib/cvm-doc-title';
 
 // Página /airton/{TICKER}/ — a porta de entrada por notificação.
 //
 // Quem chega aqui veio de um tweet, de um post ou do Google procurando "fato relevante
-// PETR4" / "comunicado PETR4 CVM". A página mostra o AIrton entregando, no WhatsApp,
-// os documentos REAIS que a companhia publicou na CVM (tabela `cvm_documents`) — não é
-// mock. Uma única oferta: "receba os próximos de {TICKER} no WhatsApp".
+// PETR4" / "comunicado PETR4 CVM". A página mostra os documentos REAIS que a companhia
+// publicou na CVM (tabela `cvm_documents`) do jeito que o AIrton os entrega no WhatsApp —
+// não é mock. Uma única oferta: "receba os próximos de {TICKER} no WhatsApp".
 //
-// Regras herdadas do resto do site (ver CLAUDE.md):
+// Regras herdadas do resto do site (ver CLAUDE.md e a SPEC das ferramentas, §1):
 //  - nenhum número inventado: só título/`ai_summary` vindos da CVM, sem métrica;
-//  - "grátis, sem cartão" — nunca "sem cadastro";
+//  - alerta em tempo real no WhatsApp/Telegram é dos planos pagos (Fato Relevante, Comunicado
+//    e release de resultados; ITR e DFP não geram alerta; proventos chegam no resumo diário;
+//    sem resumo pronto em alguns minutos, o alerta sai só com o aviso). Nunca
+//    prometer o alerta como gratuito, instantâneo ou antecipado ao mercado; nunca "sem cadastro";
+//  - CTAs no formato do SPEC §2 (`next` terminando em `&_=`): o app ignora ticker/intent/prompt
+//    soltos no /authnew, então nada de "a pergunta já vai pronta" nem "o alerta já vem selecionado";
 //  - sem wa.me / número / handle: o vínculo acontece dentro do app;
 //  - bloco de tracking idêntico ao de /airton/, só o default de utm_medium muda.
 
@@ -59,25 +67,54 @@ const fmtDateLong = (iso: string): string => {
 
 const APP = 'https://app.brasilhorizonte.com.br/authnew';
 
+// Tipos que geram alerta no app (FR, CM e PR) e cujo resumo o leitor do app mostra
+// (CvmPdfViewer: SHOULD_SHOW_SUMMARY). ITR e DFP não geram alerta e o leitor não mostra
+// resumo deles; VLMO e FRE nem entram no feed de alertas (honestidade-rotas.md, Alertas CVM).
+const GERA_ALERTA = new Set(['FR', 'CM', 'PR']);
+
+/** <title> até 60 caracteres (o resto o Google corta): com o nome da empresa quando cabe. */
+export const airtonTickerTitle = (T: string, name: string): string => {
+  const opcoes = [
+    `${T}: Fatos Relevantes e Comunicados de ${name} | iAções`,
+    `${T}: Fatos Relevantes de ${name} | iAções`,
+    `${T}: Fatos Relevantes e Comunicados na CVM | iAções`,
+  ];
+  return opcoes.find((s) => s.length <= 60) ?? opcoes[opcoes.length - 1];
+};
+
 export const generateAirtonTickerHTML = (input: AirtonTickerInput): string => {
   const T = input.symbol.toUpperCase();
-  const name = input.name || T;
+  // Nome limpo (scripts/lib/company-name.ts): a brapi grava "Banco BTG Pactual SA Units Cons of 1
+  // Sh + 2 Pfd Shs A"; aqui sai "Banco BTG Pactual" (title, frase do topo, FAQ e JSON-LD).
+  const name = cleanCompanyName(input.name) || T;
   const sector = input.sector || '';
-  const docs = input.docs.slice(0, 5);
+  // Títulos crus de ITR/DFP trocados pelo período de referência (cvmDocTitle): cartões, meta
+  // description, push e og:description leem daqui. Versões do mesmo ITR/DFP (v1, v2, v3) viram
+  // um cartão só (dedupeCvmVersions), senão o mesmo "Trimestre encerrado em…" saía repetido.
+  const docs = dedupeCvmVersions(input.docs).slice(0, 5).map((d) => ({ ...d, title: cvmDocTitle(d) }));
   const latest = docs[0];
+  // A simulação do alerta (push, og:title, frase do topo) só usa o último documento quando ele
+  // gera alerta: um ITR/DFP "chegando no WhatsApp" seria falso. Senão, o topo fica sem push.
+  const alertDoc = latest && GERA_ALERTA.has(latest.docType) ? latest : null;
   const todayISO = new Date().toISOString().split('T')[0];
 
+  // Deep links (SPEC §2): o app só obedece `next`, e todo `next` com query termina no
+  // descartável `&_=` (o Auth.tsx cola o resto da query com outro `?`; quem é engolido é o `_`).
+  // O `ref` continua iacoes-airton (atribuição first-touch do app).
   const ref = 'iacoes-airton';
-  const alertaHref = `${APP}?ref=${ref}&ticker=${T}&intent=alerta`;
-  const airtonHref = (prompt: string) => `${APP}?ref=${ref}&ticker=${T}&intent=airton&prompt=${encodeURIComponent(prompt)}`;
+  const appHref = (next: string, extra = ''): string => `${APP}?ref=${ref}&next=${encodeURIComponent(next)}${extra}`;
+  // Alertas: Central de Notificações (canais WhatsApp/Telegram + "Meus Ativos", aberta a todos os
+  // planos). O `ticker` no next só destaca o ativo quando ele já está na lista da pessoa — não
+  // pré-seleciona nada para quem acabou de criar a conta, e o texto não promete isso.
+  const alertaHref = appHref(nextPath({ ...SCREENS.notificacoes, ticker: T }));
+  const airtonHref = appHref(nextPath(SCREENS.airton));
+  const validadorHref = appHref(nextPath({ ...SCREENS.validador, ticker: T, autorun: true }));
 
-  // Cada documento leva para o app (lead), nao para a CVM: o AIrton abre ja com o pedido de
-  // resumo daquele documento, e o utm_content identifica o documento clicado.
-  const docHref = (d: CvmDocument): string => {
-    const prompt = `Resume o ${d.docTypeLabel} de ${T} publicado em ${fmtDateBR(d.date)}`;
-    const utm = `doc-${d.docType.toLowerCase()}-${d.date}`;
-    return `${APP}?ref=${ref}&ticker=${T}&intent=airton&prompt=${encodeURIComponent(prompt)}&utm_content=${utm}`;
-  };
+  // Cada documento leva para o app (lead), nao para a CVM: a aba Documentos do ativo, onde o
+  // leitor mostra o resumo da IA (Fato Relevante e Comunicado). O utm_content identifica o
+  // documento clicado (vai depois do `next`, então chega intacto ao app).
+  const docHref = (d: CvmDocument): string =>
+    appHref(nextPath({ kind: 'asset', ticker: T, tab: 'docs' }), `&utm_content=doc-${d.docType.toLowerCase()}-${d.date}`);
 
   const typesSeen = [...new Set(docs.map(d => d.docTypeLabel))];
   const typesText = typesSeen.length > 1
@@ -89,33 +126,34 @@ export const generateAirtonTickerHTML = (input: AirtonTickerInput): string => {
     : '';
 
   // ---- SEO ----
-  const title = `${T} na CVM: Fatos Relevantes e comunicados de ${escHtml(name)} no seu WhatsApp | iAções`;
+  const title = escHtml(airtonTickerTitle(T, name));
   const desc = latest
-    ? `Último documento de ${T} na CVM: ${latest.docTypeLabel} de ${fmtDateBR(latest.date)}${latest.title ? ' — ' + truncate(latest.title, 90) : ''}. Receba os próximos de ${name} no WhatsApp com o resumo do AIrton. Grátis, sem cartão.`
-    : `Receba cada Fato Relevante, ITR, DFP e comunicado de ${name} (${T}) no WhatsApp, com o resumo do AIrton. Grátis, sem cartão.`;
-  const ogTitle = latest
-    ? `AIrton avisou: ${latest.docTypeLabel} de ${T} em ${fmtDateBR(latest.date)}`
-    : `AIrton avisa quando ${T} publica na CVM`;
-  const ogDesc = latest && latest.title
-    ? truncate(latest.title, 140)
-    : `Os documentos que ${name} envia à CVM, resumidos no seu WhatsApp no instante em que saem.`;
+    ? `Último documento de ${T} na CVM: ${latest.docTypeLabel} de ${fmtDateBR(latest.date)}${latest.title ? ' — ' + truncate(latest.title, 90) : ''}. Fatos Relevantes e Comunicados de ${name} com o resumo do AIrton; alerta no WhatsApp nos planos pagos.`
+    : `Fatos Relevantes e Comunicados de ${name} (${T}) na CVM com o resumo do AIrton. Alerta em tempo real no WhatsApp nos planos pagos.`;
+  const ogTitle = alertDoc
+    ? `AIrton avisou: ${alertDoc.docTypeLabel} de ${T} em ${fmtDateBR(alertDoc.date)}`
+    : `AIrton avisa quando ${T} publica Fato Relevante ou Comunicado`;
+  const ogDesc = alertDoc && alertDoc.title
+    ? truncate(alertDoc.title, 140)
+    : `Os Fatos Relevantes e Comunicados que ${name} envia à CVM, resumidos pelo AIrton.`;
 
+  // Texto IGUAL no <details> visível e no FAQPage (JSON-LD): os dois saem deste array.
   const faq = [
     {
       q: `Como receber alertas de Fato Relevante de ${T} no WhatsApp?`,
-      a: `Crie uma conta gratuita na plataforma iAções, conecte seu WhatsApp por um código único gerado dentro do app e adicione ${T} aos seus alertas. Cada documento que ${name} publicar na CVM chega com o resumo do AIrton. Não pede cartão. Também funciona no Telegram.`,
+      a: `Crie uma conta na plataforma iAções, conecte o WhatsApp com o código único gerado dentro do app e adicione ${T} em Meus Ativos, na Central de Notificações. O alerta em tempo real no WhatsApp e no Telegram faz parte dos planos pagos: cada Fato Relevante e Comunicado ao Mercado de ${name} chega com o resumo do AIrton ou, se o resumo não ficar pronto em alguns minutos, só com o aviso de que o documento saiu. Na conta grátis, o aviso aparece no app. ITR e DFP não geram alerta.`,
     },
     {
       q: `O que é um Fato Relevante de ${T}?`,
-      a: `Fato Relevante é o documento que ${name} é obrigada a publicar na CVM sempre que ocorre algo capaz de influenciar a cotação de ${T} ou a decisão de investidores — aquisições, mudanças na diretoria, dividendos extraordinários, contratos relevantes. Comunicados ao Mercado, ITR (trimestral) e DFP (anual) são os outros documentos periódicos que aparecem nesta página.`,
+      a: `Fato Relevante é o documento que ${name} é obrigada a publicar na CVM sempre que ocorre algo capaz de influenciar a cotação de ${T} ou a decisão de investidores — aquisições, mudanças na diretoria, dividendos extraordinários, contratos relevantes. Nesta página também aparecem os Comunicados ao Mercado e, quando houver, os resultados trimestrais (ITR) e anuais (DFP).`,
     },
     {
       q: `Os resumos do AIrton são recomendação de compra ou venda de ${T}?`,
-      a: `Não. O AIrton resume o documento oficial para você ler em segundos; a decisão é sua. Os resumos são gerados por inteligência artificial e podem conter imprecisões — o link para o documento original na CVM está em cada alerta. A iAções não faz recomendação de investimento.`,
+      a: `Não. O AIrton resume o documento oficial para você ler o essencial; a decisão é sua. Os resumos são gerados por inteligência artificial e podem conter imprecisões — confira sempre o documento original, que fica disponível na plataforma. A iAções não faz recomendação de investimento.`,
     },
     {
       q: `Onde vejo o preço justo e os fundamentos de ${T}?`,
-      a: `Na página de análise de ${T} no iAções (iacoes.com.br/${T}/), com preço justo por Graham, Bazin, Gordon e DCF, indicadores e 10 anos de demonstrações financeiras.`,
+      a: `Na página de análise de ${T} no iAções (iacoes.com.br/${T}/), com preço justo por Graham, Bazin e Gordon, indicadores, proventos e 10 anos de demonstrações financeiras. O DCF fica na plataforma.`,
     },
   ];
 
@@ -153,13 +191,17 @@ ${faq.map(f => `      { "@type": "Question", "name": "${escJson(f.q)}", "accepte
   // conforme a pessoa "ativa" o alerta; sem JS (e para o crawler) a lista inteira está no DOM.
   const chatItems: string[] = docs.map((d, i) => {
     const body = d.excerpt ? truncate(stripPreamble(d.excerpt), i === 0 ? 300 : 200) : '';
+    // "Resumo completo" só quando existe resumo E o leitor do app o mostra (FR/CM/PR); senão o
+    // botão só abre a aba Documentos do ativo (é para lá que o docHref leva).
+    const btn = body && GERA_ALERTA.has(d.docType) ? 'Ler o resumo completo na plataforma →' : `Abrir os documentos de ${T} na plataforma →`;
+    const semAlerta = GERA_ALERTA.has(d.docType) ? '' : `              <p class="card-na">Este tipo de documento não gera alerta.</p>\n`;
     return `            <li class="card-msg" data-step="${i}">
               <div class="card-top"><span class="ico" aria-hidden="true">📄</span><div><b>${escHtml(d.docTypeLabel)} · ${T} · <time datetime="${escHtml(d.date)}">${fmtDateBR(d.date)}</time></b>${d.title ? `<span class="ttl">${escHtml(truncate(d.title, 110))}</span>` : ''}</div></div>
-${body ? `              <p class="card-body">${escHtml(body)}</p>\n` : ''}              <div class="card-btns"><a class="card-btn" href="${docHref(d)}" data-cta="doc-open" onclick="_iaClick(event)">Ler o resumo completo na plataforma →</a></div>
+${body ? `              <p class="card-body">${escHtml(body)}</p>\n` : ''}${semAlerta}              <div class="card-btns"><a class="card-btn" href="${docHref(d)}" data-cta="doc-open" onclick="_iaClick(event)">${btn}</a></div>
             </li>`;
   });
-  const pushTitle = latest ? `${latest.docTypeLabel} · ${T}` : T;
-  const pushBody = latest ? (latest.title ? truncate(latest.title, 80) : truncate(stripPreamble(latest.excerpt), 80)) : '';
+  const pushTitle = alertDoc ? `${alertDoc.docTypeLabel} · ${T}` : '';
+  const pushBody = alertDoc ? (alertDoc.title ? truncate(alertDoc.title, 80) : truncate(stripPreamble(alertDoc.excerpt), 80)) : '';
 
   const chatAria = latest
     ? `Conversa no WhatsApp com o AIrton mostrando os ${docs.length} documentos mais recentes que ${name} publicou na CVM, o último em ${fmtDateLong(latest.date)}. Os documentos são reais; os resumos são gerados por IA. Não é recomendação de investimento.`
@@ -301,6 +343,7 @@ ${jsonLd}
       .card-top b{font-size:.74rem;display:block;color:var(--gold-light);font-family:var(--font-mono);letter-spacing:.04em}
       .card-top .ttl{font-size:1.02rem;display:block;margin-top:4px;line-height:1.35;color:#fff;font-weight:600}
       .card-body{padding:0 16px 12px;font-size:.92rem;line-height:1.55;color:rgba(255,255,255,.82)}
+      .card-na{padding:0 16px 12px;font-size:.8rem;color:rgba(255,255,255,.6)}
       .card-btns{display:flex;border-top:1px solid rgba(255,255,255,.08)}
       .card-btn{display:block;flex:1;padding:11px;text-align:center;font-size:.86rem;color:var(--wa);font-weight:600}
       .card-btn:hover{background:rgba(255,255,255,.04)}
@@ -409,7 +452,7 @@ __TRACKING__
         <div class="nav-links">
           <a href="/${T}/" class="lnk">Valuation de ${T}</a>
           <a href="/airton/" class="lnk">AIrton</a>
-          <a href="${APP}?ref=${ref}&ticker=${T}" class="btn btn-gold" data-cta="nav-comecar" onclick="_iaClick(event)">Começar grátis →</a>
+          <a href="${airtonHref}" class="btn btn-gold" data-cta="nav-comecar" onclick="_iaClick(event)">Começar grátis →</a>
         </div>
       </div>
     </nav>
@@ -421,20 +464,22 @@ __TRACKING__
         </nav>
         <div class="hero-head">
           <span class="eyebrow"><span class="pulse"></span> Alerta de ${T} · WhatsApp</span>
-          <h1>${T} publicou na CVM.<span class="line2">O <span class="ai">AI</span>rton te avisa antes do mercado.</span></h1>
-          <p class="hero-sub">Veja o último documento real que ${escHtml(name)} enviou à CVM${latest ? ` (${fmtDateLong(latest.date)})` : ''} chegando do jeito que o <span class="ai">AI</span>rton entrega no seu WhatsApp — com o resumo pronto.</p>
+          <h1>${T} publicou na CVM.<span class="line2">O <span class="ai">AI</span>rton resume e te avisa.</span></h1>
+          <p class="hero-sub">${alertDoc
+            ? `Veja o último documento real que ${escHtml(name)} enviou à CVM (${escHtml(alertDoc.docTypeLabel)}, ${fmtDateLong(alertDoc.date)}) do jeito que o <span class="ai">AI</span>rton entrega no WhatsApp nos planos pagos${stripPreamble(alertDoc.excerpt) ? ' — com o resumo pronto' : ''}.`
+            : `Veja os últimos documentos reais que ${escHtml(name)} enviou à CVM. Nos planos pagos, o <span class="ai">AI</span>rton entrega os Fatos Relevantes e Comunicados no WhatsApp.`}</p>
         </div>
 
         <div class="sim" id="sim">
-          <div class="push" id="push" role="status" aria-live="polite">
+${alertDoc ? `          <div class="push" id="push" role="status" aria-live="polite" data-fonte="cvm">
             <span class="push-av">A</span>
             <span class="push-txt"><b><span><span class="ai">AI</span>rton · WhatsApp</span><span class="push-t">agora</span></b><span class="push-l1">${escHtml(pushTitle)}</span>${pushBody ? `<span class="push-l2">${escHtml(pushBody)}</span>` : ''}</span>
           </div>
-
+` : ''}
           <div class="act" id="act" role="status" aria-live="polite">
             <div class="act-l">
               <span class="act-tk">${T}</span>
-              <span class="act-txt"><b id="act-title">Ativando alerta da CVM…</b><small id="act-sub">É assim que chega no seu WhatsApp:</small></span>
+              <span class="act-txt"><b id="act-title">Ativando alerta da CVM…</b><small id="act-sub">É assim que chega no WhatsApp, nos planos pagos:</small></span>
             </div>
             <span class="toggle" id="act-btn" aria-hidden="true"><span class="knob"></span></span>
           </div>
@@ -443,24 +488,24 @@ __TRACKING__
             <span class="wa-av" aria-hidden="true">A</span>
             <span class="wa-id"><b><span class="ai">AI</span>rton</b><small>online · WhatsApp</small></span>
 ${countText ? `            <span class="feed-stat"><b>${countText}</b> entre ${typesText}</span>\n` : ''}          </div>
-          <ol class="feed" id="feed" aria-label="${escHtml(chatAria)}">
+          <ol class="feed" id="feed" aria-label="${escHtml(chatAria)}" data-fonte="cvm">
             <li class="typing" id="typing" hidden aria-hidden="true"><i></i><i></i><i></i></li>
 ${chatItems.join('\n')}
-            <li class="msg in" id="m-done" hidden>Esses foram os últimos ${docs.length} de ${T}. O próximo chega no seu WhatsApp assim que sair na CVM.</li>
+            <li class="msg in" id="m-done" hidden>Esses foram os últimos ${docs.length} de ${T}. Nos planos pagos, o próximo Fato Relevante ou Comunicado chega aqui logo depois de sair na CVM.</li>
           </ol>
           <div class="chips" id="chips" hidden>
-            <p class="chips-lead">Imagina receber tudo isso no seu WhatsApp, no instante em que sai na CVM?</p>
+            <p class="chips-lead">Quer receber os próximos de ${T} no WhatsApp?</p>
             <button type="button" class="chip" id="chip-prev">Mostra o anterior</button>
             <a href="${alertaHref}" class="btn btn-wa chip-cta" data-cta="hero-alerta" onclick="_iaClick(event)">Quero isso no meu WhatsApp →</a>
             <a href="/${T}/" class="reply-alt" data-cta="ver-valuation" onclick="_iaTrack('cta_click','ver-valuation')">Ver o preço justo de ${T}</a>
           </div>
-          <p class="demo-badge">Documentos reais publicados na CVM; o original fica linkado em cada alerta na plataforma. Resumos gerados por IA, podem conter imprecisões. Não é recomendação de investimento.</p>
+          <p class="demo-badge">Documentos reais publicados na CVM; o original fica disponível na plataforma. Resumos gerados por IA, podem conter imprecisões. Alerta em tempo real no WhatsApp: planos pagos. Não é recomendação de investimento.</p>
         </div>
 
         <div class="trust">
-          <span><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> Grátis, sem cartão</span>
-          <span><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> Resumo do AIrton em cada alerta</span>
-          <span><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> Também no Telegram</span>
+          <span><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> Fato Relevante e Comunicado ao Mercado</span>
+          <span><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> Em tempo real nos planos pagos</span>
+          <span><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg> WhatsApp ou Telegram</span>
         </div>
       </div>
     </header>
@@ -468,7 +513,7 @@ ${chatItems.join('\n')}
     <section class="about" aria-label="Sobre ${T} na CVM">
       <div class="wrap">
         <p><b>${escHtml(name)} (${T})</b>${sector ? ` é uma companhia aberta do setor de <a href="/acoes/${sectorSlug(sector)}/">${escHtml(sector)}</a>` : ' é uma companhia aberta'} listada na B3. Toda decisão que possa mexer com a cotação de ${T} — resultado trimestral, dividendos, aquisição, troca de diretoria — precisa ser publicada na CVM antes de chegar ao noticiário. É por isso que quem acompanha ${T} de perto lê os documentos na fonte.</p>
-        <p>O <span class="ai">AI</span>rton lê cada um deles no momento em que entra no sistema da CVM, resume em poucas linhas e envia no seu WhatsApp com o link para o original. O valuation completo de ${T}, com preço justo por cinco métodos, está em <a href="/${T}/">iacoes.com.br/${T}/</a>.</p>
+        <p>O <span class="ai">AI</span>rton resume em poucas linhas os Fatos Relevantes e Comunicados que entram no sistema da CVM. Nos planos pagos, o resumo chega no seu WhatsApp ou Telegram; o documento original fica disponível na plataforma. O preço justo de ${T} por Graham, Bazin e Gordon, com indicadores e demonstrações, está em <a href="/${T}/">iacoes.com.br/${T}/</a>.</p>
       </div>
     </section>
 
@@ -476,42 +521,42 @@ ${chatItems.join('\n')}
       <div class="wrap center">
         <p class="sec-label reveal">Vai além do aviso</p>
         <h2 class="sec-title reveal">Pergunte ao <span class="ai">AI</span>rton sobre ${T}</h2>
-        <p class="sec-desc reveal">Cada pergunta abre a conversa já com o contexto de ${T}. Sem cartão, sem instalar nada.</p>
+        <p class="sec-desc reveal">Exemplos do que perguntar no chat do AIrton, no app, no WhatsApp ou no Telegram. Ele consulta os dados da empresa e os documentos da CVM antes de responder.</p>
         <div class="prompts reveal">
-          <a class="prompt" href="${airtonHref(`Resume o último Fato Relevante da ${T}`)}" data-cta="airton-prompt" onclick="_iaClick(event)">
+          <a class="prompt" href="${airtonHref}" data-cta="airton-prompt" onclick="_iaClick(event)">
             <span class="q">Resume o último Fato Relevante da ${T}</span>
-            <span class="a">Ele lê o documento oficial na CVM e devolve o que muda, em quatro linhas.</span>
-            <span class="go">Perguntar →</span>
+            <span class="a">Ele busca o documento na base da CVM e resume o que mudou.</span>
+            <span class="go">Abrir o AIrton →</span>
           </a>
-          <a class="prompt" href="${airtonHref(`Minha tese em ${T} se sustenta?`)}" data-cta="airton-prompt" onclick="_iaClick(event)">
+          <a class="prompt" href="${validadorHref}" data-cta="airton-prompt" onclick="_iaClick(event)">
             <span class="q">Minha tese em ${T} se sustenta?</span>
-            <span class="a">Ele cruza sua tese com governança, endividamento, rentabilidade e riscos, e diz onde ela não fecha.</span>
-            <span class="go">Perguntar →</span>
+            <span class="a">No Validador de Teses, a IA audita a sua argumentação e aponta os Fatos Relevantes e Comunicados que pesam contra ela.</span>
+            <span class="go">Abrir o Validador →</span>
           </a>
-          <a class="prompt" href="${airtonHref(`Compara ${T} com os pares do setor`)}" data-cta="airton-prompt" onclick="_iaClick(event)">
+          <a class="prompt" href="${airtonHref}" data-cta="airton-prompt" onclick="_iaClick(event)">
             <span class="q">Compara ${T} com os pares do setor</span>
-            <span class="a">Múltiplos, margens e crescimento lado a lado com as empresas do mesmo setor na B3.</span>
-            <span class="go">Perguntar →</span>
+            <span class="a">Múltiplos, margens e crescimento lado a lado com empresas do mesmo setor, na própria conversa.</span>
+            <span class="go">Abrir o AIrton →</span>
           </a>
         </div>
-        <p class="prompt-note">Funciona para qualquer ação da B3 — <a href="/airton/" style="color:var(--gold);font-weight:600">conheça o AIrton</a>.</p>
+        <p class="prompt-note">Vale para as ações da B3 — <a href="/airton/" style="color:var(--gold);font-weight:600">conheça o AIrton</a>.</p>
       </div>
     </section>
 
     <section id="como" style="background:var(--bg-white);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
       <div class="wrap">
         <p class="sec-label reveal">Como funciona</p>
-        <h2 class="sec-title reveal">Três passos. Nenhum cartão.</h2>
+        <h2 class="sec-title reveal">Três passos para o alerta de ${T}.</h2>
         <div class="steps reveal">
-          <div class="step"><div class="n">01</div><h3>Crie a conta</h3><p>Grátis, com e-mail ou Google. O alerta de ${T} já vem selecionado quando você entra por aqui.</p></div>
+          <div class="step"><div class="n">01</div><h3>Crie a conta</h3><p>Grátis, com e-mail ou Google. Depois, adicione ${T} em Meus Ativos, na Central de Notificações da plataforma.</p></div>
           <div class="step"><div class="n">02</div><h3>Conecte o WhatsApp</h3><p>Dentro da plataforma, com um código único da sua conta. Sem número público, sem grupo. Também no Telegram.</p></div>
-          <div class="step"><div class="n">03</div><h3>Receba antes do mercado</h3><p>Cada documento de ${T} na CVM chega resumido, com link para o original. Você decide o que fazer.</p></div>
+          <div class="step"><div class="n">03</div><h3>Receba os próximos</h3><p>Nos planos pagos, cada Fato Relevante e Comunicado de ${T} chega em tempo real, com o resumo do AIrton quando ele fica pronto. Proventos chegam no resumo diário. Você decide o que fazer.</p></div>
         </div>
         <div class="types reveal">
           <div class="type"><b>FATO RELEVANTE</b><span>O que pode mexer na cotação: aquisições, contratos, diretoria, proventos extraordinários.</span></div>
-          <div class="type"><b>COMUNICADO</b><span>Esclarecimentos ao mercado, respostas à CVM e à B3, avisos aos acionistas.</span></div>
-          <div class="type"><b>ITR · DFP</b><span>Resultados trimestrais e anuais, com o resumo do AIrton pronto.</span></div>
-          <div class="type"><b>DIVIDENDOS · JCP</b><span>Aviso de proventos com data-com e pagamento.</span></div>
+          <div class="type"><b>COMUNICADO</b><span>Esclarecimentos ao mercado e respostas à CVM e à B3.</span></div>
+          <div class="type"><b>ITR · DFP</b><span>Resultados trimestrais e anuais. Ficam na plataforma, mas não geram alerta.</span></div>
+          <div class="type"><b>DIVIDENDOS · JCP</b><span>Nos planos pagos, o aviso de proventos chega no resumo da manhã.</span></div>
         </div>
       </div>
     </section>
@@ -528,8 +573,8 @@ ${faq.map((f, i) => `          <details${i === 0 ? ' open' : ''}><summary>${escH
 
     <section class="final">
       <div class="wrap">
-        <h2 class="reveal">O próximo documento de ${T}<br>chega quando sair. <span class="ai">AI</span>rton te avisa.</h2>
-        <p class="sec-desc reveal">Crie sua conta, conecte o WhatsApp e deixe o AIrton ler a CVM por você. Grátis, sem cartão.</p>
+        <h2 class="reveal">O próximo documento de ${T}<br>chega resumido pelo <span class="ai">AI</span>rton.</h2>
+        <p class="sec-desc reveal">Crie sua conta grátis e conecte o WhatsApp. O alerta em tempo real de ${T} faz parte dos planos pagos.</p>
         <div class="final-cta reveal">
           <a href="${alertaHref}" class="btn btn-wa btn-lg" data-cta="final-alerta" onclick="_iaClick(event)">Receber os próximos de ${T} →</a>
           <a href="/${T}/" class="btn btn-outline" data-cta="ver-valuation" onclick="_iaTrack('cta_click','ver-valuation')">Ver o valuation de ${T}</a>
@@ -546,7 +591,7 @@ ${faq.map((f, i) => `          <details${i === 0 ? ' open' : ''}><summary>${escH
             <a href="/acoes/">Ações</a>
             <a href="/${T}/">${T}</a>
             <a href="/airton/">AIrton</a>
-            <a href="${APP}?ref=${ref}&ticker=${T}" data-cta="footer-link" onclick="_iaClick(event)">Acessar plataforma</a>
+            <a href="${airtonHref}" data-cta="footer-link" onclick="_iaClick(event)">Acessar plataforma</a>
           </div>
         </div>
         <p class="disc">
@@ -582,8 +627,9 @@ ${faq.map((f, i) => `          <details${i === 0 ? ' open' : ''}><summary>${escH
           tg.classList.add('on');act.classList.add('on');
           document.getElementById('act-title').textContent='Alerta de ${T} ativo';
           wait(450,function(){
-            push.classList.add('on');try{if(navigator.vibrate)navigator.vibrate(30)}catch(_){}
-            wait(2400,function(){push.classList.remove('on')});
+            // Sem push quando o último documento não gera alerta (ITR/DFP): o elemento nem existe.
+            if(push){push.classList.add('on');try{if(navigator.vibrate)navigator.vibrate(30)}catch(_){}
+            wait(2400,function(){push.classList.remove('on')});}
             wait(500,function(){head.hidden=false;show(head);reveal(true)});
           });
         });

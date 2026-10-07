@@ -5,6 +5,7 @@ import { Badge } from '../ticker/components/ui/badge';
 import { Card, CardContent } from '../ticker/components/ui/card';
 import { AccordionItem } from '../ticker/components/ui/misc';
 import { ArrowRight, ChartColumn, FileText, TrendingDown, TrendingUp } from '../ticker/components/icons';
+import { linkFerramenta } from '../ticker/components/links-ferramentas';
 import { BuffettChart } from './chart';
 import { MacroBreadcrumb, MacroFooter, MacroHeader } from './chrome';
 import { CSV_NAME, HUB_PATH, PAGE_PATH, type BuffettModel } from './model';
@@ -51,6 +52,7 @@ function Gauge({ m }: { m: BuffettModel }) {
 }
 
 export function BuffettPage({ m }: { m: BuffettModel }) {
+  const rankingHref = linkFerramenta('ranking');
   return (
     <>
       <MacroHeader app={m.links.app} />
@@ -153,7 +155,11 @@ export function BuffettPage({ m }: { m: BuffettModel }) {
 
           <Section id="acoes" title="E as ações que você acompanha?">
             <p className="leading-relaxed">A bolsa como um todo está {m.faixa}. Para uma empresa específica, o que importa é o preço frente ao valor dela — veja o preço justo por Graham, Bazin e Gordon de cada ação.</p>
-            <a href="/acoes/" className="inline-flex items-center gap-2 text-sm font-semibold text-gold-strong hover:underline">Preço justo de todas as ações da B3 <ArrowRight className="size-4" aria-hidden="true" /></a>
+            <div className="flex flex-wrap gap-x-6 gap-y-2">
+              <a href="/acoes/" className="inline-flex items-center gap-2 text-sm font-semibold text-gold-strong hover:underline">Preço justo das ações da B3, uma a uma <ArrowRight className="size-4" aria-hidden="true" /></a>
+              {/* Só com a página publicada no disco (mesmo critério do hub /ferramentas/). */}
+              {rankingHref && <a href={rankingHref} data-track="buffett-ranking" className="inline-flex items-center gap-2 text-sm font-semibold text-gold-strong hover:underline">Ranking de ações por dividendos, P/L, P/VP e ROE <ArrowRight className="size-4" aria-hidden="true" /></a>}
+            </div>
             <div className="flex flex-col gap-4 rounded-xl bg-ink p-6 text-white sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="flex items-center gap-2 font-semibold"><ChartColumn className="size-4 text-gold" aria-hidden="true" />Painel macro completo na plataforma</p>

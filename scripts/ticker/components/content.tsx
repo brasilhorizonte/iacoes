@@ -7,9 +7,15 @@ import { Badge } from './ui/badge';
 import { ButtonLink } from './ui/button';
 import { Separator, Tabs, TabsList, TabsTrigger, TabsContent, AccordionItem } from './ui/misc';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from './ui/table';
-import { Lock, ArrowRight, Bell, MessageSquareText, Star, ChartColumn, FileText, ExternalLink, Sparkles, Layers } from './icons';
+import { Lock, ArrowRight, Bell, Star, ChartColumn, FileText, ExternalLink, Sparkles, Layers, Check, Info } from './icons';
+import { linkFerramenta } from './links-ferramentas';
+import { cvmDocTitle, dedupeCvmVersions } from '../../lib/cvm-doc-title';
 
 const toneCls = (n: number) => (!ok(n) || n === 0 ? '' : n > 0 ? 'text-positive' : 'text-negative');
+
+/** Link interno para /ferramentas/: sem _iaClick (não é CTA do app). `data-track` vira
+ *  _iaTrack('cta_click', id) no withTracks de scripts/ticker/render.tsx (como nas páginas /ferramentas/). */
+const linkInterno = 'font-medium text-primary underline-offset-2 hover:underline';
 
 function SectionTitle({ id, children, sub, action }: { id: string; children: React.ReactNode; sub?: React.ReactNode; action?: React.ReactNode }) {
   return (
@@ -92,8 +98,22 @@ export function About({ m }: { m: TickerModel }) {
 
 // --- Dividendos ----------------------------------------------------------------------
 
+type DivRow = TickerModel['div']['recent'][number] & { amountDeclared?: number; splitDivisor?: number };
+
+/**
+ * Algum provento foi trazido para a base acionária de hoje (desdobramento, grupamento,
+ * bonificação — scripts/lib/splits.ts)? `div.adjusted` (o modelo olha a lista inteira) ou, além
+ * dele, os campos `amountDeclared`/`splitDivisor` das linhas da tabela.
+ */
+export function proventosAjustados(d: TickerModel['div']): boolean {
+  if (d.adjusted === true) return true;
+  return (d.recent as DivRow[]).some(r =>
+    (typeof r.splitDivisor === 'number' && r.splitDivisor !== 1) || (typeof r.amountDeclared === 'number' && r.amountDeclared !== r.amount));
+}
+
 export function Dividends({ m }: { m: TickerModel }) {
   const d = m.div;
+  const ajustados = proventosAjustados(d);
   const maxY = Math.max(0, ...d.byYear.map(y => y.total));
   const stats: [string, string][] = [
     ['Dividend yield 12m', d.dyTTM > 0 ? pct(d.dyTTM) : '—'],
@@ -147,6 +167,13 @@ export function Dividends({ m }: { m: TickerModel }) {
               </TableBody>
             </Table>
           </div>
+        )}
+
+        {ajustados && d.totalPayments > 0 && (
+          <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+            <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
+            Valores por ação ajustados por desdobramento, grupamento e bonificação.
+          </p>
         )}
       </CardContent>
     </Card>
@@ -233,18 +260,21 @@ export function Statements({ m }: { m: TickerModel }) {
 
 export function CvmDocs({ m }: { m: TickerModel }) {
   if (!m.cvmDocs.length) return null;
+  const fatos = linkFerramenta('fatos');
   return (
     <Card id="cvm" className="scroll-mt-20" aria-labelledby="cvm-title">
       <SectionTitle id="cvm-title" sub="Os documentos mais recentes que a companhia enviou à CVM." action={<Badge variant="gold">Direto da CVM</Badge>}>O que {m.symbol} publicou na CVM</SectionTitle>
       <CardContent className="space-y-4">
-        <ol className="divide-y rounded-lg border">
-          {m.cvmDocs.map((d, i) => (
+        {/* data-fonte="cvm": título e resumo vêm da CVM e da IA (dado externo, não texto autoral). */}
+        <ol className="divide-y rounded-lg border" data-fonte="cvm">
+          {dedupeCvmVersions(m.cvmDocs).map((d, i) => (
             <li key={i}>
               <a href={d.link} target="_blank" rel="noopener nofollow" className="flex gap-3 px-4 py-3 transition-colors hover:bg-muted/50">
                 <FileText className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
                 <span className="min-w-0 space-y-0.5">
                   <span className="flex flex-wrap items-center gap-2 text-xs"><Badge variant="secondary">{d.docTypeLabel}</Badge><time dateTime={d.date} className="font-mono text-muted-foreground">{isoToBR(d.date)}</time></span>
-                  {d.title && <span className="block text-sm font-semibold">{truncate(d.title, 120)}</span>}
+                  {/* Título cru de ITR/DFP ("BCO X S.A. | ref 2026-06-30 | v3 | id 160881") vira o período de referência. */}
+                  {cvmDocTitle(d) && <span className="block text-sm font-semibold">{truncate(cvmDocTitle(d), 120)}</span>}
                   {d.excerpt && <span className="block text-sm text-muted-foreground">{truncate(d.excerpt, 220)}</span>}
                 </span>
                 <ExternalLink className="ml-auto size-3.5 shrink-0 text-muted-foreground" />
@@ -256,6 +286,14 @@ export function CvmDocs({ m }: { m: TickerModel }) {
           <ButtonLink href={m.links.alerta} cta="alerta-cvm" variant="default"><Bell /> Receber os próximos no WhatsApp</ButtonLink>
           <a href={`/airton/${m.symbol}/`} className="text-sm font-medium text-muted-foreground underline-offset-2 hover:underline">Veja como o alerta chega →</a>
         </div>
+        <p className="text-xs text-muted-foreground">
+          Fato Relevante e Comunicado ao Mercado chegam em tempo real no WhatsApp e no Telegram nos planos pagos. Na conta grátis, o aviso aparece no app.
+        </p>
+        {fatos && (
+          <p className="text-sm">
+            <a href={fatos} data-track="tk-fatos-relevantes" className={linkInterno}>Fatos relevantes de outras empresas da B3, resumidos por IA →</a>
+          </p>
+        )}
       </CardContent>
     </Card>
   );
@@ -274,35 +312,46 @@ export function Faq({ m }: { m: TickerModel }) {
   );
 }
 
-// --- Aside: AIrton + plataforma ------------------------------------------------------------
+// --- Aside: Validador de Teses + plataforma ------------------------------------------------
+
+/**
+ * O card de auditoria leva ao Validador de Teses (m.links.airton → ?s=ianalista&t=validador).
+ * O Validador audita a ARGUMENTAÇÃO com IA, contra os Fatos Relevantes e Comunicados da CVM:
+ * não compara a tese com os indicadores da plataforma nem dá preço-alvo (honestidade-rotas.md).
+ * Sem perguntas prontas com &prompt=: o app ignora o parâmetro.
+ */
+const ENTREGAS_DO_VALIDADOR = [
+  'Nota em 4 critérios: fundamentação, análise de riscos, clareza e lógica de valuation',
+  'Fatos Relevantes e Comunicados que pesam contra a tese',
+  'Veredito sem recomendação de compra ou venda',
+];
 
 export function Aside({ m }: { m: TickerModel }) {
-  const q = encodeURIComponent;
+  const nota = linkFerramenta('nota');
   const features: { href: string; cta: string; icon: React.ReactNode; title: React.ReactNode; desc: string }[] = [
-    { href: m.links.dcf, cta: 'dcf-locked', icon: <ChartColumn className="size-4" />, title: <>DCF completo de {m.symbol}</>, desc: 'WACC, cenários e sensibilidade com premissas suas.' },
-    { href: m.links.generic, cta: 'nota-qualitativa', icon: <Star className="size-4" />, title: <>Nota qualitativa <span className="locked-blur inline-block">?,??</span>/4</>, desc: 'Governança, gestão, vantagens competitivas e riscos.' },
-    { href: m.links.alerta, cta: 'alerta-cvm', icon: <Bell className="size-4" />, title: <>Alertas de {m.symbol} no WhatsApp</>, desc: 'Fato Relevante, ITR, DFP e proventos assim que saem.' },
+    { href: m.links.dcf, cta: 'dcf-locked', icon: <ChartColumn className="size-4" />, title: <>DCF completo de {m.symbol}</>, desc: 'A IA propõe as premissas e você decide. WACC e sensibilidade.' },
+    // A nota de cada empresa abre na página do ativo no app (Visão geral, aberta a toda conta), não na Home.
+    { href: m.links.asset, cta: 'nota-qualitativa', icon: <Star className="size-4" />, title: <>Nota qualitativa <span className="locked-blur inline-block">?,??</span>/4</>, desc: 'Governança, gestão, vantagens competitivas e riscos.' },
+    { href: m.links.alerta, cta: 'alerta-cvm', icon: <Bell className="size-4" />, title: <>Alertas de {m.symbol} no WhatsApp</>, desc: 'Nos planos pagos: Fato Relevante e Comunicado em tempo real, proventos no resumo diário.' },
     { href: m.links.asset, cta: 'asset-page', icon: <Layers className="size-4" />, title: <>{m.symbol} completa na plataforma</>, desc: 'Gráficos, comparativos e histórico em um só lugar.' },
   ];
   return (
     <div className="aside-sticky space-y-4">
       <Card className="gap-4 border-gold/40 bg-gradient-to-b from-gold/10 to-card">
         <CardHeader>
-          <p className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-gold-strong uppercase"><Sparkles className="size-3.5" /> AIrton · IA da Brasil Horizonte</p>
-          <CardTitle as="h2" className="text-lg">Leu um relatório sobre {m.symbol}? Pergunte ao AIrton.</CardTitle>
-          <CardDescription>Ele cruza a tese com os números reais e os documentos da CVM e aponta onde ela não se sustenta.</CardDescription>
+          <p className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-gold-strong uppercase"><Sparkles className="size-3.5" /> Validador de Teses · IA</p>
+          <CardTitle as="h2" className="text-lg">Leu um relatório sobre {m.symbol}? Coloque a tese à prova.</CardTitle>
+          <CardDescription>Escreva a sua tese ou anexe o relatório. A IA audita a argumentação, confronta com os Fatos Relevantes e Comunicados de {m.symbol} na CVM e aponta onde ela se sustenta e onde não fecha.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          <ul className="space-y-2">
-            {m.airtonQuestions.map(question => (
-              <li key={question}>
-                <a href={`${m.links.airton}&prompt=${q(question)}`} data-cta="airton-audit" className="flex items-center gap-2 rounded-lg border bg-card px-3 py-2 text-sm font-medium transition-colors hover:border-gold/60 hover:bg-gold/5">
-                  <MessageSquareText className="size-4 shrink-0 text-gold-strong" /><span className="flex-1">{question}</span><ArrowRight className="size-3.5 text-muted-foreground" />
-                </a>
+          <ul className="space-y-2" aria-label="O que a auditoria entrega">
+            {ENTREGAS_DO_VALIDADOR.map(item => (
+              <li key={item} className="flex items-start gap-2 text-sm">
+                <Check className="mt-0.5 size-4 shrink-0 text-gold-strong" aria-hidden="true" /><span>{item}</span>
               </li>
             ))}
           </ul>
-          <ButtonLink href={m.links.airton} cta="airton-audit" variant="gold" className="w-full">Auditar {m.symbol} grátis <ArrowRight /></ButtonLink>
+          <ButtonLink href={m.links.airton} cta="airton-audit" variant="gold" className="w-full">Auditar minha tese de {m.symbol} <ArrowRight /></ButtonLink>
           <p className="text-center text-xs text-muted-foreground">{m.socialProof.toLocaleString('pt-BR')} investidores já validaram teses em {m.symbol}</p>
         </CardContent>
       </Card>
@@ -310,7 +359,7 @@ export function Aside({ m }: { m: TickerModel }) {
       <Card className="gap-3">
         <CardHeader>
           <CardTitle as="h2" className="text-base">Na plataforma para {m.symbol}</CardTitle>
-          <CardDescription>Grátis para começar. Sem cartão.</CardDescription>
+          <CardDescription>Comece com uma conta grátis.</CardDescription>
         </CardHeader>
         <CardContent>
           <ul className="-mx-2">
@@ -327,6 +376,11 @@ export function Aside({ m }: { m: TickerModel }) {
               </li>
             ))}
           </ul>
+          {nota && (
+            <p className="mt-2 border-t pt-3 text-xs text-muted-foreground">
+              <a href={nota} data-track="tk-nota-qualitativa" className={linkInterno}>Como avaliar uma empresa: a nota qualitativa de 1 a 4 →</a>
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>
@@ -378,7 +432,7 @@ export function FinalCta({ m }: { m: TickerModel }) {
           <div className="relative grid items-center gap-6 lg:grid-cols-[1fr_auto]">
             <div className="max-w-2xl">
               <h2 id="final-cta-title" className="text-2xl font-bold tracking-tight sm:text-3xl">Faça o valuation completo de {m.symbol}</h2>
-              <p className="mt-2 text-white/75">DCF com as suas premissas, nota qualitativa, AIrton para auditar a sua tese e alertas da CVM no WhatsApp. Comece grátis, sem cartão.</p>
+              <p className="mt-2 text-white/75">DCF com as suas premissas, nota qualitativa e Validador de Teses. Nos planos pagos, os alertas da CVM chegam no WhatsApp. Comece com uma conta grátis.</p>
             </div>
             <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
               <ButtonLink href={m.links.dcf} cta="footer" variant="gold" size="lg">Começar o DCF de {m.symbol} <ArrowRight /></ButtonLink>

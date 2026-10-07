@@ -5,7 +5,9 @@ import { Container } from './chrome';
 import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardContent, CardFooter } from './ui/card';
 import { Badge } from './ui/badge';
 import { ButtonLink } from './ui/button';
-import { Lock, ArrowRight, Calculator, Bell } from './icons';
+import { Target } from 'lucide-react';
+import { Lock, ArrowRight, Calculator } from './icons';
+import { linkFerramenta } from './links-ferramentas';
 
 const upsideVariant = (fv: number, price: number) => (fv > 0 ? (fv >= price ? 'positive' : 'negative') : 'neutral') as 'positive' | 'negative' | 'neutral';
 
@@ -51,7 +53,12 @@ function FairValue({ id, fv, price, na }: { id: string; fv: number; price: numbe
 
 function MethodCard({ id, title, desc, fv, price, na, children, footer, formula, alerta }: {
   id: string; title: string; desc: string; fv: number; price: number; na: string; children: React.ReactNode; footer: React.ReactNode; formula: string;
-  /** Cadastro na plataforma com intenção de alerta (WhatsApp); cta por método para medir qual converte. */
+  /**
+   * Aba "Minha tese" do ativo na plataforma (m.links.alerta), onde a pessoa registra o próprio
+   * preço-alvo; cta por método (calc-alerta-<id>) para medir qual converte. O preço justo das
+   * calculadoras não dispara alerta no app, e o aviso de preço-alvo é dos planos pagos (resumo
+   * diário): o botão não promete alerta.
+   */
   alerta: string;
 }) {
   return (
@@ -70,7 +77,7 @@ function MethodCard({ id, title, desc, fv, price, na, children, footer, formula,
       <CardFooter className="mt-auto flex-col items-stretch gap-1.5 border-t pt-4 text-xs text-muted-foreground">
         <div className="flex flex-wrap gap-x-4 gap-y-1">{footer}</div>
         <code className="font-mono text-[11px] text-muted-foreground/90">{formula}</code>
-        <ButtonLink href={alerta} cta={`calc-alerta-${id}`} className="mt-2 w-full"><Bell /> Salvar e criar alerta no WhatsApp</ButtonLink>
+        <ButtonLink href={alerta} cta={`calc-alerta-${id}`} className="mt-2 w-full"><Target /> Registrar meu preço-alvo</ButtonLink>
       </CardFooter>
     </Card>
   );
@@ -126,6 +133,7 @@ function SummaryChart({ m }: { m: TickerModel }) {
 }
 
 function SensitivityLocked({ m }: { m: TickerModel }) {
+  const dcf = linkFerramenta('dcf');
   const cols = m.dcf.gAxis.length ? m.dcf.gAxis : [0.04, 0.045, 0.05, 0.055, 0.06];
   const rows = m.dcf.waccAxis.length ? m.dcf.waccAxis : [0.13, 0.135, 0.14, 0.145, 0.15];
   return (
@@ -164,8 +172,9 @@ function SensitivityLocked({ m }: { m: TickerModel }) {
             <div className="mx-4 max-w-sm rounded-xl border bg-card/95 p-5 text-center shadow-lg backdrop-blur">
               <div className="mx-auto mb-2 grid size-10 place-items-center rounded-full bg-gold/15 text-gold-strong"><Lock className="size-4" /></div>
               <p id="dcf-lock-msg" className="text-sm font-semibold">O DCF é o único método que olha o caixa que {m.symbol} vai gerar, não só o passado.</p>
-              <p className="mt-1 text-xs text-muted-foreground">Projeção de receita, margens, capex e WACC, com cenários. Ajuste tudo.</p>
+              <p className="mt-1 text-xs text-muted-foreground">Projeção de receita, custos e capex, com WACC decomposto. A IA propõe as premissas e você decide.</p>
               <ButtonLink href={m.links.dcf} cta="dcf-locked" variant="default" className="mt-4 w-full">Fazer o DCF de {m.symbol} <ArrowRight /></ButtonLink>
+              {dcf && <a href={dcf} data-track="tk-dcf" className="mt-3 inline-block text-xs font-medium text-primary underline-offset-2 hover:underline">Como funciona o fluxo de caixa descontado →</a>}
             </div>
           </div>
         </div>
@@ -177,6 +186,7 @@ function SensitivityLocked({ m }: { m: TickerModel }) {
 export function Calculators({ m }: { m: TickerModel }) {
   const { graham, bazin, gordon } = m.calc;
   const hasDiv = m.div.avg['5'] > 0 || m.div.avg['10'] > 0;
+  const calc = linkFerramenta('calc');
   return (
     <section id="calculadoras" className="scroll-mt-20 py-10" aria-labelledby="calc-title">
       <Container>
@@ -184,7 +194,12 @@ export function Calculators({ m }: { m: TickerModel }) {
           <div className="max-w-2xl">
             <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold tracking-wide text-gold-strong uppercase"><Calculator className="size-3.5" /> Calculadoras de preço justo</p>
             <h2 id="calc-title" className="text-2xl font-bold tracking-tight sm:text-3xl">Calcule o preço justo de {m.symbol}</h2>
-            <p className="mt-1 text-muted-foreground">Três métodos clássicos com premissas ajustáveis. O resultado muda na hora — salve e receba alertas de {m.symbol} no WhatsApp com sua conta grátis.</p>
+            <p className="mt-1 text-muted-foreground">Três métodos clássicos com premissas ajustáveis. O resultado muda na hora, calculado no seu navegador.</p>
+            {calc && (
+              <p className="mt-1 text-sm text-muted-foreground">
+                Para outra ação ou para digitar os números à mão, use a <a href={calc} data-track="tk-calculadora" className="font-medium text-primary underline-offset-2 hover:underline">calculadora de preço justo e preço teto</a>.
+              </p>
+            )}
           </div>
           <div className="rounded-lg border bg-card px-4 py-2 text-right">
             <div className="text-xs text-muted-foreground">Cotação de referência</div>

@@ -1,9 +1,21 @@
 # IAções
 > Análise fundamentalista e valuation de ações da B3, da Brasil Horizonte: preço justo por Graham, Bazin, Gordon e DCF, sem conflito de interesse.
 
+## Ferramentas
+- [Ferramentas para analisar ações da B3](https://iacoes.com.br/ferramentas/): o que cada ferramenta faz, como funciona e onde usar na plataforma.
+- [Otimizador de carteira (Markowitz)](https://iacoes.com.br/ferramentas/markowitz/): Fronteira eficiente e carteira de maior índice de Sharpe com as suas premissas de retorno, de 2 a 20 ações.
+- [Backtest de carteira](https://iacoes.com.br/ferramentas/backtest-de-carteira/): Retorno acumulado da carteira contra Ibovespa, CDI, S&P 500 e dólar em até 15 anos, com a comparação real Ibovespa × CDI.
+- [Documentos da CVM](https://iacoes.com.br/ferramentas/fatos-relevantes/): Fatos relevantes e comunicados ao mercado recentes das empresas da B3, cada um com um resumo gerado por IA.
+- [Rankings de ações](https://iacoes.com.br/ferramentas/ranking-de-acoes/): Ações da B3 ordenadas por dividend yield, P/L, P/VP e ROE, com a mediana do setor e o dado do último pregão.
+- [Radar de oportunidades](https://iacoes.com.br/ferramentas/radar-de-oportunidades/): Triagem por 6 regras fixas: distorções de valuation, PEG, reprecificação, small caps ignoradas e riscos elevados.
+- [Score Qualitativo](https://iacoes.com.br/ferramentas/nota-qualitativa/): Checklist dos 6 pilares para avaliar uma empresa e a nota qualitativa de 1 a 4 da plataforma, gerada por IA com critérios objetivos.
+- [Minhas Teses e Validador de Teses](https://iacoes.com.br/ferramentas/tese-de-investimento/): Modelo de tese em 5 blocos, Minhas Teses com preço-alvo e critérios conferidos uma vez por dia e o Validador, que audita a argumentação com IA.
+- [Calculadora de preço justo](https://iacoes.com.br/ferramentas/calculadora-preco-justo/): Preço justo por Graham e Gordon e preço teto por Bazin, com os dados de cada ação ou com os seus números.
+- [Valuation por DCF](https://iacoes.com.br/ferramentas/fluxo-de-caixa-descontado/): DCF de 10 anos com WACC decomposto e sensibilidade WACC × g; a IA propõe as premissas e você decide.
+
 ## Indicadores macro
-- [Indicador de Buffett Brasil](https://iacoes.com.br/macro/indicador-de-buffett/): valor de mercado das empresas listadas na B3 ÷ PIB de 12 meses. Hoje: 43,45% (fechamento oficial de 05/10/2026); média desde 2000: 47,7%; faixa histórica (p25–p75): 38,1% a 55,4%. Série mensal em CSV (CC BY 4.0): https://iacoes.com.br/macro/indicador-de-buffett/indicador-buffett-brasil.csv
+- [Indicador de Buffett Brasil](https://iacoes.com.br/macro/indicador-de-buffett/): valor de mercado das empresas listadas na B3 ÷ PIB de 12 meses. Hoje: 43,30% (fechamento oficial de 06/10/2026); média desde 2000: 47,7%; faixa histórica (p25–p75): 38,1% a 55,4%. Série mensal em CSV (CC BY 4.0): https://iacoes.com.br/macro/indicador-de-buffett/indicador-buffett-brasil.csv
 
 ## Ações
-- [Todas as ações da B3](https://iacoes.com.br/acoes/): preço justo e indicadores fundamentalistas de cada ação, atualizados todo dia útil.
+- [Ações da B3](https://iacoes.com.br/acoes/): preço justo por Graham, Bazin e Gordon e indicadores fundamentalistas de cada ação, atualizados todo dia útil.
 - [AIrton](https://iacoes.com.br/airton/): alertas de documentos da CVM com resumo por inteligência artificial.

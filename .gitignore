@@ -28,3 +28,6 @@ preview/
 _bmad-output/specs/
 _bmad-output/party-mode/
 _bmad-output/gsc/
+
+# Nota qualitativa é conteúdo da plataforma (exige login): nunca publicar
+scripts/qualitative-cache.json

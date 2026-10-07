@@ -34,10 +34,12 @@ export const toolByPath = (path: string): ToolContent | undefined => TOOLS.find(
 /** data-cta das páginas de ferramenta: `tool-<id>` (hero) e variações por posição. */
 export const ctaId = (t: Pick<ToolContent, 'id'>, pos?: 'final' | 'sticky'): string => `tool-${t.id}${pos ? `-${pos}` : ''}`;
 
-/** JSONs públicos com dado real (landing e widgets leem daqui). */
+/** JSONs públicos com dado real (landing e widgets leem daqui; formato em DADOS-API / data.ts). */
 export const DATA_JSON = {
   ranking: `${HUB_PATH}ranking-de-acoes/dados.json`,
   fatos: `${HUB_PATH}fatos-relevantes/dados.json`,
+  /** Ibovespa × CDI reais (SPEC-v2 §B8), produzido por data.ts produceBacktest. */
+  backtest: `${HUB_PATH}backtest-de-carteira/dados.json`,
 } as const;
 
 /** Páginas do site (fora de /ferramentas/) que o hub e "Outras ferramentas" linkam. */

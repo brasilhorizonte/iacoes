@@ -1,13 +1,14 @@
 import 'dotenv/config';
 import { mkdirSync, writeFileSync, readdirSync, statSync, openSync, readSync, closeSync } from 'fs';
 import { join } from 'path';
-import { getAllTickers, getTickersWithNames, getAllTickersWithSector, saveQualitativeCache, getCvmDocuments, CVM_CACHE_LIMIT } from './supabase';
+import { getAllTickers, getTickersWithNames, getAllTickersWithSector, getCvmDocuments, CVM_CACHE_LIMIT } from './supabase';
 import { generateAirtonTickerHTML } from './airton-template';
 import { getFinancialData, performValuation } from './valuation';
 import { generateTickerPage, buildTickerCss } from './ticker/render';
 import { buildModel } from './ticker/model';
-import { widgetValuationFields } from './lib/valuations-json';
+import { buildValuationsJson, countValuations, readValuationsFile, widgetValuationFields } from './lib/valuations-json';
 import { quoteDateFromTimes } from './lib/dates';
+import { companyName } from './lib/company-name';
 import { generateIndexHTML, generateSectorPage, generateSitemap, generateRobots, sectorSlug } from './template';
 import { generateMacro, macroLlmsSection } from './macro';
 import { generateFerramentas } from './ferramentas';
@@ -122,7 +123,7 @@ async function generatePage(ticker: string): Promise<boolean> {
     // vira 0; LPA/VPA saem com 6 casas e sinal (recalcular o Graham com eles dá o `graham`).
     const w = widgetValuationFields(buildModel(data, val, allTickerData, getCvmDocuments(ticker)));
     widgetValuations[ticker] = {
-      name: data.fundamentals.name,
+      name: companyName('', data.fundamentals.name, ticker),
       sector: data.fundamentals.sector,
       price: data.price,
       graham: w.graham,
@@ -204,13 +205,27 @@ async function main() {
     }).sort();
     const airtonSet = new Set(airtonDirs);
 
+    // Conteúdo do valuations.json (gravado mais abaixo). Calculado AQUI porque a calculadora de
+    // /ferramentas/ mostra a data dele: sem o `quoteDate`, o generateFerramentas caía no
+    // `_quoteDate` do arquivo de ontem (que só é regravado depois).
+    // Data da cotação = maior regular_market_time (em BRT) entre os tickers do arquivo — o build
+    // das 20h BRT publica a cotação do próprio dia. Sem horário válido: dia útil anterior.
+    const quoteDate = quoteDateFromTimes(quoteTimes);
+    // Execução com tickers na linha de comando MESCLA com o arquivo anterior (não trunca): a
+    // calculadora, a landing e o ranking leem o arquivo inteiro (SPEC-v2 §E3).
+    const partial = cliTickers.length > 0;
+    const valuationsFile = join(ROOT, 'valuations.json');
+    const valuationsWithMeta = buildValuationsJson(widgetValuations, quoteDate, { partial, previous: partial ? readValuationsFile(valuationsFile) : null });
+    // Papéis do arquivo que vai ser gravado (o mesclado, na execução parcial): o {n} da calculadora.
+    const valuationsTotal = countValuations(valuationsWithMeta);
+
     // Ferramentas (/ferramentas/): hub, páginas prontas, dados.json do ranking e dos fatos
     // relevantes e o bundle dos widgets. Roda antes do macro para o rodapé das páginas macro já
     // achar o hub no disco. O DY do ranking usa os proventos desta execução (widgetValuations,
     // ajustados por desdobramento). Nunca derruba o build: dado ruim vira ::warning::.
     const toolEntries = await generateFerramentas({
       outRoot: ROOT,
-      build: { valuations: widgetValuations, hasPage: hasRealPage, airton: airtonSet },
+      build: { valuations: widgetValuations, quoteDate: String(valuationsWithMeta._quoteDate), valuationsCount: valuationsTotal, hasPage: hasRealPage, airton: airtonSet },
     });
     const toolsLink = toolEntries.length ? { href: '/ferramentas/', label: 'Ferramentas para analisar ações' } : undefined;
 
@@ -267,13 +282,11 @@ async function main() {
     writeFileSync(join(ROOT, 'tickers.json'), JSON.stringify(tickersIndex), 'utf-8');
     console.log(`🔍 tickers.json gerado (${tickersIndex.length} tickers)`);
 
-    // Generate valuations.json for landing page widget
-    // Data da cotação = maior regular_market_time (em BRT) entre os tickers do arquivo — o build
-    // das 20h BRT publica a cotação do próprio dia. Sem horário válido: dia útil anterior.
-    const quoteDate = quoteDateFromTimes(quoteTimes);
-    const valuationsWithMeta = { _quoteDate: quoteDate, ...widgetValuations };
-    writeFileSync(join(ROOT, 'valuations.json'), JSON.stringify(valuationsWithMeta), 'utf-8');
-    console.log(`📊 valuations.json gerado (${Object.keys(widgetValuations).length} tickers, data: ${quoteDate})`);
+    // Generate valuations.json for landing page widget (conteúdo e data calculados acima, antes
+    // do generateFerramentas).
+    writeFileSync(valuationsFile, JSON.stringify(valuationsWithMeta), 'utf-8');
+    const total = valuationsTotal;
+    console.log(`📊 valuations.json gerado (${total} tickers${partial ? `: ${Object.keys(widgetValuations).length} desta execução + ${total - Object.keys(widgetValuations).length} do arquivo anterior` : ''}, data: ${valuationsWithMeta._quoteDate})`);
   }
 
   // Ping search engines to re-crawl sitemap
@@ -293,7 +306,6 @@ async function main() {
     }
   }
 
-  saveQualitativeCache();
   console.log(`\n✅ Concluído: ${success} geradas, ${failed} falhas (de ${tickers.length} total)\n`);
 }
 

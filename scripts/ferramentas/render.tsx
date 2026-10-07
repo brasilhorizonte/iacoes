@@ -15,7 +15,7 @@ import { pageHeadTracking } from '../ticker/render';
 import { APP, SITE } from '../ticker/model';
 import { HubPage, ToolPage } from './page';
 import { HUB_URL, TOOLS, toolUrl } from './registry';
-import type { HubModel, ToolPageModel } from './model';
+import { pageAssets, pageSchema, termId, type HubModel, type ToolPageModel } from './model';
 
 const OG_IMAGE = `${SITE}/assets/img/og-iacoes-v3.png`;
 export const ORG = {
@@ -88,7 +88,12 @@ interface ShellProps {
   ogAlt: string;
   ld: unknown[];
   body: string;
-  assets: { js: string | null; css: string | null };
+  /**
+   * Bundle dos widgets (com ?v=hash), na ordem: o principal (runtime) antes do arquivo do widget
+   * pesado. Nas páginas de ferramenta o CSS entra como <link> no <head> (bloqueante de propósito:
+   * o quadro grande do hero não pisca); a landing carrega sem bloquear (o runtime injeta).
+   */
+  assets: { js: string[]; css: string[] };
   noindex?: boolean;
   /** Prévia local: tracking desligado (ver headTracking). */
   preview?: boolean;
@@ -127,7 +132,7 @@ function shell(p: ShellProps): string {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..700&family=JetBrains+Mono:wght@400..700&display=swap" rel="stylesheet">
   ${p.ld.map(jsonLd).join('\n  ')}
-  <style>${pageCss()}</style>${p.assets.css ? `\n  <link rel="stylesheet" href="${p.assets.css}">` : ''}${p.assets.js ? `\n  <script src="${p.assets.js}" defer></script>` : ''}
+  <style>${pageCss()}</style>${p.assets.css.map((href) => `\n  <link rel="stylesheet" href="${href}">`).join('')}${p.assets.js.map((src) => `\n  <script src="${src}" defer></script>`).join('')}
 ${headTracking(!!p.preview)}
 </head>
 <body>
@@ -146,23 +151,46 @@ const breadcrumb = (items: { name: string; item: string }[]) => ({
 
 // ─── Página da ferramenta ─────────────────────────────────────────────────
 
+/**
+ * JSON-LD da página da ferramenta (SPEC-v2 §D), pelo tipo decidido em model.pageSchema:
+ *  - WebApplication (+ WebPage): só a calculadora, que roda grátis no site → offers price 0 e
+ *    isAccessibleForFree. Nenhuma outra página declara preço: o JSON-LD não pode dizer a buscador
+ *    nem a LLM que uma ferramenta paga do app é grátis;
+ *  - CollectionPage com mainEntity ItemList (só URLs internas, `name` só autoral): fatos e ranking;
+ *  - WebPage: as demais;
+ * sempre com BreadcrumbList e FAQPage (texto idêntico ao visível) e, quando o conteúdo define
+ * termos, um DefinedTermSet com o mesmo texto do glossário visível.
+ */
 export function toolStructuredData(m: ToolPageModel): unknown[] {
   const t = m.tool;
+  const kind = pageSchema(t);
+  const terms = t.definedTerms ?? [];
+  const page: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': kind === 'CollectionPage' ? 'CollectionPage' : 'WebPage',
+    '@id': m.url,
+    url: m.url,
+    name: m.title,
+    description: m.description,
+    inLanguage: 'pt-BR',
+    dateModified: m.dateModified,
+    isPartOf: { '@type': 'WebSite', name: 'IAções', url: SITE },
+    publisher: ORG,
+    speakable: { '@type': 'SpeakableSpecification', cssSelector: ['#tool-title', '#tool-resumo'] },
+  };
+  if (kind === 'WebApplication') page.mainEntity = { '@id': `${m.url}#ferramenta` };
+  if (kind === 'CollectionPage' && m.itemList.length) {
+    page.mainEntity = {
+      '@type': 'ItemList',
+      name: m.h1,
+      numberOfItems: m.itemList.length,
+      itemListElement: m.itemList.map((it, i) => ({ '@type': 'ListItem', position: i + 1, name: it.name, url: it.url })),
+    };
+  }
+  if (terms.length) page.about = terms.map((d) => ({ '@id': `${m.url}#${termId(d.name)}` }));
+
   const ld: unknown[] = [
-    {
-      '@context': 'https://schema.org',
-      '@type': 'WebPage',
-      '@id': m.url,
-      url: m.url,
-      name: m.title,
-      description: m.description,
-      inLanguage: 'pt-BR',
-      dateModified: m.dateModified,
-      isPartOf: { '@type': 'WebSite', name: 'IAções', url: SITE },
-      publisher: ORG,
-      mainEntity: { '@id': `${m.url}#ferramenta` },
-      speakable: { '@type': 'SpeakableSpecification', cssSelector: ['#tool-title', '#tool-resumo'] },
-    },
+    page,
     breadcrumb([
       { name: 'IAções', item: `${SITE}/` },
       { name: 'Ferramentas', item: HUB_URL },
@@ -173,18 +201,15 @@ export function toolStructuredData(m: ToolPageModel): unknown[] {
       '@type': 'FAQPage',
       mainEntity: t.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
     },
-    {
-      // A PÁGINA é grátis (o que ela calcula ou demonstra); o plano do app não entra aqui. Com
-      // widget ilustrativo, o que é grátis é o guia com a demonstração — e o nome diz isso, para
-      // não sugerir que a ferramenta completa do app é gratuita.
+  ];
+  if (kind === 'WebApplication') {
+    ld.push({
       '@context': 'https://schema.org',
       '@type': 'WebApplication',
       '@id': `${m.url}#ferramenta`,
-      name: t.widget.illustrative ? `${t.name} (guia e demonstração)` : t.name,
+      name: t.name,
       url: m.url,
-      description: t.widget.illustrative
-        ? `${m.description} A página explica o método com uma demonstração ilustrativa; a ferramenta completa fica na plataforma IAções.`
-        : m.description,
+      description: m.description,
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Web',
       browserRequirements: 'Requer JavaScript',
@@ -192,15 +217,25 @@ export function toolStructuredData(m: ToolPageModel): unknown[] {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'BRL' },
       publisher: ORG,
-    },
-  ];
-  if (m.itemList.length) {
+    });
+  }
+  if (terms.length) {
+    const setId = `${m.url}#glossario`;
     ld.push({
       '@context': 'https://schema.org',
-      '@type': 'ItemList',
-      name: m.h1,
-      numberOfItems: m.itemList.length,
-      itemListElement: m.itemList.map((it, i) => ({ '@type': 'ListItem', position: i + 1, name: it.name, url: it.url })),
+      '@type': 'DefinedTermSet',
+      '@id': setId,
+      name: `Glossário: ${t.name}`,
+      url: setId,
+      inLanguage: 'pt-BR',
+      hasDefinedTerm: terms.map((d) => ({
+        '@type': 'DefinedTerm',
+        '@id': `${m.url}#${termId(d.name)}`,
+        name: d.name,
+        description: d.description,
+        url: `${m.url}#${termId(d.name)}`,
+        inDefinedTermSet: { '@id': setId },
+      })),
     });
   }
   return ld;
@@ -215,7 +250,7 @@ export function renderToolPage(m: ToolPageModel): string {
     ogAlt: `${m.tool.name} | IAções`,
     ld: toolStructuredData(m),
     body,
-    assets: m.env.assets,
+    assets: pageAssets(m),
     noindex: m.draft,
     preview: m.env.basePath !== '',
   });
@@ -261,7 +296,7 @@ export function renderHub(m: HubModel): string {
     ogAlt: 'Ferramentas para analisar ações da B3 | IAções',
     ld: hubStructuredData(m),
     body,
-    assets: { js: null, css: null },
+    assets: { js: [], css: [] },
     preview: m.env.basePath !== '',
   });
 }

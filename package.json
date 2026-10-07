@@ -10,7 +10,8 @@
     "postgenerate": "npx tsx scripts/validate-html.ts",
     "test:macro": "npx tsx --test scripts/macro/macro.test.ts",
     "preview:macro": "npx tsx scripts/macro/preview.ts",
-    "test:ferramentas": "npx tsx --test scripts/ferramentas/ferramentas.test.ts",
+    "test:ferramentas": "npx tsx --test scripts/ferramentas/ferramentas.test.ts scripts/ferramentas/data.test.ts scripts/ferramentas/polimento.test.ts",
+    "test:dados": "npx tsx --test scripts/lib/*.test.ts scripts/ferramentas/data.test.ts",
     "preview:ferramentas": "npx tsx scripts/ferramentas/preview.ts"
   },
   "private": true,

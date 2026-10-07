@@ -47,8 +47,12 @@ export function ToolsBreadcrumb({ items }: { items: { href?: string; label: stri
   );
 }
 
-/** Autoria (E-E-A-T): quem faz o IAções, com as credenciais públicas da landing (#sobre). */
-export function Autoria({ revised }: { revised?: string }) {
+/**
+ * Autoria (E-E-A-T): quem faz o IAções, com as credenciais públicas da landing (#sobre).
+ * `updated` = data do dado (páginas com dado real) ou da última atualização do conteúdo. O rótulo é
+ * "Atualizado em" (SPEC-v2 §B6): não alega revisão humana, que o processo não garante.
+ */
+export function Autoria({ updated }: { updated?: string }) {
   return (
     <section id="autoria" aria-labelledby="autoria-title" className="rounded-xl border bg-card p-5 text-sm leading-relaxed text-muted-foreground">
       <h2 id="autoria-title" className="text-base font-semibold text-foreground">Quem faz o IAções</h2>
@@ -58,7 +62,7 @@ export function Autoria({ revised }: { revised?: string }) {
         <a href="https://www.linkedin.com/in/lucastnm/" target="_blank" rel="noopener" className="font-medium text-foreground underline-offset-2 hover:underline">Lucas T. Noronha Mello</a> (CGA, ANBIMA).{' '}
         <a href="/#sobre" className="font-medium text-gold-strong underline-offset-2 hover:underline">Conheça a equipe</a>.
       </p>
-      {revised && <p className="mt-1">Conteúdo revisado em <time dateTime={revised}>{revised.slice(8, 10)}/{revised.slice(5, 7)}/{revised.slice(0, 4)}</time>.</p>}
+      {updated && <p className="mt-1">Atualizado em <time dateTime={updated}>{updated.slice(8, 10)}/{updated.slice(5, 7)}/{updated.slice(0, 4)}</time>.</p>}
     </section>
   );
 }
@@ -79,7 +83,7 @@ export function ToolsFooter({ app, hubHref, sources, macroPage, padForSticky }: 
             <a className="text-muted-foreground hover:text-foreground" href="/acoes/">Ações da B3</a>
             <a className="text-muted-foreground hover:text-foreground" href="/airton/">AIrton</a>
             {macroPage && <a className="text-muted-foreground hover:text-foreground" href="/macro/indicador-de-buffett/">Indicador de Buffett</a>}
-            <a className="text-muted-foreground hover:text-foreground" href="/#precos">Planos</a>
+            {/* Sem link para /#precos (SPEC-v2 §B2): a tabela de planos diverge do código. */}
           </nav>
           <div className="flex flex-wrap gap-3 text-sm">
             <a className="text-muted-foreground hover:text-foreground" href="https://br.linkedin.com/company/brasil-horizonte" rel="noopener" target="_blank">LinkedIn</a>

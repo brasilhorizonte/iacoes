@@ -5,12 +5,20 @@
  * - Regexes quebradas por template literals (backslash engolido)
  * - Links de CTA apontando para destinos errados
  * - Funcoes de tracking ausentes ou corrompidas
+ * - Ferramentas: link /ferramentas/... para pagina que nao existe (landing inclusive), widget
+ *   dentro de <a>, bundle de widgets ausente, JSON-LD do tipo errado e termo proibido em texto
+ *   autoral (blocos data-fonte com dado externo ficam fora, como no gate de marca)
  *
  * Rodar: npm test (apos npm run generate ou generate:test)
  */
 
 import { existsSync, readdirSync, readFileSync, statSync } from 'fs';
 import { join, relative, sep } from 'path';
+// Ponte LEVE das ferramentas (só fs/path): nada de React nem do registro de conteúdo aqui.
+import {
+  ferramentasRefs, forbiddenHits, htmlAuthorText, PUBLICADAS_PATH, refCandidates, stripExternal, widgetsInsideLinks,
+} from './ferramentas/site';
+import type { ToolId } from './ferramentas/types';
 
 const ROOT = join(__dirname, '..');
 const REQUIRED_CTA_PATH = '/authnew';
@@ -61,7 +69,61 @@ function addIssue(file: string, rule: string, detail: string) {
  */
 const SKIP_DIRS = new Set(['node_modules', '.git', '.github', 'scripts', 'assets', '_bmad', '_bmad-output']);
 
-function collectHTMLFiles(): string[] {
+/** Glob do .gitignore → regex (`*`, `?` e `**`), sem âncoras. */
+function globToRegex(glob: string): string {
+  let out = '';
+  for (let i = 0; i < glob.length; i++) {
+    const c = glob[i];
+    if (c === '*' && glob[i + 1] === '*') {
+      if (glob[i + 2] === '/') { out += '(?:.*/)?'; i += 2; } else { out += '.*'; i += 1; }
+    } else if (c === '*') out += '[^/]*';
+    else if (c === '?') out += '[^/]';
+    else out += c.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+  }
+  return out;
+}
+
+/**
+ * O que o .gitignore da raiz ignora (`rel` com '/', relativo à raiz). Cobre o que o arquivo usa:
+ * comentário, `!` (reinclui), `dir/` (só pasta), padrão com '/' (ancorado na raiz) e sem '/' (casa
+ * o nome em qualquer nível), `*`, `?` e `**`. Como no git, a última regra que casa decide.
+ */
+export function gitignoreMatcher(text: string): (rel: string, isDir: boolean) => boolean {
+  const rules: { re: RegExp; neg: boolean; dirOnly: boolean; anchored: boolean }[] = [];
+  for (const raw of text.split(/\r?\n/)) {
+    let line = raw.replace(/\s+$/, '');
+    if (!line || line.startsWith('#')) continue;
+    const neg = line.startsWith('!');
+    if (neg) line = line.slice(1);
+    const dirOnly = line.endsWith('/');
+    if (dirOnly) line = line.replace(/\/+$/, '');
+    const anchored = line.includes('/');
+    line = line.replace(/^\/+/, '');
+    if (line) rules.push({ re: new RegExp(`^${globToRegex(line)}$`), neg, dirOnly, anchored });
+  }
+  return (rel, isDir) => {
+    const base = rel.slice(rel.lastIndexOf('/') + 1);
+    let ignored = false;
+    for (const r of rules) {
+      if (r.dirOnly && !isDir) continue;
+      if (r.re.test(r.anchored ? rel : base)) ignored = !r.neg;
+    }
+    return ignored;
+  };
+}
+
+/** Matcher do .gitignore de `root` (sem arquivo: nada ignorado). */
+export function gitignoreOf(root: string): (rel: string, isDir: boolean) => boolean {
+  try { return gitignoreMatcher(readFileSync(join(root, '.gitignore'), 'utf-8')); } catch { return () => false; }
+}
+
+/**
+ * Todos os index.html publicáveis de `root`. Fora: pastas que começam com '.', SKIP_DIRS e tudo o
+ * que o .gitignore ignora (preview/ das prévias locais, node_modules/, .build/...). O que o git
+ * ignora nunca é publicado, então nenhuma regra varre esses diretórios: a prévia de um agente
+ * (preview/<id>/, com bundle e links de produção simulados) não pode reprovar o gate do site.
+ */
+export function collectHTMLFiles(root: string = ROOT, ignored: (rel: string, isDir: boolean) => boolean = gitignoreOf(root)): string[] {
   const files: string[] = [];
 
   const walk = (dir: string) => {
@@ -70,15 +132,17 @@ function collectHTMLFiles(): string[] {
       const full = join(dir, entry);
       let st;
       try { st = statSync(full); } catch { continue; }
+      const rel = relative(root, full).split(sep).join('/');
+      if (ignored(rel, st.isDirectory())) continue;
       if (st.isDirectory()) walk(full);
       else if (entry === 'index.html') files.push(full);
     }
   };
 
-  // ⚠️ Nada de `files.push(landing)` aqui: `walk(ROOT)` já varre a raiz e acha o
+  // ⚠️ Nada de `files.push(landing)` aqui: `walk(root)` já varre a raiz e acha o
   // index.html dela. O push extra validava a landing DUAS vezes (360 coletados para 359
   // arquivos) e reportava em dobro cada issue justamente da página mais importante.
-  walk(ROOT);
+  walk(root);
 
   return files;
 }
@@ -258,6 +322,11 @@ function checkJSSyntax(file: string, html: string) {
  *
  * ⚠️ NÃO procure preço aqui. Nas páginas de ticker, "19,90" e "39,90" são cotação e
  * receita ("R$ 19,90 B"), não plano — uma regra por número acusaria demonstrativo.
+ *
+ * ⚠️ Só TEXTO AUTORAL (SPEC-v2 §E1): no HTML, os blocos com dado externo (resumo e título da
+ * CVM, nome de empresa) saem marcados com data-fonte="cvm" | "b3" e ficam fora do gate. Em 365
+ * dias, 4 resumos reais da CVM tinham "14 dias": sem a marcação, o dia em que um deles entrasse
+ * na página de fatos derrubaria o build do site inteiro. Fontes (.ts/.tsx/.js) são sempre autorais.
  */
 const MARCA_APOSENTADA: Array<[RegExp, string]> = [
   [/IAnalista/g, 'o plano IAnalista virou IAções'],
@@ -265,11 +334,64 @@ const MARCA_APOSENTADA: Array<[RegExp, string]> = [
   [/14 dias/g, 'o teste grátis é de 7 dias, não 14'],
 ];
 
-function checkMarcaAposentada(file: string, texto: string) {
+/** Ocorrências da marca aposentada num texto (puro: os testes usam). */
+export function marcaHits(texto: string): string[] {
+  const out: string[] = [];
   for (const [re, porque] of MARCA_APOSENTADA) {
     const n = (texto.match(re) || []).length;
-    if (n > 0) addIssue(file, 'marca-aposentada', `${n}× — ${porque}`);
+    if (n > 0) out.push(`${n}× — ${porque}`);
   }
+  return out;
+}
+
+function checkMarcaAposentada(file: string, texto: string) {
+  for (const msg of marcaHits(texto)) addIssue(file, 'marca-aposentada', msg);
+}
+
+/**
+ * RULE: ferramentas-links (SPEC-v2 §E2)
+ *
+ * Todo href/src/data-src="/ferramentas/..." de QUALQUER página (a landing escrita à mão inclusive,
+ * e também os literais no JS inline dela) tem de existir no disco. A landing linka as páginas das
+ * ferramentas; uma ferramenta ainda em rascunho não é escrita na raiz, então o link daria 404.
+ * Link condicional (só quando a página está no ar) sai do /ferramentas/publicadas.json, nunca de
+ * literal. ⚠️ Num checkout sem o hub gerado na raiz, os links da landing para /ferramentas/
+ * reprovam até a geração (npm run generate): é o aviso certo antes de publicar.
+ */
+export function ferramentasLinkProblems(html: string, exists: (rel: string) => boolean): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const r of ferramentasRefs(html)) {
+    if (seen.has(r.path)) continue;
+    seen.add(r.path);
+    const cands = refCandidates(r.path);
+    if (cands.some(exists)) continue;
+    const why = r.path === '/ferramentas/'
+      ? 'o hub é escrito por generateFerramentas: gere antes de publicar (npm run generate)'
+      : 'ferramenta em rascunho ou não gerada: linke só o que está no ar (site.ts toolPageExists / publicadas.json)';
+    out.push(`${r.attr}="${r.url}" aponta para ${cands[0]}, que não existe no disco — ${why}`);
+  }
+  return out;
+}
+
+/** RULE: widget-em-link (SPEC-v2 §E6) — nenhum <a> envolve quadro de widget (botões e abas dentro de link). */
+export function widgetInLinkProblems(html: string): string[] {
+  return widgetsInsideLinks(html).map((id) => `widget "${id}" dentro de <a>: o link da ferramenta fica fora do quadro`);
+}
+
+/**
+ * RULE: ferramentas-bundle — todo /assets/{js,css}/ferramentas*.{js,css}?v= carregado existe no disco
+ * (src/href e o data-bundle da landing, que injeta o script quando a seção chega perto da tela).
+ */
+export function bundleRefProblems(html: string, exists: (rel: string) => boolean): string[] {
+  const out: string[] = [];
+  const re = /\b(?:src|href|data-bundle)="(\/(?:[^"?#\s]*\/)?assets\/(?:js|css)\/ferramentas(?:-[a-z0-9]+)?\.(?:js|css))\?v=/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(html))) {
+    const rel = m[1].replace(/^\/+/, '');
+    if (!exists(rel)) out.push(`carrega ${m[1]} (bundle dos widgets), que não existe`);
+  }
+  return out;
 }
 
 /**
@@ -298,14 +420,84 @@ function checkMacroPage() {
   }
 }
 
+/** Única página de ferramenta que pode declarar preço 0 / grátis no JSON-LD (SPEC-v2 §D). */
+const CALC_SLUG = 'calculadora-preco-justo';
+
+/** Todos os objetos (com @type) de um JSON-LD, inclusive aninhados. */
+function ldNodes(v: unknown, out: Record<string, unknown>[] = []): Record<string, unknown>[] {
+  if (Array.isArray(v)) v.forEach((x) => ldNodes(x, out));
+  else if (v && typeof v === 'object') {
+    const o = v as Record<string, unknown>;
+    if ('@type' in o) out.push(o);
+    for (const x of Object.values(o)) ldNodes(x, out);
+  }
+  return out;
+}
+
+/**
+ * Problemas de UMA página /ferramentas/ (slug '' = hub). Puro: os testes rodam o mesmo código
+ * sobre a saída do gerador.
+ */
+export function toolPageProblems(slug: string, html: string): string[] {
+  const p: string[] = [];
+  const expected = `https://iacoes.com.br/ferramentas/${slug ? `${slug}/` : ''}`;
+  const canon = /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1];
+  if (canon !== expected) p.push(`canonical ${canon ?? 'ausente'} (esperado ${expected})`);
+  const h1 = (html.match(/<h1[\s>]/g) || []).length;
+  if (h1 !== 1) p.push(`${h1} <h1> na página (esperado 1)`);
+  if (/<meta name="robots" content="noindex/.test(html)) p.push('página em rascunho (noindex) na raiz do site: rascunho só existe na prévia');
+  const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => m[1]);
+  if (!blocks.length) p.push('sem JSON-LD');
+  let faqQuestions = -1;
+  const nodes: Record<string, unknown>[] = [];
+  for (const b of blocks) {
+    try {
+      const o = JSON.parse(b);
+      if (o['@type'] === 'FAQPage') faqQuestions = Array.isArray(o.mainEntity) ? o.mainEntity.length : 0;
+      ldNodes(o, nodes);
+    } catch (e) {
+      p.push(`JSON-LD que não faz parse: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+  // SPEC-v2 §D: offers/isAccessibleForFree e WebApplication só na calculadora (grátis no site).
+  const free = nodes.filter((n) => n['@type'] === 'WebApplication' || 'offers' in n || 'isAccessibleForFree' in n);
+  if (slug !== CALC_SLUG && free.length) p.push(`JSON-LD declara aplicação/oferta grátis (${free.map((n) => n['@type']).join(', ')}): só a calculadora pode (SPEC-v2 §D)`);
+  if (slug === CALC_SLUG && !nodes.some((n) => n['@type'] === 'WebApplication' && (n.offers as { price?: unknown } | undefined)?.price === '0')) p.push('calculadora sem WebApplication com offers price 0');
+  for (const list of nodes.filter((n) => n['@type'] === 'ItemList')) {
+    const items = Array.isArray(list.itemListElement) ? (list.itemListElement as { url?: unknown }[]) : [];
+    for (const it of items) if (typeof it.url !== 'string' || !it.url.startsWith('https://iacoes.com.br/')) p.push(`ItemList com URL fora do site: ${String(it.url)}`);
+  }
+  if (!/href="https:\/\/app\.brasilhorizonte\.com\.br\/authnew[^"]*"[^>]*data-cta="/.test(html)) p.push('nenhum CTA para /authnew com data-cta');
+  if (slug) {
+    const faqHtml = (html.split('id="faq"')[1] || '').split('</section>')[0];
+    const details = (faqHtml.match(/<details/g) || []).length;
+    if (details === 0 || details !== faqQuestions) p.push(`FAQ visível com ${details} pergunta(s) e FAQPage com ${faqQuestions}`);
+  }
+  // Texto autoral (sem os blocos data-fonte): o HTML sai de código, então termo proibido é bug de conteúdo.
+  const general = forbiddenHits(htmlAuthorText(html), 'page');
+  for (const hit of general) p.push(`termo proibido no texto autoral: ${hit}`);
+  // Regras próprias da ferramenta (ex.: o ranking nunca diz "baratas" nem "oportunidades") valem no
+  // conteúdo dela, seções SSR inclusive — o conteúdo de content/<id>.ts já é conferido nos testes,
+  // o HTML das seções não. "Outras ferramentas" fica de fora: lá "Radar de oportunidades" é nome
+  // de outra ferramenta.
+  const tool = /<main\b[^>]*\sdata-tool="([a-z]+)"/.exec(html)?.[1] as ToolId | undefined;
+  if (tool) {
+    const main = (html.split(/<main\b/)[1] || '').split('id="outras-ferramentas"')[0];
+    for (const hit of forbiddenHits(htmlAuthorText(`<main${main}`), tool)) if (!general.includes(hit)) p.push(`termo proibido no texto autoral (regra de ${tool}): ${hit}`);
+  }
+  if (/href="\/#precos"/.test(html)) p.push('link para /#precos (SPEC-v2 §B2: página de ferramenta não linka a tabela de planos)');
+  return p;
+}
+
 /**
  * RULE: ferramentas (páginas /ferramentas/, scripts/ferramentas)
  *
- * Checagem leve e DETERMINÍSTICA (reprova): o HTML sai de código, não de dado externo, então
- * defeito aqui é bug de template. Hub presente, canonical igual ao caminho, um <h1>, JSON-LD que
- * faz parse, FAQ visível com o mesmo número de perguntas do FAQPage, CTA para /authnew com
- * data-cta, nenhum rascunho (noindex) na raiz e o bundle de widgets existindo quando é carregado.
- * Frescor dos dados.json (ranking e fatos relevantes) só AVISA, no molde do checkMacroPage.
+ * Checagem leve e DETERMINÍSTICA (reprova): o HTML sai de código, e o dado externo vem marcado
+ * (data-fonte), então defeito aqui é bug de template ou de conteúdo. Hub presente, canonical
+ * igual ao caminho, um <h1>, JSON-LD que faz parse e com o tipo certo (§D), FAQ visível com o
+ * mesmo número de perguntas do FAQPage, CTA para /authnew com data-cta, nenhum rascunho
+ * (noindex) na raiz, nenhum termo proibido no texto autoral e o publicadas.json batendo com o
+ * disco. Frescor dos dados.json (ranking e fatos relevantes) só AVISA, no molde do checkMacroPage.
  */
 function checkToolPages() {
   const base = join(ROOT, 'ferramentas');
@@ -319,47 +511,42 @@ function checkToolPages() {
     ...pages.map((d) => [`ferramentas/${d}/index.html`, join(base, d, 'index.html'), d] as [string, string, string]),
   ];
   for (const [rel, file, slug] of files) {
-    const html = readFileSync(file, 'utf-8');
-    const expected = `https://iacoes.com.br/ferramentas/${slug ? `${slug}/` : ''}`;
-    const canon = /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1];
-    if (canon !== expected) addIssue(rel, 'ferramentas', `canonical ${canon ?? 'ausente'} (esperado ${expected})`);
-    const h1 = (html.match(/<h1[\s>]/g) || []).length;
-    if (h1 !== 1) addIssue(rel, 'ferramentas', `${h1} <h1> na página (esperado 1)`);
-    if (/<meta name="robots" content="noindex/.test(html)) addIssue(rel, 'ferramentas', 'página em rascunho (noindex) na raiz do site: rascunho só existe na prévia');
-    const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => m[1]);
-    if (!blocks.length) addIssue(rel, 'ferramentas', 'sem JSON-LD');
-    let faqQuestions = -1;
-    for (const b of blocks) {
-      try {
-        const o = JSON.parse(b);
-        if (o['@type'] === 'FAQPage') faqQuestions = Array.isArray(o.mainEntity) ? o.mainEntity.length : 0;
-      } catch (e) {
-        addIssue(rel, 'ferramentas', `JSON-LD que não faz parse: ${e instanceof Error ? e.message : String(e)}`);
+    for (const msg of toolPageProblems(slug, readFileSync(file, 'utf-8'))) addIssue(rel, 'ferramentas', msg);
+  }
+
+  // publicadas.json: o que a landing lê para ligar um quadro tem de bater com o disco.
+  const pubFile = join(ROOT, PUBLICADAS_PATH);
+  const pubRel = PUBLICADAS_PATH.replace(/^\//, '');
+  if (pages.length && !existsSync(pubFile)) addIssue(pubRel, 'ferramentas', 'publicadas.json ausente (o gerador escreve a cada build)');
+  if (existsSync(pubFile)) {
+    try {
+      const pub = JSON.parse(readFileSync(pubFile, 'utf-8')) as { ids?: unknown; tools?: { id?: unknown; path?: unknown }[] };
+      const tools = Array.isArray(pub.tools) ? pub.tools : [];
+      const ids = Array.isArray(pub.ids) ? pub.ids : [];
+      if (JSON.stringify(ids) !== JSON.stringify(tools.map((t) => t.id))) addIssue(pubRel, 'ferramentas', 'ids diferentes da lista de ferramentas');
+      for (const t of tools) {
+        const path = typeof t.path === 'string' ? t.path : '';
+        if (!path.startsWith('/ferramentas/') || !refCandidates(path).some((c) => existsSync(join(ROOT, c)))) addIssue(pubRel, 'ferramentas', `ferramenta ${String(t.id)} publicada em ${path || '?'}, que não existe no disco`);
       }
-    }
-    if (!/href="https:\/\/app\.brasilhorizonte\.com\.br\/authnew[^"]*"[^>]*data-cta="/.test(html)) addIssue(rel, 'ferramentas', 'nenhum CTA para /authnew com data-cta');
-    if (slug) {
-      const faqHtml = (html.split('id="faq"')[1] || '').split('</section>')[0];
-      const details = (faqHtml.match(/<details/g) || []).length;
-      if (details === 0 || details !== faqQuestions) addIssue(rel, 'ferramentas', `FAQ visível com ${details} pergunta(s) e FAQPage com ${faqQuestions}`);
-    }
-    for (const [asset, path] of [['js', 'assets/js/ferramentas.js'], ['css', 'assets/css/ferramentas.css']]) {
-      if (html.includes(`/${path}?v=`) && !existsSync(join(ROOT, path))) addIssue(rel, 'ferramentas', `carrega /${path} (bundle ${asset} dos widgets), que não existe`);
+    } catch {
+      addIssue(pubRel, 'ferramentas', 'JSON inválido');
     }
   }
 
   const warn = (m: string) => console.warn(`::warning title=Ferramentas::${m}`);
-  for (const [path, key, label] of [
-    ['ferramentas/ranking-de-acoes/dados.json', 'date', 'ranking'],
-    ['ferramentas/fatos-relevantes/dados.json', 'updated', 'fatos relevantes'],
-  ]) {
+  // Backtest: `updated` é o fim do último mês COMPLETO (até ~31 dias de idade é o normal).
+  for (const [path, key, label, maxDays] of [
+    ['ferramentas/ranking-de-acoes/dados.json', 'date', 'ranking', 7],
+    ['ferramentas/fatos-relevantes/dados.json', 'updated', 'fatos relevantes', 7],
+    ['ferramentas/backtest-de-carteira/dados.json', 'updated', 'backtest (Ibovespa × CDI)', 70],
+  ] as const) {
     const file = join(ROOT, path);
     if (!existsSync(file)) continue;
     try {
       const ref = String(JSON.parse(readFileSync(file, 'utf-8'))[key] || '');
       if (!/^\d{4}-\d{2}-\d{2}$/.test(ref)) { warn(`${path}: sem data (${key})`); continue; }
       const days = (Date.now() - Date.parse(`${ref}T12:00:00Z`)) / 86400000;
-      if (days > 7) warn(`${label}: dado de ${ref} (${Math.floor(days)} dias) — fonte parada?`);
+      if (days > maxDays) warn(`${label}: dado de ${ref} (${Math.floor(days)} dias) — fonte parada?`);
     } catch {
       warn(`${path}: JSON inválido`);
     }
@@ -381,6 +568,7 @@ function main() {
   console.log(`📋 ${files.length} arquivos encontrados\n`);
 
   let checked = 0;
+  const onDisk = (rel: string) => existsSync(join(ROOT, rel));
   for (const file of files) {
     const html = readFileSync(file, 'utf-8');
     // relative + '/' fixo: no Windows o caminho vem com '\' e as regras que casam 'acoes/...' erravam.
@@ -394,7 +582,13 @@ function main() {
     checkOnclickWithoutFunction(relPath, html);
     checkUTMInjection(relPath, html);
     checkJSSyntax(relPath, html);
-    checkMarcaAposentada(relPath, html);
+    // Só texto autoral: blocos data-fonte (resumo/título da CVM, nome de empresa) ficam fora (§E1).
+    checkMarcaAposentada(relPath, stripExternal(html));
+    // A prévia local (preview/, gitignored) nem é coletada: ela simula páginas da raiz e linka
+    // caminhos de produção, então nenhuma regra vale para ela (collectHTMLFiles).
+    for (const msg of ferramentasLinkProblems(html, onDisk)) addIssue(relPath, 'ferramentas-links', msg);
+    for (const msg of widgetInLinkProblems(html)) addIssue(relPath, 'widget-em-link', msg);
+    for (const msg of bundleRefProblems(html, onDisk)) addIssue(relPath, 'ferramentas-bundle', msg);
 
     checked++;
   }
@@ -414,13 +608,17 @@ function main() {
   // Desde out/2026 as páginas de ticker saem de scripts/ticker/ (React + shadcn): a
   // CAUSA agora mora lá, então o gate da marca também varre esses fontes.
   const tickerSrc = join(ROOT, 'scripts', 'ticker');
+  const ignored = gitignoreOf(ROOT);   // .build/ e afins: o que o git ignora não é fonte publicada
   const walkSrc = (dir: string) => {
     for (const e of readdirSync(dir)) {
       if (e.startsWith('.')) continue;
       const full = join(dir, e);
-      if (statSync(full).isDirectory()) walkSrc(full);
+      const rel = relative(ROOT, full).split(sep).join('/');
+      const isDir = statSync(full).isDirectory();
+      if (ignored(rel, isDir)) continue;
+      if (isDir) walkSrc(full);
       else if (/\.(tsx?|js|html|css)$/.test(e)) {
-        checkMarcaAposentada(full.replace(ROOT, '').replace(/\\/g, '/').replace(/^\//, ''), readFileSync(full, 'utf-8'));
+        checkMarcaAposentada(rel, readFileSync(full, 'utf-8'));
         checked++;
       }
     }
@@ -493,4 +691,5 @@ function main() {
   process.exit(1);
 }
 
-main();
+// Importado pelos testes (regras puras exportadas acima): só roda como script (npm test).
+if (require.main === module) main();

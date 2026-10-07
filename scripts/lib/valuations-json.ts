@@ -10,6 +10,7 @@
  * Proventos já vêm na base acionária de hoje (ajuste por desdobramento em supabase.ts).
  */
 import type { TickerModel } from '../ticker/model';
+import { readFileSync } from 'fs';
 
 // Mesmo arredondamento do `brl()` da página (Intl/ICU). `toFixed(2)` diverge no meio centavo:
 // 1.005.toFixed(2) = "1.00", e a página mostra R$ 1,01.
@@ -57,4 +58,46 @@ export function widgetValuationFields(m: Pick<TickerModel, 'calc' | 'div'>): Wid
       '10': perShare(m.div.avg['10']),
     },
   };
+}
+
+// ─── O arquivo inteiro (SPEC-v2 §E3) ──────────────────────────────────────
+
+const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
+
+/** valuations.json anterior no disco (objeto), ou null se não existe ou não é JSON válido. */
+export function readValuationsFile(file: string): Record<string, unknown> | null {
+  try {
+    const v = JSON.parse(readFileSync(file, 'utf-8')) as unknown;
+    return v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Papéis de um valuations.json (as chaves que não começam com `_`, como `_quoteDate`). */
+export const countValuations = (v: Record<string, unknown>): number => Object.keys(v).filter((k) => !k.startsWith('_')).length;
+
+/**
+ * Conteúdo do valuations.json.
+ *
+ * - Execução completa: só os papéis desta execução (quem saiu do universo sai do arquivo).
+ * - Execução com tickers na linha de comando (`partial`): o arquivo anterior por baixo e os papéis
+ *   desta execução por cima. Antes ela regravava o arquivo só com os poucos tickers pedidos, e a
+ *   calculadora, a landing e o DY do ranking perdiam os outros ~300.
+ *   `_quoteDate` = a data MAIS ANTIGA entre a do arquivo anterior e a desta execução: o arquivo
+ *   passa a misturar cotações de dias diferentes e não pode dizer que todas são de hoje.
+ *   Arquivo anterior ausente ou inválido: fica só esta execução (como antes).
+ */
+export function buildValuationsJson<T extends object>(
+  current: Record<string, T>,
+  quoteDate: string,
+  opts: { partial: boolean; previous?: Record<string, unknown> | null },
+): Record<string, unknown> {
+  if (!opts.partial || !opts.previous) return { _quoteDate: quoteDate, ...current };
+  const prev = opts.previous;
+  const kept: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(prev)) if (!k.startsWith('_') && v && typeof v === 'object' && !Array.isArray(v)) kept[k] = v;
+  const prevDate = typeof prev._quoteDate === 'string' && ISO_DAY.test(prev._quoteDate) ? prev._quoteDate : null;
+  const date = Object.keys(kept).some((k) => !(k in current)) && prevDate && prevDate < quoteDate ? prevDate : quoteDate;
+  return { _quoteDate: date, ...kept, ...current };
 }

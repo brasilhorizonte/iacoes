@@ -173,12 +173,12 @@ test('DY: sem provento ajustado na janela, o número do banco fica intacto', () 
   assert.equal(splitAdjustedDividendYield([], 43.7, NaN, NOW), 0);
 });
 
-test('DY ajustado segue a régua do banco: só renda, data-com entre hoje − 12 meses e hoje', () => {
+test('DY ajustado segue a régua do banco: só renda, data-com em (hoje − 12 meses, hoje]', () => {
   const splits: StockSplitRow[] = [{ ticker: 'TEST3', ex_date: '2026-09-30', label: 'DESDOBRAMENTO', factor: 2 }];
   const divs = adjustDividendsByTicker([
     div('2026-09-01', 2, 'DIVIDENDO'),     // entra: 1,00 ajustado
-    div('2025-10-06', 4, 'JCP'),           // borda da janela (hoje − 12 meses): entra, 2,00
-    div('2025-10-05', 8, 'JCP'),           // um dia antes da janela: fora
+    div('2025-10-07', 4, 'JCP'),           // 1º dia da janela: entra, 2,00
+    div('2025-10-06', 8, 'JCP'),           // hoje − 12 meses: fora, como em incomeWindows (dividends.ts)
     div('2026-05-01', 6, 'REST CAP DIN'),  // restituição de capital não é renda: fora
     div('2026-10-20', 10, 'DIVIDENDO'),    // data-com futura: fora
     div('2026-06-01', 0.5, 'RENDIMENTO'),  // entra: 0,25

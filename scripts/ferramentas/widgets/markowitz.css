@@ -1,0 +1,137 @@
+/* Widget "markowitz": port do MarkowitzExplainer. Dois tamanhos (SPEC §4):
+   - page (página da ferramenta, quadro ≈ 640×360 com altura mínima reservada): duas colunas
+     (gráfico 1,7fr | legenda 1fr) a partir de 520 px de largura útil, como no app; abaixo disso,
+     empilhado;
+   - tile (landing): ocupa o quadro inteiro quando ele tem altura (.iaw-mk--fill, a .tool-w do
+     bento): o gráfico encolhe para caber e, em quadro baixo, a legenda fica só com o título.
+   Só transform e opacity animam (SPEC-v2 §E5); a legenda tem as 5 etapas empilhadas na mesma célula
+   (a altura é a da maior: nada pula quando a fase troca). Texto do SVG: tamanho em unidades do
+   viewBox × --iaw-mk-k (1 ÷ escala do gráfico, medido pelo widget), entre o tamanho do original e
+   um teto que não estoura o quadro (SPEC-v2 §E6: legível no tamanho em que aparece). */
+.iaw-mk { --iaw-mk-k: 1; --iaw-mk-plot: #F5F4F0; container: iawmk / inline-size; min-width: 0; }
+.iaw-mk--tile { --iaw-mk-k: .62; }
+.iaw-mk--fill { position: absolute; top: 0; right: 0; bottom: 0; left: 0; container-type: size; }
+
+.iaw-mk-in {
+  display: grid; gap: 10px 18px; min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "top" "plot" "cap" "ctrl";
+}
+.iaw-mk--page .iaw-mk-in { min-height: 266px; }
+.iaw-mk--fill .iaw-mk-in { height: 100%; grid-template-rows: auto minmax(0, 1fr) auto auto; gap: 8px 16px; }
+
+.iaw-mk-top { grid-area: top; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 8px; min-width: 0; }
+.iaw-mk-over { font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #5F6B70; white-space: nowrap; }
+
+/* Gráfico */
+.iaw-mk-plot { grid-area: plot; position: relative; min-width: 0; min-height: 0; padding: 8px; border-radius: 12px; background: var(--iaw-mk-plot); }
+.iaw-mk-svg { display: block; width: 100%; height: auto; overflow: hidden; }
+.iaw-mk--fill .iaw-mk-svg { position: absolute; top: 8px; left: 8px; width: calc(100% - 16px); height: calc(100% - 16px); }
+
+.iaw-mk-axis { stroke: #8E9AA6; stroke-width: 1; }
+.iaw-mk-t { fill: #5F6B70; font-family: inherit; }
+.iaw-mk-t-axis { font-size: clamp(10px, calc(11.5px * var(--iaw-mk-k)), 13px); }
+/* Tetos dos rótulos de ponto (12,5 nas ações, 12 em "maior Sharpe"): acima disso "maior Sharpe"
+   encosta em "Ação B" e "Ação E" passa da borda do viewBox. */
+.iaw-mk-t-asset { fill: #0B1F26; font-weight: 600; font-size: clamp(9px, calc(12px * var(--iaw-mk-k)), 12.5px); }
+.iaw-mk-t-rf { font-size: clamp(9px, calc(11px * var(--iaw-mk-k)), 12px); }
+.iaw-mk-t-sharpe { fill: #0B1F26; font-weight: 700; font-size: clamp(10px, calc(12px * var(--iaw-mk-k)), 12px); }
+.iaw-mk-t-bar { font-size: clamp(9px, calc(11px * var(--iaw-mk-k)), 11.5px); }
+/* Halo da cor do fundo: rótulo legível por cima da nuvem e das linhas. */
+.iaw-mk-t-asset, .iaw-mk-t-rf, .iaw-mk-t-sharpe {
+  paint-order: stroke; stroke: var(--iaw-mk-plot); stroke-width: 3px; stroke-linejoin: round;
+}
+
+.iaw-mk-dot { fill: rgba(148, 163, 184, .5); }
+.iaw-mk-ring { fill: none; stroke: var(--iaw-ouro); stroke-width: 2; }
+.iaw-mk-frontier { fill: none; stroke: var(--iaw-ouro); stroke-width: 3; stroke-linecap: round; }
+.iaw-mk-rf { fill: #5F6B70; }
+.iaw-mk-cal { stroke: #5F6B70; stroke-width: 1.5; stroke-dasharray: 5 4; }
+/* A tangência "assenta" com scale(): o contorno fica com 2 de espessura do começo ao fim. */
+.iaw-mk-tan { fill: var(--iaw-ouro); stroke: #fff; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.iaw-mk-track { fill: #E2E8F0; }
+.iaw-mk-cur-seg { opacity: .5; }
+/* Cores dos ativos (as do original, em tom 700 sobre o fundo claro). */
+.iaw-mk-a0 { fill: #6D28D9; }
+.iaw-mk-a1 { fill: #047857; }
+.iaw-mk-a2 { fill: #0369A1; }
+.iaw-mk-a3 { fill: #1D4ED8; }
+.iaw-mk-a4 { fill: #64748B; }
+
+/* Legenda: as 5 etapas na mesma célula; só a da fase atual aparece. */
+.iaw-mk-cap { grid-area: cap; display: grid; min-width: 0; transition: opacity .3s ease; }
+.iaw-mk-step { grid-area: 1 / 1; min-width: 0; visibility: hidden; }
+.iaw-mk-step.is-on { visibility: visible; }
+.iaw-mk-step-title { margin: 0; font-size: 17px; font-weight: 700; line-height: 1.3; letter-spacing: -.01em; color: #0B1F26; }
+.iaw-mk-step-text { margin: 6px 0 0; font-size: 13.5px; line-height: 1.55; color: #4A555B; }
+
+/* Controles */
+.iaw-mk-ctrl { grid-area: ctrl; display: flex; align-items: center; gap: 10px; min-width: 0; }
+.iaw-mk-play {
+  display: inline-flex; flex: none; align-items: center; justify-content: center;
+  width: 34px; height: 34px; margin: 0; padding: 0;
+  border: 0; border-radius: 50%; background: var(--iaw-ouro); color: #041C24; cursor: pointer;
+}
+.iaw-mk-play svg { display: block; fill: currentColor; }
+.iaw-mk-play:hover { background: var(--iaw-ouro-claro); }
+.iaw-mk-play:focus-visible { outline: 3px solid rgba(9, 56, 72, .35); outline-offset: 2px; }
+.iaw-mk-prog { display: flex; flex: 1 1 auto; gap: 3px; min-width: 0; }
+.iaw-mk-seg {
+  display: flex; flex: 1 1 0; align-items: center; min-width: 0; height: 24px;
+  margin: 0; padding: 0; border: 0; background: transparent; cursor: pointer;
+}
+.iaw-mk-seg-bar { position: relative; display: block; width: 100%; height: 6px; overflow: hidden; border-radius: 99px; background: #DCE2E9; }
+.iaw-mk-seg-fill {
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+  background: var(--iaw-ouro); transform: scaleX(0); transform-origin: left center;
+}
+.iaw-mk-seg:hover .iaw-mk-seg-bar { background: #D3DAE3; }
+.iaw-mk-seg:focus-visible { outline: none; }
+.iaw-mk-seg:focus-visible .iaw-mk-seg-bar { box-shadow: 0 0 0 3px rgba(9, 56, 72, .35); }
+
+/* Página: altura mínima do quadro reservado pelo page.tsx (300/360 px menos borda e padding). */
+@media (min-width: 640px) {
+  .iaw-mk--page .iaw-mk-in { min-height: 326px; }
+}
+/* Página larga: duas colunas, como no app (gráfico à esquerda, legenda e controles à direita). */
+@container iawmk (min-width: 520px) {
+  .iaw-mk--page .iaw-mk-in {
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas: "plot top" "plot cap" "plot ctrl";
+  }
+  .iaw-mk--page .iaw-mk-plot { display: flex; align-items: center; }
+  /* Gráfico até 310 px de altura: o quadro não passa dos 360 px reservados (sem CLS). A escala
+     medida pelo widget já considera a sobra lateral (o desenho fica centralizado). */
+  .iaw-mk--page .iaw-mk-svg { max-height: 310px; }
+  .iaw-mk--page .iaw-mk-cap { align-self: start; }
+}
+/* Página estreita (celular): o painel do gráfico avança sobre metade do padding do quadro, para o
+   gráfico (e o texto dele) ficar maior. Fica dentro do quadro (contain: paint corta no padding). */
+@container iawmk (max-width: 519px) {
+  .iaw-mk--page .iaw-mk-plot { margin: 0 -8px; padding: 6px 4px; }
+}
+
+/* Landing (tile): texto menor; quadro largo e baixo vira duas colunas; quadro baixo encurta a legenda. */
+.iaw-mk--tile .iaw-mk-step-title { font-size: 15px; }
+.iaw-mk--tile .iaw-mk-step-text { margin-top: 3px; font-size: 12.5px; line-height: 1.45; }
+.iaw-mk--tile .iaw-seal { font-size: 9.5px; padding: 1px 7px; }
+.iaw-mk--tile .iaw-mk-play { width: 30px; height: 30px; }
+@container iawmk (min-width: 560px) and (min-aspect-ratio: 8 / 5) {
+  .iaw-mk--fill .iaw-mk-in {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas: "plot top" "plot cap" "plot ctrl";
+  }
+}
+/* Só no empilhado (nas duas colunas a legenda tem a altura toda). */
+@container iawmk (max-height: 430px) and ((max-width: 559px) or (max-aspect-ratio: 8 / 5)) {
+  .iaw-mk--fill .iaw-mk-step-text { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+}
+@container iawmk (max-height: 330px) and ((max-width: 559px) or (max-aspect-ratio: 8 / 5)) {
+  .iaw-mk--fill .iaw-mk-step-text { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iaw-mk-cap { transition: none; }
+}

@@ -10,10 +10,11 @@ import { AccordionItem } from '../ticker/components/ui/misc';
 import { brl, isoToBR, mult, pct } from '../ticker/lib/format';
 import { Autoria, ToolsBreadcrumb, ToolsFooter, ToolsHeader } from './chrome';
 import { HUB_PATH, ctaId } from './registry';
-import { RANKING_LABELS, rankingRows, resolveHref, type HubModel, type LinkCard, type RenderEnv, type ToolPageModel } from './model';
+import { RANKING_LABELS, rankingRows, resolveHref, termId, type HubModel, type LinkCard, type RenderEnv, type ToolPageModel } from './model';
+import { SECTIONS } from './sections';
 import type { Block, FatosData, RankingData, RankingKey, Tone, ToolId } from './types';
 
-type LinkEnv = Pick<RenderEnv, 'published' | 'macroPage' | 'basePath'>;
+type LinkEnv = Pick<RenderEnv, 'published' | 'macroPage' | 'basePath' | 'pages'>;
 
 const TOOL_ICONS: Record<ToolId, React.ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' }>> = {
   markowitz: ChartScatter,
@@ -72,6 +73,9 @@ function Section({ id, title, scroll, children }: { id: string; title: string; s
 }
 
 // ─── Blocos com dado real ─────────────────────────────────────────────────
+// Texto que vem de fora (título e resumo da CVM, nome de empresa, setor da base de mercado) sai
+// num elemento com data-fonte="cvm" | "b3" (SPEC-v2 §E1): fica fora das checagens de texto
+// autoral (gate de marca do validate-html e termos proibidos). Ticker, rótulos e datas são nossos.
 
 const rankingValue = (k: RankingKey, v: number | null): string =>
   v === null ? '—' : k === 'dy' || k === 'roe' ? pct(v, 1) : mult(v, 2);
@@ -102,9 +106,9 @@ export function RankingTable({ d, k, limit, compact }: { d: RankingData; k: Rank
                 <td className="px-4 py-2 font-mono text-muted-foreground tnum">{i + 1}</td>
                 <td className="px-2 py-2">
                   <a href={`/${r.t}/`} className="font-mono font-semibold text-foreground hover:text-gold-strong hover:underline">{r.t}</a>
-                  <span className="ml-2 hidden text-xs text-muted-foreground sm:inline">{r.name}</span>
+                  <span className="ml-2 hidden text-xs text-muted-foreground sm:inline" data-fonte="b3">{r.name}</span>
                 </td>
-                {!compact && <td className="hidden px-2 py-2 text-xs text-muted-foreground sm:table-cell">{r.sector}</td>}
+                {!compact && <td className="hidden px-2 py-2 text-xs text-muted-foreground sm:table-cell" data-fonte="b3">{r.sector}</td>}
                 <td className="px-2 py-2 text-right font-mono tnum">{brl(r.price)}</td>
                 <td className="px-4 py-2 text-right font-mono font-semibold tnum">{rankingValue(k, r[k])}</td>
               </tr>
@@ -127,11 +131,15 @@ export function FatosList({ d, limit, compact }: { d: FatosData; limit?: number;
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <Badge variant="neutral">{it.typeLabel}</Badge>
               <a href={it.url} className="font-mono font-semibold text-foreground hover:text-gold-strong hover:underline">{it.t}</a>
-              <span className="text-muted-foreground">{it.name}</span>
-              <time dateTime={it.date} title={it.time ? 'Data de publicação · horário em que o documento entrou no feed da plataforma' : undefined} className="ml-auto text-muted-foreground tnum">{isoToBR(it.date)}{it.time ? ` · ${it.time}` : ''}</time>
+              <span className="text-muted-foreground" data-fonte="cvm">{it.name}</span>
+              {/* Data de publicação; a hora, quando há, é a de entrada no feed e vem rotulada (SPEC-v2 §C). */}
+              <span className="ml-auto text-muted-foreground tnum">
+                <time dateTime={it.publishedDate ?? it.date}>{isoToBR(it.publishedDate ?? it.date)}</time>
+                {it.feedLabel ? ` · ${it.feedLabel}` : it.time ? ` · entrou no feed às ${it.time}` : ''}
+              </span>
             </div>
-            <h3 className="text-sm font-semibold leading-snug">{it.title}</h3>
-            {!compact && <p className="text-sm leading-relaxed text-muted-foreground">{it.summary}</p>}
+            <h3 className="text-sm font-semibold leading-snug" data-fonte="cvm">{it.title}</h3>
+            {!compact && <p className="text-sm leading-relaxed text-muted-foreground" data-fonte="cvm">{it.summary}</p>}
           </li>
         ))}
       </ol>
@@ -211,6 +219,13 @@ function BlockView({ b, m }: { b: Block; m: ToolPageModel }) {
       return env.ranking ? <RankingTable d={env.ranking} k={b.indicator} limit={b.limit} /> : null;
     case 'fatos-list':
       return env.fatos ? <FatosList d={env.fatos} limit={b.limit} /> : null;
+    case 'ssr': {
+      // Ponto de extensão: componente de scripts/ferramentas/sections/ registrado em SECTIONS.
+      // Chave desconhecida quebra ESTA página (o gerador mantém a anterior e avisa no log).
+      const S = Object.prototype.hasOwnProperty.call(SECTIONS, b.id) ? SECTIONS[b.id] : undefined;
+      if (!S) throw new Error(`seção SSR "${b.id}" não registrada em scripts/ferramentas/sections/index.ts`);
+      return <S m={m} block={b} />;
+    }
     case 'todo':
       return <p className="rounded-lg border border-dashed border-negative/50 bg-negative/5 px-4 py-3 text-sm text-negative">{b.text}</p>;
   }
@@ -330,6 +345,20 @@ export function ToolPage({ m }: { m: ToolPageModel }) {
             </Section>
           ))}
 
+          {/* Termos definidos: o MESMO texto do DefinedTermSet do JSON-LD (dado estruturado reflete o visível). */}
+          {t.definedTerms && t.definedTerms.length > 0 && (
+            <Section id="glossario" title="Glossário">
+              <dl className="grid gap-3 sm:grid-cols-2">
+                {t.definedTerms.map((d) => (
+                  <div key={d.name} id={termId(d.name)} className="scroll-mt-20 rounded-xl border bg-card p-4">
+                    <dt className="font-semibold">{d.name}</dt>
+                    <dd className="mt-1 text-sm leading-relaxed text-muted-foreground">{d.description}</dd>
+                  </div>
+                ))}
+              </dl>
+            </Section>
+          )}
+
           <Section id="faq" title="Perguntas frequentes" scroll="scroll_75">
             <div className="rounded-xl border bg-card px-6 py-2">
               {t.faq.map((f, i) => <AccordionItem key={i} question={f.q} open={i === 0}>{f.a}</AccordionItem>)}
@@ -350,7 +379,8 @@ export function ToolPage({ m }: { m: ToolPageModel }) {
             <ButtonLink href={m.href} cta={ctaId(t, 'final')} variant="gold" size="lg" className={`shrink-0 ${CTA_WRAP}`}>{t.finalCta.label} <ArrowRight /></ButtonLink>
           </section>
 
-          <Autoria revised={t.contentRevised} />
+          {/* Data do dado (páginas com dado real) ou da última atualização do conteúdo. */}
+          <Autoria updated={m.dateModified} />
         </Container>
       </main>
       <ToolsFooter app={m.href} hubHref={hubHref} sources={t.sources} macroPage={m.env.macroPage} padForSticky />
@@ -386,7 +416,7 @@ export function HubPage({ m, app }: { m: HubModel; app: string }) {
           <section id="lista" aria-label="Ferramentas e páginas" data-scroll="scroll_50">
             <LinkCards cards={m.cards} trackPrefix="hub" />
           </section>
-          <Autoria revised={m.dateModified} />
+          <Autoria updated={m.dateModified} />
         </Container>
       </main>
       <ToolsFooter

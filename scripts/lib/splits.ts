@@ -166,12 +166,17 @@ export const isIncomeDividend = (type: unknown): boolean =>
 
 /**
  * DY de 12 meses na base de hoje, com a régua do `compute_dividend_yield()` do banco (o
- * `dividend_yield` de `brapi_quotes`): proventos de RENDA com data-com entre hoje − 12 meses
- * e hoje, somados sem deduplicar, ÷ cotação. A única diferença é o divisor de split — é o
+ * `dividend_yield` de `brapi_quotes`): proventos de RENDA com data-com em (hoje − 12 meses,
+ * hoje], somados sem deduplicar, ÷ cotação. A única diferença é o divisor de split — é o
  * conserto ensaiado (e ainda não aplicado) no app.
  *
  * Só troca o DY publicado (`reported`) quando algum provento da janela foi ajustado: sem
  * evento na janela, o número do banco já está certo e fica intacto (nenhuma página muda à toa).
+ *
+ * As páginas NÃO usam mais esta função: o DY da página inteira e da lista é o
+ * `dividendYieldTTM` de `./dividends` (a mesma régua, sem as duplicatas da fonte). A janela
+ * daqui segue a de lá — (hoje − 12 meses, hoje], o limite de baixo fica de fora — para as duas
+ * contas nunca divergirem por um provento com data-com exatamente em hoje − 12 meses.
  */
 export function splitAdjustedDividendYield(
   dividends: readonly (AdjustableDividend & { dividendType?: string })[],
@@ -185,7 +190,7 @@ export function splitAdjustedDividendYield(
   let adjusted = false;
   for (const d of dividends) {
     const ex = isoDay(d.exDate);
-    if (!ex || ex < from || ex > today) continue;
+    if (!ex || ex <= from || ex > today) continue;
     if (!isIncomeDividend(d.dividendType) || !Number.isFinite(d.amount) || d.amount <= 0) continue;
     ttm += d.amount;
     if (d.splitDivisor !== undefined && d.splitDivisor !== 1) adjusted = true;

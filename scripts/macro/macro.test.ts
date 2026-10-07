@@ -140,6 +140,29 @@ test('resumo JSON da landing: manchete no último ponto, URL relativa e leve', (
   assert.ok(json.length < 10_000, String(json.length));
 });
 
+test('resumo JSON: meses estimados (estimatedRanges) sem mudar os campos que já existiam', () => {
+  const m = buildBuffettModel(synthetic(), { today: new Date('2026-10-06T12:00:00Z') });
+  const r = JSON.parse(resumoJson(m));
+  // Campos e ordem de antes, com estimatedRanges acrescentado no fim.
+  assert.deepEqual(Object.keys(r), ['value', 'date', 'dateBR', 'band', 'percentile', 'since', 'mean', 'p25', 'p75', 'min', 'max', 'url', 'series', 'estimatedRanges']);
+  // Anomalia da fonte (nov/2018–jan/2019) e o trecho do Banco Mundial interpolado pelo Ibovespa
+  // (set/2019–jun/2026): os mesmos períodos que o gráfico da página sombreia, em meses.
+  assert.deepEqual(r.estimatedRanges, [{ from: '2018-11', to: '2019-01' }, { from: '2019-09', to: '2026-06' }]);
+  assert.deepEqual(r.estimatedRanges, m.estimatedRanges.map((x) => ({ from: x.from.slice(0, 7), to: x.to.slice(0, 7) })));
+  for (const x of r.estimatedRanges) {
+    assert.match(x.from, /^\d{4}-\d{2}$/);
+    assert.match(x.to, /^\d{4}-\d{2}$/);
+    assert.ok(x.from <= x.to);
+  }
+  // Todo mês marcado é "estimado" ou dezembro do Banco Mundial (âncora) para o CSV; o oficial da B3 não é marcado.
+  const inRange = (mo: string) => r.estimatedRanges.some((x: { from: string; to: string }) => x.from <= mo && mo <= x.to);
+  for (const [mo] of r.series as [string, number][]) {
+    if (inRange(mo)) assert.notEqual(sourceOf(`${mo}-15`).label, 'BCB SGS 7849', mo);
+    else assert.notEqual(sourceOf(`${mo}-15`).kind, 'estimado', mo);
+  }
+  assert.ok(!inRange('2026-10'));                         // manchete: fechamento oficial da B3
+});
+
 test('download do CSV pede e-mail: formulário + lead em iacoes_email_leads, sem link direto', () => {
   const html = renderBuffettPage(buildBuffettModel(synthetic(), { today: new Date('2026-10-06T12:00:00Z') }));
   assert.match(html, /<form id="csv-lead"[^>]*data-csv="\/macro\/indicador-de-buffett\/indicador-buffett-brasil\.csv"/);

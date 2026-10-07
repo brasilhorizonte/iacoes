@@ -1,0 +1,164 @@
+/* Widget "fatos": feed da CVM (lista + leitor). Page (~640×360) e tile (~300×220, landing).
+   Só transform e opacity animam (SPEC-v2 §E5): a linha desliza por translateY (transição), entra
+   por um keyframe de opacidade, sai por opacidade; o leitor troca com fade. Alturas fixas em cada
+   tamanho: trocar de documento não muda a altura do quadro. Texto em ouro: #8A6A24. */
+.iaw-fatos { display: flex; flex-direction: column; gap: 10px; height: 100%; min-width: 0; }
+.iaw-fatos p { margin: 0; }
+
+.iaw-fatos-head { display: flex; align-items: center; gap: 8px; min-width: 0; height: 24px; }
+.iaw-fatos-prompt { flex: none; font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; font-weight: 700; color: var(--iaw-ouro-texto); }
+.iaw-fatos-title { flex: none; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--iaw-petroleo); }
+.iaw-fatos-latest { min-width: 0; margin-left: auto; overflow: hidden; font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; color: var(--iaw-mudo); white-space: nowrap; text-overflow: ellipsis; }
+
+.iaw-fatos-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; min-width: 0; }
+
+/* Lista: cada <li> tem a altura de uma linha + o espaço até a próxima; translateY(n × 100%) põe a
+   linha na posição n sem o JS saber a altura em px. */
+.iaw-fatos-list { position: relative; height: 144px; margin: 0; padding: 0; overflow: hidden; list-style: none; }
+.iaw-fatos-slot {
+  position: absolute; top: 0; right: 0; left: 0; height: 50px; padding-bottom: 6px;
+  transition: transform .6s cubic-bezier(.22, .8, .24, 1), opacity .45s ease;
+}
+.iaw-fatos-slot.is-out { opacity: 0; }
+.iaw-fatos-slot.is-new > .iaw-fatos-row { animation: iaw-fatos-in .55s cubic-bezier(.2, .8, .2, 1) both; }
+
+.iaw-fatos-row {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; align-items: center; gap: 8px; width: 100%; height: 100%; min-width: 0;
+  margin: 0; padding: 0 10px 0 12px;
+  border: 1px solid var(--iaw-linha); border-radius: 10px; background: #fff; color: var(--iaw-tinta);
+  font: inherit; text-align: left; cursor: pointer;
+}
+.iaw-fatos-row::before {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 3px;
+  background: var(--iaw-ouro); opacity: 0; transition: opacity .25s ease; pointer-events: none;
+}
+.iaw-fatos-row::after {
+  content: ""; position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: -1;
+  background: rgba(184, 146, 62, .09); opacity: 0; transition: opacity .25s ease; pointer-events: none;
+}
+.iaw-fatos-row:hover { border-color: rgba(184, 146, 62, .55); }
+.iaw-fatos-row.is-on { border-color: rgba(184, 146, 62, .65); }
+.iaw-fatos-row.is-on::before, .iaw-fatos-row.is-on::after { opacity: 1; }
+.iaw-fatos-row:focus-visible { outline: 2px solid var(--iaw-petroleo); outline-offset: -2px; }
+
+.iaw-fatos-pill {
+  display: inline-flex; flex: none; align-items: center; justify-content: center;
+  min-width: 26px; height: 18px; padding: 0 5px; border-radius: 5px;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .02em; line-height: 1;
+}
+.iaw-fatos-pill[data-type="FR"] { background: rgba(185, 56, 56, .1); color: #9A2F2F; }
+.iaw-fatos-pill[data-type="CM"] { background: rgba(9, 56, 72, .08); color: var(--iaw-petroleo); }
+.iaw-fatos-pill--full { padding: 0 7px; font-family: inherit; font-size: 11px; letter-spacing: 0; }
+
+.iaw-fatos-row-t { flex: none; font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; font-weight: 700; }
+.iaw-fatos-row-name { flex: 1 1 auto; min-width: 0; overflow: hidden; font-size: 12px; color: var(--iaw-mudo); white-space: nowrap; text-overflow: ellipsis; }
+.iaw-fatos-row-date { flex: none; margin-left: auto; font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; color: var(--iaw-mudo); }
+
+/* Leitor: altura fixa (cada linha com teto de linhas e altura em em). */
+.iaw-fatos-reader {
+  position: relative; min-width: 0; height: 242px; overflow: hidden;
+  padding: 12px 14px; border: 1px solid var(--iaw-linha); border-radius: 12px;
+  background: var(--iaw-papel); box-shadow: inset 3px 0 0 var(--iaw-ouro);
+}
+.iaw-fatos-doc { display: flex; flex-direction: column; gap: 5px; height: 100%; min-width: 0; }
+.iaw-fatos-doc.is-new { animation: iaw-fatos-fade .35s ease-out both; }
+.iaw-fatos-doc-top { display: flex; align-items: center; gap: 8px; min-width: 0; height: 20px; white-space: nowrap; }
+.iaw-fatos-doc-t { flex: none; font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; font-weight: 700; }
+.iaw-fatos-doc-name { min-width: 0; overflow: hidden; font-size: 12px; color: var(--iaw-mudo); text-overflow: ellipsis; }
+.iaw-fatos-doc-title {
+  flex: none; height: 2.7em; overflow: hidden;
+  font-size: 14px; font-weight: 700; line-height: 1.35; color: var(--iaw-tinta);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.iaw-fatos-doc-sum {
+  flex: none; height: 7.1em; overflow: hidden;
+  font-size: 13px; line-height: 1.42; color: var(--iaw-tinta);
+  display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical;
+}
+.iaw-fatos-ai { margin-right: 2px; font-size: .78em; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--iaw-ouro-texto); }
+.iaw-fatos-doc-meta { flex: none; height: 2.7em; overflow: hidden; font-size: 11px; line-height: 1.35; color: var(--iaw-mudo); }
+.iaw-fatos-doc-date, .iaw-fatos-doc-feed { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.iaw-fatos-doc-go { flex: none; height: 1.4em; overflow: hidden; font-size: 12.5px; line-height: 1.4; white-space: nowrap; text-overflow: ellipsis; color: var(--iaw-ouro-texto); }
+.iaw-fatos-doc-link, .iaw-fatos-doc-titlelink { color: inherit; text-decoration: none; }
+.iaw-fatos-doc-link { font-weight: 700; color: var(--iaw-ouro-texto); }
+.iaw-fatos-doc-link:hover, .iaw-fatos-doc-titlelink:hover { text-decoration: underline; text-underline-offset: 2px; }
+.iaw-fatos-doc-link:focus-visible, .iaw-fatos-doc-titlelink:focus-visible { outline: 2px solid var(--iaw-petroleo); outline-offset: 1px; border-radius: 3px; }
+
+.iaw-fatos-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; min-height: 32px; }
+.iaw-fatos-note { flex: 1 1 220px; min-width: 0; font-size: 11px; line-height: 1.4; color: var(--iaw-mudo); }
+.iaw-fatos-pause { flex: none; }
+
+.iaw-fatos-status { font-size: 12.5px; line-height: 1.45; color: var(--iaw-mudo); }
+
+/* Página a partir de 640 px: lista (5 linhas) e leitor lado a lado, na mesma altura. */
+@media (min-width: 640px) {
+  .iaw-fatos--page .iaw-fatos-body { grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); gap: 12px; }
+  .iaw-fatos--page .iaw-fatos-list { height: 244px; }
+  .iaw-fatos--page .iaw-fatos-reader { height: 244px; }
+}
+
+/* Celular estreito (< 400 px): página compacta, com o resumo em mais linhas (a coluna é estreita). */
+@media (max-width: 400px) {
+  .iaw-fatos--page { gap: 8px; }
+  .iaw-fatos--page .iaw-fatos-latest { display: none; }
+  .iaw-fatos--page .iaw-fatos-slot { height: 46px; }
+  .iaw-fatos--page .iaw-fatos-list { height: 132px; }
+  .iaw-fatos--page .iaw-fatos-row { gap: 6px; padding: 0 8px 0 10px; }
+  .iaw-fatos--page .iaw-fatos-row-name { font-size: 11.5px; }
+  .iaw-fatos--page .iaw-fatos-reader { height: 262px; padding: 10px 11px; }
+  .iaw-fatos--page .iaw-fatos-doc-title { font-size: 13.5px; }
+  .iaw-fatos--page .iaw-fatos-doc-sum { height: 8.52em; font-size: 12.5px; -webkit-line-clamp: 6; }
+}
+
+/* Tile (landing, ~300×220): cabeçalho com a pausa, 3 linhas curtas e o leitor com 3 linhas de resumo. */
+.iaw-fatos--tile { gap: 6px; }
+.iaw-fatos--tile .iaw-fatos-head { height: 22px; }
+.iaw-fatos--tile .iaw-fatos-title { font-size: 10.5px; letter-spacing: .05em; }
+.iaw-fatos--tile .iaw-fatos-prompt { font-size: 12px; }
+.iaw-fatos--tile .iaw-fatos-body { gap: 6px; }
+.iaw-fatos--tile .iaw-fatos-list { height: 80px; }
+.iaw-fatos--tile .iaw-fatos-slot { height: 28px; padding-bottom: 4px; }
+.iaw-fatos--tile .iaw-fatos-row { gap: 6px; padding: 0 8px 0 9px; border-radius: 8px; }
+.iaw-fatos--tile .iaw-fatos-pill { min-width: 22px; height: 16px; padding: 0 4px; font-size: 9.5px; }
+.iaw-fatos--tile .iaw-fatos-row-t { font-size: 11.5px; }
+.iaw-fatos--tile .iaw-fatos-row-name { font-size: 10.5px; }
+.iaw-fatos--tile .iaw-fatos-row-date { font-size: 10px; }
+.iaw-fatos--tile .iaw-fatos-reader { height: 94px; padding: 7px 9px; border-radius: 10px; }
+.iaw-fatos--tile .iaw-fatos-doc { gap: 3px; }
+.iaw-fatos--tile .iaw-fatos-doc-title {
+  height: 1.3em; font-size: 12px; line-height: 1.3;
+  display: block; white-space: nowrap; text-overflow: ellipsis;
+}
+.iaw-fatos--tile .iaw-fatos-doc-sum { height: 4.05em; font-size: 11px; line-height: 1.35; -webkit-line-clamp: 3; }
+.iaw-fatos--tile .iaw-fatos-doc-meta { height: 1.3em; font-size: 10px; line-height: 1.3; white-space: nowrap; text-overflow: ellipsis; }
+.iaw-fatos--tile .iaw-fatos-status { font-size: 11.5px; }
+
+/* Tile largo (2x1 / 2x2): lado a lado, 5 linhas. */
+.iaw-fatos--tile.iaw-fatos--wide .iaw-fatos-body { grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); }
+.iaw-fatos--tile.iaw-fatos--wide .iaw-fatos-list { height: 136px; }
+.iaw-fatos--tile.iaw-fatos--wide .iaw-fatos-reader { height: 136px; }
+.iaw-fatos--tile.iaw-fatos--wide .iaw-fatos-doc-title { height: 2.6em; display: -webkit-box; white-space: normal; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.iaw-fatos--tile.iaw-fatos--wide .iaw-fatos-doc-sum { height: 5.4em; -webkit-line-clamp: 4; }
+
+.iaw-fatos-pause-icon {
+  display: inline-flex; flex: none; align-items: center; justify-content: center;
+  width: 22px; height: 22px; margin: 0 0 0 auto; padding: 0;
+  border: 1px solid var(--iaw-linha); border-radius: 50%; background: #fff; color: var(--iaw-petroleo); cursor: pointer;
+}
+.iaw-fatos-pause-icon svg { fill: currentColor; }
+.iaw-fatos-pause-icon:hover { border-color: var(--iaw-ouro); }
+.iaw-fatos-pause-icon:focus-visible { outline: 3px solid rgba(9, 56, 72, .35); outline-offset: 2px; }
+
+@keyframes iaw-fatos-in {
+  from { opacity: 0; transform: translateY(-40%); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes iaw-fatos-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .iaw-fatos-slot, .iaw-fatos-row::before, .iaw-fatos-row::after { transition: none; }
+}

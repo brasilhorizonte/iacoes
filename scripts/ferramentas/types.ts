@@ -37,8 +37,30 @@ export type Block =
   | { type: 'ranking-table'; indicator: RankingKey; limit?: number }
   /** Lista dos documentos mais recentes da CVM (dados.json do build). */
   | { type: 'fatos-list'; limit?: number }
+  /**
+   * Seção SSR específica da ferramenta (componente React em scripts/ferramentas/sections/<id>.tsx,
+   * registrado em sections/index.ts). Renderiza nesta posição; `props` chega ao componente.
+   */
+  | SsrBlock
   /** Marcador de conteúdo a escrever. Só pode existir em ferramenta `rascunho` (teste garante). */
   | { type: 'todo'; text: string };
+
+/** Bloco que chama um componente de scripts/ferramentas/sections/ (ver sections/index.ts). */
+export interface SsrBlock {
+  type: 'ssr';
+  /** Chave em SECTIONS (sections/index.ts): `<id da ferramenta>` ou `<id>-<nome>`. */
+  id: string;
+  props?: Record<string, unknown>;
+}
+
+/**
+ * Termo definido da página (SPEC-v2 §D): vira um DefinedTerm no JSON-LD (DefinedTermSet) E um
+ * item do glossário visível, com o MESMO texto. Texto puro, sem marcação.
+ */
+export interface DefinedTermSpec {
+  name: string;
+  description: string;
+}
 
 export interface ToolSection {
   /** id estável do H2 (âncora). */
@@ -66,8 +88,11 @@ export interface WidgetSpec {
   fallback?: { kind: 'chips'; items: string[] } | { kind: 'text'; text: string };
 }
 
-/** De onde vem o dado da página. Evergreen = conteúdo sem dado do dia. */
-export type DataKind = 'evergreen' | 'ranking' | 'fatos' | 'valuations';
+/**
+ * De onde vem o dado da página. Evergreen = conteúdo sem dado do dia. `backtest` = Ibovespa × CDI
+ * reais (dados.json do backtest; a página só sai com o dado, como ranking e fatos).
+ */
+export type DataKind = 'evergreen' | 'ranking' | 'fatos' | 'valuations' | 'backtest';
 
 export interface ToolContent {
   id: ToolId;
@@ -100,9 +125,17 @@ export interface ToolContent {
   dataSource: DataKind;
   sections: ToolSection[];
   faq: Faq[];
+  /**
+   * Opcional: termos definidos (JSON-LD DefinedTermSet + glossário visível antes do FAQ), quando
+   * fizer sentido (ex.: "Fronteira eficiente", "Índice de Sharpe").
+   */
+  definedTerms?: DefinedTermSpec[];
   /** Fontes e metodologia (rodapé). */
   sources: string;
-  /** Data da última revisão do conteúdo (AAAA-MM-DD): lastmod e dateModified das evergreen. */
+  /**
+   * Data da última atualização do conteúdo (AAAA-MM-DD): lastmod e dateModified das evergreen e o
+   * "Atualizado em" da página (não alega revisão humana).
+   */
   contentRevised: string;
 }
 
@@ -211,6 +244,13 @@ export interface FatoItem {
   summary: string;
   /** Link interno: /airton/{T}/ quando existe, senão /{T}/. */
   url: string;
+  /** Data de publicação na CVM (data.ts FatoItemX; igual a `date`). */
+  publishedDate?: string;
+  /**
+   * Rótulo pronto da entrada no feed: "entrou no feed às 12:25" (ou "em 06/10 às 00:17"). Não é a
+   * hora da publicação nem de alerta (SPEC-v2 §C Fatos).
+   */
+  feedLabel?: string | null;
 }
 
 export interface FatosData {

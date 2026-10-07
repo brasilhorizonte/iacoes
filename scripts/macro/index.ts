@@ -11,7 +11,7 @@ import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'fs
 import { join } from 'path';
 import { num } from '../ticker/lib/format';
 import { fetchBuffettData, headline, validate, type BuffettData } from './data';
-import { buildBuffettModel, CSV_NAME, HUB_PATH, JSON_NAME, PAGE_PATH, type BuffettModel } from './model';
+import { buildBuffettModel, CSV_NAME, estimatedMonthRanges, HUB_PATH, JSON_NAME, PAGE_PATH, type BuffettModel } from './model';
 import { buildMacroCss, renderBuffettPage, renderMacroHub } from './render';
 
 export const macroEnabled = (): boolean => process.env.MACRO_BUFFETT_ENABLED === 'true';
@@ -104,6 +104,8 @@ export function resumoJson(m: BuffettModel): string {
     max: { value: r1(m.stats.max.value), month: m.s.maxMonth },
     url: PAGE_PATH,
     series,
+    // Meses estimados (interpolados entre âncoras anuais): o widget marca "estimado" no hover.
+    estimatedRanges: estimatedMonthRanges(m),
   });
 }
 

@@ -79,10 +79,13 @@ function DcfHook({ m }: { m: TickerModel }) {
         </div>
       </div>
 
+      {/* O DCF do app: 5 anos explícitos + 5 de convergência + perpetuidade; a IA propõe as
+          premissas e você decide. Sem "cenários": não há botões bear/base/bull no modelo
+          editável (honestidade-rotas.md, Valuation item 3). O WACC aqui é a estimativa do site. */}
       <ul className="relative grid gap-1.5 text-sm text-white/80">
-        {m.dcf.wacc > 0 && <li className="flex justify-between"><span>WACC estimado (cenário base)</span><span className="font-mono font-semibold text-white tnum">{pct(m.dcf.wacc)}</span></li>}
-        <li className="flex justify-between"><span>Projeção</span><span className="font-semibold text-white">5 anos + perpetuidade</span></li>
-        <li className="flex justify-between"><span>Cenários</span><span className="font-semibold text-white">base · otimista · pessimista</span></li>
+        {m.dcf.wacc > 0 && <li className="flex justify-between gap-3"><span>WACC estimado (premissas do site)</span><span className="font-mono font-semibold text-white tnum">{pct(m.dcf.wacc)}</span></li>}
+        <li className="flex justify-between gap-3"><span>Projeção</span><span className="font-semibold text-white">10 anos + perpetuidade</span></li>
+        <li className="flex justify-between gap-3"><span>Premissas</span><span className="text-right font-semibold text-white">a IA propõe, você decide</span></li>
       </ul>
 
       <div className="relative mt-auto space-y-3">

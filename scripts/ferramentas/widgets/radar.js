@@ -7,8 +7,9 @@
    listas não se excluem. Passar o mouse, tocar ou focar um cartão mostra a regra dele.
 
    Tamanhos: 'page' (~640×360, página da ferramenta) mostra os papéis de exemplo em cada cartão e o
-   botão "Pausar" embaixo; 'tile' (~300×220, landing) mostra só os nomes curtos, a regra resumida e
-   um botão de pausa compacto no topo (o movimento automático sempre tem como parar). */
+   botão "Pausar" embaixo (abaixo de 400 px de tela, layout compacto: os papéis viram etiquetas
+   "A", "C", "F" numa linha); 'tile' (~300×220, landing) mostra só os nomes curtos, a regra resumida
+   e um botão de pausa compacto no topo (o movimento automático sempre tem como parar). */
 (function () {
   var LISTS = [
     { name: 'Oportunidades Claras', tile: 'Oportunidades', tone: 'gold', items: ['A', 'C', 'F'],
@@ -66,7 +67,7 @@
         list = h('span', { 'class': 'iaw-radar-rows', 'aria-hidden': 'true' });
         L.items.forEach(function (letter) {
           var row = h('span', { 'class': 'iaw-radar-row', 'data-letter': letter }, [
-            h('span', { 'class': 'iaw-radar-row-name' }, 'Ação ' + letter),
+            h('span', { 'class': 'iaw-radar-row-name' }, [h('span', { 'class': 'iaw-radar-row-pre' }, 'Ação '), letter]),
             h('span', { 'class': 'iaw-radar-row-bar' })
           ]);
           rows.push(row);

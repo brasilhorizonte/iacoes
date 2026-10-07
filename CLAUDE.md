@@ -55,7 +55,6 @@ iacoes/
 │   ├── validate-html.ts         # Validacao pos-geracao (8 regras, roda via postgenerate)
 │   ├── valuation.ts         # Calculos de valuation (DCF, Graham, Gordon, EVA, Multiplos)
 │   ├── supabase.ts          # Client Supabase + fetch + mappers de dados
-│   ├── qualitative-cache.json  # Cache de notas qualitativas
 │   ├── types.ts             # Interfaces TypeScript (FinancialData, CvmDocument, etc.)
 │   └── constants.ts         # Constantes (taxas, pesos, cenarios)
 ├── _bmad/                   # BMAD framework (agentes, workflows, skills)
@@ -218,6 +217,21 @@ As paginas exibem 3 metodologias classicas de valuation com premissas ajustaveis
 - Premissas locked: anos para media
 - Avaliacao por desconto de dividendos futuros
 
+### Premissas padrao do SITE (iguais em ticker, landing, valuations.json e /ferramentas/calculadora-preco-justo/)
+- Graham: `sqrt(22.5 * LPA * VPA)`, sem margem de seguranca
+- Bazin: media de proventos de 5 anos / 6% (o "preco teto")
+- Gordon: D0 = media de proventos de 5 anos, D1 = D0 * 1,04, r = 14%, g = 4% (exige r > g)
+- O `valuations.json` traz os precos justos prontos, saidos do mesmo `buildModel` da pagina de ticker (invalido ou negativo = 0). A landing usa os prontos e so recalcula se faltar o campo.
+- Os defaults do APP sao outros (margem 25%, DY 16%, r ancorado no beta). Nunca escrever "mesma conta do app".
+
+### Proventos (`scripts/lib/dividends.ts`, out/2026)
+Uma regua so para DY 12m, medias, Bazin/Gordon, ranking e o DY do topo da pagina (`dividendYieldTTM`):
+ajuste por desdobramento/grupamento/bonificacao (`brapi_stock_splits`), duplicata = mesma natureza e valor
+(ate 0,01%) com data-com a ate 3 dias, parcela com pagamentos diferentes fica, dividendo x JCP de mesmo valor
+ficam, linha-total ao lado das parcelas sai (ate 0,01%, com a condicao do pagamento), cronograma revisto
+(GRND3 dez/2025) conta uma vez; DY e medias so com renda e data-com em (hoje - N anos, hoje]. Testes com dado
+real em `scripts/lib/fixtures/`. Residuos conhecidos no topo do arquivo.
+
 ### 4. DCF (Locked — apenas visual)
 - Card full-width com tabela de sensibilidade WACC x G Perpetuo (gradiente fixo verde/vermelho)
 - Premissas listadas mas borradas: beta setorial, WACC, crescimento por fase, margem EBITDA, cenarios
@@ -350,7 +364,24 @@ entao o dashboard agrega as duas superficies na mesma serie. O `utm_medium` dife
 
 **Paginas de setor** (`/acoes/{setor}/`): nenhum CTA com `data-cta` hoje.
 
-### Convencao de `intent` no `/authnew`
+### Deep link para o app (convencao atual, out/2026)
+
+O app so obedece `next`. O `Auth.tsx` cola o resto da query no fim do `next` com outro `?`, entao o `next`
+termina SEMPRE com o parametro descartavel `&_=` (ele absorve o que o `_iaClick` acrescenta):
+
+```
+https://app.brasilhorizonte.com.br/authnew?ref=iacoes&next=<encodeURIComponent('/?s=<s>&t=<t>[&ticker=T]&_=')>
+https://app.brasilhorizonte.com.br/authnew?ref=iacoes&next=<encodeURIComponent('/ativo/T?tab=<aba>&_=')>
+```
+(na landing `ref=iacoes-lp`). Mapa: Otimizador `s=ialocador&t=optimization` · Carteira/Backtest `s=ialocador&t=portfolio` ·
+Radar `t=radar` · Rankings `t=rankings` · Painel Macro `t=macro` (todos `s=ialocador`) · Score `s=ianalista&t=score` ·
+Validador `s=ianalista&t=validador` (aceita `&ticker=T&autorun=1`) · Minhas Teses `s=ianalista&t=teses` · Valuation DCF
+`s=ianalista&t=valuai` (aceita `&ticker=T`) · AIrton `s=workspace` · Notificacoes `s=home&t=notificacoes` ·
+Ativo `/ativo/T?tab=valuation|tese|docs`. Builders: `scripts/ferramentas/links.ts` (`appHref`) e `scripts/ticker/model.ts`;
+simulacao ponta a ponta em `scripts/deeplinks.test.ts`. Pelo Google so o `next` sobrevive (ok); cadastro por e-mail com
+confirmacao ainda perde o destino (pendencia do app: emailRedirectTo).
+
+### Convencao antiga de `intent` (o app IGNORA; mantida so como rotulo de analytics)
 
 Os CTAs passam um `intent` para a plataforma saber o que abrir depois do cadastro:
 
@@ -404,6 +435,14 @@ Script `scripts/validate-html.ts` roda automaticamente apos `npm run generate` e
 | onclick-without-function | `_iaClick(event)` em paginas sem o script de tracking |
 | utm-injection | `_iaClick` que nao injeta `utm_source`/`utm_campaign` (CTA sem atribuicao). Paginas de setor sao isentas |
 | js-syntax | Padroes de JS invalido por template literals |
+| marca-aposentada | IAnalista / IAlocador / "14 dias" no texto autoral (blocos `data-fonte="cvm"`/`"b3"` com dado externo ficam fora) |
+| ferramentas-links | `href`/`src`/`data-src` para `/ferramentas/...` que nao existe no disco (landing e literais do JS inline inclusive) |
+| ferramentas-bundle | `/assets/{js,css}/ferramentas*.{js,css}?v=` (inclusive `data-bundle`) apontando para arquivo inexistente |
+| widget-em-link | `data-ia-widget` dentro de `<a>` |
+| ferramentas | Paginas de /ferramentas/: tipo de JSON-LD, ItemList so com URL interna, termo proibido no texto autoral, link para `/#precos`, `publicadas.json` x disco |
+| macro-page (aviso) | Frescor da pagina do Buffett |
+
+`preview/` (gitignored) nao e varrido. A regra ferramentas-links so passa depois que o `npm run generate` cria o hub.
 
 **IMPORTANTE:** Ao editar regexes dentro de template literals em `template.ts`, lembrar que `\\/` no template produz `\\/` no output (correto), mas `\/` produz `/` (backslash engolido). Sempre usar `\\\\` para `\\` no output.
 
@@ -427,18 +466,13 @@ As tres superficies na pagina de ticker sao deliberadas — e o produto. Antes d
 
 ### Copy canonica (usar literalmente)
 
-- Eyebrow: `Assistente IA`
-- Titulo (ticker): `Conheca o AIrton, seu copiloto para {TICKER}`
-- Sub: `Ele conhece sua carteira, valida suas teses contra os fundamentos reais e resume os documentos da CVM — no app e no seu WhatsApp.`
-- Capacidades: `Acessa sua carteira` · `Valida suas teses` · `Resume a CVM em segundos`
-- Botao: `Conversar com o AIrton sobre {TICKER} →`
-- Auditoria, headline: `Leu um relatorio sobre {TICKER}? Pergunte ao AIrton.`
-- Auditoria, sub: `O AIrton cruza a tese com os numeros reais de {TICKER} — governanca, vantagem competitiva, endividamento e riscos — e diz onde ela nao se sustenta.`
-- Auditoria, perguntas prontas (3, clicaveis, cada uma leva ao app com o prompt em `&prompt=`):
-  `Minha tese em {TICKER} se sustenta?` · `Resume o ultimo Fato Relevante de {TICKER}` ·
-  `Compara {TICKER} com os pares do setor`
-- Auditoria, botao: `Auditar {TICKER} gratis →`
-- Badge da bolha de demonstracao: `Exemplo ilustrativo — nao e recomendacao de investimento`
+**Revisada em 07/out/2026 contra o codigo do app** (o que o texto pode prometer):
+- O AIrton conversa no app, no WhatsApp e no Telegram (a conta gratis tambem, com limite diario), conhece carteira e teses, resume documentos da CVM e compara empresas DENTRO da conversa. Nao roda DCF, otimizacao nem backtest.
+- Modos Discreto / Atento / Copiloto ficam nas Configuracoes; o padrao e **Atento** (o mock da landing abre nele).
+- **Validador de Teses** (card de auditoria do ticker): a IA audita a ARGUMENTACAO da tese (fundamentacao, analise de riscos, clareza e logica de valuation) contra Fatos Relevantes e Comunicados da CVM. Nunca dizer que "cruza a tese com os numeros reais" nem que da preco-alvo. Pode errar.
+- Perguntas prontas com `&prompt=` foram removidas: o app ignora o parametro.
+- Badge da bolha de demonstracao: `Exemplo ilustrativo — nao e recomendacao de investimento`.
+- Proibido: "Resume a CVM em segundos", "antes do mercado", "no instante", "valida contra os fundamentos reais".
 
 ### Regra dura: nunca inventar numero na bolha de demonstracao
 
@@ -535,10 +569,10 @@ nosso); "te aviso quando a {TICKER} publicar Fato Relevante" nao tem o que quest
 
 ### Tipos de alerta anunciados
 
-1. **Documentos da CVM** — Fato Relevante, ITR, DFP, Comunicado ao Mercado, no instante da publicacao
-2. **Dividendos / JCP** — anuncios de proventos
-3. **Resultados** — com o resumo do AIrton pronto
-4. **Violacao de criterio de tese** — aviso na hora em que um criterio da tese do usuario e violado
+1. **Fato Relevante e Comunicado ao Mercado:** em tempo real no WhatsApp/Telegram **so nos planos pagos (e no teste)**; na conta gratis, aviso no sino do app e resumo por e-mail limitado. Sem resumo da IA em alguns minutos, sai so o aviso.
+2. **ITR e DFP NAO geram alerta** (decisao de produto). Nunca anunciar.
+3. **Proventos, preco-alvo, preco justo de analise ValuAI salva e criterios da tese:** so planos pagos, no **resumo diario da manha** (nao e instantaneo). O preco justo das calculadoras Graham/Bazin/Gordon NAO gera alerta.
+4. Criterios de tese monitorados: ROE min., P/L max., DY min., Div.Liq./EBITDA max., Margem EBITDA min., Margem liquida min.
 
 ### Canal: WhatsApp primario, Telegram secundario
 
@@ -558,11 +592,11 @@ tem que voltar **vazio**.
 
 ### Copy canonica de alerta
 
-- Titulo: `Fique sabendo antes do mercado`
-- Sub (ticker): `Receba no WhatsApp cada Fato Relevante, ITR, DFP e anuncio de proventos de {TICKER} no instante em que sai na CVM — com o resumo do AIrton pronto.`
-- Botao: `Ativar alertas de {TICKER} →`
-- Rodape: `Gratis, sem cartao. Tambem disponivel no Telegram.`
-- Bloco de topo (documentos da CVM), botao: `Receba os proximos no WhatsApp →`, rodape `Gratis, sem cartao.`
+- Titulo (landing): `Fatos relevantes da sua carteira, resumidos no WhatsApp.`
+- Sub: `Fatos relevantes e comunicados das suas acoes chegam em tempo real no WhatsApp ou no Telegram, com o resumo da IA. Proventos, preco-alvo e criterios da sua tese vem no resumo da manha.`
+- Nota obrigatoria perto do botao: `Alertas no WhatsApp e no Telegram sao dos planos pagos. Na conta gratis, os avisos ficam no app e no e-mail.`
+- Ticker: `Nos planos pagos: Fato Relevante e Comunicado em tempo real, proventos no resumo diario.`
+- **Nunca** `Gratis, sem cartao` para WhatsApp/alertas: vale so para criar a conta.
 
 **PROIBIDO prometer "sem cadastro" em qualquer copy.** O usuario vai ter que se cadastrar de
 qualquer jeito — o degrau e o mesmo do DCF e da auditoria. A promessa honesta e **"gratis, sem
@@ -717,6 +751,41 @@ Geradas por `scripts/macro/` (React + mesmos componentes/tokens das paginas de t
   `indicador-buffett-brasil.csv` (CC BY 4.0, distribution do JSON-LD Dataset) e `/llms.txt`.
 - **Comandos:** `npm run preview:macro` (gera em `preview/`, fora do git, ignorando a trava; sirva a raiz
   com `npx serve .` e abra `/preview/macro/indicador-de-buffett/`) e `npm run test:macro` (node:test).
+
+## Ferramentas (`/ferramentas/`, out/2026)
+
+Hub `/ferramentas/` + 9 paginas `/ferramentas/<slug>/`, geradas por `generateFerramentas()` (`scripts/ferramentas/`)
+dentro do `npm run generate` (depois dos tickers e do macro):
+
+| id | slug | dado | JSON-LD |
+|---|---|---|---|
+| markowitz | markowitz | ilustrativo ("Acao A..E") | WebPage + DefinedTermSet |
+| backtest | backtest-de-carteira | real: Ibovespa (retorno total) x CDI SGS 4390, `dados.json` | WebPage |
+| fatos | fatos-relevantes | real: FR/CM com resumo da CVM, `dados.json` | CollectionPage + ItemList |
+| ranking | ranking-de-acoes | real: DY/P-L/P-VP/ROE com cortes, `dados.json` | CollectionPage + ItemList |
+| radar | radar-de-oportunidades | ilustrativo | WebPage |
+| nota | nota-qualitativa | checklist do proprio usuario | WebPage |
+| tese | tese-de-investimento | ilustrativo | WebPage |
+| calc | calculadora-preco-justo | real: `valuations.json` | WebPage + WebApplication (unica com `offers`) |
+| dcf | fluxo-de-caixa-descontado | ilustrativo ("Empresa A") | WebPage |
+
+- Conteudo em `scripts/ferramentas/content/<id>.ts` (status `rascunho` | `pronto`; so `pronto` vai para a raiz), secoes SSR em `sections/<id>.tsx` (mapa `sections/index.ts`), widgets em `widgets/<id>.js|css` (ES5, sem template literal).
+- **Bundle (excecao ao tudo-inline):** `assets/js/ferramentas.js` (runtime + widgets) e `assets/js/ferramentas-calc.js` (so a calculadora), com `?v=<hash>`; o gerador atualiza o `?v=` da landing. Runtime documentado no topo de `widgets/_runtime.js` (laco unico a 30 fps, nada anima fora da tela, `prefers-reduced-motion` = quadro final, `IAFerr.pauseAll()`, botao `data-ia-pause`).
+- `/ferramentas/publicadas.json` lista o que esta no ar; quadro com `data-ia-tool` so monta se a ferramenta estiver publicada. Templates de ticker/macro/acoes so linkam pagina que existe (`toolPageExists`).
+- Dado ruim nao sobrescreve: `dados.json` anterior fica, pagina anterior fica, `::warning::` no log. Ranking e backtest so gravam o JSON na raiz com a ferramenta `pronto`. Contrato dos JSONs: campos em fracao, datas em BRT, formato so cresce.
+- Despublicar (`pronto` -> `rascunho`) exige apagar a pasta da ferramenta.
+- Testes: `npm run test:ferramentas`, `npm run test:dados`; previa: `npm run preview:ferramentas -- --id <id>` (escreve em `preview/<id>/`, gitignored, inclui rascunhos com noindex).
+- Honestidade: numero so de dado real e com data; sem dado real, selo "Exemplo ilustrativo" e rotulos "Acao A"; sem link para `/#precos` nem limite de plano; ferramenta paga diz "do plano IAcoes"; nada de "melhores", "baratas", "oportunidades" como rotulo de lista.
+- data-cta: `tool-<id>`, `tool-<id>-final`, `tool-<id>-sticky`, `tool-nota-ativo`; links internos medidos com `data-track` (`tk-dcf`, `tk-calculadora`, `tk-nota-qualitativa`, `tk-fatos-relevantes`, `buffett-ranking`, `acoes-ranking`).
+
+## Landing: secao "Todas as ferramentas" (`#ferramentas`)
+
+Bento escuro logo depois da historia da plataforma: Markowitz 2x2, DCF 2x1, Ranking, Fatos, Nota, Tese, Radar,
+Backtest, cada quadro com o widget `data-size="tile"` e o titulo linkando a pagina (`lp-tool-<id>`). O bundle
+desce sob demanda (`data-bundle` na secao, IntersectionObserver a 1200 px). Botao "Pausar animacoes"
+(`data-ia-pause`, WCAG 2.2.2). Ao tirar uma ferramenta do ar, tirar o quadro da landing (o validate-html reprova
+link para pagina inexistente). O mock do WhatsApp (passo 3 da historia) le os 2 documentos mais recentes de
+`/ferramentas/fatos-relevantes/dados.json`; o balao do "resumo da manha" segue ilustrativo ("Acao C").
 
 ## Landing Page (index.html)
 

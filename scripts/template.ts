@@ -1,6 +1,12 @@
 // Índice /acoes/, páginas de setor, sitemap e robots.
 // As páginas de ticker saem de scripts/ticker/ (React + shadcn/ui renderizados no build).
 import type { TickerIndexEntry } from './types';
+import { linkFerramenta } from './ticker/components/links-ferramentas';
+
+// "Ordenar por indicador" → /ferramentas/ranking-de-acoes/, só quando a página está publicada no
+// disco (mesmo critério do hub). /acoes/ e setores saem depois do generateFerramentas no build
+// diário. A página do ranking só ordena (não tem filtro): o rótulo não promete "filtrar".
+const RANKING_LABEL = 'Ordenar por indicador: ranking de ações da B3 por dividendos, P/L, P/VP e ROE';
 
 // --- Slug helper (normalizes accented chars to ASCII) ---
 export const sectorSlug = (s: string): string =>
@@ -41,6 +47,7 @@ export const generateIndexHTML = (
   const today = new Date().toLocaleDateString('pt-BR');
   const year = new Date().getFullYear();
   const sectors = [...new Set(tickers.map(t => t.sector).filter(Boolean))].sort();
+  const rankingHref = linkFerramenta('ranking');
 
   const tickerRows = tickers.map(t => `
     <tr data-sector="${t.sector}">
@@ -275,7 +282,8 @@ export const generateIndexHTML = (
     <h1 class="font-playfair">Todas as Ações da B3</h1>
     <p><span class="count">${tickers.length}</span> ações com análise fundamentalista e preço justo por Graham, Bazin e Gordon. Dados atualizados em ${today}.</p>${macroLink ? `
     <p><a href="${macroLink.href}" style="color:#8a6a24;font-weight:600">${macroLink.label} →</a></p>` : ''}${toolsLink ? `
-    <p><a href="${toolsLink.href}" style="color:#8a6a24;font-weight:600" onclick="_iaTrack('cta_click','acoes-ferramentas')">${toolsLink.label} →</a></p>` : ''}
+    <p><a href="${toolsLink.href}" style="color:#8a6a24;font-weight:600" onclick="_iaTrack('cta_click','acoes-ferramentas')">${toolsLink.label} →</a></p>` : ''}${rankingHref ? `
+    <p><a href="${rankingHref}" style="color:#8a6a24;font-weight:600" onclick="_iaTrack('cta_click','acoes-ranking')">${RANKING_LABEL} →</a></p>` : ''}
   </header>
 
   <div class="idx-filters">
@@ -309,7 +317,7 @@ export const generateIndexHTML = (
   </div>
 
   <footer class="footer-disc">
-    <p>&copy; ${new Date().getFullYear()} ValuAI by <a href="https://brasilhorizonte.com.br" target="_blank">Brasil Horizonte</a>. Dados atualizados em ${today}. As informações não constituem recomendação de investimento.</p>
+    <p>&copy; ${new Date().getFullYear()} IAções by <a href="https://brasilhorizonte.com.br" target="_blank">Brasil Horizonte</a>. Dados atualizados em ${today}. As informações não constituem recomendação de investimento.</p>
   </footer>
 </main>
 
@@ -354,6 +362,8 @@ export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[], 
   const year = new Date().getFullYear();
   const slug = sectorSlug(sector);
   const count = tickers.length;
+  // Página de setor não carrega o tracking (_iaTrack): link interno simples, sem onclick.
+  const rankingHref = linkFerramenta('ranking');
 
   const avgPL = tickers.filter(t => t.pl > 0).reduce((s, t) => s + t.pl, 0) / (tickers.filter(t => t.pl > 0).length || 1);
   const avgDY = tickers.filter(t => t.divYield > 0).reduce((s, t) => s + t.divYield, 0) / (tickers.filter(t => t.divYield > 0).length || 1);
@@ -441,6 +451,9 @@ export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[], 
     .page-header{margin-bottom:1.5rem}
     .page-header h1{font-family:'Playfair Display',serif;font-size:1.8rem;margin-bottom:0.5rem}
     .page-header p{color:#64748b;font-size:0.88rem}
+    .page-header .rank-link{margin-top:0.4rem}
+    .page-header .rank-link a{color:#8a6a24;font-weight:600;text-decoration:none}
+    .page-header .rank-link a:hover{text-decoration:underline}
     .sector-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem}
     .stat-card{background:#fff;border-radius:10px;padding:1rem;border:1px solid #e2e8f0;text-align:center}
     .stat-card .stat-val{font-size:1.3rem;font-weight:700;color:#0f172a;font-family:'SFMono-Regular',monospace}
@@ -487,7 +500,8 @@ export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[], 
 <main class="page">
   <header class="page-header">
     <h1 class="font-playfair">Ações do Setor de ${sector}</h1>
-    <p>${count} ações com análise fundamentalista e preço justo. Dados atualizados em ${today}.</p>
+    <p>${count} ações com análise fundamentalista e preço justo. Dados atualizados em ${today}.</p>${rankingHref ? `
+    <p class="rank-link"><a href="${rankingHref}">${RANKING_LABEL} →</a></p>` : ''}
   </header>
 
   <div class="sector-stats">
@@ -516,7 +530,7 @@ export const generateSectorPage = (sector: string, tickers: TickerIndexEntry[], 
   <a href="/acoes/" class="back-link">&larr; Ver todos os setores</a>
 
   <footer class="footer-disc">
-    <p>&copy; ${year} ValuAI by <a href="https://brasilhorizonte.com.br" target="_blank">Brasil Horizonte</a>. Dados atualizados em ${today}. As informações não constituem recomendação de investimento.</p>
+    <p>&copy; ${year} IAções by <a href="https://brasilhorizonte.com.br" target="_blank">Brasil Horizonte</a>. Dados atualizados em ${today}. As informações não constituem recomendação de investimento.</p>
   </footer>
 </main>
 </body>

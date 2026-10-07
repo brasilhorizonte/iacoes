@@ -6,6 +6,8 @@
   --iaw-petroleo-fundo: #062A36;
   --iaw-ouro: #B8923E;
   --iaw-ouro-claro: #C9A44E;
+  /* Texto em ouro sobre branco: #8A6A24 (contraste ≥ 4,5:1). #B8923E e #C9A44E só em traço e fundo. */
+  --iaw-ouro-texto: #8A6A24;
   --iaw-papel: #FAFAF8;
   --iaw-tinta: #1A1A18;
   --iaw-linha: #E8E6E0;
@@ -34,3 +36,28 @@
 }
 .iaw-btn:hover { border-color: var(--iaw-ouro); }
 .iaw-btn:focus-visible { outline: 3px solid rgba(9, 56, 72, .35); outline-offset: 2px; }
+
+/* Isolamento (SPEC-v2 §E5): o quadro não força layout nem pintura do resto da página. Tudo o que o
+   widget desenha fica dentro dele (contain: paint corta o que vaza: nada de tooltip para fora). */
+[data-ia-widget] { contain: layout paint; }
+
+/* Fora da tela, aba escondida ou pausado (data-ia-run="0", escrito pelo runtime): animação CSS
+   congelada. O laço de JS já para sozinho (stop()). */
+[data-ia-widget][data-ia-run="0"] *,
+[data-ia-widget][data-ia-run="0"] *::before,
+[data-ia-widget][data-ia-run="0"] *::after { animation-play-state: paused !important; }
+
+/* Movimento reduzido: o widget desenha o quadro final (ctx.reduced); qualquer animação ou
+   transição CSS que sobrar termina na hora, já no estado final. */
+@media (prefers-reduced-motion: reduce) {
+  [data-ia-widget] *,
+  [data-ia-widget] *::before,
+  [data-ia-widget] *::after {
+    animation-duration: .001ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}
