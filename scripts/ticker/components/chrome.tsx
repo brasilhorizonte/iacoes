@@ -2,6 +2,7 @@ import * as React from 'react';
 import type { TickerModel } from '../model';
 import { ButtonLink } from './ui/button';
 import { Search, ChevronRight, ArrowRight } from './icons';
+import { TOOLS_HUB_PATH, toolsHubExists } from '../../ferramentas/site';
 
 export function Container({ className = '', children }: { className?: string; children: React.ReactNode }) {
   return <div className={`mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-8 ${className}`}>{children}</div>;
@@ -83,6 +84,11 @@ export function SiteFooter({ m }: { m: TickerModel }) {
           {/* Só com a página macro publicada (trava em scripts/macro/index.ts). */}
           {process.env.MACRO_BUFFETT_ENABLED === 'true' && (
             <a href="/macro/indicador-de-buffett/" className="inline-flex text-sm font-semibold text-gold-strong hover:underline">A bolsa está cara? Indicador de Buffett de hoje →</a>
+          )}
+          {/* Só com o hub publicado no disco (as páginas de ticker saem antes das ferramentas no build:
+              na 1ª execução o link ainda não aparece, e nunca aponta para um 404). */}
+          {toolsHubExists() && (
+            <a href={TOOLS_HUB_PATH} className="flex text-sm font-semibold text-gold-strong hover:underline">Ferramentas para analisar ações →</a>
           )}
         </div>
         <div className="space-y-3 text-xs leading-relaxed text-muted-foreground lg:col-span-7">

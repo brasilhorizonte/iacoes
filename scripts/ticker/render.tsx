@@ -37,6 +37,15 @@ const clientJs = () => (clientCache ??= readFileSync(join(DIR, 'client.js'), 'ut
 /** Mesmo tracking para as páginas macro (scripts/macro/), que reusam o design. */
 export const pageHeadTracking = (): string => headTracking();
 
+/**
+ * Link interno medido sem redirect e sem UTM (SPEC §2): `data-track="id"` ganha
+ * `onclick="_iaTrack('cta_click','id')"`. Mesmo pós-processamento do withTracks das páginas
+ * /ferramentas/ (scripts/ferramentas/render.tsx), copiado aqui para não puxar aquele módulo.
+ * Id fora de [a-z0-9-] não vira JS.
+ */
+export const withTracks = (html: string): string =>
+  html.replace(/ data-track="([a-z0-9-]+)"/g, ` onclick="_iaTrack('cta_click','$1')" data-track="$1"`);
+
 const attr = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 const jsonLd = (o: unknown) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, '\\u003c')}</script>`;
 
@@ -52,7 +61,7 @@ function structuredData(m: TickerModel): string {
   };
   const company: Record<string, unknown> = {
     '@type': 'Corporation',
-    name: m.name,
+    name: m.shortName || m.name,
     tickerSymbol: `BVMF:${m.symbol}`,
     ...(m.logoUrl ? { logo: m.logoUrl } : {}),
     ...(m.website ? { url: m.website } : {}),
@@ -98,8 +107,9 @@ export function renderTickerPage(m: TickerModel): string {
   const url = `${SITE}/${m.symbol}/`;
   const og = `${SITE}/assets/img/og-iacoes-v3.png`;
   // CTAs: o React não renderiza onclick em string, então o atributo entra aqui, logo
-  // antes do data-cta (que vem depois do href — regra `onclick-without-href`).
-  const body = renderToStaticMarkup(<TickerPage m={m} />).replace(/ data-cta="/g, ' onclick="_iaClick(event)" data-cta="');
+  // antes do data-cta (que vem depois do href — regra `onclick-without-href`). Links internos
+  // para /ferramentas/ (data-track) ganham o _iaTrack sem redirect.
+  const body = withTracks(renderToStaticMarkup(<TickerPage m={m} />).replace(/ data-cta="/g, ' onclick="_iaClick(event)" data-cta="'));
   const pageData = { symbol: m.symbol, price: m.price, lpa: m.calc.graham.lpa, vpa: m.calc.graham.vpa };
 
   return `<!DOCTYPE html>

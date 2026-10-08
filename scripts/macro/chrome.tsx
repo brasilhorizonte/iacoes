@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Container } from '../ticker/components/chrome';
 import { ButtonLink } from '../ticker/components/ui/button';
 import { ChevronRight, Search } from '../ticker/components/icons';
+import { TOOLS_HUB_PATH, toolsHubExists } from '../ferramentas/site';
 
 /** Cabeçalho das páginas macro: mesmo visual das páginas de ticker, sem a busca (não há client.js aqui). */
 export function MacroHeader({ app }: { app: string }) {
@@ -57,6 +58,10 @@ export function MacroFooter({ app, sources }: { app: string; sources: string }) 
             <a className="text-muted-foreground hover:text-foreground" href="https://www.instagram.com/brasil.horizonte/" rel="noopener" target="_blank">Instagram</a>
             <a className="text-muted-foreground hover:text-foreground" href="https://t.me/brasilhorizonte" rel="noopener" target="_blank">Telegram</a>
           </div>
+          {/* Só com o hub publicado (gerado no build por scripts/ferramentas). */}
+          {toolsHubExists() && (
+            <a href={TOOLS_HUB_PATH} className="inline-flex text-sm font-semibold text-gold-strong hover:underline">Ferramentas para analisar ações →</a>
+          )}
         </div>
         <div className="space-y-3 text-xs leading-relaxed text-muted-foreground lg:col-span-7">
           <h2 className="text-sm font-semibold text-foreground">Fontes e aviso legal</h2>

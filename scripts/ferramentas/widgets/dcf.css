@@ -1,0 +1,153 @@
+/* Widget "dcf": tabela de sensibilidade WACC × g da Empresa A (fictícia). Tile 2×1 (~620×220, landing)
+   e page (~640×360). Dois arranjos: .is-wide (leitura ao lado da tabela, com frases) e o estreito
+   (leitura condensada embaixo). .is-compact esconde o anel externo da tabela 7×7 (fica 5×5).
+   Só transform e opacity animam (SPEC-v2 §E5): a cruz (linha + coluna da célula escolhida) é uma
+   camada ::after que entra por opacidade, e o anel da célula é um ::before que entra por opacidade
+   e escala. As cores do mapa de calor são fixas (diferença para o caso base). */
+.iaw-dcf { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.iaw-dcf-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+.iaw-dcf-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12.5px; font-weight: 700; letter-spacing: .01em; color: var(--iaw-petroleo); }
+.iaw-dcf:not(.is-wide) .iaw-dcf-title-pre { display: none; }
+.iaw-dcf:not(.is-wide) .iaw-seal { font-size: 9.5px; padding: 1px 7px; }
+.iaw-dcf-top-r { display: flex; flex: none; align-items: center; gap: 6px; }
+
+.iaw-dcf-body { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.iaw-dcf.is-wide .iaw-dcf-body { flex-direction: row; align-items: stretch; gap: 14px; }
+.iaw-dcf-gridwrap { min-width: 0; }
+.iaw-dcf.is-wide .iaw-dcf-gridwrap { flex: 0 1 440px; }
+.iaw-dcf.is-wide.is-compact .iaw-dcf-gridwrap { flex-basis: 310px; }
+
+/* Tabela: colunas de largura igual; a 1ª (rótulos do WACC) tem a largura do canto. */
+.iaw-dcf-table { width: 100%; margin: 0; table-layout: fixed; border-collapse: separate; border-spacing: 2px; }
+.iaw-dcf-table th, .iaw-dcf-table td { padding: 0; }
+.iaw-dcf-corner {
+  position: relative; width: 46px; height: 24px; font-size: 9.5px; font-weight: 700; line-height: 1; color: var(--iaw-mudo);
+  background: linear-gradient(to top right, transparent calc(50% - .6px), var(--iaw-linha) 50%, transparent calc(50% + .6px));
+}
+.iaw-dcf-corner-g { position: absolute; top: 2px; right: 5px; white-space: nowrap; }
+.iaw-dcf-corner-w { position: absolute; bottom: 2px; left: 2px; white-space: nowrap; }
+/* Rótulo do eixo das colunas, centrado sobre elas (o recuo é a largura do canto + o espaçamento). */
+.iaw-dcf-axis { display: none; padding: 0 0 1px 50px; font-size: 10.5px; line-height: 1.3; color: var(--iaw-mudo); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.iaw-dcf.is-wide .iaw-dcf-axis { display: block; }
+.iaw-dcf-ch, .iaw-dcf-rh {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums;
+  font-size: 10.5px; font-weight: 500; color: var(--iaw-mudo); white-space: nowrap;
+}
+.iaw-dcf-ch { height: 22px; padding-bottom: 2px; text-align: center; vertical-align: bottom; }
+.iaw-dcf-rh { padding-right: 6px; text-align: right; }
+.iaw-dcf-ch.is-on, .iaw-dcf-rh.is-on { color: var(--iaw-petroleo); font-weight: 700; }
+
+.iaw-dcf-cell {
+  position: relative; height: 30px;
+  border: 1px solid transparent; border-radius: 6px; background: #F3F1EC; color: var(--iaw-tinta);
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums;
+  font-size: 12px; text-align: center; vertical-align: middle; white-space: nowrap; cursor: default; outline: none;
+}
+.iaw-dcf-cell::after {
+  content: ""; position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+  border-radius: inherit; background: rgba(9, 56, 72, .11); opacity: 0; pointer-events: none;
+  transition: opacity .2s ease;
+}
+.iaw-dcf-cell::before {
+  content: ""; position: absolute; top: -1px; right: -1px; bottom: -1px; left: -1px; z-index: 1;
+  border-radius: 7px; box-shadow: 0 0 0 2px var(--iaw-petroleo); opacity: 0; pointer-events: none;
+  transform: scale(.88); transition: opacity .18s ease, transform .18s ease;
+}
+.iaw-dcf-cell.is-cross::after { opacity: 1; }
+.iaw-dcf-cell.is-sel { font-weight: 700; }
+.iaw-dcf-cell.is-sel::before { opacity: 1; transform: none; }
+.iaw-dcf-cell.is-base { border-style: dashed; border-color: rgba(9, 56, 72, .6); }
+/* Foco de teclado: o anel fica mais grosso (a célula focada é sempre a escolhida). */
+.iaw-dcf-cell:focus-visible::before { box-shadow: 0 0 0 3px var(--iaw-petroleo); }
+
+/* Mapa de calor: diferença para o caso base (0: até 2,5%; 1: até 10%; 2: até 20%; 3: até 30%; 4: mais).
+   Fundos claros com texto escuro: contraste alto em todas as faixas. */
+.iaw-dcf-cell[data-heat="-4"], .iaw-dcf-sw[data-heat="-4"] { background: #E8B4AE; }
+.iaw-dcf-cell[data-heat="-3"], .iaw-dcf-sw[data-heat="-3"] { background: #EEC5C0; }
+.iaw-dcf-cell[data-heat="-2"], .iaw-dcf-sw[data-heat="-2"] { background: #F3D6D2; }
+.iaw-dcf-cell[data-heat="-1"], .iaw-dcf-sw[data-heat="-1"] { background: #F8E7E4; }
+.iaw-dcf-cell[data-heat="0"], .iaw-dcf-sw[data-heat="0"] { background: #F1EFEA; }
+.iaw-dcf-cell[data-heat="1"], .iaw-dcf-sw[data-heat="1"] { background: #F5EDDC; }
+.iaw-dcf-cell[data-heat="2"], .iaw-dcf-sw[data-heat="2"] { background: #EFE1C0; }
+.iaw-dcf-cell[data-heat="3"], .iaw-dcf-sw[data-heat="3"] { background: #E8D3A2; }
+.iaw-dcf-cell[data-heat="4"], .iaw-dcf-sw[data-heat="4"] { background: #DFC481; }
+
+/* Leitura da célula escolhida: ao lado (frases) ou embaixo (condensada). */
+.iaw-dcf-read {
+  display: flex; flex-direction: column; justify-content: center; gap: 4px; min-width: 0;
+  padding: 10px 12px; border: 1px solid var(--iaw-linha); border-radius: 12px; background: #fff;
+}
+.iaw-dcf.is-wide .iaw-dcf-read { flex: 1 1 190px; }
+.iaw-dcf-read-x { font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--iaw-mudo); }
+.iaw-dcf-read-head { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.iaw-dcf-read-k { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; color: var(--iaw-mudo); white-space: nowrap; }
+.iaw-dcf-read-v {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums;
+  font-size: 26px; font-weight: 700; line-height: 1.15; color: var(--iaw-tinta); white-space: nowrap;
+}
+.iaw-dcf-read-d { font-size: 12px; font-weight: 600; color: var(--iaw-mudo); white-space: nowrap; }
+.iaw-dcf-read-d.is-up { color: var(--iaw-alta); }
+.iaw-dcf-read-d.is-down { color: var(--iaw-baixa); }
+.iaw-dcf-read-l { margin: 0; font-size: 12.5px; line-height: 1.4; color: var(--iaw-tinta); }
+.iaw-dcf-read-c { display: none; margin: 0; font-size: 11.5px; line-height: 1.35; color: var(--iaw-tinta); }
+
+.iaw-dcf:not(.is-wide) .iaw-dcf-read { gap: 2px; padding: 6px 10px; border-radius: 10px; }
+.iaw-dcf:not(.is-wide) .iaw-dcf-read-x,
+.iaw-dcf:not(.is-wide) .iaw-dcf-read-l { display: none; }
+.iaw-dcf:not(.is-wide) .iaw-dcf-read-c { display: block; }
+.iaw-dcf:not(.is-wide) .iaw-dcf-read-head { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 0 10px; }
+.iaw-dcf:not(.is-wide) .iaw-dcf-read-v { font-size: 18px; }
+
+.iaw-dcf-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; margin-top: auto; }
+.iaw-dcf:not(.is-wide) .iaw-dcf-foot { display: none; }
+.iaw-dcf-legend { display: inline-flex; align-items: center; gap: 3px; font-size: 10.5px; color: var(--iaw-mudo); }
+.iaw-dcf-legend span:first-child { margin-right: 3px; }
+.iaw-dcf-legend span:last-child { margin-left: 3px; }
+.iaw-dcf-sw { display: inline-block; width: 12px; height: 10px; border-radius: 2px; }
+.iaw-dcf-note { font-size: 11px; color: var(--iaw-mudo); }
+
+.iaw-dcf-pause {
+  display: inline-flex; flex: none; align-items: center; justify-content: center;
+  width: 26px; height: 26px; margin: 0; padding: 0;
+  border: 1px solid var(--iaw-linha); border-radius: 50%; background: #fff; color: var(--iaw-petroleo); cursor: pointer;
+}
+.iaw-dcf-pause[hidden] { display: none; }
+.iaw-dcf-pause svg { fill: currentColor; }
+.iaw-dcf-pause:hover { border-color: var(--iaw-ouro); }
+.iaw-dcf-pause:focus-visible { outline: 3px solid rgba(9, 56, 72, .35); outline-offset: 2px; }
+
+/* 5×5: o anel externo da tabela 7×7 sai (linhas, cabeçalhos e células). */
+.iaw-dcf.is-compact .iaw-dcf-out { display: none; }
+
+/* ── Page (página da ferramenta): preenche a altura reservada pelo quadro (300 px no celular,
+   360 px a partir de 640 px, menos 16 px de respiro de cada lado e a borda), com o rodapé embaixo. ── */
+.iaw-dcf--page { min-height: 266px; }
+.iaw-dcf--page.is-compact .iaw-dcf-cell { height: 28px; }
+.iaw-dcf--page:not(.is-wide) .iaw-dcf-cell { height: 24px; }
+.iaw-dcf--page:not(.is-wide) .iaw-dcf-pause { width: 24px; height: 24px; }
+@media (min-width: 640px) {
+  .iaw-dcf--page { min-height: 326px; }
+}
+
+/* ── Tile (bento da landing): 5×5, respiro de 3 px para o anel da célula nunca ser cortado. ── */
+.iaw-dcf--tile { gap: 5px; padding: 3px; }
+.iaw-dcf--tile .iaw-dcf-title { font-size: 11.5px; }
+.iaw-dcf--tile .iaw-seal { font-size: 9.5px; padding: 1px 7px; }
+.iaw-dcf--tile .iaw-dcf-pause { width: 24px; height: 24px; }
+.iaw-dcf--tile .iaw-dcf-corner { width: 40px; height: 18px; font-size: 9px; }
+.iaw-dcf--tile .iaw-dcf-corner-g { top: 1px; right: 4px; }
+.iaw-dcf--tile .iaw-dcf-corner-w { bottom: 1px; left: 1px; }
+.iaw-dcf--tile .iaw-dcf-axis { padding-left: 44px; font-size: 10px; }
+.iaw-dcf--tile .iaw-dcf-ch { height: 18px; font-size: 10px; }
+.iaw-dcf--tile .iaw-dcf-rh { font-size: 10px; padding-right: 4px; }
+.iaw-dcf--tile .iaw-dcf-cell { height: 25px; font-size: 11px; border-radius: 5px; }
+.iaw-dcf--tile.is-wide .iaw-dcf-read { padding: 8px 12px; gap: 3px; }
+.iaw-dcf--tile.is-wide .iaw-dcf-read-v { font-size: 23px; }
+.iaw-dcf--tile.is-wide .iaw-dcf-read-l { font-size: 12px; line-height: 1.35; }
+.iaw-dcf--tile:not(.is-wide) .iaw-dcf-cell { height: 21px; }
+.iaw-dcf--tile:not(.is-wide) .iaw-dcf-read { padding: 5px 8px; }
+.iaw-dcf--tile:not(.is-wide) .iaw-dcf-read-v { font-size: 15px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .iaw-dcf-cell::after, .iaw-dcf-cell::before { transition: none; }
+}

@@ -2,8 +2,11 @@ import { createClient } from '@supabase/supabase-js';
 import type {
   RawIncomeStatement, RawBalanceSheet, RawCashFlow,
   RawBrapiQuote, RawDividend, SupabaseFinancials,
-  PeerTicker, TickerIndexEntry, QualitativeScore, CvmDocument
+  PeerTicker, TickerIndexEntry, CvmDocument
 } from './types';
+import { SHARE_BASE_SPLIT_LABELS, adjustDividendsByTicker, baseTicker, type StockSplitRow } from './lib/splits';
+import { dividendYieldTTM } from './lib/dividends';
+import { brtDateISO, isoMinusYears } from './lib/dates';
 
 const SUPABASE_URL = process.env.SUPABASE_URL!;
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY!;
@@ -140,6 +143,7 @@ const mapBrapi = (row: Record<string, any>): RawBrapiQuote => {
     dividendYield: toNumber(pick(r, ['dividend_yield', 'dividendyield'])),
     enterpriseToEbitda: toNumber(pick(r, ['enterprise_to_ebitda'])),
     regularMarketTime: toStr(pick(r, ['regular_market_time', 'updated_at'])),
+    marketTime: toStr(pick(r, ['regular_market_time'])),
     fiftyTwoWeekLow: toNumber(pick(r, ['fifty_two_week_low'])),
     fiftyTwoWeekHigh: toNumber(pick(r, ['fifty_two_week_high'])),
     averageDailyVolume3Month: toNumber(pick(r, ['average_daily_volume_3_month', 'adtv', 'regular_market_volume'])),
@@ -355,6 +359,73 @@ const queryByTicker = async (table: string, ticker: string): Promise<Record<stri
   return [];
 };
 
+// Segunda tentativa para erro de rede/PostgREST antes de desistir. Coluna inexistente
+// (42703) é resposta, não falha: não repete.
+const withRetry = async <R extends { error: { code?: string } | null }>(run: () => PromiseLike<R>): Promise<R> => {
+  const first = await run();
+  if (!first.error || first.error.code === '42703') return first;
+  await new Promise(r => setTimeout(r, 500));
+  return run();
+};
+
+// O PostgREST deste projeto devolve no máximo 1000 linhas por consulta, sem avisar.
+const PAGE_ROWS = 1000;
+
+/**
+ * Todas as linhas de `brapi_dividends` com `col = val`, em páginas ordenadas por `id`. Sem
+ * paginar, o corte de 1000 linhas descartava proventos sem aviso (e, sem ordem, quaisquer
+ * deles). A fonte regrava o histórico em lotes de duplicatas: em out/2026 ITUB3 já tinha 821
+ * linhas, ITUB4 818 e BBDC3 787.
+ */
+const fetchDividendPages = async (col: string, val: string) => {
+  const rows: Record<string, any>[] = [];
+  for (let offset = 0; ; offset += PAGE_ROWS) {
+    const { data, error } = await withRetry(() =>
+      supabase.from('brapi_dividends').select('*').eq(col, val).order('id').range(offset, offset + PAGE_ROWS - 1)
+    );
+    if (error) return { rows, error };
+    rows.push(...(data ?? []));
+    if (!data || data.length < PAGE_ROWS) return { rows, error: null };
+  }
+};
+
+/**
+ * Proventos do papel: mesma busca por coluna e variante do ticker de `fetchTable`, mas erro
+ * de consulta LANÇA. Antes o erro virava "sem proventos": a página afirmava que a empresa não
+ * pagou nada em 12 meses e o Bazin sumia. Com o erro, a página de ontem continua no ar, como
+ * acontece com qualquer ticker que falha no lote.
+ */
+const fetchDividendRows = async (candidates: string[]): Promise<Record<string, any>[]> => {
+  for (const col of ['symbol', 'ticker']) {
+    for (const val of candidates) {
+      const { rows, error } = await fetchDividendPages(col, val);
+      if (error) {
+        if (error.code === '42703') break; // a coluna não existe nesta tabela
+        throw new Error(`brapi_dividends: ${error.message}`);
+      }
+      if (rows.length > 0) return rows;
+    }
+  }
+  return [];
+};
+
+/**
+ * Desdobramentos, grupamentos e bonificações dos tickers pedidos, sem corte de data: um
+ * desdobramento de hoje reescala o provento de 10 anos atrás. O filtro de rótulo vai no SQL
+ * e é repetido no ajuste (scripts/lib/splits.ts).
+ *
+ * Erro LANÇA: degradar para "sem eventos" traria de volta o DY 5× com cara de dado bom.
+ */
+export const fetchStockSplits = async (tickers: string[]): Promise<StockSplitRow[]> => {
+  const list = [...new Set(tickers.map(baseTicker).filter(Boolean))];
+  if (!list.length) return [];
+  const { data, error } = await withRetry(() =>
+    supabase.from('brapi_stock_splits').select('ticker,ex_date,factor,label').in('ticker', list).in('label', [...SHARE_BASE_SPLIT_LABELS])
+  );
+  if (error) throw new Error(`brapi_stock_splits: ${error.message}`);
+  return data ?? [];
+};
+
 // --- Main fetch ---
 
 export const fetchFinancials = async (ticker: string): Promise<SupabaseFinancials | null> => {
@@ -384,11 +455,12 @@ export const fetchFinancials = async (ticker: string): Promise<SupabaseFinancial
     return [];
   };
 
-  const [incomeRows, balanceRows, cashFlowRows, dividendRows, cvmDocs] = await Promise.all([
+  const [incomeRows, balanceRows, cashFlowRows, dividendRows, splitRows, cvmDocs] = await Promise.all([
     fetchTable('brapi_income_statements'),
     fetchTable('brapi_balance_sheets'),
     fetchTable('brapi_cashflows'),
-    fetchTable('brapi_dividends'),
+    fetchDividendRows(candidates),
+    fetchStockSplits([sym, t]),
     fetchCvmDocuments(sym, CVM_CACHE_LIMIT)
   ]);
 
@@ -398,7 +470,10 @@ export const fetchFinancials = async (ticker: string): Promise<SupabaseFinancial
   const income = incomeRows.map(mapIncome).filter(r => r.symbol);
   const balance = balanceRows.map(mapBalance).filter(r => r.symbol);
   const cashFlow = cashFlowRows.map(mapCashFlow).filter(r => r.symbol);
-  const dividends = dividendRows.map(mapDividend).filter(r => r.amount > 0 || r.symbol);
+  // Proventos na base acionária de hoje: divididos pelos desdobramentos/grupamentos/bonificações
+  // com data-com no dia ou depois (scripts/lib/splits.ts). Daqui em diante todo consumidor —
+  // DY, Bazin, Gordon, tabelas de proventos e valuations.json — recebe o valor ajustado.
+  const dividends = adjustDividendsByTicker(dividendRows.map(mapDividend).filter(r => r.amount > 0 || r.symbol), splitRows, sym);
 
   if (!income.length && !balance.length && !cashFlow.length) return null;
 
@@ -432,6 +507,90 @@ export const getTickersWithNames = async (): Promise<{ ticker: string; name: str
   })).filter(t => t.ticker);
 };
 
+/**
+ * Folga antes da janela de 12 meses na leitura dos proventos da lista. A deduplicação compara
+ * linhas com data-com a até 3 dias (e encadeia), então a linha logo antes da janela decide se
+ * a de dentro é cópia; 31 dias cobrem com sobra o que a página de ticker vê no histórico inteiro.
+ */
+const INDEX_DY_MARGIN_DAYS = 31;
+
+const isoMinusDays = (iso: string, days: number): string =>
+  new Date(Date.UTC(Number(iso.slice(0, 4)), Number(iso.slice(5, 7)) - 1, Number(iso.slice(8, 10)) - days)).toISOString().slice(0, 10);
+
+/** Todas as páginas de uma consulta ordenada (o PostgREST corta em 1000 linhas sem avisar). */
+const allPages = async (run: (from: number, to: number) => PromiseLike<{ data: any[] | null; error: { message: string; code?: string } | null }>, what: string): Promise<Record<string, any>[]> => {
+  const rows: Record<string, any>[] = [];
+  for (let offset = 0; ; offset += PAGE_ROWS) {
+    const { data, error } = await withRetry(() => run(offset, offset + PAGE_ROWS - 1));
+    if (error) throw new Error(`${what}: ${error.message}`);
+    rows.push(...(data ?? []));
+    if (!data || data.length < PAGE_ROWS) return rows;
+  }
+};
+
+/**
+ * DY da lista (/acoes/, setores, pares e mediana do setor nas páginas de ticker) com a MESMA
+ * régua do DY da página de ticker (`dividendYieldTTM`: renda sem duplicatas, data-com em
+ * (hoje − 12 meses, hoje], na base acionária de hoje, ÷ cotação). Antes (como
+ * `adjustIndexYieldsForSplits`) só corrigia o desdobramento e o resto ficava com o
+ * `dividend_yield` do banco, que soma as duplicatas da fonte: quem chegava pela lista ou pelo
+ * ranking via BPAC11 com 1,84% e o topo da página com 3,69%.
+ *
+ * Três leituras: os eventos de base (todos — a regra de evento repetido olha os vizinhos), os
+ * proventos com data-com desde 12 meses + 31 dias atrás (cerca de 1.900 linhas em out/2026,
+ * em ordem de id como a página) e, só para quem não tem linha na janela e tem DY no banco, se
+ * há algum provento na base. Papel sem nenhum provento na base fica com o DY do banco, como na
+ * página. Falha aqui não derruba o build: a lista fica com o DY do banco (o que já está no ar)
+ * e o log do CI ganha um ::warning::.
+ */
+const adjustIndexYields = async (entries: TickerIndexEntry[], now = new Date()): Promise<void> => {
+  const today = brtDateISO(now);
+  const since = isoMinusDays(isoMinusYears(today, 1), INDEX_DY_MARGIN_DAYS);
+  try {
+    const splitRows: StockSplitRow[] = await allPages((a, b) =>
+      supabase.from('brapi_stock_splits').select('ticker,ex_date,factor,label').in('label', [...SHARE_BASE_SPLIT_LABELS])
+        .order('ticker').order('ex_date').order('label').range(a, b), 'brapi_stock_splits');
+    const divRows = await allPages((a, b) =>
+      supabase.from('brapi_dividends').select('id,ticker,ex_date,payment_date,amount,dividend_type')
+        .gte('ex_date', since).order('id').range(a, b), 'brapi_dividends');
+
+    const divsByTicker = new Map<string, Record<string, any>[]>();
+    for (const r of divRows) {
+      const t = baseTicker(r.ticker);
+      const list = divsByTicker.get(t);
+      if (list) list.push(r); else divsByTicker.set(t, [r]);
+    }
+    const splitsByTicker = new Map<string, StockSplitRow[]>();
+    for (const r of splitRows) {
+      const t = baseTicker(r.ticker);
+      const list = splitsByTicker.get(t);
+      if (list) list.push(r); else splitsByTicker.set(t, [r]);
+    }
+
+    // Calcula tudo antes de trocar: com erro no meio, a lista inteira fica com o DY do banco.
+    const next = new Map<TickerIndexEntry, number>();
+    for (const entry of entries) {
+      const rows = (divsByTicker.get(entry.ticker) ?? []).filter(r => toNumber(r.amount) > 0);
+      if (rows.length) {
+        const divs = adjustDividendsByTicker(rows.map(mapDividend), splitsByTicker.get(entry.ticker) ?? [], entry.ticker, today);
+        next.set(entry, dividendYieldTTM(divs, entry.price, entry.divYield, today));
+        continue;
+      }
+      // Nada na janela: com algum provento na base, a página mostra 0 (nada em 12 meses); sem
+      // nenhum, a página fica com o DY do banco. Só pergunta quando o banco tem DY.
+      if (!(entry.divYield > 0)) continue;
+      const { data, error } = await withRetry(() =>
+        supabase.from('brapi_dividends').select('id').eq('ticker', entry.ticker).gt('amount', 0).limit(1)
+      );
+      if (error) throw new Error(`brapi_dividends: ${error.message}`);
+      if (data && data.length) next.set(entry, 0);
+    }
+    for (const [entry, dy] of next) entry.divYield = dy;
+  } catch (err: any) {
+    console.warn(`::warning::DY da lista com o dividend_yield do banco (sem a régua da página): ${err?.message || err}`);
+  }
+};
+
 export const getAllTickersWithSector = async (): Promise<TickerIndexEntry[]> => {
   const { data, error } = await supabase
     .from('brapi_quotes')
@@ -440,7 +599,7 @@ export const getAllTickersWithSector = async (): Promise<TickerIndexEntry[]> => 
     .order('market_cap', { ascending: false });
 
   if (error || !data) { console.warn('getAllTickersWithSector error:', error?.message); return []; }
-  return data.map((r: any) => ({
+  const entries: TickerIndexEntry[] = data.map((r: any) => ({
     ticker: String(r.symbol).toUpperCase(),
     name: bestName(r.short_name, r.long_name),
     sector: normalizeSector(String(r.sector || '').trim()),
@@ -448,51 +607,13 @@ export const getAllTickersWithSector = async (): Promise<TickerIndexEntry[]> => 
     pl: toNumber(r.pl),
     divYield: toNumber(r.dividend_yield),
     marketCap: toNumber(r.market_cap)
-  })).filter(t => t.ticker);
+  })).filter((t: TickerIndexEntry) => t.ticker);
+  await adjustIndexYields(entries);
+  return entries;
 };
 
-// Cache local de scores qualitativos (scores mudam raramente)
-import { readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
-const QUAL_CACHE_PATH = join(__dirname, 'qualitative-cache.json');
-
-let qualCache: Record<string, QualitativeScore> = {};
-try { qualCache = JSON.parse(readFileSync(QUAL_CACHE_PATH, 'utf-8')); } catch {}
-
-export const saveQualitativeCache = () => {
-  writeFileSync(QUAL_CACHE_PATH, JSON.stringify(qualCache, null, 2), 'utf-8');
-};
-
-export const fetchQualitativeScore = async (ticker: string): Promise<QualitativeScore | null> => {
-  const t = ticker.toUpperCase().trim();
-
-  // Tenta buscar do Supabase (requer service role key)
-  if (supabaseAdmin) {
-    const { data, error } = await supabaseAdmin
-      .from('Qualitativo')
-      .select('score_final,c1_score,c2_score,c3_score,c4_score,c5_score,c6_score')
-      .eq('ticker', t)
-      .is('user_id', null)
-      .limit(1);
-    if (!error && data && data.length) {
-      const r = data[0];
-      const score: QualitativeScore = {
-        scoreFinal: toNumber(r.score_final),
-        c1: toNumber(r.c1_score),
-        c2: toNumber(r.c2_score),
-        c3: toNumber(r.c3_score),
-        c4: toNumber(r.c4_score),
-        c5: toNumber(r.c5_score),
-        c6: toNumber(r.c6_score),
-      };
-      qualCache[t] = score;
-      return score;
-    }
-  }
-
-  // Fallback: lê do cache local
-  return qualCache[t] || null;
-};
+// Nota qualitativa: o build não lê nem publica (é conteúdo da plataforma, exige login).
+// O antigo scripts/qualitative-cache.json saiu do repositório em 07/10/2026.
 
 export const getPeersBySector = (allTickers: TickerIndexEntry[], ticker: string, limit = 8): PeerTicker[] => {
   const current = allTickers.find(t => t.ticker === ticker);

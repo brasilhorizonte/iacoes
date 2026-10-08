@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { execFileSync } from 'child_process';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
-import { pageHeadTracking } from '../ticker/render';
+import { pageHeadTracking, withTracks } from '../ticker/render';
 import { SITE } from '../ticker/model';
 import { BuffettPage, MacroHubPage } from './page';
 import { HUB_PATH, PAGE_PATH, type BuffettModel } from './model';
@@ -37,7 +37,8 @@ const pageCss = (): string => {
 const attr = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 const jsonLd = (o: unknown) => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, '\\u003c')}</script>`;
 // Mesmo pós-processamento das páginas de ticker: o React não renderiza onclick em string.
-const withClicks = (html: string) => html.replace(/ data-cta="/g, ' onclick="_iaClick(event)" data-cta="');
+// data-cta ganha _iaClick (CTA do app); data-track ganha _iaTrack (link interno, ex.: ranking).
+const withClicks = (html: string) => withTracks(html.replace(/ data-cta="/g, ' onclick="_iaClick(event)" data-cta="'));
 // Formulário de e-mail do download do CSV (JS puro em arquivo próprio; ver csv-lead.client.js).
 const csvLeadScript = (): string => `<script>${readFileSync(join(__dirname, 'csv-lead.client.js'), 'utf-8')}</script>`;
 

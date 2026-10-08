@@ -1,0 +1,8 @@
+/* Páginas /ferramentas/: mesmos tokens e componentes das páginas de ticker (o import abaixo
+   também escaneia scripts/ticker/) + as classes dos componentes desta pasta. CSS separado de
+   propósito: as páginas de ticker não mudam nem um byte por causa das ferramentas.
+   Os widgets (widgets/*.js) usam CSS próprio, prefixado .iaw-<id>-*, que vai no bundle
+   assets/css/ferramentas.css — por isso a pasta fica fora do scan do Tailwind. */
+@import "../ticker/styles.css";
+@source "./";
+@source not "./widgets";

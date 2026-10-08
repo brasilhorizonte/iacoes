@@ -6,6 +6,8 @@ import type {
 import { ValuationMethodType } from './types';
 import { DEFAULT_WEIGHTS, SCENARIO_PRESETS, DEFAULT_COST_OF_DEBT } from './constants';
 import { fetchFinancials } from './supabase';
+import { dividendYieldTTM } from './lib/dividends';
+import { brtDateISO } from './lib/dates';
 
 // --- Helpers ---
 
@@ -146,7 +148,12 @@ export const getFinancialData = async (ticker: string): Promise<FinancialData> =
     pl, pvp,
     pebit: ebit > 0 ? mCap / ebit : 0,
     psr: revenue > 0 ? mCap / revenue : 0,
-    divYield: tickerBrapi.dividendYield || 0,
+    // Um DY só na página: o hero, as métricas, a meta description, a introdução, o FAQ de
+    // indicadores e os pares usam a MESMA régua da seção de proventos (renda sem duplicatas,
+    // data-com em (hoje − 12 m, hoje], ÷ cotação), não o dividend_yield do banco, que soma as
+    // duplicatas da fonte (BPAC11 3,69% contra 1,84%). Os proventos já chegam ajustados por
+    // desdobramento de fetchFinancials. Sem nenhum provento na base, fica o DY do banco.
+    divYield: dividendYieldTTM(rawDividends, tickerBrapi.regularMarketPrice, tickerBrapi.dividendYield || 0, brtDateISO(new Date())),
     evEbitda, evEbit, lpa, vpa,
     grossMargin: revenue > 0 ? (baseIncome?.gross_profit || 0) / revenue : 0,
     ebitMargin: revenue > 0 ? ebit / revenue : 0,
@@ -186,7 +193,8 @@ export const getFinancialData = async (ticker: string): Promise<FinancialData> =
       ytdReturn: tickerBrapi.ytdReturn ?? null,
       yearChange: tickerBrapi.fiftyTwoWeekChange ?? null,
       dividendYield5y: tickerBrapi.dividendYield5y || null,
-    }
+    },
+    quoteTime: tickerBrapi.marketTime || null,
   };
 };
 

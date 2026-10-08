@@ -1,12 +1,18 @@
 import 'dotenv/config';
 import { mkdirSync, writeFileSync, readdirSync, statSync, openSync, readSync, closeSync } from 'fs';
 import { join } from 'path';
-import { getAllTickers, getTickersWithNames, getAllTickersWithSector, saveQualitativeCache, getCvmDocuments, CVM_CACHE_LIMIT } from './supabase';
+import { getAllTickers, getTickersWithNames, getAllTickersWithSector, getCvmDocuments, CVM_CACHE_LIMIT } from './supabase';
 import { generateAirtonTickerHTML } from './airton-template';
 import { getFinancialData, performValuation } from './valuation';
 import { generateTickerPage, buildTickerCss } from './ticker/render';
+import { buildModel } from './ticker/model';
+import { buildValuationsJson, countValuations, readValuationsFile, widgetValuationFields } from './lib/valuations-json';
+import { quoteDateFromTimes } from './lib/dates';
+import { companyName } from './lib/company-name';
 import { generateIndexHTML, generateSectorPage, generateSitemap, generateRobots, sectorSlug } from './template';
-import { generateMacro } from './macro';
+import { generateMacro, macroLlmsSection } from './macro';
+import { generateFerramentas } from './ferramentas';
+import { composeLlmsTxt } from './ferramentas/llms';
 import { SCENARIO_PRESETS, DEFAULT_COST_OF_DEBT } from './constants';
 import type { ValuationAssumptions, TickerIndexEntry } from './types';
 
@@ -53,6 +59,8 @@ interface WidgetValuation {
   avgDiv: Record<string, number>; // dividends by year-window: "1","3","5","10"
 }
 const widgetValuations: Record<string, WidgetValuation> = {};
+// regular_market_time de cada ticker publicado no valuations.json (vira o `_quoteDate`)
+const quoteTimes: (string | null | undefined)[] = [];
 
 async function generatePage(ticker: string): Promise<boolean> {
   try {
@@ -109,40 +117,24 @@ async function generatePage(ticker: string): Promise<boolean> {
       writeFileSync(join(airtonDir, 'index.html'), airtonHtml, 'utf-8');
     }
 
-    // Widget valuation data (Graham, Bazin, Gordon)
-    const grahamFV = val.results.find(r => r.method === 'GRAHAM')?.fairValue || 0;
-    const gordonFV = val.results.find(r => r.method === 'GORDON')?.fairValue || 0;
-    const fiveYearsAgo = new Date(); fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
-    const oneYearAgo = new Date(); oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-    const recentDivs = data._rawDividends.filter(d => new Date(d.exDate) >= oneYearAgo);
-    const divTTM = recentDivs.reduce((sum, d) => sum + d.amount, 0);
-    const fiveYearDivs = data._rawDividends.filter(d => new Date(d.exDate) >= fiveYearsAgo);
-    const avgDiv5y = fiveYearDivs.length > 0 ? fiveYearDivs.reduce((s, d) => s + d.amount, 0) / 5 : divTTM;
-    const bazinFV = avgDiv5y > 0 ? avgDiv5y / 0.06 : 0;
-
-    // Compute avg dividends for multiple year windows
-    const now = new Date();
-    const avgDivByWindow: Record<string, number> = {};
-    for (const y of [1, 3, 5, 10]) {
-      const cutoff = new Date(); cutoff.setFullYear(cutoff.getFullYear() - y);
-      const windowDivs = data._rawDividends.filter(d => new Date(d.exDate) >= cutoff);
-      avgDivByWindow[String(y)] = windowDivs.length > 0
-        ? Math.round((windowDivs.reduce((s, d) => s + d.amount, 0) / y) * 100) / 100
-        : 0;
-    }
-
+    // valuations.json (landing e calculadora): Graham, Bazin e Gordon são os números padrão
+    // que a página de ticker mostra — saem do mesmo modelo, com os proventos já ajustados por
+    // desdobramento. Proventos (12m e médias por janela) idem. Preço justo inválido ou negativo
+    // vira 0; LPA/VPA saem com 6 casas e sinal (recalcular o Graham com eles dá o `graham`).
+    const w = widgetValuationFields(buildModel(data, val, allTickerData, getCvmDocuments(ticker)));
     widgetValuations[ticker] = {
-      name: data.fundamentals.name,
+      name: companyName('', data.fundamentals.name, ticker),
       sector: data.fundamentals.sector,
       price: data.price,
-      graham: Math.round(grahamFV * 100) / 100,
-      bazin: Math.round(bazinFV * 100) / 100,
-      gordon: Math.round(gordonFV * 100) / 100,
-      lpa: Math.round(data.fundamentals.lpa * 100) / 100,
-      vpa: Math.round(data.fundamentals.vpa * 100) / 100,
-      divTTM: Math.round(divTTM * 100) / 100,
-      avgDiv: avgDivByWindow,
+      graham: w.graham,
+      bazin: w.bazin,
+      gordon: w.gordon,
+      lpa: w.lpa,
+      vpa: w.vpa,
+      divTTM: w.divTTM,
+      avgDiv: w.avgDiv,
     };
+    quoteTimes.push(data.quoteTime);
 
     const upside = (val.totalUpside * 100).toFixed(1);
     console.log(`  ✓ ${ticker}: R$ ${data.price.toFixed(2)} → R$ ${val.weightedFairValue.toFixed(2)} (${upside}%)`);
@@ -213,6 +205,30 @@ async function main() {
     }).sort();
     const airtonSet = new Set(airtonDirs);
 
+    // Conteúdo do valuations.json (gravado mais abaixo). Calculado AQUI porque a calculadora de
+    // /ferramentas/ mostra a data dele: sem o `quoteDate`, o generateFerramentas caía no
+    // `_quoteDate` do arquivo de ontem (que só é regravado depois).
+    // Data da cotação = maior regular_market_time (em BRT) entre os tickers do arquivo — o build
+    // das 20h BRT publica a cotação do próprio dia. Sem horário válido: dia útil anterior.
+    const quoteDate = quoteDateFromTimes(quoteTimes);
+    // Execução com tickers na linha de comando MESCLA com o arquivo anterior (não trunca): a
+    // calculadora, a landing e o ranking leem o arquivo inteiro (SPEC-v2 §E3).
+    const partial = cliTickers.length > 0;
+    const valuationsFile = join(ROOT, 'valuations.json');
+    const valuationsWithMeta = buildValuationsJson(widgetValuations, quoteDate, { partial, previous: partial ? readValuationsFile(valuationsFile) : null });
+    // Papéis do arquivo que vai ser gravado (o mesclado, na execução parcial): o {n} da calculadora.
+    const valuationsTotal = countValuations(valuationsWithMeta);
+
+    // Ferramentas (/ferramentas/): hub, páginas prontas, dados.json do ranking e dos fatos
+    // relevantes e o bundle dos widgets. Roda antes do macro para o rodapé das páginas macro já
+    // achar o hub no disco. O DY do ranking usa os proventos desta execução (widgetValuations,
+    // ajustados por desdobramento). Nunca derruba o build: dado ruim vira ::warning::.
+    const toolEntries = await generateFerramentas({
+      outRoot: ROOT,
+      build: { valuations: widgetValuations, quoteDate: String(valuationsWithMeta._quoteDate), valuationsCount: valuationsTotal, hasPage: hasRealPage, airton: airtonSet },
+    });
+    const toolsLink = toolEntries.length ? { href: '/ferramentas/', label: 'Ferramentas para analisar ações' } : undefined;
+
     // Páginas macro (/macro/): trava MACRO_BUFFETT_ENABLED; nunca derruba o build.
     const macroEntries = await generateMacro({ outRoot: ROOT });
     const macroLink = macroEntries.length ? { href: '/macro/indicador-de-buffett/', label: 'A bolsa está cara? Veja o Indicador de Buffett de hoje' } : undefined;
@@ -220,7 +236,7 @@ async function main() {
     // Generate /acoes/index.html — todos os tickers do Supabase QUE TÊM PÁGINA (inclui os gerados agora)
     const indexTickers = allTickerData.filter(t => t.price > 0 && hasRealPage(t.ticker));
     if (indexTickers.length > 0) {
-      const indexHTML = generateIndexHTML(indexTickers, airtonSet, macroLink);
+      const indexHTML = generateIndexHTML(indexTickers, airtonSet, macroLink, toolsLink);
       const acoesDir = join(ROOT, 'acoes');
       mkdirSync(acoesDir, { recursive: true });
       writeFileSync(join(acoesDir, 'index.html'), indexHTML, 'utf-8');
@@ -248,9 +264,13 @@ async function main() {
     });
     // Get sectors for sitemap
     const allSectors = [...new Set(allTickerData.map(t => t.sector).filter(Boolean))].sort();
-    const sitemap = generateSitemap(allTickerDirs, allSectors, tickerLastmod, airtonDirs, macroEntries);
+    const sitemap = generateSitemap(allTickerDirs, allSectors, tickerLastmod, airtonDirs, [...macroEntries, ...toolEntries]);
     writeFileSync(join(ROOT, 'sitemap.xml'), sitemap, 'utf-8');
-    console.log(`📄 sitemap.xml gerado (${allTickerDirs.length} tickers, ${airtonDirs.length} páginas /airton/{TICKER}/)`);
+    console.log(`📄 sitemap.xml gerado (${allTickerDirs.length} tickers, ${airtonDirs.length} páginas /airton/{TICKER}/, ${toolEntries.length} de ferramentas)`);
+
+    // llms.txt com dono único: ferramentas + macro (só com a trava ligada) + links gerais.
+    writeFileSync(join(ROOT, 'llms.txt'), composeLlmsTxt({ toolEntries, macroSection: macroLlmsSection(ROOT) }), 'utf-8');
+    console.log('🤖 llms.txt gerado');
 
     const robots = generateRobots();
     writeFileSync(join(ROOT, 'robots.txt'), robots, 'utf-8');
@@ -262,18 +282,11 @@ async function main() {
     writeFileSync(join(ROOT, 'tickers.json'), JSON.stringify(tickersIndex), 'utf-8');
     console.log(`🔍 tickers.json gerado (${tickersIndex.length} tickers)`);
 
-    // Generate valuations.json for landing page widget
-    // Data de fechamento = dia útil anterior em BRT (o build roda após o fechamento)
-    const nowBRT = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
-    nowBRT.setDate(nowBRT.getDate() - 1); // dia anterior (fechamento)
-    // Pular fim de semana: se caiu no domingo, volta para sexta; se sábado, volta para sexta
-    const dow = nowBRT.getDay();
-    if (dow === 0) nowBRT.setDate(nowBRT.getDate() - 2);
-    else if (dow === 6) nowBRT.setDate(nowBRT.getDate() - 1);
-    const quoteDate = nowBRT.toISOString().split('T')[0];
-    const valuationsWithMeta = { _quoteDate: quoteDate, ...widgetValuations };
-    writeFileSync(join(ROOT, 'valuations.json'), JSON.stringify(valuationsWithMeta), 'utf-8');
-    console.log(`📊 valuations.json gerado (${Object.keys(widgetValuations).length} tickers, data: ${quoteDate})`);
+    // Generate valuations.json for landing page widget (conteúdo e data calculados acima, antes
+    // do generateFerramentas).
+    writeFileSync(valuationsFile, JSON.stringify(valuationsWithMeta), 'utf-8');
+    const total = valuationsTotal;
+    console.log(`📊 valuations.json gerado (${total} tickers${partial ? `: ${Object.keys(widgetValuations).length} desta execução + ${total - Object.keys(widgetValuations).length} do arquivo anterior` : ''}, data: ${valuationsWithMeta._quoteDate})`);
   }
 
   // Ping search engines to re-crawl sitemap
@@ -293,7 +306,6 @@ async function main() {
     }
   }
 
-  saveQualitativeCache();
   console.log(`\n✅ Concluído: ${success} geradas, ${failed} falhas (de ${tickers.length} total)\n`);
 }
 

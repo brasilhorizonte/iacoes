@@ -1,0 +1,214 @@
+/* Widget "nota": checklist dos 6 pilares (page, ~640×360), demonstração ilustrativa (tile 1x1,
+   ~300×220) e caixa ticker → página da ação (data-mode="ativo").
+   Só transform e opacity animam (SPEC-v2 §E5): os segmentos enchem com scaleX e o marcador da régua
+   anda com translateX. Régua de cor do app: acima de 3,2 ouro; de 2,9 a 3,2 petróleo; abaixo de 2,9
+   vermelho (texto em ouro sobre branco = --iaw-ouro-texto, contraste ≥ 4,5:1). */
+.iaw-nota { display: flex; flex-direction: column; gap: 12px; min-width: 0; height: 100%; }
+.iaw-nota [hidden] { display: none !important; }
+.iaw-nota p { margin: 0; }
+.iaw-nota button { font: inherit; }
+
+/* ── Segmentos de 1 a 4 ─────────────────────────────────────────────────── */
+.iaw-nota-segs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px; min-width: 0; color: var(--iaw-petroleo); }
+.iaw-nota-segs.is-g1, .iaw-nota-segs.is-g2 { color: var(--iaw-baixa); }
+.iaw-nota-segs.is-g4 { color: var(--iaw-ouro); }
+.iaw-nota-seg { position: relative; display: block; height: 8px; overflow: hidden; border-radius: 3px; background: var(--iaw-linha); }
+.iaw-nota-seg > i {
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0; border-radius: inherit; background: currentColor;
+  transform: scaleX(0); transform-origin: left center; transition: transform .26s ease-out;
+}
+.iaw-nota-seg.is-on > i { transform: scaleX(1); }
+.iaw-nota-seg:nth-child(2) > i { transition-delay: .05s; }
+.iaw-nota-seg:nth-child(3) > i { transition-delay: .1s; }
+.iaw-nota-seg:nth-child(4) > i { transition-delay: .15s; }
+
+/* Notas (texto) e nota final na régua do app. */
+.iaw-nota-pill-g.is-g1, .iaw-nota-pill-g.is-g2, .iaw-nota-row-g.is-g1, .iaw-nota-row-g.is-g2 { color: var(--iaw-baixa); }
+.iaw-nota-pill-g.is-g3, .iaw-nota-row-g.is-g3 { color: var(--iaw-petroleo); }
+.iaw-nota-pill-g.is-g4, .iaw-nota-row-g.is-g4 { color: var(--iaw-ouro-texto); }
+.iaw-nota-final-v.is-alto, .iaw-nota-res-v.is-alto, .iaw-nota-tfinal.is-alto { color: var(--iaw-ouro-texto); }
+.iaw-nota-final-v.is-medio, .iaw-nota-res-v.is-medio, .iaw-nota-tfinal.is-medio { color: var(--iaw-petroleo); }
+.iaw-nota-final-v.is-baixo, .iaw-nota-res-v.is-baixo, .iaw-nota-tfinal.is-baixo { color: var(--iaw-baixa); }
+
+/* ── Página: checklist ──────────────────────────────────────────────────── */
+.iaw-nota--page { gap: 14px; }
+.iaw-nota-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.iaw-nota-head-l { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; min-width: 0; padding-top: 2px; }
+.iaw-nota-kicker { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--iaw-petroleo); }
+.iaw-nota-tag {
+  border: 1px solid var(--iaw-linha); border-radius: 999px; padding: 1px 9px; background: var(--iaw-papel);
+  font-size: 11px; font-weight: 600; color: var(--iaw-mudo); white-space: nowrap;
+}
+.iaw-nota-final { display: grid; flex: none; justify-items: end; text-align: right; line-height: 1.15; }
+.iaw-nota-final-k { font-size: 11px; font-weight: 600; color: var(--iaw-mudo); }
+.iaw-nota-final-num { display: inline-flex; align-items: baseline; gap: 4px; }
+.iaw-nota-final-v { font-size: 26px; font-weight: 700; color: var(--iaw-tinta); }
+.iaw-nota-final-of { font-size: 12px; color: var(--iaw-mudo); }
+.iaw-nota-final-sub { font-size: 11px; color: var(--iaw-mudo); }
+
+.iaw-nota-body { display: grid; grid-template-columns: minmax(170px, 210px) minmax(0, 1fr); gap: 14px; align-items: start; }
+.iaw-nota-nav { display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.iaw-nota-pill {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: "name n g" "segs segs segs";
+  align-items: center; gap: 3px 8px; width: 100%; margin: 0; padding: 5px 9px;
+  border: 1px solid var(--iaw-linha); border-radius: 10px; background: #fff; color: var(--iaw-tinta);
+  text-align: left; cursor: pointer;
+}
+.iaw-nota-pill:hover { border-color: var(--iaw-ouro); }
+.iaw-nota-pill:focus-visible, .iaw-nota-grade:focus-visible, .iaw-nota-row:focus-visible, .iaw-nota-cmp-go:focus-visible, .iaw-nota-pause:focus-visible {
+  outline: 3px solid rgba(9, 56, 72, .35); outline-offset: 2px;
+}
+.iaw-nota-pill.is-cur { border-color: var(--iaw-petroleo); box-shadow: inset 0 0 0 1px var(--iaw-petroleo); background: rgba(9, 56, 72, .04); }
+.iaw-nota-pill-name { grid-area: name; min-width: 0; font-size: 13px; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.iaw-nota-pill-n { grid-area: n; font-size: 10.5px; color: var(--iaw-mudo); white-space: nowrap; }
+.iaw-nota-pill-g { grid-area: g; min-width: 10px; font-size: 13px; font-weight: 700; text-align: right; color: var(--iaw-mudo); }
+.iaw-nota-pill .iaw-nota-segs { grid-area: segs; }
+.iaw-nota-pill .iaw-nota-seg { height: 4px; }
+.iaw-nota-pill--res { display: block; padding: 6px 9px; text-align: center; font-size: 12.5px; font-weight: 700; color: var(--iaw-petroleo); background: var(--iaw-papel); }
+
+.iaw-nota-panel { min-width: 0; }
+.iaw-nota-step, .iaw-nota-res {
+  display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 12px 14px;
+  border: 1px solid var(--iaw-linha); border-radius: 12px; background: var(--iaw-papel);
+}
+.iaw-nota-step-meta { font-size: 11.5px; color: var(--iaw-mudo); }
+.iaw-nota-step-name { font-size: 17px; font-weight: 700; line-height: 1.25; color: var(--iaw-petroleo); }
+.iaw-nota-step-lead { font-size: 13px; line-height: 1.4; color: var(--iaw-tinta); }
+.iaw-nota-qs { display: flex; flex-direction: column; gap: 3px; margin: 0; padding-left: 18px; list-style: disc outside; font-size: 13px; line-height: 1.4; color: var(--iaw-tinta); }
+.iaw-nota-qs li { display: list-item; }
+.iaw-nota-qs li::marker { color: var(--iaw-ouro); }
+.iaw-nota-grades { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 4px; }
+.iaw-nota-grade {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  min-width: 0; min-height: 48px; margin: 0; padding: 4px 2px;
+  border: 1px solid var(--iaw-linha); border-radius: 10px; background: #fff; color: var(--iaw-tinta); cursor: pointer;
+}
+@media (hover: hover) { .iaw-nota-grade:not(.is-on):hover { background: #F3F1EA; } }
+.iaw-nota-grade-n { font-size: 17px; font-weight: 700; line-height: 1.1; }
+.iaw-nota-grade-l { max-width: 100%; font-size: 11px; font-weight: 600; line-height: 1.15; color: var(--iaw-mudo); text-align: center; -webkit-hyphens: auto; hyphens: auto; }
+.iaw-nota-grade.is-on { border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
+.iaw-nota-grade.is-on .iaw-nota-grade-l { color: inherit; }
+.iaw-nota-grade.is-g1, .iaw-nota-grade.is-g2 { color: var(--iaw-baixa); background: rgba(185, 56, 56, .06); }
+.iaw-nota-grade.is-g3 { color: var(--iaw-petroleo); background: rgba(9, 56, 72, .06); }
+.iaw-nota-grade.is-g4 { color: var(--iaw-ouro-texto); background: rgba(184, 146, 62, .1); }
+.iaw-nota-hint { font-size: 11.5px; color: var(--iaw-mudo); }
+.iaw-nota-step-nav { display: flex; justify-content: space-between; gap: 8px; }
+.iaw-nota .iaw-btn[aria-disabled="true"] { opacity: .45; cursor: default; }
+.iaw-nota-next { border-color: var(--iaw-petroleo); color: var(--iaw-petroleo); }
+
+/* Resultado */
+.iaw-nota-res-k { font-size: 11.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--iaw-mudo); }
+.iaw-nota-res-row { display: flex; align-items: baseline; gap: 6px; }
+.iaw-nota-res-v { font-size: 34px; font-weight: 700; line-height: 1; color: var(--iaw-tinta); }
+.iaw-nota-res-of { font-size: 14px; color: var(--iaw-mudo); }
+.iaw-nota-res-band { font-size: 12.5px; line-height: 1.4; color: var(--iaw-tinta); }
+.iaw-nota-res-note { font-size: 12px; line-height: 1.45; color: var(--iaw-mudo); }
+.iaw-nota-res-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.iaw-nota-scale { position: relative; display: block; padding: 4px 3px 0; overflow: hidden; }
+.iaw-nota-track { position: relative; display: block; height: 10px; }
+.iaw-nota-zone { position: absolute; top: 0; bottom: 0; }
+.iaw-nota-zone.is-baixo { left: 0; width: 63.333%; border-radius: 99px 0 0 99px; background: rgba(185, 56, 56, .16); }
+.iaw-nota-zone.is-medio { left: 63.333%; width: 10%; background: rgba(9, 56, 72, .2); }
+.iaw-nota-zone.is-alto { left: 73.333%; width: 26.667%; border-radius: 0 99px 99px 0; background: rgba(184, 146, 62, .3); }
+.iaw-nota-mk {
+  position: absolute; top: -3px; bottom: -3px; left: 0; width: 100%; pointer-events: none;
+  transform: translateX(0); transition: transform .45s ease-out, opacity .2s ease-out;
+}
+.iaw-nota-mk > i { position: absolute; top: 0; bottom: 0; left: -2px; width: 4px; border-radius: 2px; background: var(--iaw-tinta); box-shadow: 0 0 0 2px #fff; }
+.iaw-nota-mk.is-off { opacity: 0; }
+.iaw-nota-mk.is-alto > i { background: var(--iaw-ouro-texto); }
+.iaw-nota-mk.is-medio > i { background: var(--iaw-petroleo); }
+.iaw-nota-mk.is-baixo > i { background: var(--iaw-baixa); }
+.iaw-nota-ticks { position: relative; display: block; height: 14px; margin-top: 5px; font-size: 10.5px; line-height: 14px; color: var(--iaw-mudo); }
+.iaw-nota-tick { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.iaw-nota-tick:first-child { transform: none; }
+.iaw-nota-tick:last-child { transform: translateX(-100%); }
+
+/* Caixa ticker → página da ação no app */
+.iaw-nota-cmp { display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 1px solid var(--iaw-linha); }
+.iaw-nota-cmp-l { font-size: 12.5px; font-weight: 700; color: var(--iaw-petroleo); }
+.iaw-nota-cmp-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.iaw-nota-cmp-in {
+  flex: 1 1 120px; min-width: 0; max-width: 190px; height: 40px; margin: 0; padding: 0 10px;
+  border: 1px solid var(--iaw-linha); border-radius: 10px; background: #fff; color: var(--iaw-tinta);
+  font-size: 15px; text-transform: uppercase;
+}
+.iaw-nota-cmp-in::placeholder { text-transform: none; color: var(--iaw-mudo); opacity: 1; }
+.iaw-nota-cmp-in:focus-visible { outline: 3px solid rgba(9, 56, 72, .35); outline-offset: 1px; border-color: var(--iaw-petroleo); }
+.iaw-nota-cmp-go {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 0 14px;
+  border-radius: 10px; background: var(--iaw-petroleo); color: #fff; font-size: 13px; font-weight: 700;
+  text-decoration: none; cursor: pointer;
+}
+.iaw-nota-cmp-go:hover { background: var(--iaw-petroleo-fundo); }
+.iaw-nota-cmp-go.is-off { background: var(--iaw-linha); color: var(--iaw-mudo); cursor: default; }
+.iaw-nota-cmp-hint { font-size: 11.5px; line-height: 1.45; color: var(--iaw-mudo); }
+.iaw-nota-cmp-hint a { color: var(--iaw-ouro-texto); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.iaw-nota--ativo .iaw-nota-cmp { padding-top: 0; border-top: 0; }
+
+/* ── Tile (landing): demonstração ───────────────────────────────────────── */
+.iaw-nota--tile { gap: 7px; }
+.iaw-nota-ttop { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+.iaw-nota-ex { min-width: 0; font-size: 13px; font-weight: 800; color: var(--iaw-petroleo); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.iaw-nota-ttop-r { display: flex; flex: none; align-items: center; gap: 6px; }
+.iaw-nota--tile .iaw-seal { font-size: 9.5px; padding: 1px 7px; }
+.iaw-nota-rows { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.iaw-nota-row {
+  display: grid; grid-template-columns: minmax(64px, 84px) minmax(0, 1fr) 12px; align-items: center; gap: 8px;
+  width: 100%; margin: 0; padding: 2px 4px; border: 0; border-radius: 6px; background: transparent;
+  color: var(--iaw-tinta); text-align: left; cursor: pointer;
+}
+.iaw-nota-row:hover { background: var(--iaw-papel); }
+.iaw-nota-row-name { min-width: 0; font-size: 11.5px; font-weight: 600; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.iaw-nota-row-g { font-size: 12px; font-weight: 700; text-align: right; color: var(--iaw-mudo); }
+.iaw-nota-row .iaw-nota-seg { height: 7px; }
+.iaw-nota-tfoot { margin-top: auto; padding-top: 6px; border-top: 1px solid var(--iaw-linha); }
+.iaw-nota-tline { display: flex; align-items: baseline; gap: 5px; min-width: 0; }
+.iaw-nota-tk { font-size: 11px; font-weight: 600; color: var(--iaw-mudo); white-space: nowrap; }
+.iaw-nota-tfinal { font-size: 18px; font-weight: 700; color: var(--iaw-tinta); }
+.iaw-nota-tof { font-size: 11px; color: var(--iaw-mudo); }
+.iaw-nota-tsimple { margin-left: auto; font-size: 10.5px; color: var(--iaw-mudo); white-space: nowrap; }
+.iaw-nota-tnote { min-height: 1.35em; margin-top: 2px; font-size: 10.5px; line-height: 1.35; color: var(--iaw-mudo); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.iaw-nota-pause {
+  display: inline-flex; flex: none; align-items: center; justify-content: center;
+  width: 26px; height: 26px; margin: 0; padding: 0;
+  border: 1px solid var(--iaw-linha); border-radius: 50%; background: #fff; color: var(--iaw-petroleo); cursor: pointer;
+}
+.iaw-nota-pause svg { fill: currentColor; }
+.iaw-nota-pause:hover { border-color: var(--iaw-ouro); }
+
+/* ── Celular ────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .iaw-nota-body { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .iaw-nota-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+  .iaw-nota-nav-res { grid-column: 1 / -1; }
+  .iaw-nota-pill { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name name" "segs g"; gap: 3px 6px; padding: 5px 7px; }
+  .iaw-nota-pill-n { display: none; }
+  .iaw-nota-pill-name { font-size: 12px; }
+  .iaw-nota-pill--res { padding: 6px 8px; }
+  .iaw-nota-final-v { font-size: 22px; }
+}
+/* Celular estreito (< 400 px, INFRA-API §5): página compacta. */
+@media (max-width: 400px) {
+  .iaw-nota--page { gap: 10px; }
+  .iaw-nota-head { gap: 8px; }
+  .iaw-nota-kicker { font-size: 11px; }
+  .iaw-nota-tag { display: none; }
+  .iaw-nota-nav { gap: 4px; }
+  .iaw-nota-pill { padding: 4px 5px; border-radius: 8px; }
+  .iaw-nota-pill-name { font-size: 11px; letter-spacing: -.01em; }
+  .iaw-nota-step-pct { display: none; }
+  .iaw-nota-step, .iaw-nota-res { padding: 10px; gap: 7px; }
+  .iaw-nota-step-name { font-size: 16px; }
+  .iaw-nota-step-lead { font-size: 12.5px; }
+  .iaw-nota-qs { padding-left: 16px; font-size: 12.5px; }
+  .iaw-nota-grades { gap: 4px; }
+  .iaw-nota-grade { min-height: 46px; padding: 4px 1px; }
+  .iaw-nota-grade-l { font-size: 9.5px; }
+  .iaw-nota-res-v { font-size: 30px; }
+  .iaw-nota-cmp-in { max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .iaw-nota-seg > i, .iaw-nota-mk { transition: none; }
+}

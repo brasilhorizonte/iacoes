@@ -136,6 +136,13 @@
         .nav-links .btn-cta-nav:hover { background: var(--ouro-claro); color: var(--petroleo-tinta); }
         .mobile-menu-btn { display: none; background: none; border: 0; cursor: pointer; padding: .5rem; }
         .mobile-menu-btn span { display: block; width: 20px; height: 2px; margin: 4px 0; background: #fff; }
+        /* 769–1100 px: sete links e o botão não cabem com o espaçamento cheio */
+        @media (min-width: 769px) and (max-width: 1100px) {
+            nav { padding: 0 1.25rem; }
+            .nav-links { gap: 1rem; }
+            .nav-links a { font-size: .84rem; }
+            .nav-links .btn-cta-nav { padding: .5rem .85rem; }
+        }
 
         /* ---------- Hero ---------- */
         .hero { background: var(--petroleo-fundo); color: #fff; padding: 8.5rem 0 5rem; }
@@ -280,40 +287,6 @@
         .tape.paused .tape-btn .play { display: block; }
         @keyframes tape { to { transform: translateX(-50%); } }
 
-        /* ---------- A bolsa está cara? (Indicador de Buffett) ---------- */
-        .bolsa { background: var(--papel); }
-        .bolsa-grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); grid-template-areas: "texto grafico" "final grafico"; column-gap: 3.5rem; align-items: center; }
-        .bolsa-text { grid-area: texto; align-self: end; }
-        .bolsa-chart { grid-area: grafico; }
-        .bolsa-final { grid-area: final; align-self: start; }
-        .bolsa .sec-h { margin-bottom: 0; }
-        .bolsa-num { margin-top: 1.6rem; display: flex; align-items: baseline; flex-wrap: wrap; gap: .25rem .7rem; }
-        .bolsa-num data { font: 800 clamp(3.5rem, 7.5vw, 5.25rem)/1 var(--font-display); letter-spacing: -.045em; color: var(--petroleo); font-variant-numeric: tabular-nums; }
-        .bolsa-num .pct { margin-left: -.55rem; font: 800 clamp(1.75rem, 3.6vw, 2.5rem)/1 var(--font-display); color: var(--petroleo); }
-        .bolsa-num span { font-size: 1.125rem; font-weight: 600; color: var(--tinta-2); }
-        .bolsa-when { margin-top: .55rem; font-size: .9rem; color: var(--tinta-3); min-height: 1.5em; }
-        .bolsa-verdict { margin-top: 1.4rem; font-size: 1.0625rem; max-width: 27rem; }
-        .bolsa-verdict b { font-weight: 800; }
-        .bolsa .btn { margin-top: 1.5rem; }
-        .bolsa-chart { background: var(--branco); border: 1px solid var(--linha); border-radius: var(--r-l); padding: 1.25rem 1rem .9rem 1.1rem; }
-        .bolsa-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
-        .bolsa-legend { display: flex; flex-wrap: wrap; gap: .4rem 1.4rem; margin-top: .55rem; font-size: .76rem; color: var(--tinta-3); }
-        .bolsa-legend i { display: inline-block; width: 14px; height: 8px; margin-right: .4rem; border-radius: 2px; vertical-align: middle; }
-        .bc-grid line { stroke: var(--linha); stroke-width: 1; }
-        .bc-grid text, .bc-years text { font: 500 11px var(--font-mono); fill: var(--tinta-4); }
-        .bc-band { fill: rgba(184, 146, 62, .16); }
-        .bc-mean { stroke: var(--tinta-3); stroke-width: 1; stroke-dasharray: 3 4; }
-        .bc-area { fill: rgba(9, 56, 72, .07); }
-        .bc-evdot { fill: var(--branco); stroke: var(--tinta-3); stroke-width: 1.5; }
-        .bc-line { fill: none; stroke: var(--petroleo); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
-        .bc-note { font: 600 11px var(--font-display); fill: var(--tinta-3); }
-        .bc-today { font: 700 12px var(--font-mono); fill: var(--petroleo); opacity: 0; transition: opacity .4s; }
-        .bolsa-chart.played .bc-today { opacity: 1; }
-        .bolsa-chart:not(.played) .bc-ring { display: none; }
-        .bc-dot { fill: var(--ouro); stroke: var(--branco); stroke-width: 2; }
-        .bc-ring { fill: none; stroke: var(--ouro); stroke-width: 2; transform-box: fill-box; transform-origin: center; animation: ring 2.6s ease-out infinite; }
-        @keyframes ring { from { opacity: .9; transform: scale(1); } to { opacity: 0; transform: scale(3.4); } }
-
         /* ---------- Plataforma ---------- */
         .plat { background: var(--branco); }
         .step { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 4rem; align-items: center; padding: 3.5rem 0; border-top: 1px solid var(--linha); }
@@ -325,13 +298,12 @@
         .step-visual { display: flex; justify-content: flex-end; }
         .story-head { margin-bottom: 2.75rem; }
         .story-head h2 { font-size: clamp(1.75rem, 3.4vw, 2.5rem); line-height: 1.12; letter-spacing: -.028em; font-weight: 800; max-width: 18ch; }
-        .plat-also { margin-top: 1rem; padding-top: 2.5rem; border-top: 1px solid var(--linha); display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 1rem 4rem; align-items: start; }
-        .plat-also h3 { font-size: 1.05rem; font-weight: 800; }
-        .plat-also p { margin-top: .35rem; font-size: .92rem; color: var(--tinta-2); }
-        .chips { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; }
-        .chips li { padding: .45rem .85rem; border: 1px solid var(--linha); border-radius: 999px; background: var(--papel); font-size: .86rem; color: var(--tinta-2); }
 
-        /* Mock: DCF com a IA questionando a premissa */
+        /* Selo dos mocks: números e empresas de exemplo, nunca de ação real */
+        .mock-ex { flex: none; padding: .14rem .5rem; border-radius: 999px; border: 1px solid rgba(184, 146, 62, .45); background: var(--ouro-wash); color: var(--ouro-texto); font-size: .66rem; font-weight: 700; line-height: 1.4; }
+        .mock-ex.on-dark { background: rgba(255, 255, 255, .08); border-color: rgba(201, 164, 78, .5); color: var(--ouro-claro); }
+
+        /* Mock: DCF com as premissas propostas pela IA e ajustadas por você */
         .dcf { width: 100%; max-width: 30rem; background: var(--papel); border: 1px solid var(--linha); border-radius: var(--r-l); padding: 1.25rem; box-shadow: 0 30px 70px -40px rgba(9, 56, 72, .45); }
         .dcf-h { display: flex; justify-content: space-between; align-items: baseline; font-size: .82rem; color: var(--tinta-3); margin-bottom: .4rem; }
         .dcf-h b { font-size: .95rem; color: var(--tinta); }
@@ -339,7 +311,7 @@
         .dcf-row output { font: 700 .95rem var(--font-mono); white-space: nowrap; }
         .dcf-row s { color: var(--tinta-4); font-weight: 500; margin-right: .35rem; }
         .dcf-row.hl { border-color: var(--ouro); box-shadow: 0 0 0 3px rgba(184, 146, 62, .16); }
-        .dcf-note { display: flex; gap: .65rem; margin: .55rem 0 0 1.6rem; padding: .75rem .9rem; border-radius: 4px 14px 14px 14px; background: var(--petroleo); color: #fff; font-size: .86rem; line-height: 1.45; }
+        .dcf-note { display: flex; gap: .65rem; margin: .45rem 0 .2rem; padding: .75rem .9rem; border-radius: 14px; background: var(--petroleo); color: #fff; font-size: .86rem; line-height: 1.45; }
         .dcf-ai { flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--ouro); color: var(--petroleo-tinta); font: 800 .6rem/24px var(--font-mono); text-align: center; }
         .dcf-fv { display: flex; justify-content: space-between; align-items: baseline; margin-top: 1rem; padding-top: .85rem; border-top: 1px dashed var(--linha-forte); }
         .dcf-fv span { font-size: .85rem; color: var(--tinta-2); }
@@ -392,9 +364,56 @@
         .wa-b p strong { color: var(--tinta); }
         .wa-time { display: block; margin-top: .25rem; text-align: right; font: 500 .66rem var(--font-mono); color: var(--tinta-4); }
         .wa-typing { align-self: flex-start; background: var(--branco); border-radius: 4px 14px 14px 14px; padding: .65rem .85rem; }
+        .wa-cap { padding: 0 1rem .85rem; font-size: .7rem; line-height: 1.4; color: rgba(255, 255, 255, .62); }
         .js .wa-b:not(.in) { display: none; }
         .wa-b.in { animation: pop .38s var(--ease); }
         @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+
+        /* ---------- Todas as ferramentas (bento): cada quadro é o widget da página da ferramenta ---------- */
+        .ferr { background: var(--petroleo-tinta); color: #fff; }
+        .ferr .wrap { max-width: 1320px; }
+        .ferr-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1.25rem 2rem; margin-bottom: 2.25rem; }
+        .ferr-head .sec-h { margin-bottom: 0; }
+        .ferr .sec-h h2 { color: #fff; }
+        .ferr .sec-h p { color: rgba(255, 255, 255, .7); }
+        .ferr-pause { display: inline-flex; align-items: center; gap: .5rem; padding: .55rem 1rem; border: 1px solid rgba(255, 255, 255, .24); border-radius: 999px; background: transparent; color: rgba(255, 255, 255, .88); font: 600 .85rem var(--font-display); cursor: pointer; transition: border-color .2s, color .2s; }
+        .ferr-pause:hover { border-color: var(--ouro-claro); color: #fff; }
+        .ferr-pause svg { width: 14px; height: 14px; flex: none; }
+        .ferr-pause .play, .ferr-pause[aria-pressed="true"] .pause { display: none; }
+        .ferr-pause[aria-pressed="true"] .play { display: block; }
+        .bento { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+        .tool { display: flex; flex-direction: column; min-width: 0; padding: 1.1rem 1.1rem 1rem; border-radius: var(--r-l); background: var(--branco); color: var(--tinta); }
+        .tool h3 { font-size: 1rem; font-weight: 800; line-height: 1.3; letter-spacing: -.01em; }
+        .tool h3 a { text-decoration: none; }
+        .tool h3 a:hover { text-decoration: underline; text-decoration-color: var(--ouro); text-underline-offset: 4px; }
+        .tool > p { margin-top: .3rem; font-size: .84rem; line-height: 1.45; color: var(--tinta-2); }
+        .tool-w { position: relative; flex: 1; min-height: 220px; margin-top: .9rem; border-radius: var(--r-m); contain: layout paint; }
+        .js .tool-w:not([data-ia-state="ok"]) { background: var(--papel); }
+        html:not(.js) .tool-w { display: none; }
+        .t-markowitz { grid-column: span 2; grid-row: span 2; }
+        .t-markowitz .tool-w { min-height: 460px; }
+        .t-dcf, .t-buffett, .t-radar, .t-backtest { grid-column: span 2; }
+        /* entrada única quando a grade chega na tela (nada amarrado à rolagem: o quadro nunca fica apagado enquanto se lê) */
+        .fx .bento:not(.in) .tool { opacity: 0; transform: translateY(18px); }
+        .fx .bento .tool { transition: opacity .45s var(--ease), transform .55s var(--ease); }
+        .fx .bento .tool:nth-child(2) { transition-delay: .05s; } .fx .bento .tool:nth-child(3) { transition-delay: .1s; }
+        .fx .bento .tool:nth-child(4) { transition-delay: .15s; } .fx .bento .tool:nth-child(5) { transition-delay: .2s; }
+        .fx .bento .tool:nth-child(6) { transition-delay: .25s; } .fx .bento .tool:nth-child(7) { transition-delay: .3s; }
+        .fx .bento .tool:nth-child(8) { transition-delay: .35s; } .fx .bento .tool:nth-child(9) { transition-delay: .4s; }
+        .fx .bento.in-done .tool { transition: none; }
+        .porque.comp { padding-top: 0; }
+        .ferr-all { display: inline-block; margin-top: 1.75rem; color: #fff; font-weight: 700; text-decoration: underline; text-decoration-color: rgba(201, 164, 78, .6); text-underline-offset: 4px; }
+        .ferr-all:hover { text-decoration-color: var(--ouro-claro); }
+        @media (max-width: 999px) {
+            .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .t-markowitz { grid-row: auto; }
+            .t-markowitz .tool-w { min-height: 400px; }
+        }
+        @media (max-width: 599px) {
+            .bento { grid-template-columns: minmax(0, 1fr); }
+            .t-markowitz, .t-dcf, .t-buffett, .t-radar, .t-backtest { grid-column: auto; }
+            .t-markowitz .tool-w { min-height: 360px; }
+        }
 
         /* ---------- Por que IAções (comparativo) ---------- */
         .porque { background: var(--papel); }
@@ -573,12 +592,8 @@
 
         /* Indicador de Buffett: o scroll é a linha do tempo (2000 → hoje). Manifesto: palavras acendem. */
         @media (min-height: 600px) {
-            .fx .bolsa .scene { height: 260vh; }
-            .fx .bolsa .scene-stage, .fx .porque .scene-stage { position: sticky; top: 64px; height: calc(100vh - 64px); display: flex; align-items: center; }
-            .fx .bolsa .scene-stage > .wrap, .fx .porque .scene-stage > .wrap { width: 100%; }
-            .fx .bolsa .scene-anchor { top: calc((100% - 100vh + 64px) * .94); }
-            .fx .bolsa-final { opacity: var(--fin, 0); transform: translateY(calc((1 - var(--fin, 0)) * 18px)); }
-            .fx .bolsa-final.off { visibility: hidden; }
+            .fx .porque .scene-stage { position: sticky; top: 64px; height: calc(100vh - 64px); display: flex; align-items: center; }
+            .fx .porque .scene-stage > .wrap { width: 100%; }
             .fx .bc-ev { opacity: 0; transition: opacity .3s; }
             .fx .bc-ev.on { opacity: 1; }
             .fx .porque .scene { height: 190vh; }
@@ -587,13 +602,12 @@
         }
         /* No celular o CTA fixo ocupa o rodapé: o palco das cenas centraliza acima dele */
         @media (max-width: 768px) and (min-height: 600px) {
-            .fx .bolsa .scene-stage, .fx .porque .scene-stage { padding-bottom: 76px; }
+            .fx .porque .scene-stage { padding-bottom: 76px; }
         }
 
         /* ---------- Responsivo ---------- */
         @media (max-width: 1000px) {
-            .hero-grid, .bolsa-grid, .step, .plat-also, .faq-grid { grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
-            .bolsa-grid { grid-template-areas: "texto" "grafico" "final"; gap: 1.5rem; }
+            .hero-grid, .step, .faq-grid { grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
             .hero h1 { max-width: 14ch; }
             .step-visual { justify-content: flex-start; }
             .faq-aside { position: static; }
@@ -646,8 +660,7 @@
             .tape { overflow-x: auto; }
             .tape-track { animation: none !important; }
             .tape-btn, .tape-group[aria-hidden] { display: none; }
-            .bc-ring { display: none; }
-        }
+            }
     </style>
     <!-- Schema.org JSON-LD: Organization -->
     <script type="application/ld+json">
@@ -758,7 +771,7 @@
                 "name": "Como funciona a análise por IA?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Nossa IA processa dados financeiros públicos das empresas listadas na B3 e aplica as metodologias de Graham, Bazin e Gordon de forma automatizada. No DCF, você monta seu próprio valuation e a IA analisa criticamente suas premissas. Tudo validado por analista CNPI certificado pela APIMEC."
+                    "text": "A IA lê os dados públicos das empresas da B3 e trabalha em tarefas definidas: no DCF, ela propõe as premissas a partir do histórico da empresa e você decide cada uma; no Validador, audita a argumentação da sua tese; no AIrton, responde às suas perguntas. As calculadoras de Graham, Bazin e Gordon são fórmulas aplicadas aos dados, sem IA. As metodologias foram definidas por um analista CNPI (APIMEC) e um gestor CGA (ANBIMA), e cada análise é gerada automaticamente a partir delas."
                 }
             },
             {
@@ -766,7 +779,7 @@
                 "name": "Quem está por trás da plataforma?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "A plataforma foi desenvolvida por profissionais certificados — analista CNPI (APIMEC) e gestor CGA (ANBIMA). A IA executa as análises com base nos critérios técnicos definidos por eles, garantindo rigor metodológico em escala."
+                    "text": "A plataforma foi criada por profissionais certificados: um analista CNPI (APIMEC) e um gestor CGA (ANBIMA). Eles definem as metodologias e os critérios técnicos que a IA e as fórmulas aplicam a cada empresa."
                 }
             },
             {
@@ -790,7 +803,7 @@
                 "name": "Quem é o AIrton?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Nosso assistente de IA conversacional. Pergunte sobre qualquer ação da B3, peça comparações, tire dúvidas sobre indicadores. Como ter um analista disponível 24/7 — no app e no seu WhatsApp, e também no Telegram."
+                    "text": "É o assistente de IA da plataforma. Pergunte sobre qualquer ação da B3, peça comparações entre empresas ou tire dúvidas sobre indicadores. Ele conhece a sua carteira e as suas teses e responde no app, no WhatsApp e no Telegram. Como toda IA, pode errar: confira os números antes de decidir."
                 }
             },
             {
@@ -798,7 +811,7 @@
                 "name": "O IAções cobre todas as ações da B3?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Sim. Cobrimos mais de 300 ações listadas na B3, com análise fundamentalista e valuation automatizados para cada uma. A cobertura é atualizada continuamente conforme novas empresas entram no mercado."
+                    "text": "Cobrimos as ações da B3 que têm dados financeiros disponíveis: são mais de 300, cada uma com página própria de valuation. Fundos imobiliários, ETFs e BDRs ficam de fora. A lista acompanha as empresas que entram e saem da bolsa."
                 }
             },
             {
@@ -806,7 +819,7 @@
                 "name": "De onde vêm os dados utilizados nas análises?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Utilizamos dados financeiros públicos das empresas listadas na B3: demonstrações de resultado (DRE), balanços patrimoniais, fluxos de caixa, histórico de dividendos e cotações de mercado. Todos os dados são coletados de fontes oficiais e atualizados automaticamente."
+                    "text": "Usamos dados públicos das empresas listadas na B3: demonstrações de resultado (DRE), balanços patrimoniais, fluxos de caixa, proventos e cotações, obtidos de provedores de dados de mercado e dos documentos entregues à CVM. A coleta e a atualização são automáticas."
                 }
             },
             {
@@ -822,7 +835,7 @@
                 "name": "A IA pode errar? Como vocês lidam com isso?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Sim, como qualquer modelo de IA, pode haver erros de interpretação ou cálculo. Por isso, toda a lógica analítica é validada por profissionais certificados — analista CNPI (APIMEC) e gestor CGA (ANBIMA). As análises são ferramentas de apoio à decisão, não recomendações de investimento."
+                    "text": "Sim. Como qualquer modelo de IA, ela pode errar na interpretação ou no cálculo. Por isso as metodologias foram definidas por profissionais certificados (analista CNPI e gestor CGA), os números ficam à mostra para você conferir e as premissas do DCF são suas. As análises são ferramentas de apoio à decisão, não recomendações de investimento."
                 }
             },
             {
@@ -854,7 +867,7 @@
                 "name": "Como funciona a otimização de portfólio por Markowitz?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "O IAções utiliza a Teoria Moderna de Portfólio de Harry Markowitz para calcular a distribuição ideal entre ativos. Com base na correlação histórica entre ações, o algoritmo encontra a fronteira eficiente — a combinação que maximiza retorno esperado para cada nível de risco aceito pelo investidor."
+                    "text": "O Otimizador aplica a Teoria Moderna de Portfólio de Harry Markowitz às ações que você escolher. Com o retorno esperado que você define (seu preço-alvo ou a média de Graham, Bazin e Gordon) e a volatilidade e a correlação do último ano, ele calcula a fronteira eficiente — as carteiras com o maior retorno esperado para cada nível de risco — e marca a de maior índice de Sharpe. O resultado é uma referência de cálculo, não uma recomendação."
                 }
             }
         ]
@@ -951,7 +964,7 @@
     <ul class="nav-links" id="nav-links">
         <li><a href="#calculadora">Calculadora</a></li>
         <li><a href="#plataforma">Plataforma</a></li>
-        <li id="nav-bolsa" hidden><a href="#bolsa-hoje">Bolsa hoje</a></li>
+        <li><a href="#ferramentas">Ferramentas</a></li>
         <li><a href="/airton/">AIrton</a></li>
         <li><a href="#precos">Preços</a></li>
         <li><a href="#faq">FAQ</a></li>
@@ -1022,17 +1035,17 @@
                 <div class="adj-grid">
                     <div class="adj"><label for="adj-graham">Graham: margem de segurança <output id="adj-graham-o" for="adj-graham">0%</output></label><input type="range" id="adj-graham" min="0" max="50" step="1" value="0"></div>
                     <div class="adj"><label for="adj-bazin">Bazin: dividend yield mínimo <output id="adj-bazin-o" for="adj-bazin">6,0%</output></label><input type="range" id="adj-bazin" min="1" max="15" step="0.5" value="6"></div>
-                    <div class="adj"><label for="adj-gordon-r">Gordon: taxa de desconto <output id="adj-gordon-r-o" for="adj-gordon-r">12,0%</output></label><input type="range" id="adj-gordon-r" min="5" max="25" step="0.5" value="12"></div>
-                    <div class="adj"><label for="adj-gordon-g">Gordon: crescimento ao ano <output id="adj-gordon-g-o" for="adj-gordon-g">5,0%</output></label><input type="range" id="adj-gordon-g" min="0" max="15" step="0.5" value="5"></div>
+                    <div class="adj"><label for="adj-gordon-r">Gordon: taxa de desconto <output id="adj-gordon-r-o" for="adj-gordon-r">14,0%</output></label><input type="range" id="adj-gordon-r" min="5" max="25" step="0.5" value="14"></div>
+                    <div class="adj"><label for="adj-gordon-g">Gordon: crescimento ao ano <output id="adj-gordon-g-o" for="adj-gordon-g">4,0%</output></label><input type="range" id="adj-gordon-g" min="0" max="15" step="0.5" value="4"></div>
                 </div>
                 <div class="adj-go" id="adj-go" hidden>
                     <p>Recalcule <b id="adj-tk">PETR4</b> com as suas premissas na aba Preço justo da plataforma. Conta grátis, sem cartão.</p>
-                    <a id="adj-link" href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp&amp;intent=valuation" class="btn btn-ouro" data-cta="lp-calc-recalcular" onclick="_iaClick(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>Recalcular na plataforma</a>
+                    <a id="adj-link" href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp&amp;intent=valuation&amp;next=%2Fativo%2FPETR4%3Ftab%3Dvaluation%26_%3D" class="btn btn-ouro" data-cta="lp-calc-recalcular" onclick="_iaClick(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>Recalcular na plataforma</a>
                 </div>
             </details>
 
             <div class="calc-actions">
-                <a id="calc-alerta" href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp&amp;intent=alerta" class="btn btn-petroleo" data-cta="lp-calc-alerta" onclick="_iaClick(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Salvar e criar alerta no WhatsApp</a>
+                <a id="calc-alerta" href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp&amp;intent=alerta&amp;next=%2F%3Fs%3Dhome%26t%3Dnotificacoes%26_%3D" class="btn btn-petroleo" data-cta="lp-calc-alerta" onclick="_iaClick(event)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Receber os fatos relevantes desta ação</a>
                 <a id="calc-full" href="/acoes/" class="link">Ver todas as ações</a>
             </div>
             <p class="calc-erro" id="calc-erro" hidden>Não deu para carregar as cotações agora. O preço justo de cada empresa está na <a class="link" href="/acoes/">página da ação</a>.</p>
@@ -1059,18 +1072,19 @@
 
                 <div class="step" data-step="0">
                     <div class="step-text" id="dcf-passo">
-                        <h3>Monte seu DCF. A IA questiona cada premissa.</h3>
+                        <h3>Monte seu DCF. A IA propõe as premissas, você decide.</h3>
                         <div class="step-body"><div>
-                            <p>Projete receita, margens e crescimento com os dados da B3. A IA aponta o que destoa do histórico da empresa e do setor antes de você confiar no número.</p>
-                            <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp&amp;intent=dcf" class="btn btn-petroleo" data-cta="metodologias" onclick="_iaClick(event)">Montar meu valuation</a>
+                            <p>A IA sugere crescimento da receita, custos e investimentos a partir do histórico da própria empresa. Você muda o que quiser e vê o preço justo recalculado.</p>
+                            <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp&amp;intent=dcf&amp;next=%2F%3Fs%3Dianalista%26t%3Dvaluai%26_%3D" class="btn btn-petroleo" data-cta="metodologias" onclick="_iaClick(event)">Montar meu valuation</a>
                         </div></div>
                     </div>
                     <div class="step-visual">
                         <div class="dcf" id="dcf" aria-hidden="true">
-                            <div class="dcf-h"><b>Meu valuation</b><span>fluxo de caixa descontado</span></div>
-                            <div class="dcf-row" id="dcf-g"><span>Crescimento da receita</span><output><s>12%</s>8% a.a.</output></div>
-                            <div class="dcf-note"><span class="dcf-ai">IA</span><span>12% ao ano por 10 anos é o dobro do que o setor cresceu na última década. Que tal testar 8%?</span></div>
-                            <div class="dcf-row"><span>Margem EBITDA</span><output>24%</output></div>
+                            <div class="dcf-h"><b>Meu valuation</b><span class="mock-ex">Exemplo ilustrativo</span></div>
+                            <div class="dcf-note"><span class="dcf-ai">IA</span><span>Premissas propostas a partir dos últimos 10 anos da empresa. Você decide cada uma.</span></div>
+                            <div class="dcf-row" id="dcf-g"><span>Crescimento da receita (anos 1 a 5)</span><output><s>6%</s>8% a.a.</output></div>
+                            <div class="dcf-row"><span>CPV / receita</span><output>58%</output></div>
+                            <div class="dcf-row"><span>Capex / receita</span><output>7%</output></div>
                             <div class="dcf-row"><span>Custo de capital (WACC)</span><output>13,5%</output></div>
                             <div class="dcf-fv"><span>Preço justo</span><output id="dcf-fv">R$ 49,80</output></div>
                         </div>
@@ -1087,15 +1101,15 @@
                     </div>
                     <div class="step-visual">
                         <div class="ham-window">
-                            <div class="ham-titlebar"><span class="ham-title">AIrton</span><span class="ham-live"><span class="ham-live-dot"></span>online</span></div>
+                            <div class="ham-titlebar"><span class="ham-title">AIrton</span><span class="mock-ex on-dark">Exemplo ilustrativo</span><span class="ham-live"><span class="ham-live-dot"></span>online</span></div>
                             <div class="airton-modes" role="group" aria-label="Modos de resposta do AIrton">
                                 <button class="airton-mode" type="button" data-mode="discreto" aria-pressed="false">Discreto<small>direto ao ponto</small></button>
-                                <button class="airton-mode" type="button" data-mode="atento" aria-pressed="false">Atento<small>com contexto</small></button>
-                                <button class="airton-mode active" type="button" data-mode="copiloto" aria-pressed="true">Copiloto<small>proativo</small></button>
+                                <button class="airton-mode active" type="button" data-mode="atento" aria-pressed="true">Atento<small>com contexto</small></button>
+                                <button class="airton-mode" type="button" data-mode="copiloto" aria-pressed="false">Copiloto<small>proativo</small></button>
                             </div>
                             <div class="ham-body">
-                                <div class="ham-msg user">Como está minha tese em WEGE3?</div>
-                                <div class="ham-msg ai" id="airton-demo-ai">Sua tese em WEGE3 está sólida: ROE de 18% e dívida líquida/EBITDA de 0,4x, dentro dos seus critérios, e faltam <strong>+12%</strong> até o seu preço-alvo. Notei que a posição já pesa 8,2% da carteira e que o setor industrial concentra 3 ativos seus. Resumi o fato relevante de hoje e deixei a comparação com os pares no painel.</div>
+                                <div class="ham-msg user">Como está a minha tese da Ação A?</div>
+                                <div class="ham-msg ai" id="airton-demo-ai">Sua tese da Ação A segue de pé: <strong>ROE e endividamento continuam dentro dos critérios</strong> que você definiu, e a cotação ainda está abaixo do seu preço-alvo. Saiu um fato relevante hoje. Quer o resumo?</div>
                             </div>
                             <div class="ham-inputbar" aria-hidden="true"><span>Pergunte ao AIrton…</span><span class="ham-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span></div>
                         </div>
@@ -1104,22 +1118,23 @@
 
                 <div class="step" data-step="2">
                     <div class="step-text" id="alertas">
-                        <h3>Saiba do fato relevante antes do mercado.</h3>
+                        <h3>Fatos relevantes da sua carteira, resumidos no WhatsApp.</h3>
                         <div class="step-body"><div>
-                            <p>Fatos relevantes, resultados e proventos das suas ações chegam no WhatsApp no instante em que saem na CVM, já resumidos. E você é avisado quando um critério da sua tese deixa de valer.</p>
-                            <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp&amp;intent=alerta" class="btn btn-ouro" data-cta="alerta-cvm" onclick="_iaClick(event)" aria-label="Ativar alertas do AIrton no WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Ativar alertas no WhatsApp</a>
-                            <p class="step-note">Grátis, sem cartão. Também no Telegram.</p>
+                            <p>Fatos relevantes e comunicados das suas ações chegam em tempo real no WhatsApp ou no Telegram, com o resumo da IA. Proventos, preço-alvo e critérios da sua tese vêm no resumo da manhã.</p>
+                            <a href="https://app.brasilhorizonte.com.br/authnew?ref=iacoes-lp&amp;intent=alerta&amp;next=%2F%3Fs%3Dhome%26t%3Dnotificacoes%26_%3D" class="btn btn-ouro" data-cta="alerta-cvm" onclick="_iaClick(event)" aria-label="Ativar alertas do AIrton no WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Ativar alertas no WhatsApp</a>
+                            <p class="step-note">Alertas no WhatsApp e no Telegram são dos planos pagos. Na conta grátis, os avisos ficam no app e no e-mail.</p>
                         </div></div>
                     </div>
                     <div class="step-visual">
                         <div class="wa" aria-hidden="true">
                             <div class="wa-h"><span class="wa-av">IA</span><div><div class="wa-name">AIrton</div><div class="wa-status">online</div></div></div>
                             <div class="wa-feed" id="wa-feed">
-                                <div class="wa-b"><div class="wa-b-top"><span class="wa-tag">Fato relevante</span><span class="wa-tk">PETR4</span></div><p>Publicado <strong>há 1 minuto</strong> na CVM. O resumo do AIrton já está pronto.</p><span class="wa-time">10:03</span></div>
-                                <div class="wa-b"><div class="wa-b-top"><span class="wa-tag ouro">Provento</span><span class="wa-tk">TAEE11</span></div><p><strong>JCP de R$ 0,42 por ação</strong>. Data-ex em 7 dias, já no seu fluxo de dividendos.</p><span class="wa-time">10:07</span></div>
-                                <div class="wa-b"><div class="wa-b-top"><span class="wa-tag alerta">Tese</span><span class="wa-tk">RADL3</span></div><p>O ROE caiu para <strong>14,2%</strong>, abaixo do seu critério de 15%.</p><span class="wa-time">10:12</span></div>
+                                <div class="wa-b"><div class="wa-b-top"><span class="wa-tag alerta">Resumo da manhã</span><span class="wa-tk">Ação C</span></div><p>Um critério da sua tese deixou de valer: o <strong>ROE ficou abaixo do mínimo</strong> que você definiu.</p><span class="wa-time">09:30</span></div>
+                                <div class="wa-b" id="wa-fr"><div class="wa-b-top"><span class="wa-tag">Fato relevante</span><span class="wa-tk">Ação A</span></div><p>Resumo da IA: a companhia aprovou um novo programa de recompra de ações.</p><span class="wa-time">10:03</span></div>
+                                <div class="wa-b" id="wa-cm"><div class="wa-b-top"><span class="wa-tag ouro">Comunicado</span><span class="wa-tk">Ação B</span></div><p>Resumo da IA: a empresa informou a data de divulgação do próximo resultado trimestral.</p><span class="wa-time">10:07</span></div>
                                 <div class="wa-typing" id="wa-typing" hidden><span class="ham-typing"><span></span><span></span><span></span></span></div>
                             </div>
+                            <p class="wa-cap" id="wa-cap">Exemplo ilustrativo</p>
                         </div>
                     </div>
                 </div>
@@ -1127,48 +1142,8 @@
         </div>
     </div>
 
-    <div class="wrap">
-        <div class="plat-also" data-rise>
-            <div>
-                <h3>Também na plataforma</h3>
-                <p>Tudo integrado ao AIrton e às suas teses.</p>
-            </div>
-            <ul class="chips">
-                <li>Score qualitativo</li>
-                <li>Radar de oportunidades</li>
-                <li>Otimizador de carteira (Markowitz)</li>
-                <li>Painel macro</li>
-                <li>Rankings e screening</li>
-                <li>Minhas Teses</li>
-                <li>Documentos da CVM</li>
-                <li>Backtesting</li>
-            </ul>
-        </div>
-    </div>
 </section>
 
-<section class="bolsa sec" id="bolsa" aria-labelledby="bolsa-title" hidden>
-    <div class="scene" id="bolsa-scene">
-        <span id="bolsa-hoje" class="scene-anchor" aria-hidden="true"></span>
-        <div class="scene-stage">
-            <div class="wrap bolsa-grid">
-                <div class="bolsa-text">
-                    <div class="sec-h"><h2 id="bolsa-title">A bolsa está cara hoje?</h2><p>Calculado por nós para a bolsa brasileira: o valor de mercado das empresas da B3 dividido pelo PIB de 12 meses.</p></div>
-                    <div class="bolsa-num"><data id="bolsa-v" value="">—</data><span class="pct">%</span><span>do PIB</span></div>
-                    <p class="bolsa-when" id="bolsa-when"></p>
-                </div>
-                <figure class="bolsa-chart" id="bolsa-chart">
-                    <svg id="bolsa-svg" viewBox="0 0 720 300" role="img" aria-labelledby="bolsa-svg-t"><title id="bolsa-svg-t">Indicador de Buffett do Brasil</title></svg>
-                    <figcaption class="bolsa-legend" id="bolsa-legend"></figcaption>
-                </figure>
-                <div class="bolsa-final" id="bolsa-final">
-                    <p class="bolsa-verdict" id="bolsa-verdict"></p>
-                    <a id="bolsa-link" class="btn btn-petroleo" data-cta="lp-buffett" onclick="_iaTrack('cta_click','lp-buffett')">Ver o Indicador de Buffett completo</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
 <section class="porque sec" id="comparativo" aria-labelledby="porque-title">
     <div class="scene" id="manifesto-scene">
@@ -1179,6 +1154,69 @@
             </div>
         </div>
     </div>
+</section>
+
+<section class="ferr sec" id="ferramentas" aria-labelledby="ferr-title" data-bundle="/assets/js/ferramentas.js?v=db5d7309e9">
+    <div class="wrap">
+        <div class="ferr-head">
+            <div class="sec-h">
+                <h2 id="ferr-title">Todas as ferramentas, ao mesmo tempo</h2>
+                <p>Cada quadro é uma ferramenta da plataforma funcionando. Passe o mouse ou toque para explorar.</p>
+            </div>
+            <button class="ferr-pause" id="ferr-pause" type="button" data-ia-pause="#ferramentas" aria-pressed="false" hidden><svg class="pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><svg class="play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5v14l12-7z"/></svg><span data-ia-pause-label>Pausar animações</span></button>
+        </div>
+        <div class="bento" id="bento">
+            <article class="tool t-markowitz">
+                <h3><a href="/ferramentas/markowitz/" onclick="_iaTrack('cta_click','lp-tool-markowitz')">Otimizador de carteira (Markowitz)</a></h3>
+                <p>A fronteira eficiente e a carteira de maior índice de Sharpe, a partir das suas premissas de retorno.</p>
+                <div class="tool-w" data-ia-widget="markowitz" data-size="tile" data-span="2x2" data-ia-tool="markowitz"></div>
+            </article>
+            <article class="tool t-dcf">
+                <h3><a href="/ferramentas/fluxo-de-caixa-descontado/" onclick="_iaTrack('cta_click','lp-tool-dcf')">Valuation por fluxo de caixa descontado</a></h3>
+                <p>Como o preço justo reage ao custo de capital e ao crescimento na perpetuidade.</p>
+                <div class="tool-w" data-ia-widget="dcf" data-size="tile" data-span="2x1" data-ia-tool="dcf"></div>
+            </article>
+            <article class="tool t-buffett">
+                <h3><a href="/macro/indicador-de-buffett/" onclick="_iaTrack('cta_click','lp-tool-buffett')">Indicador de Buffett do Brasil</a></h3>
+                <p>Calculado por nós: o valor de mercado das empresas da B3 dividido pelo PIB, mês a mês desde 2000.</p>
+                <div class="tool-w" data-ia-widget="buffett" data-size="tile" data-span="2x1"></div>
+            </article>
+            <article class="tool">
+                <h3><a href="/ferramentas/ranking-de-acoes/" onclick="_iaTrack('cta_click','lp-tool-ranking')">Ranking de ações</a></h3>
+                <p>Ações da B3 ordenadas por dividendos, P/L, P/VP e ROE, com o dado do último pregão.</p>
+                <div class="tool-w" data-ia-widget="ranking" data-size="tile" data-span="1x1" data-ia-tool="ranking"></div>
+            </article>
+            <article class="tool">
+                <h3><a href="/ferramentas/fatos-relevantes/" onclick="_iaTrack('cta_click','lp-tool-fatos')">Fatos relevantes</a></h3>
+                <p>Os documentos mais recentes entregues à CVM, com resumo da IA.</p>
+                <div class="tool-w" data-ia-widget="fatos" data-size="tile" data-span="1x1" data-ia-tool="fatos"></div>
+            </article>
+            <article class="tool">
+                <h3><a href="/ferramentas/nota-qualitativa/" onclick="_iaTrack('cta_click','lp-tool-nota')">Nota qualitativa</a></h3>
+                <p>Seis pilares do negócio avaliados numa escala de 1 a 4.</p>
+                <div class="tool-w" data-ia-widget="nota" data-size="tile" data-span="1x1" data-ia-tool="nota"></div>
+            </article>
+            <article class="tool">
+                <h3><a href="/ferramentas/tese-de-investimento/" onclick="_iaTrack('cta_click','lp-tool-tese')">Tese de investimento</a></h3>
+                <p>Os critérios da sua tese conferidos uma vez por dia contra os números.</p>
+                <div class="tool-w" data-ia-widget="tese" data-size="tile" data-span="1x1" data-ia-tool="tese"></div>
+            </article>
+            <article class="tool t-radar">
+                <h3><a href="/ferramentas/radar-de-oportunidades/" onclick="_iaTrack('cta_click','lp-tool-radar')">Radar de oportunidades</a></h3>
+                <p>Seis regras fixas separam as ações em listas para começar o estudo.</p>
+                <div class="tool-w" data-ia-widget="radar" data-size="tile" data-span="2x1" data-ia-tool="radar"></div>
+            </article>
+            <article class="tool t-backtest">
+                <h3><a href="/ferramentas/backtest-de-carteira/" onclick="_iaTrack('cta_click','lp-tool-backtest')">Backtest de carteira</a></h3>
+                <p>Quanto rendeu o Ibovespa contra o CDI em 1, 5, 10 e 15 anos.</p>
+                <div class="tool-w" data-ia-widget="backtest" data-size="tile" data-span="2x1" data-ia-tool="backtest"></div>
+            </article>
+        </div>
+        <a class="ferr-all" href="/ferramentas/" onclick="_iaTrack('cta_click','lp-ferramentas')">Ver todas as ferramentas</a>
+    </div>
+</section>
+
+<section class="porque comp sec" aria-label="IAções comparado a corretoras e casas de research">
     <div class="wrap">
         <div class="tbl-wrap" data-rise>
             <table class="tbl">
@@ -1192,7 +1230,7 @@
                     <tr><td>Screening avançado</td><td class="partial">Básico</td><td class="no"><span aria-hidden="true">✗</span><span class="sr-only">Não</span></td><td class="us yes"><span aria-hidden="true">✓</span><span class="sr-only">Sim</span></td></tr>
                     <tr><td>Assistente de IA conversacional</td><td class="no"><span aria-hidden="true">✗</span><span class="sr-only">Não</span></td><td class="no"><span aria-hidden="true">✗</span><span class="sr-only">Não</span></td><td class="us yes">AIrton</td></tr>
                     <tr><td>Alocação inteligente</td><td class="no"><span aria-hidden="true">✗</span><span class="sr-only">Não</span></td><td class="partial">Manual</td><td class="us yes"><span aria-hidden="true">✓</span><span class="sr-only">Sim</span></td></tr>
-                    <tr><td>Validação por CNPI e CGA</td><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Sim</span></td><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Sim</span></td><td class="us yes"><span aria-hidden="true">✓</span><span class="sr-only">Sim</span></td></tr>
+                    <tr><td>Metodologia de profissionais CNPI e CGA</td><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Sim</span></td><td class="yes"><span aria-hidden="true">✓</span><span class="sr-only">Sim</span></td><td class="us yes"><span aria-hidden="true">✓</span><span class="sr-only">Sim</span></td></tr>
                 </tbody>
             </table>
         </div>
@@ -1321,19 +1359,19 @@
         </div>
         <div class="faq-list" data-rise>
             <details><summary>O IAções é uma casa de análise ou corretora?</summary><p>Nenhum dos dois. O IAções é uma plataforma de tecnologia que oferece ferramentas de análise fundamentalista potencializadas por IA. Não fazemos recomendações de compra/venda, não vendemos ativos e não somos uma corretora.</p></details>
-            <details><summary>Como funciona a análise por IA?</summary><p>Nossa IA processa dados financeiros públicos das empresas listadas na B3 e aplica as metodologias de Graham, Bazin e Gordon de forma automatizada. No DCF, você monta seu próprio valuation e a IA analisa criticamente suas premissas. Tudo validado por analista CNPI certificado pela APIMEC.</p></details>
-            <details><summary>Quem está por trás da plataforma?</summary><p>A plataforma foi desenvolvida por profissionais certificados — analista CNPI (APIMEC) e gestor CGA (ANBIMA). A IA executa as análises com base nos critérios técnicos definidos por eles, garantindo rigor metodológico em escala.</p></details>
+            <details><summary>Como funciona a análise por IA?</summary><p>A IA lê os dados públicos das empresas da B3 e trabalha em tarefas definidas: no DCF, ela propõe as premissas a partir do histórico da empresa e você decide cada uma; no Validador, audita a argumentação da sua tese; no AIrton, responde às suas perguntas. As calculadoras de Graham, Bazin e Gordon são fórmulas aplicadas aos dados, sem IA. As metodologias foram definidas por um analista CNPI (APIMEC) e um gestor CGA (ANBIMA), e cada análise é gerada automaticamente a partir delas.</p></details>
+            <details><summary>Quem está por trás da plataforma?</summary><p>A plataforma foi criada por profissionais certificados: um analista CNPI (APIMEC) e um gestor CGA (ANBIMA). Eles definem as metodologias e os critérios técnicos que a IA e as fórmulas aplicam a cada empresa.</p></details>
             <details><summary>O que significa "zero conflito de interesses"?</summary><p>Nossa receita vem 100% das assinaturas. Não ganhamos comissão por operações, não vendemos fundos, não fazemos co-distribuição. Nosso compromisso é exclusivamente com a qualidade da análise.</p></details>
             <details><summary>Posso cancelar a qualquer momento?</summary><p>Sim. Planos mensais podem ser cancelados a qualquer momento sem multa. O plano anual pode ser cancelado com reembolso proporcional nos primeiros 30 dias.</p></details>
-            <details><summary>Quem é o AIrton?</summary><p>Nosso assistente de IA conversacional. Pergunte sobre qualquer ação da B3, peça comparações, tire dúvidas sobre indicadores. Como ter um analista disponível 24/7 — no app e no seu WhatsApp, e também no Telegram.</p></details>
-            <details><summary>O IAções cobre todas as ações da B3?</summary><p>Sim. Cobrimos mais de 300 ações listadas na B3, com análise fundamentalista e valuation automatizados para cada uma. A cobertura é atualizada continuamente conforme novas empresas entram no mercado.</p></details>
-            <details><summary>De onde vêm os dados utilizados nas análises?</summary><p>Utilizamos dados financeiros públicos das empresas listadas na B3: demonstrações de resultado (DRE), balanços patrimoniais, fluxos de caixa, histórico de dividendos e cotações de mercado. Todos os dados são coletados de fontes oficiais e atualizados automaticamente.</p></details>
+            <details><summary>Quem é o AIrton?</summary><p>É o assistente de IA da plataforma. Pergunte sobre qualquer ação da B3, peça comparações entre empresas ou tire dúvidas sobre indicadores. Ele conhece a sua carteira e as suas teses e responde no app, no WhatsApp e no Telegram. Como toda IA, pode errar: confira os números antes de decidir.</p></details>
+            <details><summary>O IAções cobre todas as ações da B3?</summary><p>Cobrimos as ações da B3 que têm dados financeiros disponíveis: são mais de 300, cada uma com página própria de valuation. Fundos imobiliários, ETFs e BDRs ficam de fora. A lista acompanha as empresas que entram e saem da bolsa.</p></details>
+            <details><summary>De onde vêm os dados utilizados nas análises?</summary><p>Usamos dados públicos das empresas listadas na B3: demonstrações de resultado (DRE), balanços patrimoniais, fluxos de caixa, proventos e cotações, obtidos de provedores de dados de mercado e dos documentos entregues à CVM. A coleta e a atualização são automáticas.</p></details>
             <details><summary>Com que frequência os dados são atualizados?</summary><p>As cotações são atualizadas diariamente. Dados de balanço, DRE e fluxo de caixa são atualizados a cada divulgação trimestral. Os cálculos de valuation são reprocessados automaticamente sempre que novos dados ficam disponíveis.</p></details>
-            <details><summary>A IA pode errar? Como vocês lidam com isso?</summary><p>Sim, como qualquer modelo de IA, pode haver erros de interpretação ou cálculo. Por isso, toda a lógica analítica é validada por profissionais certificados — analista CNPI (APIMEC) e gestor CGA (ANBIMA). As análises são ferramentas de apoio à decisão, não recomendações de investimento.</p></details>
+            <details><summary>A IA pode errar? Como vocês lidam com isso?</summary><p>Sim. Como qualquer modelo de IA, ela pode errar na interpretação ou no cálculo. Por isso as metodologias foram definidas por profissionais certificados (analista CNPI e gestor CGA), os números ficam à mostra para você conferir e as premissas do DCF são suas. As análises são ferramentas de apoio à decisão, não recomendações de investimento.</p></details>
             <details><summary>Preciso ter experiência com investimentos para usar o IAções?</summary><p>Não. A plataforma foi projetada para ser acessível tanto para iniciantes quanto para investidores experientes. As análises são apresentadas de forma clara e objetiva, com explicações sobre cada indicador e metodologia utilizada.</p></details>
             <details><summary>Qual a diferença entre os planos IAções e Fundamentalista?</summary><p>O IAções reúne a análise fundamentalista com IA — valuation por Graham, Bazin, Gordon e DCF, score de qualidade, validação de teses, o AIrton e os alertas no WhatsApp — e as ferramentas de alocação: dashboard, rankings, radar de oportunidades, otimização de portfólio e painel macro. O Fundamentalista inclui tudo isso, mais relatórios exclusivos, conteúdos audiovisuais e acesso a grupo fechado.</p></details>
             <details><summary>O IAções faz recomendação de compra ou venda de ações?</summary><p>Não. O IAções é uma plataforma de ferramentas analíticas, não uma casa de análise. Fornecemos dados, cálculos de valuation e indicadores para que você tome suas próprias decisões de investimento com mais informação e autonomia.</p></details>
-            <details><summary>Como funciona a otimização de portfólio por Markowitz?</summary><p>O IAções utiliza a Teoria Moderna de Portfólio de Harry Markowitz para calcular a distribuição ideal entre ativos. Com base na correlação histórica entre ações, o algoritmo encontra a fronteira eficiente — a combinação que maximiza retorno esperado para cada nível de risco aceito pelo investidor.</p></details>
+            <details><summary>Como funciona a otimização de portfólio por Markowitz?</summary><p>O Otimizador aplica a Teoria Moderna de Portfólio de Harry Markowitz às ações que você escolher. Com o retorno esperado que você define (seu preço-alvo ou a média de Graham, Bazin e Gordon) e a volatilidade e a correlação do último ano, ele calcula a fronteira eficiente — as carteiras com o maior retorno esperado para cada nível de risco — e marca a de maior índice de Sharpe. O resultado é uma referência de cálculo, não uma recomendação.</p></details>
         </div>
     </div>
 </section>
@@ -1391,6 +1429,7 @@
                 <span>Uma plataforma <a href="https://brasilhorizonte.com.br" target="_blank" rel="noopener">Brasil Horizonte</a></span>
             </div>
             <ul class="footer-links">
+                <li><a href="/ferramentas/">Ferramentas</a></li>
                 <li><a href="#">Termos de Uso</a></li>
                 <li><a href="#">Política de Privacidade</a></li>
                 <li><a href="mailto:contato@brasilhorizonte.com.br">Contato</a></li>
@@ -1592,26 +1631,29 @@ document.addEventListener('DOMContentLoaded',function(){var f=new URLSearchParam
       rows[m] = $('.calc-row[data-m="' + m + '"]', calc);
     });
     var sl = { graham: $('#adj-graham'), bazin: $('#adj-bazin'), r: $('#adj-gordon-r'), g: $('#adj-gordon-g') };
-    /* A régua usa sempre as premissas padrão; as do visitante vão para a plataforma. */
-    var BASE = { margin: 0, dy: 6, r: 12, g: 5 };
+    /* A régua usa sempre as premissas padrão (as mesmas das páginas de ação); as do visitante vão para a plataforma. */
+    var BASE = { margin: 0, dy: 6, r: 14, g: 4 };
     var DATA = null, KEYS = [], cur = null, curT = '', last = {}, opts = [], active = -1;
     var fb = new URLSearchParams(location.search).get('fbclid');
 
+    /* Os preços justos prontos do valuations.json são os mesmos da página da ação; a conta abaixo é
+       só para um JSON antigo sem eles. Gordon: D0 = média de 5 anos, D1 = D0 × (1 + g). */
     function compute(d){
       var margin = BASE.margin / 100, dy = BASE.dy / 100, r = BASE.r / 100, g = BASE.g / 100;
       var avgDiv = (d.avgDiv ? (d.avgDiv['5'] || d.divTTM) : d.divTTM) || 0;
-      var dpa = d.divTTM || 0, d1 = dpa * (1 + g);
+      var d1 = avgDiv * (1 + g);
+      function ready(v, f){ return typeof v === 'number' && isFinite(v) ? Math.max(0, v) : f; }
       return {
-        graham: (d.lpa > 0 && d.vpa > 0) ? Math.sqrt(22.5 * d.lpa * d.vpa) * (1 - margin) : 0,
-        bazin: avgDiv > 0 ? avgDiv / dy : 0,
-        gordon: (r > g && d1 > 0) ? d1 / (r - g) : 0,
-        avgDiv: avgDiv, dpa: dpa
+        graham: ready(d.graham, (d.lpa > 0 && d.vpa > 0) ? Math.sqrt(22.5 * d.lpa * d.vpa) * (1 - margin) : 0),
+        bazin: ready(d.bazin, avgDiv > 0 ? avgDiv / dy : 0),
+        gordon: ready(d.gordon, (r > g && d1 > 0) ? d1 / (r - g) : 0),
+        avgDiv: avgDiv
       };
     }
     function texts(d, c){
       $('#info-graham').textContent = (d.lpa > 0 && d.vpa > 0) ? 'LPA ' + brl(d.lpa) + ' e VPA ' + brl(d.vpa) : 'Não se aplica: lucro ou patrimônio negativo';
       $('#info-bazin').textContent = c.avgDiv > 0 ? 'Dividendo médio de 5 anos (' + brl(c.avgDiv) + ') ÷ 6%' : 'Não se aplica: sem dividendos recentes';
-      $('#info-gordon').textContent = c.dpa > 0 ? 'Dividendo de 12 meses (' + brl(c.dpa) + '), desconto de 12%' : 'Não se aplica: sem dividendos em 12 meses';
+      $('#info-gordon').textContent = c.avgDiv > 0 ? 'Dividendo médio de 5 anos (' + brl(c.avgDiv) + '), desconto de 14% e crescimento de 4%' : 'Não se aplica: sem dividendos recentes';
     }
     function niceStep(span){
       var raw = span / 4, mag = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10)), n = raw / mag;
@@ -1691,8 +1733,7 @@ document.addEventListener('DOMContentLoaded',function(){var f=new URLSearchParam
       drawRuler(p, c, fromPrice);
       try {
         var u = new URL(alerta.href);
-        u.searchParams.set('next', '/ativo/' + curT);
-        u.searchParams.set('tab', 'tese');
+        u.searchParams.set('next', '/ativo/' + curT + '?tab=tese&_=');
         u.searchParams.set('ticker', curT);
         if (fb) u.searchParams.set('fbclid', fb);
         alerta.href = u.toString();
@@ -1704,7 +1745,8 @@ document.addEventListener('DOMContentLoaded',function(){var f=new URLSearchParam
     }
 
     /* Premissas: trocar não recalcula aqui. Aparece o botão que abre a plataforma na aba Preço justo
-       do ticker. O app só obedece next=/ativo/TICKER (o resto da query é repassado à página). */
+       do ticker. O app só obedece o next: /ativo/TICKER?tab=valuation&_= (o Auth.tsx cola o resto da
+       query com outro "?", e o "_" descartável absorve o primeiro parâmetro repassado; o tab chega intacto). */
     function premissas(){
       var v = { margem: +sl.graham.value, dy: +sl.bazin.value, r: +sl.r.value, g: +sl.g.value };
       $('#adj-graham-o').textContent = NF0.format(v.margem) + '%';
@@ -1715,8 +1757,7 @@ document.addEventListener('DOMContentLoaded',function(){var f=new URLSearchParam
       if (adjGo.hidden === changed) adjGo.hidden = !changed;
       try {
         var u = new URL(adjLink.href);
-        if (curT) { u.searchParams.set('next', '/ativo/' + curT); u.searchParams.set('ticker', curT); }
-        u.searchParams.set('tab', 'valuation');
+        if (curT) { u.searchParams.set('next', '/ativo/' + curT + '?tab=valuation&_='); u.searchParams.set('ticker', curT); }
         /* nomes e frações dos campos de premissa do app (QuickValuationPanel), para quando ele passar a ler da URL */
         u.searchParams.set('marginOfSafety', +(v.margem / 100).toFixed(4));
         u.searchParams.set('minDividendYield', +(v.dy / 100).toFixed(4));
@@ -1821,24 +1862,25 @@ document.addEventListener('DOMContentLoaded',function(){var f=new URLSearchParam
   /* ---------- Plataforma: 3 passos. No desktop o scroll conduz; no celular, cada um anima ao aparecer ---------- */
   var story = $('#story'), steps = story ? $$('.step', story) : [];
 
-  // Passo 1: a IA questiona a premissa do DCF e o preço justo se ajusta
+  // Passo 1: a IA propõe as premissas, você troca o crescimento e o preço justo se ajusta (exemplo ilustrativo)
   var dcf = $('#dcf'), gRow = $('#dcf-g'), gOut = gRow && $('output', gRow), fvOut = $('#dcf-fv');
   var finalG = gOut ? gOut.innerHTML : '', dcfS = {};
   function dcfAt(t){
     if (!dcf) return;
     var note = t > 0.15, changed = t > 0.45, hl = t > 0.45 && t < 0.85;
     if (dcfS.note !== note) { dcf.classList.toggle('done', note); dcfS.note = note; }
-    if (dcfS.changed !== changed) { gOut.innerHTML = changed ? finalG : '12% a.a.'; dcfS.changed = changed; }
+    if (dcfS.changed !== changed) { gOut.innerHTML = changed ? finalG : '6% a.a.'; dcfS.changed = changed; }
     if (dcfS.hl !== hl) { gRow.classList.toggle('hl', hl); dcfS.hl = hl; }
-    var txt = brl(61.4 + (49.8 - 61.4) * smooth((t - 0.45) / 0.3));
+    var txt = brl(44.1 + (49.8 - 44.1) * smooth((t - 0.45) / 0.3));
     if (dcfS.fv !== txt) { fvOut.textContent = txt; dcfS.fv = txt; }
   }
 
-  // Passo 2: o AIrton responde (no desktop, digitando conforme o scroll)
+  // Passo 2: o AIrton responde no modo Atento, o padrão do app (no desktop, digitando conforme o scroll).
+  // Exemplo ilustrativo: "Ação A" e nenhum número atribuído a empresa real.
   var demo = $('#airton-demo-ai'), modes = $$('.airton-mode');
-  var richCopiloto = demo ? demo.innerHTML : '', tmpDiv = document.createElement('div');
+  var richAtento = demo ? demo.innerHTML : '', tmpDiv = document.createElement('div');
   function plain(h){ tmpDiv.innerHTML = h; return tmpDiv.textContent; }
-  var chatPlain = plain(richCopiloto), chatS = null, userPicked = false, sayT = null;
+  var chatPlain = plain(richAtento), chatS = null, userPicked = false, sayT = null;
   var DOTS = '<span class="ham-typing"><span></span><span></span><span></span></span>';
   function chatAt(t){
     if (!demo || userPicked) return;
@@ -1847,16 +1889,16 @@ document.addEventListener('DOMContentLoaded',function(){var f=new URLSearchParam
     if (key === chatS) return;
     chatS = key;
     if (key === 'dots') demo.innerHTML = DOTS;
-    else if (key === 'full') demo.innerHTML = richCopiloto;
+    else if (key === 'full') demo.innerHTML = richAtento;
     else demo.textContent = chatPlain.slice(0, n);
   }
   var answers = {
-    discreto: 'ROE de 18% (seu critério: acima de 15% ✓). Faltam <strong>+12%</strong> até o preço-alvo da sua tese.',
-    atento: 'Sua tese em WEGE3 segue válida: ROE de 18% (critério acima de 15% ✓) e dívida líquida/EBITDA de 0,4x (✓). Faltam <strong>+12%</strong> até o seu preço-alvo. Saiu um fato relevante hoje; quer o resumo?',
-    copiloto: richCopiloto
+    discreto: '<strong>Critérios atendidos.</strong> A cotação segue abaixo do seu preço-alvo.',
+    atento: richAtento,
+    copiloto: 'Sua tese da Ação A segue de pé: <strong>ROE e endividamento continuam dentro dos critérios</strong> e a cotação está abaixo do seu preço-alvo. A Ação A já é uma das maiores posições da sua carteira. Saiu um fato relevante hoje: quer que eu resuma e compare com as concorrentes aqui na conversa?'
   };
   function say(mode){
-    var rich = answers[mode] || richCopiloto;
+    var rich = answers[mode] || richAtento;
     if (sayT) clearTimeout(sayT);
     if (RM) { demo.innerHTML = rich; return; }
     demo.innerHTML = DOTS;
@@ -1892,6 +1934,32 @@ document.addEventListener('DOMContentLoaded',function(){var f=new URLSearchParam
     typing.hidden = !typingOn;
     if (typingOn) feed.appendChild(typing);
   }
+  /* Passo 3: os dois balões da CVM viram os documentos mais recentes do feed (FR e CM com resumo da IA).
+     O balão do resumo da manhã segue ilustrativo. Texto da CVM entra só por textContent. */
+  fetch('/ferramentas/fatos-relevantes/dados.json').then(function(r){ if (!r.ok) throw 0; return r.json(); }).then(function(d){
+    var items = (d && d.items) || [], pick = [];
+    var fr = items.filter(function(x){ return x.type === 'FR'; })[0], cm = items.filter(function(x){ return x.type === 'CM'; })[0];
+    if (fr) pick.push(fr); if (cm) pick.push(cm);
+    for (var i = 0; pick.length < 2 && i < items.length; i++) if (pick.indexOf(items[i]) < 0) pick.push(items[i]);
+    if (pick.length < 2) return;
+    function cut(s, n){ s = String(s || '').replace(/\s+/g, ' ').trim(); if (s.length <= n) return s; s = s.slice(0, n); return s.slice(0, s.lastIndexOf(' ') > 40 ? s.lastIndexOf(' ') : n).replace(/[,;:.\s]+$/, '') + '…'; }
+    [['#wa-fr', pick[0]], ['#wa-cm', pick[1]]].forEach(function(p){
+      var b = $(p[0]), x = p[1]; if (!b) return;
+      var tag = $('.wa-tag', b), tk = $('.wa-tk', b), txt = $('p', b), tm = $('.wa-time', b);
+      tag.textContent = x.type === 'FR' ? 'Fato relevante' : 'Comunicado';
+      tag.className = 'wa-tag' + (x.type === 'FR' ? '' : ' ouro');
+      tk.textContent = x.t;
+      txt.textContent = 'Resumo da IA: ' + cut(x.summary, 120);
+      tm.textContent = x.feedTime || '';
+    });
+    /* ordem do feed pela hora (o resumo da manhã fica às 09:30) */
+    var feedEl = $('#wa-feed'), bs = $$('.wa-b', feedEl);
+    bs.sort(function(a, b){ return ($('.wa-time', a).textContent || '').localeCompare($('.wa-time', b).textContent || ''); })
+      .forEach(function(b){ feedEl.insertBefore(b, typing); });
+    bubbles = $$('.wa-b', feedEl);
+    var cap = $('#wa-cap');
+    if (cap) cap.textContent = 'Fato relevante e comunicado: os documentos mais recentes do feed da CVM (' + (d.updatedBR || '') + '), com resumo gerado por IA, que pode errar. Resumo da manhã: exemplo ilustrativo.';
+  }).catch(function(){});
   var STEP_FX = [dcfAt, chatAt, waAt];
 
   function storyFrame(){
@@ -1914,112 +1982,13 @@ document.addEventListener('DOMContentLoaded',function(){var f=new URLSearchParam
       if (storyOn()) return;
       tween(0, 1, 3800, function(t){ dcfAt(t); });
     }, 0.5);
-    onView($('.ham-window'), function(){ if (!storyOn() && !userPicked) say('copiloto'); }, 0.6);
+    onView($('.ham-window'), function(){ if (!storyOn() && !userPicked) say('atento'); }, 0.6);
     onView(feed, function(){
       if (storyOn()) return;
       tween(0, 1, 3200, function(t){ waAt(t); });
     }, 0.45);
   }
   if (storyOn()) { dcfAt(0); chatAt(0); waAt(0); } else { dcfAt(0); waAt(0); stackedPlay(); }
-
-  /* ---------- A bolsa está cara? Só aparece quando a página do indicador está publicada ---------- */
-  var bolsa = $('#bolsa'), B = null;
-  function drawBuffett(svg, b){
-    var W = Math.round(Math.max(340, Math.min(720, (svg.parentNode.clientWidth || 720) - 30))), H = W < 520 ? 250 : 300, L = 40, R = W < 520 ? 44 : 56, T = 24, Bm = 30;
-    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
-    var s = b.series, n = s.length, i;
-    var hiV = Math.max(b.max.value, b.value), loV = Math.min(b.min.value, b.value);
-    var y0 = Math.floor((loV - 5) / 10) * 10, y1 = Math.ceil((hiV + 5) / 10) * 10;
-    function X(k){ return L + k / (n - 1) * (W - L - R); }
-    function Y(v){ return T + (1 - (v - y0) / (y1 - y0)) * (H - T - Bm); }
-    var pts = [], d = '';
-    for (i = 0; i < n; i++) { pts.push([X(i), Y(s[i][1])]); d += (i ? 'L' : 'M') + pts[i][0].toFixed(1) + ' ' + pts[i][1].toFixed(1); }
-    var area = d + 'L' + X(n - 1).toFixed(1) + ' ' + Y(y0).toFixed(1) + 'L' + L + ' ' + Y(y0).toFixed(1) + 'Z';
-    var grid = '<g class="bc-grid">', gstep = (y1 - y0) > 60 ? 20 : 10;
-    for (var v = Math.ceil(y0 / gstep) * gstep; v <= y1; v += gstep) grid += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(v).toFixed(1) + '" y2="' + Y(v).toFixed(1) + '"/><text x="' + (L - 8) + '" y="' + (Y(v) + 4).toFixed(1) + '" text-anchor="end">' + v + '%</text>';
-    grid += '</g>';
-    var years = '<g class="bc-years">';
-    for (i = 0; i < n; i++) { var ym = s[i][0]; if (ym.slice(5) === '01' && +ym.slice(0, 4) % 5 === 0) years += '<text x="' + X(i).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="middle">' + ym.slice(0, 4) + '</text>'; }
-    years += '</g>';
-    /* marcos que acendem quando a linha do tempo passa por eles */
-    var iMax = 0, iMin = 0;
-    for (i = 1; i < n; i++) { if (s[i][1] > s[iMax][1]) iMax = i; if (s[i][1] < s[iMin][1]) iMin = i; }
-    function idxOf(m){ for (var k = 0; k < n; k++) if (s[k][0] === m) return k; return -1; }
-    var narrow = W < 520;
-    var evs = [
-      { i: iMin, t: (narrow ? 'mín. ' : 'mínima: ') + NF1.format(b.min.value) + '%' + (narrow ? '' : ' em ' + b.min.month), below: true },
-      { i: iMax, t: (narrow ? 'máx. ' : 'máxima: ') + NF1.format(b.max.value) + '%' + (narrow ? '' : ' em ' + b.max.month), below: false },
-      { i: idxOf('2008-10'), t: 'crise de 2008', below: true },
-      { i: idxOf('2020-03'), t: 'pandemia', below: true }
-    ].filter(function(e){ return e.i >= 0; });
-    var evSvg = evs.map(function(e){
-      var x = clamp(X(e.i), L + (narrow ? 36 : 60), W - R - (narrow ? 36 : 60)), px = X(e.i), py = Y(s[e.i][1]);
-      var ty = e.below ? Math.min(py + 22, H - Bm - 4) : py - 12;
-      return '<g class="bc-ev" data-i="' + e.i + '"><circle cx="' + px.toFixed(1) + '" cy="' + py.toFixed(1) + '" r="3.5" class="bc-evdot"/><text class="bc-note" x="' + x.toFixed(1) + '" y="' + ty.toFixed(1) + '" text-anchor="middle">' + esc(e.t) + '</text></g>';
-    }).join('');
-    svg.innerHTML = '<title id="bolsa-svg-t">Indicador de Buffett do Brasil desde ' + esc(b.since) + ': ' + NF2.format(b.value) + '% do PIB no fechamento de ' + esc(b.dateBR) + ', média de ' + NF1.format(b.mean) + '%</title>'
-      + '<defs><clipPath id="bc-clip"><rect id="bc-clip-r" x="0" y="0" width="' + W + '" height="' + H + '"/></clipPath></defs>'
-      + grid + '<rect class="bc-band" x="' + L + '" width="' + (W - L - R) + '" y="' + Y(b.p75).toFixed(1) + '" height="' + (Y(b.p25) - Y(b.p75)).toFixed(1) + '"/>'
-      + '<line class="bc-mean" x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(b.mean).toFixed(1) + '" y2="' + Y(b.mean).toFixed(1) + '"/>'
-      + years + '<g clip-path="url(#bc-clip)"><path class="bc-area" d="' + area + '"/><path class="bc-line" d="' + d + '"/></g>' + evSvg
-      + '<g class="bc-head" id="bc-head"><circle class="bc-ring" r="5"/><circle class="bc-dot" r="5.5"/></g>'
-      + '<text class="bc-today" id="bc-today" x="' + (X(n - 1) + 11).toFixed(1) + '" y="' + (Y(b.value) + 4).toFixed(1) + '">hoje</text>';
-    return { pts: pts, X: X, Y: Y, n: n, evs: $$('.bc-ev', svg), clip: $('#bc-clip-r', svg), head: $('#bc-head', svg) };
-  }
-  /* k: posição na linha do tempo (0 = primeiro mês, 1 = hoje); fin: revela veredito e botão */
-  function bolsaAt(k, fin){
-    var g = B.g, s = B.b.series, f = k * (g.n - 1), j = Math.floor(f), t = f - j;
-    var a = g.pts[j], c = g.pts[Math.min(j + 1, g.n - 1)];
-    var x = a[0] + (c[0] - a[0]) * t, y = a[1] + (c[1] - a[1]) * t;
-    if (B.k !== k) {
-      B.k = k;
-      g.clip.setAttribute('width', (x + 1).toFixed(1));
-      g.head.setAttribute('transform', 'translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ')');
-      g.evs.forEach(function(e){ e.classList.toggle('on', f >= +e.getAttribute('data-i')); });
-      var done = k >= 1;
-      B.chart.classList.toggle('played', done);
-      if (done) { B.v.textContent = B.finalV; B.when.textContent = B.finalWhen; }
-      else {
-        var m = s[Math.round(f)];
-        B.v.textContent = NF1.format(m[1]);
-        B.when.textContent = MES[+m[0].slice(5) - 1] + '/' + m[0].slice(0, 4);
-      }
-    }
-    if (B.fin !== fin) {
-      B.fin = fin;
-      B.final.style.setProperty('--fin', fin.toFixed(3));
-      B.final.classList.toggle('off', fin < 0.02);
-    }
-  }
-  function bolsaFrame(){
-    var p = progressOf(B.scene);
-    bolsaAt(clamp((p - 0.06) / 0.78, 0, 1), clamp((p - 0.86) / 0.1, 0, 1));
-  }
-  if (bolsa) fetch('/macro/indicador-de-buffett/dados.json').then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); }).then(function(b){
-    if (!b || typeof b.value !== 'number' || !b.series || b.series.length < 24 || !b.url || !b.min || !b.max) return;
-    var url = String(b.url);
-    if (url.charAt(0) !== '/') return;
-    $('#bolsa-link').href = url;
-    var faixa = b.band ? String(b.band).charAt(0).toUpperCase() + String(b.band).slice(1) : '';
-    $('#bolsa-verdict').innerHTML = '<b>' + esc(faixa) + '.</b> ' + esc(b.percentile) + '% dos meses desde ' + esc(b.since) + ' tiveram valor igual ou menor.';
-    $('#bolsa-legend').innerHTML = '<span><i style="background:rgba(184,146,62,.32)"></i>Faixa histórica, de ' + NF1.format(b.p25) + '% a ' + NF1.format(b.p75) + '%</span><span><i style="background:repeating-linear-gradient(90deg,#737068 0 3px,transparent 3px 7px);height:2px"></i>Média de ' + NF1.format(b.mean) + '%</span>';
-    $('#bolsa-v').setAttribute('value', String(b.value));
-    $('#nav-bolsa').hidden = false;
-    bolsa.hidden = false;
-    spy();
-    B = {
-      b: b, scene: $('#bolsa-scene'), chart: $('#bolsa-chart'), final: $('#bolsa-final'),
-      v: $('#bolsa-v'), when: $('#bolsa-when'), k: -1, fin: -1,
-      finalV: NF2.format(b.value), finalWhen: 'Indicador de Buffett no fechamento de ' + b.dateBR
-    };
-    B.g = drawBuffett($('#bolsa-svg'), b);
-    tapeParts.macro = '<a href="' + esc(url) + '" data-track="lp-buffett-tape"><b>Indicador de Buffett</b>' + B.finalV + '% do PIB<span class="fv">' + esc(b.band) + '</span></a>';
-    renderTape();
-    if (RM) { bolsaAt(1, 1); return; }
-    if (pinOn()) { bolsaFrame(); req(); return; }
-    bolsaAt(0, 1);
-    onView(B.chart, function(){ if (!pinOn()) tween(0, 1, 2600, function(k){ bolsaAt(k, 1); }); }, 0.45);
-  }).catch(function(){});
 
   /* ---------- Manifesto: as palavras acendem com o scroll ---------- */
   var man = $('#manifesto'), manScene = $('#manifesto-scene'), words = [], manS = -1;
@@ -2040,6 +2009,27 @@ document.addEventListener('DOMContentLoaded',function(){var f=new URLSearchParam
     $$('[data-rise]').forEach(function(el){ onView(el, function(){ el.classList.add('risen'); }, 0.12); });
   }
 
+  /* ---------- Todas as ferramentas: o bundle dos widgets só desce quando a seção se aproxima ---------- */
+  var ferr = $('#ferramentas'), ferrBtn = $('#ferr-pause');
+  var bento = $('#bento');
+  if (bento) onView(bento, function(){ bento.classList.add('in'); setTimeout(function(){ bento.classList.add('in-done'); }, 900); }, 0.12);
+  if (ferr) {
+    var ferrLoad = function(){
+      if (ferr._on) return; ferr._on = true;
+      var s = document.createElement('script'); s.src = ferr.getAttribute('data-bundle'); s.async = true;
+      document.body.appendChild(s);
+    };
+    document.addEventListener('iaferr:ready', function(){
+      if (ferrBtn && FX && !(window.IAFerr && IAFerr.reduced && IAFerr.reduced())) ferrBtn.hidden = false;
+    });
+    if (IO) {
+      var fio = new IntersectionObserver(function(es){
+        for (var i = 0; i < es.length; i++) if (es[i].isIntersecting) { fio.disconnect(); ferrLoad(); return; }
+      }, { rootMargin: '1200px 0px' });
+      fio.observe(ferr);
+    } else ferrLoad();
+  }
+
   /* ---------- Motor do scroll ---------- */
   var ticking = false, wasStory = storyOn(), wasPin = pinOn();
   function frame(){
@@ -2048,7 +2038,6 @@ document.addEventListener('DOMContentLoaded',function(){var f=new URLSearchParam
     if (hero) heroFrame();
     if (story && storyOn()) storyFrame();
     if (pinOn()) {
-      if (B && !bolsa.hidden) bolsaFrame();
       if (manScene && words.length) manAt((progressOf(manScene) - 0.06) / 0.7);
     }
   }
@@ -2056,7 +2045,7 @@ document.addEventListener('DOMContentLoaded',function(){var f=new URLSearchParam
   function modeCheck(){
     var s = storyOn(), p = pinOn();
     if (wasStory && !s) storyFinal();
-    if (wasPin && !p) { if (B) bolsaAt(1, 1); manAt(1); }
+    if (wasPin && !p) { manAt(1); }
     wasStory = s; wasPin = p;
   }
   if (FX) {

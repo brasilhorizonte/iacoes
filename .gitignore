@@ -19,11 +19,15 @@ node_modules/
 seo-audit-*.html
 scripts/ticker/.build/
 scripts/macro/.build/
+scripts/ferramentas/.build/
 
-# Prévia local das páginas macro (npm run preview:macro)
+# Prévia local (npm run preview:macro, npm run preview:ferramentas)
 preview/
 
 # Documentos internos (specs, relatórios do GSC, sessões) — o repositório é público
 _bmad-output/specs/
 _bmad-output/party-mode/
 _bmad-output/gsc/
+
+# Nota qualitativa é conteúdo da plataforma (exige login): nunca publicar
+scripts/qualitative-cache.json
