@@ -1,0 +1,17 @@
+# Na Vercel só vai o site estático. Código, documentos internos e configuração do repositório
+# (que é privado) não são publicados.
+.claude
+.github
+_bmad
+_bmad-output
+scripts
+preview
+node_modules
+*.md
+package.json
+package-lock.json
+tsconfig.json
+.nojekyll
+CNAME
+.gitignore
+.env
