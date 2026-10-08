@@ -402,6 +402,7 @@
         .fx .bento .tool:nth-child(8) { transition-delay: .35s; } .fx .bento .tool:nth-child(9) { transition-delay: .4s; }
         .fx .bento.in-done .tool { transition: none; }
         .porque.comp { padding-top: 0; }
+        .compare-note { margin-top: .85rem; font-size: .82rem; line-height: 1.5; color: var(--tinta-3); max-width: 60rem; }
         .ferr-all { display: inline-block; margin-top: 1.75rem; color: #fff; font-weight: 700; text-decoration: underline; text-decoration-color: rgba(201, 164, 78, .6); text-underline-offset: 4px; }
         .ferr-all:hover { text-decoration-color: var(--ouro-claro); }
         @media (max-width: 999px) {
@@ -1283,17 +1284,17 @@
                     <thead><tr><th scope="col">Recursos</th><th scope="col">Free</th><th scope="col">IAções</th><th scope="col" class="hl">Fundamentalista</th></tr></thead>
                     <tbody>
                         <tr><td>Dashboard diário</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
-                        <tr><td>Score</td><td class="no">✗</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
-                        <tr><td>Valuation (Graham, Bazin, Gordon, DCF)</td><td class="partial">1/dia</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
+                        <tr><td>Score</td><td class="partial">Parcial</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
+                        <tr><td>Valuation (Graham, Bazin, Gordon, DCF)</td><td class="partial">Parcial</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
                         <tr><td>Validador de Teses</td><td class="partial">1/dia</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
                         <tr><td>Análise Qualitativa</td><td class="partial">1/dia</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
-                        <tr><td>AIrton (chat IA)</td><td class="no">✗</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
-                        <tr><td>Minhas Teses (preço-alvo + critérios)</td><td class="no">✗</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
-                        <tr><td>Rankings de Screenings</td><td class="no">✗</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
+                        <tr><td>AIrton (chat IA)</td><td class="partial">Limitado</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
+                        <tr><td>Minhas Teses (preço-alvo + critérios)</td><td class="partial">Até 3</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
+                        <tr><td>Rankings de Screenings</td><td class="partial">Parcial</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
                         <tr><td>Radar de Oportunidades</td><td class="no">✗</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
-                        <tr><td>Gestão de Carteiras</td><td class="partial">1/dia</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
-                        <tr><td>Otimização de portfólio (Markowitz)</td><td class="partial">1/dia</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
-                        <tr><td>Painel Macro (SELIC, IPCA, DI, Focus)</td><td class="no">✗</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
+                        <tr><td>Gestão de Carteiras</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
+                        <tr><td>Otimização de portfólio (Markowitz)</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
+                        <tr><td>Painel Macro (SELIC, IPCA, DI, Focus)</td><td class="partial">Parcial</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
                         <tr><td>Alertas proativos (CVM, dividendos, preço justo)</td><td class="no">✗</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
                         <tr><td>Notificações no WhatsApp (e Telegram)</td><td class="no">✗</td><td class="yes">✓</td><td class="yes hl">✓</td></tr>
                         <tr><td>Relatórios exclusivos</td><td class="no">✗</td><td class="no">—</td><td class="yes hl">✓</td></tr>
@@ -1302,6 +1303,7 @@
                     </tbody>
                 </table>
             </div>
+            <p class="compare-note">Na conta grátis: as calculadoras de Graham, Bazin e Gordon não têm limite; a análise de IA é 1 por dia, compartilhada entre DCF, Validador de Teses e Análise Qualitativa; o AIrton tem um limite diário de mensagens; Minhas Teses guarda até 3 teses, sem alertas; a nota qualitativa de cada empresa aparece na página da ação; o Painel Macro e os Rankings abrem em parte; na Gestão de Carteiras, o backtest usa a análise do dia; no Otimizador, a conta é livre e a leitura da IA usa a análise do dia.</p>
         </details>
     </div>
 </section>
