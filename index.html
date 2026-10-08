@@ -426,7 +426,16 @@
         html:not(.js) .tool-w { display: none; }
         .t-markowitz { grid-column: span 2; grid-row: span 2; }
         .t-markowitz .tool-w { min-height: 460px; }
-        .t-dcf { grid-column: span 2; }
+        .t-dcf, .t-buffett, .t-radar, .t-backtest { grid-column: span 2; }
+        /* entrada única quando a grade chega na tela (nada amarrado à rolagem: o quadro nunca fica apagado enquanto se lê) */
+        .fx .bento:not(.in) .tool { opacity: 0; transform: translateY(18px); }
+        .fx .bento .tool { transition: opacity .45s var(--ease), transform .55s var(--ease); }
+        .fx .bento .tool:nth-child(2) { transition-delay: .05s; } .fx .bento .tool:nth-child(3) { transition-delay: .1s; }
+        .fx .bento .tool:nth-child(4) { transition-delay: .15s; } .fx .bento .tool:nth-child(5) { transition-delay: .2s; }
+        .fx .bento .tool:nth-child(6) { transition-delay: .25s; } .fx .bento .tool:nth-child(7) { transition-delay: .3s; }
+        .fx .bento .tool:nth-child(8) { transition-delay: .35s; } .fx .bento .tool:nth-child(9) { transition-delay: .4s; }
+        .fx .bento.in-done .tool { transition: none; }
+        .porque.comp { padding-top: 0; }
         .ferr-all { display: inline-block; margin-top: 1.75rem; color: #fff; font-weight: 700; text-decoration: underline; text-decoration-color: rgba(201, 164, 78, .6); text-underline-offset: 4px; }
         .ferr-all:hover { text-decoration-color: var(--ouro-claro); }
         @media (max-width: 999px) {
@@ -436,7 +445,7 @@
         }
         @media (max-width: 599px) {
             .bento { grid-template-columns: minmax(0, 1fr); }
-            .t-markowitz, .t-dcf { grid-column: auto; }
+            .t-markowitz, .t-dcf, .t-buffett, .t-radar, .t-backtest { grid-column: auto; }
             .t-markowitz .tool-w { min-height: 360px; }
         }
 
@@ -1176,60 +1185,6 @@
 
 </section>
 
-<section class="ferr sec" id="ferramentas" aria-labelledby="ferr-title" data-bundle="/assets/js/ferramentas.js?v=fd3cef4e42">
-    <div class="wrap">
-        <div class="ferr-head">
-            <div class="sec-h">
-                <h2 id="ferr-title">Todas as ferramentas, ao mesmo tempo</h2>
-                <p>Cada quadro é uma ferramenta da plataforma funcionando. Passe o mouse ou toque para explorar.</p>
-            </div>
-            <button class="ferr-pause" id="ferr-pause" type="button" data-ia-pause="#ferramentas" aria-pressed="false" hidden><svg class="pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><svg class="play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5v14l12-7z"/></svg><span data-ia-pause-label>Pausar animações</span></button>
-        </div>
-        <div class="bento">
-            <article class="tool t-markowitz" data-rise>
-                <h3><a href="/ferramentas/markowitz/" onclick="_iaTrack('cta_click','lp-tool-markowitz')">Otimizador de carteira (Markowitz)</a></h3>
-                <p>A fronteira eficiente e a carteira de maior índice de Sharpe, a partir das suas premissas de retorno.</p>
-                <div class="tool-w" data-ia-widget="markowitz" data-size="tile" data-span="2x2" data-ia-tool="markowitz"></div>
-            </article>
-            <article class="tool t-dcf" data-rise="2">
-                <h3><a href="/ferramentas/fluxo-de-caixa-descontado/" onclick="_iaTrack('cta_click','lp-tool-dcf')">Valuation por fluxo de caixa descontado</a></h3>
-                <p>Como o preço justo reage ao custo de capital e ao crescimento na perpetuidade.</p>
-                <div class="tool-w" data-ia-widget="dcf" data-size="tile" data-span="2x1" data-ia-tool="dcf"></div>
-            </article>
-            <article class="tool" data-rise>
-                <h3><a href="/ferramentas/ranking-de-acoes/" onclick="_iaTrack('cta_click','lp-tool-ranking')">Ranking de ações</a></h3>
-                <p>Ações da B3 ordenadas por dividendos, P/L, P/VP e ROE, com o dado do último pregão.</p>
-                <div class="tool-w" data-ia-widget="ranking" data-size="tile" data-span="1x1" data-ia-tool="ranking"></div>
-            </article>
-            <article class="tool" data-rise="2">
-                <h3><a href="/ferramentas/fatos-relevantes/" onclick="_iaTrack('cta_click','lp-tool-fatos')">Fatos relevantes</a></h3>
-                <p>Os documentos mais recentes entregues à CVM, com resumo da IA.</p>
-                <div class="tool-w" data-ia-widget="fatos" data-size="tile" data-span="1x1" data-ia-tool="fatos"></div>
-            </article>
-            <article class="tool" data-rise>
-                <h3><a href="/ferramentas/nota-qualitativa/" onclick="_iaTrack('cta_click','lp-tool-nota')">Nota qualitativa</a></h3>
-                <p>Seis pilares do negócio avaliados numa escala de 1 a 4.</p>
-                <div class="tool-w" data-ia-widget="nota" data-size="tile" data-span="1x1" data-ia-tool="nota"></div>
-            </article>
-            <article class="tool" data-rise="2">
-                <h3><a href="/ferramentas/tese-de-investimento/" onclick="_iaTrack('cta_click','lp-tool-tese')">Tese de investimento</a></h3>
-                <p>Os critérios da sua tese conferidos uma vez por dia contra os números.</p>
-                <div class="tool-w" data-ia-widget="tese" data-size="tile" data-span="1x1" data-ia-tool="tese"></div>
-            </article>
-            <article class="tool" data-rise>
-                <h3><a href="/ferramentas/radar-de-oportunidades/" onclick="_iaTrack('cta_click','lp-tool-radar')">Radar de oportunidades</a></h3>
-                <p>Seis regras fixas separam as ações em listas para começar o estudo.</p>
-                <div class="tool-w" data-ia-widget="radar" data-size="tile" data-span="1x1" data-ia-tool="radar"></div>
-            </article>
-            <article class="tool" data-rise="2">
-                <h3><a href="/ferramentas/backtest-de-carteira/" onclick="_iaTrack('cta_click','lp-tool-backtest')">Backtest de carteira</a></h3>
-                <p>Quanto rendeu o Ibovespa contra o CDI em 1, 5, 10 e 15 anos.</p>
-                <div class="tool-w" data-ia-widget="backtest" data-size="tile" data-span="1x1" data-ia-tool="backtest"></div>
-            </article>
-        </div>
-        <a class="ferr-all" href="/ferramentas/" onclick="_iaTrack('cta_click','lp-ferramentas')">Ver todas as ferramentas</a>
-    </div>
-</section>
 
 <section class="bolsa sec" id="bolsa" aria-labelledby="bolsa-title" hidden>
     <div class="scene" id="bolsa-scene">
@@ -1263,6 +1218,69 @@
             </div>
         </div>
     </div>
+</section>
+
+<section class="ferr sec" id="ferramentas" aria-labelledby="ferr-title" data-bundle="/assets/js/ferramentas.js?v=b30d26b6f1">
+    <div class="wrap">
+        <div class="ferr-head">
+            <div class="sec-h">
+                <h2 id="ferr-title">Todas as ferramentas, ao mesmo tempo</h2>
+                <p>Cada quadro é uma ferramenta da plataforma funcionando. Passe o mouse ou toque para explorar.</p>
+            </div>
+            <button class="ferr-pause" id="ferr-pause" type="button" data-ia-pause="#ferramentas" aria-pressed="false" hidden><svg class="pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><svg class="play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5v14l12-7z"/></svg><span data-ia-pause-label>Pausar animações</span></button>
+        </div>
+        <div class="bento" id="bento">
+            <article class="tool t-markowitz">
+                <h3><a href="/ferramentas/markowitz/" onclick="_iaTrack('cta_click','lp-tool-markowitz')">Otimizador de carteira (Markowitz)</a></h3>
+                <p>A fronteira eficiente e a carteira de maior índice de Sharpe, a partir das suas premissas de retorno.</p>
+                <div class="tool-w" data-ia-widget="markowitz" data-size="tile" data-span="2x2" data-ia-tool="markowitz"></div>
+            </article>
+            <article class="tool t-dcf">
+                <h3><a href="/ferramentas/fluxo-de-caixa-descontado/" onclick="_iaTrack('cta_click','lp-tool-dcf')">Valuation por fluxo de caixa descontado</a></h3>
+                <p>Como o preço justo reage ao custo de capital e ao crescimento na perpetuidade.</p>
+                <div class="tool-w" data-ia-widget="dcf" data-size="tile" data-span="2x1" data-ia-tool="dcf"></div>
+            </article>
+            <article class="tool t-buffett">
+                <h3><a href="/macro/indicador-de-buffett/" onclick="_iaTrack('cta_click','lp-tool-buffett')">Indicador de Buffett do Brasil</a></h3>
+                <p>Calculado por nós: o valor de mercado das empresas da B3 dividido pelo PIB, mês a mês desde 2000.</p>
+                <div class="tool-w" data-ia-widget="buffett" data-size="tile" data-span="2x1"></div>
+            </article>
+            <article class="tool">
+                <h3><a href="/ferramentas/ranking-de-acoes/" onclick="_iaTrack('cta_click','lp-tool-ranking')">Ranking de ações</a></h3>
+                <p>Ações da B3 ordenadas por dividendos, P/L, P/VP e ROE, com o dado do último pregão.</p>
+                <div class="tool-w" data-ia-widget="ranking" data-size="tile" data-span="1x1" data-ia-tool="ranking"></div>
+            </article>
+            <article class="tool">
+                <h3><a href="/ferramentas/fatos-relevantes/" onclick="_iaTrack('cta_click','lp-tool-fatos')">Fatos relevantes</a></h3>
+                <p>Os documentos mais recentes entregues à CVM, com resumo da IA.</p>
+                <div class="tool-w" data-ia-widget="fatos" data-size="tile" data-span="1x1" data-ia-tool="fatos"></div>
+            </article>
+            <article class="tool">
+                <h3><a href="/ferramentas/nota-qualitativa/" onclick="_iaTrack('cta_click','lp-tool-nota')">Nota qualitativa</a></h3>
+                <p>Seis pilares do negócio avaliados numa escala de 1 a 4.</p>
+                <div class="tool-w" data-ia-widget="nota" data-size="tile" data-span="1x1" data-ia-tool="nota"></div>
+            </article>
+            <article class="tool">
+                <h3><a href="/ferramentas/tese-de-investimento/" onclick="_iaTrack('cta_click','lp-tool-tese')">Tese de investimento</a></h3>
+                <p>Os critérios da sua tese conferidos uma vez por dia contra os números.</p>
+                <div class="tool-w" data-ia-widget="tese" data-size="tile" data-span="1x1" data-ia-tool="tese"></div>
+            </article>
+            <article class="tool t-radar">
+                <h3><a href="/ferramentas/radar-de-oportunidades/" onclick="_iaTrack('cta_click','lp-tool-radar')">Radar de oportunidades</a></h3>
+                <p>Seis regras fixas separam as ações em listas para começar o estudo.</p>
+                <div class="tool-w" data-ia-widget="radar" data-size="tile" data-span="2x1" data-ia-tool="radar"></div>
+            </article>
+            <article class="tool t-backtest">
+                <h3><a href="/ferramentas/backtest-de-carteira/" onclick="_iaTrack('cta_click','lp-tool-backtest')">Backtest de carteira</a></h3>
+                <p>Quanto rendeu o Ibovespa contra o CDI em 1, 5, 10 e 15 anos.</p>
+                <div class="tool-w" data-ia-widget="backtest" data-size="tile" data-span="2x1" data-ia-tool="backtest"></div>
+            </article>
+        </div>
+        <a class="ferr-all" href="/ferramentas/" onclick="_iaTrack('cta_click','lp-ferramentas')">Ver todas as ferramentas</a>
+    </div>
+</section>
+
+<section class="porque comp sec" aria-label="IAções comparado a corretoras e casas de research">
     <div class="wrap">
         <div class="tbl-wrap" data-rise>
             <table class="tbl">
@@ -2156,6 +2174,8 @@ document.addEventListener('DOMContentLoaded',function(){var f=new URLSearchParam
 
   /* ---------- Todas as ferramentas: o bundle dos widgets só desce quando a seção se aproxima ---------- */
   var ferr = $('#ferramentas'), ferrBtn = $('#ferr-pause');
+  var bento = $('#bento');
+  if (bento) onView(bento, function(){ bento.classList.add('in'); setTimeout(function(){ bento.classList.add('in-done'); }, 900); }, 0.12);
   if (ferr) {
     var ferrLoad = function(){
       if (ferr._on) return; ferr._on = true;

@@ -780,8 +780,10 @@ dentro do `npm run generate` (depois dos tickers e do macro):
 
 ## Landing: secao "Todas as ferramentas" (`#ferramentas`)
 
-Bento escuro logo depois da historia da plataforma: Markowitz 2x2, DCF 2x1, Ranking, Fatos, Nota, Tese, Radar,
-Backtest, cada quadro com o widget `data-size="tile"` e o titulo linkando a pagina (`lp-tool-<id>`). O bundle
+Bento escuro logo depois do manifesto ("Nao vendemos ativos..."), antes da tabela comparativa: Markowitz 2x2,
+DCF 2x1, Indicador de Buffett 2x1 (widget buffett, le /macro/indicador-de-buffett/dados.json e linka a pagina macro),
+Ranking, Fatos, Nota, Tese, Radar 2x1, Backtest 2x1. Entrada unica em sequencia quando a grade chega na tela
+(classe .in via IntersectionObserver; nada amarrado a rolagem). Cada quadro com o widget `data-size="tile"` e o titulo linkando a pagina (`lp-tool-<id>`). O bundle
 desce sob demanda (`data-bundle` na secao, IntersectionObserver a 1200 px). Botao "Pausar animacoes"
 (`data-ia-pause`, WCAG 2.2.2). Ao tirar uma ferramenta do ar, tirar o quadro da landing (o validate-html reprova
 link para pagina inexistente). O mock do WhatsApp (passo 3 da historia) le os 2 documentos mais recentes de
