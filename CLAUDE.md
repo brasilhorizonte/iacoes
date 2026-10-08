@@ -754,7 +754,7 @@ Geradas por `scripts/macro/` (React + mesmos componentes/tokens das paginas de t
 
 ## Ferramentas (`/ferramentas/`, out/2026)
 
-Hub `/ferramentas/` + 9 paginas `/ferramentas/<slug>/`, geradas por `generateFerramentas()` (`scripts/ferramentas/`)
+Hub `/ferramentas/` + 10 paginas `/ferramentas/<slug>/`, geradas por `generateFerramentas()` (`scripts/ferramentas/`)
 dentro do `npm run generate` (depois dos tickers e do macro):
 
 | id | slug | dado | JSON-LD |
@@ -764,6 +764,7 @@ dentro do `npm run generate` (depois dos tickers e do macro):
 | fatos | fatos-relevantes | real: FR/CM com resumo da CVM, `dados.json` | CollectionPage + ItemList |
 | ranking | ranking-de-acoes | real: DY/P-L/P-VP/ROE com cortes, `dados.json` | CollectionPage + ItemList |
 | radar | radar-de-oportunidades | ilustrativo | WebPage |
+| macro | painel-macro | valores FICTICIOS com aviso (decisao do dono); CTA leva aos reais no Painel Macro | WebPage |
 | nota | nota-qualitativa | checklist do proprio usuario | WebPage |
 | tese | tese-de-investimento | ilustrativo | WebPage |
 | calc | calculadora-preco-justo | real: `valuations.json` | WebPage + WebApplication (unica com `offers`) |
@@ -786,7 +787,7 @@ Ranking, Fatos, Nota, Tese, Radar 2x1, Backtest 2x1. Entrada unica em sequencia 
 (classe .in via IntersectionObserver; nada amarrado a rolagem). Cada quadro com o widget `data-size="tile"` e o titulo linkando a pagina (`lp-tool-<id>`). O bundle
 desce sob demanda (`data-bundle` na secao, IntersectionObserver a 1200 px). Botao "Pausar animacoes"
 (`data-ia-pause`, WCAG 2.2.2). Ao tirar uma ferramenta do ar, tirar o quadro da landing (o validate-html reprova
-link para pagina inexistente). O mock do WhatsApp (passo 3 da historia) le os 2 documentos mais recentes de
+link para pagina inexistente). No hub, o cartao "Indicador de Buffett do Brasil" (pagina macro) e separado da ferramenta Painel Macro. Menu da landing: "Ferramentas" rola ate #ferramentas; o rodape leva ao hub. O mock do WhatsApp (passo 3 da historia) le os 2 documentos mais recentes de
 `/ferramentas/fatos-relevantes/dados.json`; o balao do "resumo da manha" segue ilustrativo ("Acao C").
 
 ## Landing Page (index.html)
@@ -801,21 +802,18 @@ bios), a calculadora no topo e scroll dinamico. Ordem das secoes:
      **nao recalcula na landing**: aparece "Recalcular na plataforma" (`lp-calc-recalcular`), que abre
      `/ativo/T?tab=valuation` no app e leva as premissas na URL com os nomes e fracoes dos campos do app
      (`marginOfSafety`, `minDividendYield`, `discountRate`, `dividendGrowth`) — o app ainda nao le.
-   - "Salvar e criar alerta no WhatsApp" (`lp-calc-alerta`) abre `/ativo/T?tab=tese`.
+   - "Receber os fatos relevantes desta acao" (`lp-calc-alerta`) abre `/ativo/T?tab=tese` (o preco justo das calculadoras nao gera alerta).
    - `#calculadora` e uma ancora vazia no topo do `<main>`: o hero e sticky e nao pode ser alvo de ancora.
 2. **Faixa de cotacoes** — preco x preco justo de ~25 tickers (dados reais do `valuations.json`), com
-   botao de pausa. Quando a pagina do Buffett existe, o primeiro item e o indicador do dia.
-3. **Plataforma** (`#plataforma`) — 3 passos: DCF com a IA questionando a premissa, AIrton (3 modos de
-   resposta) e alertas no WhatsApp. No desktop a tela fica fixa e o scroll conduz os passos (o AIrton
-   digita conforme o scroll); no celular os passos empilham e animam ao aparecer. Chips "Tambem na
-   plataforma" no fim.
-4. **A bolsa esta cara hoje?** (`#bolsa`; o link "Bolsa hoje" aponta para a ancora `#bolsa-hoje`, perto do
-   fim da cena) — **so aparece quando `/macro/indicador-de-buffett/dados.json` existe** (gerado pela pagina
-   do Buffett com a trava ligada). Antes disso fica `hidden`, sem nenhum link para a pagina. O scroll e a
-   linha do tempo de 2000 ate hoje: a linha se desenha, o numero acompanha mes a mes e os marcos (minima,
-   maxima, crise de 2008, pandemia) acendem quando a linha passa.
-5. **Ferramenta de analise, nao corretora** (`#comparativo`) — manifesto que acende palavra por palavra +
-   tabela vs corretoras e casas de research.
+   botao de pausa.
+3. **Plataforma** (`#plataforma`) — 3 passos: DCF ("a IA propoe as premissas, voce decide", mock com selo),
+   AIrton (modo Atento por padrao, "Acao A", sem numeros) e alertas no WhatsApp (dos planos pagos; os 2 baloes
+   da CVM leem os documentos reais de /ferramentas/fatos-relevantes/dados.json). No desktop a tela fica fixa e o scroll conduz os passos (o AIrton
+   digita conforme o scroll); no celular os passos empilham e animam ao aparecer.
+4. **Ferramenta de analise, nao corretora** (`#comparativo`) — manifesto que acende palavra por palavra.
+5. **Todas as ferramentas** (`#ferramentas`, ver secao propria acima), depois a tabela vs corretoras e casas de
+   research. A antiga secao "A bolsa esta cara hoje?" saiu em 07/10/2026: o Indicador de Buffett ficava em
+   dois lugares; agora e so o quadro do bento, que leva a /macro/indicador-de-buffett/.
 6. **Planos** (`#precos`) — IAcoes (destaque) e Fundamentalista; a tabela completa Free x IAcoes x
    Fundamentalista fica num `<details>`.
 7. **Quem somos** (`#sobre`), **FAQ** (`#faq`, `<details>`), **chamada final** (`#acesso`) e **analises

@@ -451,9 +451,12 @@ test('landing: a calculadora do topo leva alerta e "Recalcular" à aba certa do 
   assert.equal(viajar(p, { ...recalcTag, href: semTicker.href }).email.nome, 'ativo/PETR4/valuation');
 });
 
-test('landing: "Ferramentas" (/ferramentas/) na nav e no rodapé', () => {
-  // Aceita classe/atributos a mais (o redesenho da landing pode acrescentar), mas exige destino, texto e item visível.
-  const link = /<li\b(?![^>]*\bhidden\b)[^>]*>\s*<a\b[^>]*\bhref="\/ferramentas\/"[^>]*>\s*Ferramentas\s*<\/a>\s*<\/li>/;
-  assert.match(trecho(LANDING, '<ul class="nav-links"', '</ul>'), link);
-  assert.match(trecho(LANDING, '<ul class="footer-links">', '</ul>'), link);
+test('landing: "Ferramentas" rola até #ferramentas na nav e leva ao hub /ferramentas/ no rodapé', () => {
+  // Aceita classe/atributos a mais, mas exige destino, texto e item visível. Decisão do dono (07/10): na nav,
+  // o item rola até a seção como os outros; o rodapé mantém o link interno para o hub.
+  const nav = /<li\b(?![^>]*\bhidden\b)[^>]*>\s*<a\b[^>]*\bhref="#ferramentas"[^>]*>\s*Ferramentas\s*<\/a>\s*<\/li>/;
+  const rodape = /<li\b(?![^>]*\bhidden\b)[^>]*>\s*<a\b[^>]*\bhref="\/ferramentas\/"[^>]*>\s*Ferramentas\s*<\/a>\s*<\/li>/;
+  assert.match(trecho(LANDING, '<ul class="nav-links"', '</ul>'), nav);
+  assert.match(trecho(LANDING, '<ul class="footer-links">', '</ul>'), rodape);
+  assert.match(LANDING, /<section[^>]*id="ferramentas"/);
 });

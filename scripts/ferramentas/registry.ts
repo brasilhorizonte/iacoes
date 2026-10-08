@@ -13,9 +13,10 @@ import { nota } from './content/nota';
 import { tese } from './content/tese';
 import { calc } from './content/calc';
 import { dcf } from './content/dcf';
+import { macro } from './content/macro';
 
-/** As 9 ferramentas, na ordem da tabela do SPEC §3 (é a ordem do hub). */
-export const TOOLS: readonly ToolContent[] = [markowitz, backtest, fatos, ranking, radar, nota, tese, calc, dcf];
+/** As 10 ferramentas, na ordem da tabela do SPEC §3 (é a ordem do hub). */
+export const TOOLS: readonly ToolContent[] = [markowitz, backtest, fatos, ranking, radar, macro, nota, tese, calc, dcf];
 
 export const HUB_PATH = '/ferramentas/';
 export const HUB_URL = `${SITE}${HUB_PATH}`;
@@ -45,10 +46,10 @@ export const DATA_JSON = {
 /** Páginas do site (fora de /ferramentas/) que o hub e "Outras ferramentas" linkam. */
 export const SITE_CARDS = [
   {
-    id: 'macro',
+    id: 'buffett',
     href: '/macro/indicador-de-buffett/',
-    title: 'Painel macro',
-    text: 'Indicador de Buffett do Brasil, atualizado todo dia útil. Na plataforma, o Painel Macro reúne juros, inflação, câmbio e as expectativas do Focus.',
+    title: 'Indicador de Buffett do Brasil',
+    text: 'Calculado por nós: o valor de mercado das empresas da B3 dividido pelo PIB, com a série desde 2000 e o número de cada dia útil.',
     /** Só existe com a página macro publicada (trava MACRO_BUFFETT_ENABLED). */
     needsMacro: true,
   },

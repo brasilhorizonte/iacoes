@@ -205,14 +205,15 @@ const SPEC: Record<ToolId, { slug: string; next: string[] }> = {
   tese: { slug: 'tese-de-investimento', next: ['/?s=ianalista&t=teses&_=', '/?s=ianalista&t=validador&_='] },
   calc: { slug: 'calculadora-preco-justo', next: ['/ativo/PETR4?tab=valuation&_='] },
   dcf: { slug: 'fluxo-de-caixa-descontado', next: ['/?s=ianalista&t=valuai&_='] },
+  macro: { slug: 'painel-macro', next: ['/?s=ialocador&t=macro&_='] },
 };
 
 // ─── Registro e modelo ────────────────────────────────────────────────────
 
-test('registro: as 9 ferramentas do SPEC, na ordem, com slug e id únicos', () => {
-  assert.deepEqual(TOOLS.map((t) => t.id), ['markowitz', 'backtest', 'fatos', 'ranking', 'radar', 'nota', 'tese', 'calc', 'dcf']);
+test('registro: as 10 ferramentas do SPEC, na ordem, com slug e id únicos', () => {
+  assert.deepEqual(TOOLS.map((t) => t.id), ['markowitz', 'backtest', 'fatos', 'ranking', 'radar', 'macro', 'nota', 'tese', 'calc', 'dcf']);
   for (const t of TOOLS) assert.equal(t.slug, SPEC[t.id].slug, t.id);
-  assert.equal(new Set(TOOLS.map((t) => t.slug)).size, 9);
+  assert.equal(new Set(TOOLS.map((t) => t.slug)).size, 10);
   for (const t of TOOLS) assert.deepEqual(structureProblems(t), [], t.id);
   for (const t of TOOLS) assert.deepEqual(unknownSections(t), [], `${t.id}: seção SSR não registrada`);
   assert.equal(toolUrl(toolById('radar')), 'https://iacoes.com.br/ferramentas/radar-de-oportunidades/');
@@ -583,7 +584,7 @@ test('hub: CollectionPage + BreadcrumbList, só ferramentas publicadas e as pág
   // Card do Painel macro: só com a página do Buffett publicada.
   assert.ok(!hub.includes('href="/macro/indicador-de-buffett/"'));
   const withMacro = renderHub(buildHubModel(env({ macroPage: true })));
-  assert.match(withMacro, /href="\/macro\/indicador-de-buffett\/"[^>]*>[\s\S]*?Painel macro/);
+  assert.match(withMacro, /href="\/macro\/indicador-de-buffett\/"[^>]*>[\s\S]*?Indicador de Buffett do Brasil/);
   assert.match(withMacro, /Atualizado em <time/i);
 });
 
@@ -1591,7 +1592,7 @@ test('generateFerramentas: card do Painel macro no hub quando a página do Buffe
     writeFileSync(join(dir, 'macro', 'indicador-de-buffett', 'index.html'), '<!DOCTYPE html><html><head><meta name="robots" content="index, follow"></head></html>');
     await run();
     const hub = readFileSync(join(dir, 'ferramentas', 'index.html'), 'utf-8');
-    assert.match(hub, /href="\/macro\/indicador-de-buffett\/"[^>]*>[\s\S]*?Painel macro/);
+    assert.match(hub, /href="\/macro\/indicador-de-buffett\/"[^>]*>[\s\S]*?Indicador de Buffett do Brasil/);
     assert.ok(ldOf(hub, 'CollectionPage').mainEntity.itemListElement.some((it: any) => it.url === 'https://iacoes.com.br/macro/indicador-de-buffett/'));
   } finally {
     rmSync(dir, { recursive: true, force: true });

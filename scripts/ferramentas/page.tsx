@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {
   ArrowRight, Bot, Building2, Calculator, ChartLine, ChartNoAxesCombined, ChartScatter, ClipboardCheck, FileText, Gauge,
-  Info, Lightbulb, ListOrdered, Radar, TriangleAlert,
+  Info, Lightbulb, ListOrdered, Radar, TriangleAlert, Landmark,
 } from 'lucide-react';
 import { Container } from '../ticker/components/chrome';
 import { ButtonLink } from '../ticker/components/ui/button';
@@ -26,6 +26,7 @@ const TOOL_ICONS: Record<ToolId, React.ComponentType<{ className?: string; 'aria
   tese: Lightbulb,
   calc: Calculator,
   dcf: ChartNoAxesCombined,
+  macro: Landmark,
 };
 const SITE_ICONS: Record<string, React.ComponentType<{ className?: string; 'aria-hidden'?: boolean | 'true' }>> = {
   '/macro/indicador-de-buffett/': Gauge,

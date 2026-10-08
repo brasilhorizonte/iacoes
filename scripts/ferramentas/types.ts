@@ -7,7 +7,7 @@
  */
 import type { AppTarget } from './links';
 
-export type ToolId = 'markowitz' | 'backtest' | 'fatos' | 'ranking' | 'radar' | 'nota' | 'tese' | 'calc' | 'dcf';
+export type ToolId = 'markowitz' | 'backtest' | 'fatos' | 'ranking' | 'radar' | 'nota' | 'tese' | 'calc' | 'dcf' | 'macro';
 
 /**
  * `pronto` vai para o ar (página, hub, sitemap, llms.txt). `rascunho` só existe na prévia
