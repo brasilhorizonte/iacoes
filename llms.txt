@@ -15,7 +15,7 @@
 - [Valuation por DCF](https://iacoes.com.br/ferramentas/fluxo-de-caixa-descontado/): DCF de 10 anos com WACC decomposto e sensibilidade WACC × g; a IA propõe as premissas e você decide.
 
 ## Indicadores macro
-- [Indicador de Buffett Brasil](https://iacoes.com.br/macro/indicador-de-buffett/): valor de mercado das empresas listadas na B3 ÷ PIB de 12 meses. Hoje: 43,30% (fechamento oficial de 06/10/2026); média desde 2000: 47,7%; faixa histórica (p25–p75): 38,1% a 55,4%. Série mensal em CSV (CC BY 4.0): https://iacoes.com.br/macro/indicador-de-buffett/indicador-buffett-brasil.csv
+- [Indicador de Buffett Brasil](https://iacoes.com.br/macro/indicador-de-buffett/): valor de mercado das empresas listadas na B3 ÷ PIB de 12 meses. Hoje: 43,06% (fechamento oficial de 07/10/2026); média desde 2000: 47,7%; faixa histórica (p25–p75): 38,1% a 55,4%. Série mensal em CSV (CC BY 4.0): https://iacoes.com.br/macro/indicador-de-buffett/indicador-buffett-brasil.csv
 
 ## Ações
 - [Ações da B3](https://iacoes.com.br/acoes/): preço justo por Graham, Bazin e Gordon e indicadores fundamentalistas de cada ação, atualizados todo dia útil.
