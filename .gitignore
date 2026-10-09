@@ -15,6 +15,9 @@ node_modules/
 .env
 .env.local
 
+# Vercel CLI (vercel link)
+.vercel
+
 # SEO audit reports (local only)
 seo-audit-*.html
 scripts/ticker/.build/
@@ -31,3 +34,4 @@ _bmad-output/gsc/
 
 # Nota qualitativa é conteúdo da plataforma (exige login): nunca publicar
 scripts/qualitative-cache.json
+.env*

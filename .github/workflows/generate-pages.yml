@@ -35,10 +35,13 @@ jobs:
           MACRO_BUFFETT_ENABLED: ${{ vars.MACRO_BUFFETT_ENABLED }}
         run: npm run generate
 
+      # O commit sai em nome da conta brasilhorizonte (dona do projeto na Vercel): com o repo
+      # privado, a Vercel só faz deploy de commits de membros do time — commit do
+      # github-actions[bot] pode ser bloqueado e a regeneração diária não iria ao ar.
       - name: Commit e push se houver mudanças
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "brasilhorizonte"
+          git config user.email "247286779+brasilhorizonte@users.noreply.github.com"
           git add -A
           if git diff --staged --quiet; then
             echo "Sem mudanças para commitar"
