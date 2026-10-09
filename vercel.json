@@ -2,7 +2,8 @@
   "framework": null,
   "installCommand": "echo sem-instalacao",
   "buildCommand": "echo sem-build",
-  "cleanUrls": true,
+  "outputDirectory": ".",
+  "cleanUrls": false,
   "trailingSlash": true,
   "headers": [
     {
