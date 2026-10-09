@@ -3,7 +3,7 @@
   "installCommand": "echo sem-instalacao",
   "buildCommand": "echo sem-build",
   "outputDirectory": ".",
-  "cleanUrls": true,
+  "cleanUrls": false,
   "trailingSlash": true,
   "headers": [
     {
