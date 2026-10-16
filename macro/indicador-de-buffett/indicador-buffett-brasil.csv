@@ -308,16 +308,16 @@ data,indicador_buffett_pct,valor_mercado_b3_rs_milhoes,pib_12m_rs_milhoes,proced
 2025-07-31,33.78,4182114.73,12381096.4,estimado,Interpolado pelo Ibovespa entre âncoras anuais
 2025-08-29,35.33,4396347.27,12443552.8,estimado,Interpolado pelo Ibovespa entre âncoras anuais
 2025-09-30,35.90,4496708.95,12524498.7,estimado,Interpolado pelo Ibovespa entre âncoras anuais
-2025-10-31,36.13,4548386.68,12589120.0,estimado,Interpolado pelo Ibovespa entre âncoras anuais
-2025-11-28,37.82,4785818.65,12653979.4,estimado,Interpolado pelo Ibovespa entre âncoras anuais
+2025-10-31,36.13,4548386.68,12589163.8,estimado,Interpolado pelo Ibovespa entre âncoras anuais
+2025-11-28,37.82,4785818.65,12654032.2,estimado,Interpolado pelo Ibovespa entre âncoras anuais
 2025-12-30,37.64,4794992.36,12738565.6,oficial,Banco Mundial/WFE × PTAX de 31/dez
-2026-01-30,41.88,5364500.49,12808146.6,estimado,Interpolado pelo Ibovespa entre âncoras anuais
-2026-02-27,43.15,5550134.44,12863521.3,estimado,Interpolado pelo Ibovespa entre âncoras anuais
+2026-01-30,41.88,5364500.49,12808144.4,estimado,Interpolado pelo Ibovespa entre âncoras anuais
+2026-02-27,43.15,5550134.44,12863471.1,estimado,Interpolado pelo Ibovespa entre âncoras anuais
 2026-03-31,42.25,5477695.40,12964821.6,estimado,Interpolado pelo Ibovespa entre âncoras anuais
-2026-04-30,41.73,5440231.22,13037854.0,estimado,Interpolado pelo Ibovespa entre âncoras anuais
-2026-05-29,38.27,5016615.85,13106921.2,estimado,Interpolado pelo Ibovespa entre âncoras anuais
+2026-04-30,41.73,5440231.22,13038202.0,estimado,Interpolado pelo Ibovespa entre âncoras anuais
+2026-05-29,38.27,5016615.85,13107653.0,estimado,Interpolado pelo Ibovespa entre âncoras anuais
 2026-06-30,37.42,4935524.56,13190204.2,estimado,Interpolado pelo Ibovespa entre âncoras anuais
-2026-07-31,38.28,5075923.31,13258459.8,oficial,B3 (TOTAL GERAL)
-2026-08-31,37.51,5004655.12,13342452.6,oficial,B3 (TOTAL GERAL)
-2026-09-30,39.29,5242885.56,13342452.6,oficial,B3 (TOTAL GERAL)
-2026-10-07,43.06,5744826.62,13342452.6,oficial,B3 (TOTAL GERAL)
+2026-07-31,38.28,5075923.31,13261288.7,oficial,B3 (TOTAL GERAL)
+2026-08-31,37.51,5004655.12,13340676.3,oficial,B3 (TOTAL GERAL)
+2026-09-30,39.12,5242885.56,13402023.7,oficial,B3 (TOTAL GERAL)
+2026-10-14,43.50,5830425.45,13402023.7,oficial,B3 (TOTAL GERAL)
